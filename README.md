@@ -1,17 +1,37 @@
-CAGE WARRIOR
+# Cage Warrior
 
-Open index.html in a modern browser.
+A mobile-first, single-player fight-career game. Open `index.html` directly in
+a modern browser; no build step or server is required.
 
-The game HTML is self-contained and already embeds the artwork it needs.
-The assets folder contains separate source copies of the main visual assets.
+## Current release
 
-Release 1 adds tactical round choices, faster fight controls, daily contracts,
-win streaks, upset bonuses, offline recovery, and interrupted-fight refunds.
+Release 1 introduced tactical round choices, faster fight controls, daily
+contracts, win streaks, upset bonuses, offline recovery, and interrupted-fight
+refunds.
 
-Release 2 adds a persistent generated league, rematches, opponent scouting and
-tendencies, meaningful risky strategies, rivalries, retirement and replacement
-fighters, permanent fighter identities, belt milestones, four-slot gear
-loadouts with rarity, and a one-attempt daily seeded challenge.
+Release 2 adds:
 
-Existing browser saves migrate automatically. Fighter, rivalry, retirement,
-loadout, milestone, and daily-challenge progress is stored locally.
+- A persistent, locally generated league
+- Current-level fights and past-level rematches
+- Opponent tendencies, scouting, rivalries, retirement, and replacements
+- Meaningful favorable and risky tactical matchups
+- Permanent fighter identities and belt milestones
+- Four-slot fight-gear loadouts with item rarity
+- A deterministic, one-attempt daily challenge for each player level
+- Last-known-good save recovery and automatic migration of existing saves
+
+Progress is stored in the browser with `localStorage`. Existing fighter,
+rivalry, retirement, loadout, milestone, and daily-challenge progress migrates
+automatically. The highest authored championship is the World Title at level
+15, while generated progression can continue beyond level 15.
+
+## Development
+
+Run the repository checks with:
+
+```sh
+npm test
+```
+
+The game remains self-contained in `index.html`. PNG files under `assets/` are
+source copies of the visual artwork.

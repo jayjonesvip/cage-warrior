@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#030914" />
 <title>Cage Warrior — Fight Career</title>
 <style>
@@ -409,6 +409,9 @@
   const rand = (a,b) => Math.random()*(b-a)+a;
   const rint = (a,b) => Math.floor(rand(a,b+1));
   const fmt = n => Math.floor(n).toLocaleString();
+  const SAVE_KEY = 'cage-warrior-save-v1';
+  const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
+  let saveWarningShown = false;
 
   const defaultState = {
     version:5,name:'ROOKIE',cash:250,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
@@ -417,7 +420,7 @@
     gear:[],trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0},
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
     dailyObjective:{date:'',id:'',progress:0,complete:false},pendingFight:null,
-    roster:[],rosterSerial:0,retiredCount:0,fighterStyle:'',milestones:[],equippedGear:[],dailyChallenge:null
+    roster:[],rosterSerial:0,retiredCount:0,fighterStyle:'',milestones:[],equippedGear:[],dailyChallenge:null,leagueInitialized:false
   };
 
   let state = loadState();
@@ -474,17 +477,25 @@
     const stat=k=>Math.max(3,Math.round(base+difficulty+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.45));
     return {key:`cw-${tier}-${serial}`,name,tag:arch.tag,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:0,losses:0,winsVsPlayer:0,lossesToPlayer:0,meetings:0,retireAt:3+(seed%2),retired:false,createdAt:Date.now()};
   }
+  function hashSeed(text){let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return hash>>>0}
+  function seededRandom(seed){let value=seed>>>0;return ()=>{value+=0x6D2B79F5;let n=value;n=Math.imul(n^n>>>15,n|1);n^=n+Math.imul(n^n>>>7,n|61);return ((n^n>>>14)>>>0)/4294967296}}
+  function generateDailyOpponent(date,tier){
+    const random=seededRandom(hashSeed(`cage-warrior-daily-v1|${date}|${tier}`)),pick=list=>list[Math.floor(random()*list.length)],arch=pick(opponentArchetypes),first=pick(firstNames),last=pick(lastNames),base=4+(tier-1)*1.9,difficulty=(random()-.5)*1.4;
+    const stat=k=>Math.max(3,Math.round(base+difficulty+(arch.mods[k]||0)+(random()-.5)*.9));
+    return {key:`daily-${date.replace(/\D/g,'')}-${tier}`,name:`${first} ${last}`,tag:arch.tag,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)*1.8),fans:Math.round(22*Math.pow(1.48,tier-1)*1.8),color:pick(rosterColors),look:Math.floor(random()*10),wins:0,losses:0,winsVsPlayer:0,lossesToPlayer:0,meetings:0,retireAt:999,retired:false,daily:true,createdAt:Date.now()};
+  }
   function ensureRoster(){
-    if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;
+    if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;const bootstrapPast=!state.leagueInitialized&&state.roster.length===0;
     for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.retired).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
-    if(!state.roster.some(o=>!o.retired&&o.tier<state.level)){for(let tier=1;tier<state.level;tier++)for(let i=0;i<2;i++)state.roster.push(generateOpponent(tier))}
+    if(bootstrapPast){for(let tier=1;tier<state.level;tier++)for(let i=0;i<2;i++)state.roster.push(generateOpponent(tier))}
+    state.leagueInitialized=true;
     refreshOpponents();
   }
   function refreshOpponents(){
     const current=state.roster.filter(o=>!o.retired&&o.tier===state.level),past=state.roster.filter(o=>!o.retired&&o.tier<state.level).sort((a,b)=>b.tier-a.tier),retired=state.roster.filter(o=>o.retired).sort((a,b)=>(b.retiredAt||0)-(a.retiredAt||0)).slice(0,8),locked=state.roster.filter(o=>!o.retired&&o.tier===state.level+1);opponents=[...current,...past,...retired,...locked];
   }
   function ensureDailyChallenge(){
-    const date=todayKey();if(state.dailyChallenge&&state.dailyChallenge.date===date)return;const opponent=generateOpponent(state.level);opponent.key=`daily-${date.replace(/\D/g,'')}-${state.level}`;opponent.daily=true;opponent.name=`${opponent.name}`;opponent.reward=Math.round(opponent.reward*1.8);opponent.fans=Math.round(opponent.fans*1.8);opponent.retireAt=999;state.dailyChallenge={date,opponent,attempted:false,result:''};
+    const date=todayKey();if(state.dailyChallenge&&state.dailyChallenge.date===date)return;state.dailyChallenge={date,opponent:generateDailyOpponent(date,state.level),attempted:false,result:''};
   }
   function renderDailyFight(){
     ensureDailyChallenge();const d=state.dailyChallenge,o=d.opponent;if(d.attempted){$('#dailyFightCard').innerHTML=`<div class="daily-fight-body"><div class="daily-fight-icon">${d.result==='win'?'🏆':'🥀'}</div><div class="daily-fight-copy"><b class="daily-fight-result">${d.result==='win'?'CHALLENGE WON':'ATTEMPT COMPLETE'}</b><small>${o.name} · ${o.tag}<br>A new seeded opponent arrives tomorrow.</small></div><span class="limit-pill">${d.result.toUpperCase()}</span></div>`;return}
@@ -580,11 +591,8 @@
     {id:'titan-global',icon:'🌐',brand:'Titan Global',product:'Worldwide lifestyle campaign',minLevel:13,minFans:50000,signing:250000,perFight:30000,fansPerFight:2200,fights:8}
   ];
 
-  function loadState(){
-    try{
-      const raw = localStorage.getItem('cage-warrior-save-v1') || localStorage.getItem('fytr-save-v1');
-      if(!raw) return structuredClone(defaultState);
-      const s = Object.assign(structuredClone(defaultState),JSON.parse(raw));
+  function normalizeState(parsed){
+      const s = Object.assign(structuredClone(defaultState),parsed);
       s.stats = Object.assign({},defaultState.stats,s.stats||{});
       s.gear = Array.isArray(s.gear)?s.gear:[];
       s.dailyCounters = Object.assign({},defaultState.dailyCounters,s.dailyCounters||{});
@@ -595,13 +603,26 @@
       s.winStreak = Math.max(0,Number(s.winStreak)||0);s.bestStreak=Math.max(s.winStreak,Number(s.bestStreak)||0);
       s.dailyObjective = Object.assign({},defaultState.dailyObjective,s.dailyObjective||{});
       s.pendingFight = s.pendingFight&&typeof s.pendingFight==='object'?s.pendingFight:null;
-      s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.retiredCount=Math.max(0,Number(s.retiredCount)||0);s.fighterStyle=['brawler','technician','grappler','endurance'].includes(s.fighterStyle)?s.fighterStyle:'';s.milestones=Array.isArray(s.milestones)?s.milestones:[];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.dailyChallenge=s.dailyChallenge&&typeof s.dailyChallenge==='object'?s.dailyChallenge:null;
+      s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.retiredCount=Math.max(0,Number(s.retiredCount)||0);s.fighterStyle=['brawler','technician','grappler','endurance'].includes(s.fighterStyle)?s.fighterStyle:'';s.milestones=Array.isArray(s.milestones)?s.milestones:[];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.dailyChallenge=s.dailyChallenge&&typeof s.dailyChallenge==='object'?s.dailyChallenge:null;s.leagueInitialized=parsed.leagueInitialized===true;
       s.version=5;
       return s;
-    }catch(e){return structuredClone(defaultState)}
   }
-  function saveState(){state.lastSave=Date.now();try{localStorage.setItem('cage-warrior-save-v1',JSON.stringify(state))}catch(e){/* Storage may be blocked in sandboxed previews. */}}
-  function todayKey(){return new Date().toLocaleDateString()}
+  function loadState(){
+    const candidates=[SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1'];
+    for(const key of candidates){
+      try{const raw=localStorage.getItem(key);if(raw)return normalizeState(JSON.parse(raw))}catch(e){/* Try the last-known-good save. */}
+    }
+    return structuredClone(defaultState);
+  }
+  function saveState(){
+    state.lastSave=Date.now();
+    try{
+      const current=localStorage.getItem(SAVE_KEY);if(current){try{JSON.parse(current);localStorage.setItem(SAVE_BACKUP_KEY,current)}catch(e){/* Preserve the existing backup. */}}
+    }catch(e){/* A backup is helpful but must never block the primary save. */}
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));saveWarningShown=false}
+    catch(e){if(!saveWarningShown){saveWarningShown=true;setTimeout(()=>toast('SAVE FAILED · Check browser storage before closing.','#ff766d'),0)}}
+  }
+  function todayKey(){return new Date().toISOString().slice(0,10)}
   function applyOfflineRecovery(){
     const now=Date.now(),last=Number(state.lastSave)||now,elapsed=clamp(now-last,0,8*60*60*1000),ticks=Math.floor(elapsed/15000);
     const oldEnergy=state.energy,oldHealth=state.health;
@@ -642,7 +663,7 @@
   function ownedBonus(prop){return state.gear.reduce((sum,id)=>{const g=gearItems.find(x=>x.id===id);return sum+(g&&g[prop]?g[prop]:0)},0)}
   function trainerFee(){return 90+state.level*25}
   function ensureDailyCounters(){
-    const today=new Date().toLocaleDateString();
+    const today=todayKey();
     if(!state.dailyCounters||state.dailyCounters.date!==today)state.dailyCounters={date:today,train:0,hustle:0,risk:0,publicity:0};
   }
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
@@ -976,7 +997,7 @@
     const g=gearItems.find(x=>x.id===id);if(!g||state.gear.includes(id)||state.cash<g.price||state.level<(g.minLevel||1))return;initAudio();state.cash-=g.price;state.gear.push(id);sfx.coin();confettiBurst();toast(`${g.name} purchased`,'#f4c34a');updateUI();
   }
   function claimDaily(){
-    const today=new Date().toLocaleDateString();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20;state.cash+=cash;state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;sfx.win();confettiBurst();toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');updateUI();
+    const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20;state.cash+=cash;state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;sfx.win();confettiBurst();toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');updateUI();
   }
 
   function emptyFightStats(){return {attempted:0,landed:0,sig:0,takedowns:0,control:0,damage:0,kd:0}}
