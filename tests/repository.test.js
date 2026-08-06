@@ -122,6 +122,21 @@ test('permanent identity onboarding gates the career and removes completed selec
   assert.match(script, /if\(!\(state\.fighterStyle&&state\.fighterCity\)\)screen='home'/);
 });
 
+test('fighter attributes form one Home-only row directly beneath the condition HUD', () => {
+  assert.match(html, /\.stat-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
+  const attributes = html.indexOf('id="homeAttributes"');
+  const hero = html.indexOf('<div class="hero">');
+  const trainStart = html.indexOf('<section class="screen" data-screen="train">');
+  assert.ok(attributes > homeStart && attributes < hero, 'attributes should be the first career panel on Home');
+  assert.equal(html.indexOf('id="homeAttributes"', attributes + 1), -1, 'attributes should not be repeated on other screens');
+  assert.ok(attributes < trainStart);
+  const fightStart = html.indexOf('<section class="screen" data-screen="fight">');
+  const trainMarkup = html.slice(trainStart, fightStart);
+  assert.doesNotMatch(trainMarkup, /stat-grid|trainStatGrid|Fighter Attributes/);
+  assert.doesNotMatch(script, /\$\('#trainStatGrid'\)/);
+});
+
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
   assert.match(html, /\.gear\.equip-bursting\{animation:equipCardBurst/);
   assert.match(html, /@keyframes equipRays/);
