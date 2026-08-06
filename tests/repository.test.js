@@ -78,10 +78,15 @@ test('equipping fight gear triggers the collectible-card burst before rerenderin
   assert.match(script, /setTimeout\(updateUI,680\)/);
 });
 
-test('money is cumulative career earnings and is never spent on training', () => {
-  assert.match(html, /CAREER EARNINGS/);
-  assert.doesNotMatch(script, /state\.cash\s*-=/);
-  assert.doesNotMatch(script, /cashCost|trainerFee|Training costs/);
+test('cash pays the scaling coach fee while career earnings remain cumulative', () => {
+  assert.match(html, /id="careerEarningsText"/);
+  assert.match(script, /function coachFee\(\)\{return 35\+state\.level\*20\}/);
+  assert.match(script, /coachCost=coach\?fee\*a\.sessions:0/);
+  assert.match(script, /state\.cash-=fee/);
+  assert.match(script, /function receiveMoney\(amount,career=false\)/);
+  assert.match(script, /receiveMoney\(cash,true\)/);
+  assert.match(script, /receiveMoney\(cash\);gainXp\(a\.xp\).*shifts left/);
+  assert.match(script, /s\.careerEarnings=Number\.isFinite\(savedCareerEarnings\).*:s\.cash/);
 });
 
 test('gear is deterministic win loot with pity, title rarity, and non-stacking duplicates', () => {
