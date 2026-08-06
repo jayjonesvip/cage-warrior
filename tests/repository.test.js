@@ -55,9 +55,41 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
   assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
   assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:''/);
   assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
-  assert.match(script, /declined=available&&\(o\.lossesToPlayer\|\|0\)>0/);
+  assert.match(script, /declined=!o\.championship&&available&&\(o\.lossesToPlayer\|\|0\)>0/);
   assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
   assert.match(script, /cash=Math\.round\(basePurse/);
+});
+
+test('career identity includes a permanent hometown and a fight-earned title ladder', () => {
+  for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND']) {
+    assert.match(script, new RegExp(`name:'${city}'`));
+  }
+  for (const region of ['SOUTHWEST', 'WEST COAST', 'MIDWEST', 'NORTHEAST', 'SOUTHEAST', 'GULF COAST', 'GREAT LAKES']) {
+    assert.match(script, new RegExp(`region:'${region}'`));
+  }
+  assert.match(html, /Fighting Out Of/);
+  assert.match(html, /Fighter Attributes/);
+  assert.match(script, /function chooseCity\(id\)/);
+  assert.match(script, /function generateTitleChampion\(m\)/);
+  assert.match(script, /championship:true,titleId:m\.id/);
+  assert.match(script, /function awardTitle\(o\).*o&&o\.championship/);
+  assert.match(script, /const titleWon=awardTitle\(o\)/);
+  assert.doesNotMatch(script, /awardMilestones/);
+  assert.match(script, /s\.milestones\.includes\('district'\).*s\.milestones\.push\('city'\)/);
+  assert.match(script, /s\.milestones\.includes\('national'\).*s\.milestones\.push\('city','regional','us'\)/);
+  assert.match(script, /s\.milestones\.includes\('world'\).*s\.milestones\.push\('city','regional','us'\)/);
+  const normalize = script.match(/function normalizeState\(parsed\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+  assert.doesNotMatch(normalize, /fighterCities/);
+  const careerRender = script.match(/function renderCareer\(\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+  assert.doesNotMatch(careerRender, /LVL/);
+  assert.match(readme, /belt is awarded only after that fighter is defeated/);
+});
+
+test('living roster uses two-across collectible fighter cards', () => {
+  assert.match(html, /\.opponent-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.opponent\{[^}]*aspect-ratio:2\/3/);
+  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}">/);
+  assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {

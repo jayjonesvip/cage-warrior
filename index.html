@@ -112,26 +112,32 @@
   .action .ico{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;background:#0d0f12;border:1px solid #444;font-size:26px}.action h3{margin:0 0 3px;font-size:16px}.action p{margin:0;font-family:system-ui,sans-serif;font-size:9.5px;color:#afb2b7;line-height:1.25}.action .cost{text-align:right}.action .cost b{display:block;color:var(--gold);font-size:12px}.action .cost small{font-family:system-ui,sans-serif;font-size:9px;color:var(--muted)}
   .section-note{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);padding:0 4px 10px;line-height:1.4}
 
-  .opponent{display:grid;grid-template-columns:92px 1fr auto;align-items:center;gap:11px;padding:10px;border-bottom:1px solid #263a58;background:linear-gradient(180deg,rgba(255,255,255,.012),rgba(255,255,255,0))}.opponent:last-child{border-bottom:0}
-  .opponent.current{box-shadow:inset 3px 0 0 #5ad0ff}
-  .opponent.locked{opacity:.92}
-  .opponent.passed{border-color:#37698b;background:linear-gradient(135deg,#10243a,#08131f)}
-  .opp-face{position:relative;width:92px;height:92px;border-radius:13px;background:linear-gradient(180deg,#132237,#08101a);border:1px solid #3a5d87;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 6px 14px rgba(0,0,0,.28)}
+  .opponent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:9px;background:#050b13}
+  .opponent{--fighter-accent:#55cfff;--fighter-deep:#08294b;position:relative;min-width:0;aspect-ratio:2/3;padding:7px;display:grid;grid-template-rows:auto minmax(70px,1fr) auto auto auto;gap:5px;border:2px solid var(--fighter-accent);border-radius:13px;background:radial-gradient(circle at 50% 29%,color-mix(in srgb,var(--fighter-accent) 28%,transparent),transparent 35%),linear-gradient(150deg,var(--fighter-deep),#050a11 72%);box-shadow:inset 0 0 0 2px #ffffff16,inset 0 0 25px #0008,0 7px 16px #0008;overflow:hidden;isolation:isolate}
+  .opponent:before{content:"";position:absolute;z-index:-1;inset:5px;border:1px solid #ffffff21;border-radius:9px;clip-path:polygon(0 0,82% 0,100% 12%,100% 100%,18% 100%,0 88%)}
+  .opponent.current{--fighter-accent:#63d9ff;--fighter-deep:#0b4775}
+  .opponent.locked{--fighter-accent:#63778e;--fighter-deep:#172332}
+  .opponent.passed{--fighter-accent:#62d5d8;--fighter-deep:#104953}
+  .opponent.retired{--fighter-accent:#747d88;--fighter-deep:#252b32;opacity:.68;filter:grayscale(.75)}
+  .opponent.champion{--fighter-accent:#ffd66e;--fighter-deep:#59400a;box-shadow:inset 0 0 0 2px #fff4b02e,inset 0 0 28px #5e340088,0 0 15px #ffc83a42,0 8px 18px #0009}
+  .opp-card-top{display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0}
+  .opp-face{position:relative;width:100%;height:auto;min-height:0;border-radius:9px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--fighter-accent) 32%,transparent),transparent 42%),linear-gradient(180deg,#10243a,#040911);border:1px solid #ffffff2e;overflow:hidden;box-shadow:inset 0 0 20px #0009}
   .opp-face:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.1) 60%,rgba(0,0,0,.28));pointer-events:none}
   .opp-sprite{position:absolute;left:0;right:0;top:0;bottom:0;background-repeat:no-repeat;background-size:500% 200%;filter:drop-shadow(0 3px 7px rgba(0,0,0,.24));}
   .opponent.current .opp-sprite{opacity:.98;transform:scale(.96)}
   .opponent.locked .opp-sprite{filter:brightness(.62) grayscale(.75) contrast(1.05);opacity:.92;transform:scale(.96)}
   .opponent.passed .opp-sprite{filter:saturate(.72) brightness(.82);opacity:.92;transform:scale(.97)}
-  .opp-badge{position:absolute;left:7px;top:7px;padding:4px 6px;border-radius:999px;background:rgba(5,11,19,.84);border:1px solid #315c90;color:#86d7ff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;z-index:1}
+  .opp-badge{min-width:0;padding:3px 5px;border-radius:999px;background:#050b13d9;border:1px solid var(--fighter-accent);color:var(--fighter-accent);font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.45px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .opp-face .sil-label{position:absolute;inset:auto 0 8px 0;text-align:center;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:1px;color:#d9e7f7;text-shadow:0 1px 2px #000;z-index:1;opacity:.92}
-  .opp-title{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}.opp-title h3{margin:0;font-size:16px;line-height:.95}.opp-record{flex:0 0 auto;padding:3px 5px;border:1px solid #34597e;border-radius:999px;background:#071421;color:#a9dcff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.45px;white-space:nowrap}.opp-stats{font-family:system-ui,sans-serif;font-size:8.5px;color:#9db9d8;line-height:1.35;margin:3px 0 7px}.opp-stats b{color:#eef8ff;font-size:9px}
-  .opp-note{font-family:system-ui,sans-serif;font-size:8.5px;color:#71cfff;text-transform:uppercase;letter-spacing:.75px}
+  .opp-title{min-width:0}.opp-title h3{margin:0;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:clamp(11px,3.4vw,15px);font-weight:950;line-height:1.05;text-align:center;text-shadow:0 2px 4px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opp-record{flex:0 0 auto;padding:3px 5px;border:1px solid #ffffff45;border-radius:999px;background:#050b13d9;color:#eef9ff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.25px;white-space:nowrap}.opp-stats{font-family:system-ui,sans-serif;font-size:8.5px;color:#b6cae0;line-height:1.3;text-align:center}.opp-stats b{color:#eef8ff;font-size:8.5px}
+  .opp-details{min-height:38px;overflow:hidden;text-align:center}.opp-note{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden;margin-top:2px;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.15;color:#78d7ff;text-transform:uppercase;letter-spacing:.2px}
   .opponent.passed .opp-note{color:#8ea1b9}.opponent.locked .opp-note{color:#7dbbe3}
-  .stars{color:var(--gold);letter-spacing:1px;font-size:11px}
-  .fight-btn{border:0;border-radius:10px;padding:11px 10px;min-width:76px;background:linear-gradient(#3ca9ff,#1558bf);box-shadow:0 4px 0 #062e69;font-size:12px}
+  .stars{color:var(--gold);letter-spacing:.6px;font-size:10px;text-align:center}.tendency{max-width:100%;margin-top:3px;padding:2px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.opp-history{margin-top:2px}
+  .fight-btn{align-self:end;width:100%;min-height:34px;border:0;border-radius:8px;padding:6px 5px;background:linear-gradient(#3ca9ff,#1558bf);box-shadow:0 3px 0 #062e69;font-size:10px;font-weight:950;letter-spacing:.45px}
   .fight-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #062e69}.fight-btn:disabled{opacity:1;filter:none;box-shadow:none}
   .fight-btn.locked{background:linear-gradient(#223246,#132030);color:#84a1bf;border:1px solid #30485f}
   .fight-btn.passed{background:linear-gradient(#58c8d8,#187b9b);color:#031018;border:1px solid #7be5ef;box-shadow:0 4px 0 #074b62}
+  .fight-btn.title{background:linear-gradient(#fff0a8,#e5aa2e 48%,#9a5d09 52%,#603600);color:#201000;border:1px solid #fff2b0;box-shadow:0 3px 0 #4b2900,0 0 12px #ffd25e55}
   .fight-btn.declined{background:#24191b;color:#c68e94;border:1px solid #633b41;box-shadow:none}
   .fight-btn small{display:block;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.2;margin-top:2px}
 
@@ -173,6 +179,7 @@
   .result-card.revealing h2{animation:resultPop .35s both}.result-card.revealing .result-method{animation:resultPop .35s .18s both}.result-card.revealing #resultLine{animation:resultPop .35s .32s both}.result-card.revealing .rewards{animation:resultPop .4s .48s both}.result-card.revealing .result-actions{animation:resultPop .35s .68s both}@keyframes resultPop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}.result-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.details-toggle{border:1px solid #31557d;border-radius:9px;background:#081421;color:#93cfff;padding:0 10px;font-size:9px}.result-details{display:none}.result-details.open{display:block;animation:feedIn .25s both}
   .objective-card{border-color:#2c659d;background:linear-gradient(145deg,#0d2138,#060c14)}.objective-body{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:10px}.objective-icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:#071426;border:1px solid #315f8e;font-size:22px}.objective-copy b{display:block;font-size:13px;color:#dff5ff}.objective-copy small{display:block;margin-top:3px;font-family:system-ui,sans-serif;color:#8da6bd;font-size:8.5px;line-height:1.3}.objective-progress{text-align:right}.objective-progress b{display:block;color:#77dfff;font-size:15px}.objective-progress small{font-family:system-ui,sans-serif;color:#7f95aa;font-size:8.5px}.streak-pill{color:#ffca63!important}.objective-complete{border-color:#4b9a76;box-shadow:inset 0 0 25px #28aa7125}.objective-complete .objective-progress b{color:#7de5a9}
   .roster-group{padding:8px 11px;border-top:1px solid #244362;border-bottom:1px solid #244362;background:#081523;color:#82d9ff;font-size:10px;letter-spacing:.8px;text-transform:uppercase;display:flex;justify-content:space-between}.roster-group small{color:#748ba1;font-size:8.5px}.opponent.retired{opacity:.62;filter:grayscale(.8)}.opponent.retired .opp-face{border-color:#45515e}.fight-btn.retired{background:#1a2028;color:#7d8996;border:1px solid #394553;box-shadow:none}.tendency{display:inline-block;margin-top:5px;padding:3px 6px;border:1px solid #31577c;border-radius:12px;background:#071421;color:#8edbff;font-size:8.5px;letter-spacing:.4px}.rival-pill{color:#ffbd65;border-color:#8b6031;background:#24180a}.opp-history{margin-top:4px;color:#899db1;font-size:8.5px}.build-card{border-color:#375e88;background:linear-gradient(145deg,#10243a,#070d15)}.build-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:9px}.build-choice{border:1px solid #31577d;border-radius:10px;background:#091727;color:#dcefff;padding:9px;text-align:left}.build-choice b{display:block;color:#82d9ff;font-size:11px}.build-choice small{display:block;margin-top:3px;color:#8fa4b8;font-size:8.5px;line-height:1.3}.build-choice.locked-choice{opacity:.3!important;filter:grayscale(1) saturate(0)!important;-webkit-filter:grayscale(1) saturate(0)!important;cursor:not-allowed;background:#05080b!important;border-color:#343a40!important;color:#68717a!important;box-shadow:none!important}.build-choice.locked-choice b{color:#68717a!important}.build-choice.locked-choice small{color:#626a72!important}.build-choice.selected{opacity:1;border-color:#65d1ff;background:#12385d;box-shadow:inset 0 0 18px #46bfff22}.career-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}.career-token{min-width:0;padding:9px;border:1px solid #2e4e70;border-radius:9px;background:#081421}.career-token small{display:block;color:#8196aa;font-size:8.5px;text-transform:uppercase}.career-token b{display:block;margin-top:3px;color:#dff5ff;font-size:12px;line-height:1.15;overflow-wrap:anywhere}.rarity-tag{display:inline-block;margin:0 0 7px;padding:3px 7px;border:1px solid;border-radius:999px;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.65px}.rarity-common{color:#b8c7d8;border-color:#53667a;background:#182330}.rarity-rare{color:#75e5ff;border-color:#2586a7;background:#082936}.rarity-epic{color:#d5a5ff;border-color:#8151b0;background:#28133d}.rarity-legendary{color:#ffd66e;border-color:#a97819;background:#332407;box-shadow:0 0 9px #f3aa2233}.loadout-note{padding:8px 10px;color:#91a7bc;font-size:8.5px}.gear.equipped{border-color:#68cfff;box-shadow:inset 0 0 22px #35aaff2d}.gear button.equip-btn{background:linear-gradient(#8ee2ff,#247bcf)}
+  .career-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.identity-subhead{padding:10px 9px 0;color:#78d7ff;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}.city-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:8px 9px 9px}.city-choice{min-width:0;padding:8px 6px;border:1px solid #31577d;border-radius:9px;background:#091727;color:#dcefff;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;letter-spacing:.35px;text-transform:uppercase}.city-choice.selected{border-color:#65d1ff;background:#12385d;box-shadow:inset 0 0 18px #46bfff22}.city-choice.locked-choice{opacity:.3;filter:grayscale(1) saturate(0);cursor:not-allowed;background:#05080b;border-color:#343a40;color:#68717a;box-shadow:none}
   .gear-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:7px}.gear-top .rarity-tag{margin:0}.gear-count{padding:3px 7px;border:1px solid #38638d;border-radius:999px;background:#091a2b;color:#d9efff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;white-space:nowrap}.gear.owned h3{max-width:100%}.gear-status{position:absolute;left:9px;right:9px;bottom:9px;border:1px solid #356e59;border-radius:7px;padding:8px;background:#0b281d;color:#82dfb0;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;text-align:center;letter-spacing:.45px}.gear-empty{margin:10px;padding:24px 16px;border:1px dashed #315477;border-radius:12px;background:#07111d;text-align:center}.gear-empty b{display:block;color:#9bddff;font-family:system-ui,sans-serif;font-size:14px}.gear-empty span{display:block;margin-top:7px;color:#8299b0;font-family:system-ui,sans-serif;font-size:9px;line-height:1.45}
   .loot{margin:10px auto 4px;padding:10px;border:1px dashed #2f8ee8;background:#2185ff18;border-radius:10px;color:var(--gold);font-family:system-ui,sans-serif;font-size:11px;animation:lootPop .5s both}.loot.drop-pending{padding:14px;border-style:solid;border-color:#dcae45;background:linear-gradient(135deg,#322305,#0c1723);box-shadow:0 0 22px #ffc23a33}.drop-teaser{display:block;color:#ffe08a;font-size:15px;font-weight:950;letter-spacing:.8px}.drop-teaser small{display:block;margin-top:5px;color:#a9b7c5;font-size:9px;letter-spacing:.3px}.loot.drop-reveal{position:relative;overflow:hidden;padding:17px 12px 15px;border-width:2px;border-style:solid;animation:dropReveal .65s cubic-bezier(.2,1.45,.35,1) both}.loot.drop-reveal:before{content:"";position:absolute;inset:-70%;background:conic-gradient(transparent,#ffffff40,transparent 22%);animation:dropShine 2.2s linear infinite}.loot.drop-reveal>*{position:relative;z-index:1}.drop-kicker{font-size:9px;font-weight:950;letter-spacing:1.8px}.drop-icon{display:block;margin:7px 0 3px;font-size:56px;line-height:1;filter:drop-shadow(0 6px 10px #0009);animation:dropIcon .7s .16s cubic-bezier(.2,1.5,.35,1) both}.drop-name{display:block;color:#fff;font-size:22px;line-height:1.05;text-shadow:0 2px 7px #000}.drop-meta{display:inline-block;margin-top:8px;padding:4px 9px;border:1px solid currentColor;border-radius:20px;font-size:9px;font-weight:950}.drop-reason,.drop-extras{display:block;margin-top:8px;color:#c3ced8;font-size:9px;line-height:1.35}.drop-extras{color:#ffe092}.result-card.drop-celebration{border-color:#e8bd55;box-shadow:0 0 40px #e8bd5540,0 20px 70px #000}.loot.drop-common{border-color:#71869b;color:#d1deea;background:#60748824}.loot.drop-rare{border-color:#4edfff;color:#8cecff;background:#25bde828;box-shadow:0 0 28px #25cfff40}.loot.drop-epic{border-color:#bd7aff;color:#dfbaff;background:#8e43d632;box-shadow:0 0 34px #a652ff55}.loot.drop-legendary{border-color:#ffd35e;color:#ffe394;background:#e8a61932;box-shadow:0 0 42px #ffbd3266}@keyframes lootPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}@keyframes dropReveal{from{opacity:0;transform:scale(.35) rotate(-4deg)}to{opacity:1;transform:none}}@keyframes dropIcon{from{opacity:0;transform:scale(.25) rotate(-18deg)}to{opacity:1;transform:none}}@keyframes dropShine{to{transform:rotate(360deg)}}
   .result-method{display:inline-block;margin:4px auto 9px;padding:5px 9px;border:1px solid #555a61;border-radius:20px;background:#0d0f12;font-family:system-ui,sans-serif;font-size:9px;color:#d0d2d5;text-transform:uppercase;letter-spacing:.8px}
@@ -298,7 +305,7 @@
         <div class="objective-body"><div class="objective-icon" id="objectiveIcon">🎯</div><div class="objective-copy"><b id="objectiveTitle">GET YOUR HAND RAISED</b><small id="objectiveText">Win one fight today for a bonus.</small></div><div class="objective-progress"><b id="objectiveProgress">0/1</b><small id="objectiveReward">BONUS $300</small></div></div>
       </div>
 
-      <div class="card build-card"><div class="card-title">Career Identity <small id="careerIdentityStatus">UNDEFINED</small></div><div class="career-strip"><div class="career-token"><small>Fighting Style</small><b id="homeStyleText">Choose in Gym</b></div><div class="career-token"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token"><small>Next Milestone</small><b id="nextMilestoneText">District Belt · LVL 5</b></div></div></div>
+      <div class="card build-card"><div class="card-title">Career Identity <small id="careerIdentityStatus">UNDEFINED</small></div><div class="career-strip"><div class="career-token"><small>Fighting Style</small><b id="homeStyleText">Choose in Gym</b></div><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Choose in Gym</b></div><div class="career-token"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
       <div class="choice-grid">
         <button class="choice red" data-go="fight"><span class="bigicon">🥊</span><h3>TAKE A FIGHT</h3><p>Pick an opponent, call the tactics, and chase a finish through every round.</p><div class="reward">BIG WIN POTENTIAL</div></button>
@@ -308,7 +315,7 @@
       <div class="card"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Local promoter is looking for fresh blood tonight.</span></div></div>
 
       <div class="card">
-        <div class="card-title">Fighter Stats <small>Permanent</small></div>
+        <div class="card-title">Fighter Attributes <small>Permanent</small></div>
         <div class="stat-grid">
           <div class="stat"><div class="row"><small>Power</small><b id="powerStat">5</b></div><div class="mini"><i id="powerMini"></i></div></div>
           <div class="stat"><div class="row"><small>Speed</small><b id="speedStat">5</b></div><div class="mini"><i id="speedMini"></i></div></div>
@@ -319,7 +326,7 @@
     </section>
 
     <section class="screen" data-screen="train">
-      <div class="card build-card"><div class="card-title">Choose Your Fight Identity <small>Permanent style</small></div><div class="build-grid" id="buildChoices"></div><div class="loadout-note" id="buildDescription">Your identity adds permanent strengths and improves its matching fight plan.</div></div>
+      <div class="card build-card"><div class="card-title">Choose Your Fight Identity <small>Permanent choices</small></div><div class="build-grid" id="buildChoices"></div><div class="loadout-note" id="buildDescription">Your identity adds permanent strengths and improves its matching fight plan.</div><div class="identity-subhead">Fighting Out Of</div><div class="city-grid" id="cityChoices"></div><div class="loadout-note" id="cityDescription">Choose your hometown. It defines the opening rungs of your title journey.</div></div>
       <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. His per-session fee rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health.</div>
@@ -443,13 +450,13 @@
   let saveWarningShown = false;
 
   const defaultState = {
-    version:7,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:8,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0},
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
     dailyObjective:{date:'',id:'',progress:0,complete:false},pendingFight:null,
-    roster:[],rosterSerial:0,retiredCount:0,fighterStyle:'',milestones:[],equippedGear:[],dailyChallenge:null,leagueInitialized:false
+    roster:[],rosterSerial:0,retiredCount:0,fighterStyle:'',fighterCity:'',milestones:[],equippedGear:[],dailyChallenge:null,leagueInitialized:false
   };
 
   let state = loadState();
@@ -485,9 +492,19 @@
     {id:'grappler',icon:'🤼',name:'GRAPPLER',text:'+1 Power and Cardio. Better wrestling success.',stats:{power:1,cardio:1},plan:'wrestle'},
     {id:'endurance',icon:'🛡️',name:'ENDURANCE',text:'+2 Cardio. Recover restores more condition.',stats:{cardio:2},plan:'recover'}
   ];
+  const fighterCities = [
+    {id:'phoenix',name:'PHOENIX',region:'SOUTHWEST'},
+    {id:'los-angeles',name:'LOS ANGELES',region:'WEST COAST'},
+    {id:'chicago',name:'CHICAGO',region:'MIDWEST'},
+    {id:'new-york',name:'NEW YORK',region:'NORTHEAST'},
+    {id:'miami',name:'MIAMI',region:'SOUTHEAST'},
+    {id:'houston',name:'HOUSTON',region:'GULF COAST'},
+    {id:'cleveland',name:'CLEVELAND',region:'GREAT LAKES'}
+  ];
   const milestoneDefs=[
-    {level:5,id:'district',name:'DISTRICT BELT',icon:'🥉'},
-    {level:10,id:'national',name:'NATIONAL BELT',icon:'🥈'},
+    {level:5,id:'city',scope:'city',icon:'🥉'},
+    {level:9,id:'regional',scope:'region',icon:'🥈'},
+    {level:12,id:'us',scope:'us',icon:'🏆'},
     {level:15,id:'world',name:'WORLD TITLE',icon:'🥇'}
   ];
 
@@ -508,6 +525,11 @@
     const stat=k=>Math.max(3,Math.round(base+difficulty+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.45));
     return {key:`cw-${tier}-${serial}`,name,tag:arch.tag,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(1,tier*2+Math.abs(seed%7)),losses:Math.abs((seed>>>5)%Math.max(2,tier+2)),winsVsPlayer:0,lossesToPlayer:0,meetings:0,retireAt:3+(seed%2),retired:false,recordInitialized:true,createdAt:Date.now()};
   }
+  function generateTitleChampion(m){
+    const city=currentCity(),seed=hashSeed(`cage-warrior-champion-v1|${city.id}|${m.id}`),arch=rosterPick(opponentArchetypes,seed),first=rosterPick(firstNames,seed*3+7),last=rosterPick(lastNames,seed*5+11),base=4+(m.level-1)*1.9+1.4;
+    const stat=k=>Math.max(5,Math.round(base+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.35));
+    return {key:`champ-${city.id}-${m.id}`,name:`${first} ${last}`,tag:arch.tag,tendency:arch.tendency,scout:arch.scout,tier:m.level,min:m.level,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,m.level-1)*2),fans:Math.round(22*Math.pow(1.48,m.level-1)*2.25),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(12,m.level*3+Math.abs(seed%8)),losses:Math.abs((seed>>>5)%Math.max(2,Math.ceil(m.level/3))),winsVsPlayer:0,lossesToPlayer:0,meetings:0,retireAt:999,retired:false,championship:true,titleId:m.id,titleDefeated:state.milestones.includes(m.id),recordInitialized:true,createdAt:Date.now()};
+  }
   function hashSeed(text){let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return hash>>>0}
   function seededRandom(seed){let value=seed>>>0;return ()=>{value+=0x6D2B79F5;let n=value;n=Math.imul(n^n>>>15,n|1);n^=n+Math.imul(n^n>>>7,n|61);return ((n^n>>>14)>>>0)/4294967296}}
   function generateDailyOpponent(date,tier){
@@ -516,17 +538,19 @@
     return {key:`daily-${date.replace(/\D/g,'')}-${tier}`,name:`${first} ${last}`,tag:arch.tag,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)*1.8),fans:Math.round(22*Math.pow(1.48,tier-1)*1.8),color:pick(rosterColors),look:Math.floor(random()*10),wins:Math.max(1,tier*2+Math.floor(random()*7)),losses:Math.floor(random()*Math.max(2,tier+2)),winsVsPlayer:0,lossesToPlayer:0,meetings:0,retireAt:999,retired:false,daily:true,recordInitialized:true,createdAt:Date.now()};
   }
   function ensureProfessionalRecord(o){if(!o||o.recordInitialized)return;const seed=hashSeed(o.key||`${o.name}|${o.tier}`);o.wins=(Number(o.wins)||0)+Math.max(1,(Number(o.tier)||1)*2+(seed%7));o.losses=(Number(o.losses)||0)+((seed>>>5)%Math.max(2,(Number(o.tier)||1)+2));o.recordInitialized=true}
-  function payoutForOpponent(o){return Math.round(o.reward*(o.daily||o.tier>=state.level?1:.5))}
+  function payoutForOpponent(o){return Math.round(o.reward*(o.daily||o.championship||o.tier>=state.level?1:.5))}
+  function ensureTitleChampions(){if(!currentCity())return;for(const m of milestoneDefs){let champ=state.roster.find(o=>o.championship&&o.titleId===m.id);if(!champ){champ=generateTitleChampion(m);state.roster.push(champ)}champ.titleName=milestoneName(m);if(state.milestones.includes(m.id))champ.titleDefeated=true}}
   function ensureRoster(){
     if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;const bootstrapPast=!state.leagueInitialized&&state.roster.length===0;
-    for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.retired).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
+    for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.retired&&!o.championship).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
     if(bootstrapPast){for(let tier=1;tier<state.level;tier++)for(let i=0;i<2;i++)state.roster.push(generateOpponent(tier))}
+    ensureTitleChampions();
     state.roster.forEach(ensureProfessionalRecord);
     state.leagueInitialized=true;
     refreshOpponents();
   }
   function refreshOpponents(){
-    const current=state.roster.filter(o=>!o.retired&&o.tier===state.level),past=state.roster.filter(o=>!o.retired&&o.tier<state.level).sort((a,b)=>b.tier-a.tier),retired=state.roster.filter(o=>o.retired).sort((a,b)=>(b.retiredAt||0)-(a.retiredAt||0)).slice(0,8),locked=state.roster.filter(o=>!o.retired&&o.tier===state.level+1);opponents=[...current,...past,...retired,...locked];
+    const nextTitle=milestoneDefs.find(m=>!state.milestones.includes(m.id)),title=state.roster.filter(o=>opponentState(o)==='title'),current=state.roster.filter(o=>opponentState(o)==='current'),past=state.roster.filter(o=>opponentState(o)==='passed').sort((a,b)=>b.tier-a.tier),retired=state.roster.filter(o=>opponentState(o)==='retired').sort((a,b)=>(b.retiredAt||b.createdAt||0)-(a.retiredAt||a.createdAt||0)).slice(0,8),locked=state.roster.filter(o=>opponentState(o)==='locked'&&(!o.championship?o.tier===state.level+1:o.titleId===nextTitle?.id&&o.tier<=state.level+1));opponents=[...title,...current,...past,...retired,...locked];
   }
   function ensureDailyChallenge(){
     const date=todayKey();if(!state.dailyChallenge||state.dailyChallenge.date!==date)state.dailyChallenge={date,opponent:generateDailyOpponent(date,state.level),attempted:false,result:''};ensureProfessionalRecord(state.dailyChallenge.opponent);
@@ -544,6 +568,7 @@
   }
   function opponentState(o){
     if(o.retired)return 'retired';
+    if(o.championship){if(o.titleDefeated||state.milestones.includes(o.titleId))return 'retired';const index=milestoneDefs.findIndex(m=>m.id===o.titleId),previousWon=index<=0||state.milestones.includes(milestoneDefs[index-1].id);if(currentCity()&&state.level>=o.tier&&previousWon)return 'title';return 'locked'}
     if(state.level<o.tier)return 'locked';
     if(state.level>o.tier)return 'passed';
     return 'current';
@@ -640,8 +665,8 @@
       s.winStreak = Math.max(0,Number(s.winStreak)||0);s.bestStreak=Math.max(s.winStreak,Number(s.bestStreak)||0);
       s.dailyObjective = Object.assign({},defaultState.dailyObjective,s.dailyObjective||{});
       s.pendingFight = s.pendingFight&&typeof s.pendingFight==='object'?s.pendingFight:null;
-      s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.retiredCount=Math.max(0,Number(s.retiredCount)||0);s.fighterStyle=['brawler','technician','grappler','endurance'].includes(s.fighterStyle)?s.fighterStyle:'';s.milestones=Array.isArray(s.milestones)?s.milestones:[];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.dailyChallenge=s.dailyChallenge&&typeof s.dailyChallenge==='object'?s.dailyChallenge:null;s.leagueInitialized=parsed.leagueInitialized===true;
-      s.version=7;
+      s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.retiredCount=Math.max(0,Number(s.retiredCount)||0);s.fighterStyle=['brawler','technician','grappler','endurance'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.dailyChallenge=s.dailyChallenge&&typeof s.dailyChallenge==='object'?s.dailyChallenge:null;s.leagueInitialized=parsed.leagueInitialized===true;
+      s.version=8;
       return s;
   }
   function loadState(){
@@ -696,7 +721,9 @@
   }
   function ensureLoadout(){const ownedFight=state.gear.filter(id=>{const g=gearItems.find(x=>x.id===id);return g&&g.category==='Fight Gear'});state.equippedGear=state.equippedGear.filter(id=>ownedFight.includes(id)).slice(0,4);if(!state.equippedGear.length&&ownedFight.length)state.equippedGear=ownedFight.slice(0,4)}
   function currentStyle(){return fighterStyles.find(s=>s.id===state.fighterStyle)||null}
-  function awardMilestones(){for(const m of milestoneDefs)if(state.level>=m.level&&!state.milestones.includes(m.id)){state.milestones.push(m.id);receiveMoney(m.level*500,true);state.fans+=m.level*75;toast(`${m.icon} ${m.name} WON! Career bonus awarded.`,'#ffd36e');confettiBurst()}}
+  function currentCity(){return fighterCities.find(c=>c.id===state.fighterCity)||null}
+  function milestoneName(m){const city=currentCity();if(m.scope==='city')return city?`${city.name} TITLE`:'CITY TITLE';if(m.scope==='region')return city?`${city.region} TITLE`:'REGIONAL TITLE';if(m.scope==='us')return 'U.S. TITLE';return m.name}
+  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);state.fans+=m.level*75;toast(`${m.icon} ${milestoneName(m)} WON!`,'#ffd36e');confettiBurst();return true}
   function gearCount(id){return Math.max(0,Math.floor(Number(state.gearCounts&&state.gearCounts[id]))||0)}
   function ownedBonus(prop){return state.gear.reduce((sum,id)=>{const g=gearItems.find(x=>x.id===id);return sum+(g&&g[prop]?g[prop]:0)},0)}
   function receiveMoney(amount,career=false){const value=Math.max(0,Math.round(Number(amount)||0));state.cash+=value;if(career)state.careerEarnings+=value;return value}
@@ -796,7 +823,7 @@
       state.xp-=xpNeed();state.level++;state.maxEnergy+=3;state.energy=state.maxEnergy;state.maxHealth+=5;state.health=state.maxHealth;receiveMoney(100*state.level,true);leveled=true;
     }
     if(leveled){sfx.level();confettiBurst();toast(`LEVEL ${state.level}! Full refill + earnings bonus`, '#f4c34a')}
-    if(leveled){ensureRoster();awardMilestones()}
+    if(leveled)ensureRoster();
   }
   function spendEnergy(n){if(state.energy<n){toast('Not enough energy. It refills over time.','#ff766d');return false}state.energy-=n;return true}
 
@@ -822,10 +849,12 @@
   }
 
   function renderCareer(){
-    const style=currentStyle(),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#careerIdentityStatus').textContent=style?style.name:'UNDEFINED';$('#homeStyleText').textContent=style?`${style.icon} ${style.name}`:'Choose in Gym';$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=next?`${next.icon} ${next.name} · LVL ${next.level}`:'👑 ALL TITLES WON';
+    const style=currentStyle(),city=currentCity(),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#careerIdentityStatus').textContent=style&&city?'LOCKED IN':'INCOMPLETE';$('#homeStyleText').textContent=style?`${style.icon} ${style.name}`:'Choose in Gym';$('#homeCityText').textContent=city?city.name:'Choose in Gym';$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
     $('#buildChoices').innerHTML=fighterStyles.map(s=>{const locked=state.fighterStyle&&state.fighterStyle!==s.id;return `<button class="build-choice ${state.fighterStyle===s.id?'selected':''} ${locked?'locked-choice':''}" data-style="${s.id}" ${locked?'disabled aria-disabled="true"':''}><b>${s.icon} ${s.name}</b><small>${s.text}</small></button>`}).join('');$('#buildDescription').textContent=style?`${style.name} locked in. Its matching ${style.plan.toUpperCase()} plan receives an extra tactical edge.`:'Choose once. Your identity adds permanent stats and empowers its matching fight plan.';
+    $('#cityChoices').innerHTML=fighterCities.map(c=>{const locked=state.fighterCity&&state.fighterCity!==c.id;return `<button class="city-choice ${state.fighterCity===c.id?'selected':''} ${locked?'locked-choice':''}" data-city="${c.id}" ${locked?'disabled aria-disabled="true"':''}>${c.name}</button>`}).join('');$('#cityDescription').textContent=city?`${city.name} locked in. Win the ${city.name} and ${city.region} titles before chasing U.S. and World gold.`:'Choose once. Your hometown defines your city and regional championship path.';
   }
   function chooseStyle(id){if(state.fighterStyle)return;const style=fighterStyles.find(s=>s.id===id);if(!style)return;state.fighterStyle=id;sfx.win();confettiBurst();toast(`${style.icon} ${style.name} IDENTITY LOCKED IN`,'#76dcff');updateUI()}
+  function chooseCity(id){if(state.fighterCity)return;const city=fighterCities.find(c=>c.id===id);if(!city)return;state.fighterCity=id;ensureTitleChampions();sfx.win();confettiBurst();toast(`FIGHTING OUT OF ${city.name}`,'#76dcff');updateUI()}
 
   function navTo(screen){
     currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));
@@ -879,26 +908,26 @@
   }
   function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);sfx.tap();updateUI();return}if(state.equippedGear.length>=4){toast('Loadout full. Unequip one item first.','#ffcc75');return}state.equippedGear.push(id);initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
-    refreshOpponents();const activeCount=state.roster.filter(o=>!o.retired&&o.tier<=state.level).length;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${state.retiredCount} RETIRED`;
-    let lastStatus='';$('#opponentList').innerHTML=opponents.map(o=>{
+    refreshOpponents();const activeCount=state.roster.filter(o=>['title','current','passed'].includes(opponentState(o))).length,retiredCount=state.roster.filter(o=>opponentState(o)==='retired').length;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${retiredCount} RETIRED`;
+    const renderCard=o=>{
       const status=opponentState(o);
-      const available=status==='current'||status==='passed';
+      const available=status==='title'||status==='current'||status==='passed';
       const stars=clamp(Math.ceil((o.power+o.speed+o.chin+o.cardio)/18),1,5);
       const sprite=spriteIndexForOpponent(o);
       const x=(sprite%5)*25;
       const y=Math.floor(sprite/5)*100;
-      const badge=status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='retired'?'RETIRED':'YOUR LEVEL';
-      const hasHistory=(o.meetings||0)>0,declined=available&&(o.lossesToPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='retired'?`Career closed · retired after ${o.lossesToPlayer} losses to you`:declined?`You beat ${o.name} · they declined another fight`:status==='passed'?(hasHistory?`Past level ${o.tier} · revenge rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · revenge rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
-      const btn=status==='locked'?`LOCKED<br><small>LVL ${o.tier}</small>`:status==='retired'?`RETIRED<br><small>CAREER OVER</small>`:declined?`DECLINED<br><small>YOU WON</small>`:hasHistory?`REMATCH<br><small>$${fmt(purse)}</small>`:`BOOK<br><small>$${fmt(purse)}</small>`;
-      const disabled=!available||declined||state.energy<15||state.health<20,group=status!==lastStatus?(lastStatus=status,`<div class="roster-group"><span>${status==='current'?'AVAILABLE · YOUR LEVEL':status==='passed'?'AVAILABLE · PAST LEVELS':status==='retired'?'RETIRED FIGHTERS':'LOCKED · NEXT LEVEL'}</span><small>${status==='locked'?'SCOUT NOW · FIGHT LATER':status==='retired'?'CAREER ARCHIVE':status==='passed'?'HALF PURSE · 15 ENERGY':'15 ENERGY'}</small></div>`):'';
-      return `${group}<div class="opponent ${status}">
+      const badge=o.championship?(status==='title'?'TITLE FIGHT':status==='retired'?'FORMER CHAMP':'TITLE LOCKED'):status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='retired'?'RETIRED':'YOUR LEVEL';
+      const hasHistory=(o.meetings||0)>0,declined=!o.championship&&available&&(o.lossesToPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=o.championship?(status==='title'?`Beat the reigning champion for the ${o.titleName}`:status==='retired'?`You defeated ${o.name} for the ${o.titleName}`:`Reigning ${o.titleName} champion · not yet unlocked`):status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='retired'?`Career closed · retired after ${o.lossesToPlayer} losses to you`:declined?`You beat ${o.name} · they declined another fight`:status==='passed'?(hasHistory?`Past level ${o.tier} · revenge rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · revenge rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
+      const btn=status==='title'?`FIGHT FOR TITLE<br><small>$${fmt(purse)}</small>`:status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='retired'?`${o.championship?'DEFEATED':'RETIRED'}<br><small>${o.championship?'FORMER CHAMP':'CAREER OVER'}</small>`:declined?`DECLINED<br><small>YOU WON</small>`:hasHistory?`REMATCH<br><small>$${fmt(purse)}</small>`:`BOOK<br><small>$${fmt(purse)}</small>`;
+      const disabled=!available||declined||state.energy<15||state.health<20;
+      return `<article class="opponent ${status} ${o.championship?'champion':''}">
+        <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
         <div class="opp-face">
-          <span class="opp-badge">${badge}</span>
           <div class="opp-sprite" aria-label="${o.name} silhouette" style="background-image:url(${silhouetteSheet});background-position:${x}% ${y}%"></div>
-          ${status==='locked'?'<span class="sil-label">SCOUT REPORT</span>':status==='passed'?`<span class="sil-label">${hasHistory?'PAST OPPONENT':'AVAILABLE'}</span>`:status==='retired'?'<span class="sil-label">CAREER OVER</span>':''}
+          ${o.championship?`<span class="sil-label">${o.titleName}</span>`:status==='locked'?'<span class="sil-label">SCOUT REPORT</span>':status==='passed'?`<span class="sil-label">${hasHistory?'PAST OPPONENT':'AVAILABLE'}</span>`:status==='retired'?'<span class="sil-label">CAREER OVER</span>':''}
         </div>
-        <div class="opp-main">
-          <div class="opp-title"><h3>${o.name}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
+        <div class="opp-title"><h3>${o.name}</h3></div>
+        <div class="opp-details">
           <div class="opp-stats"><b>PWR ${o.power}</b> · SPD ${o.speed} · CHN ${o.chin} · CAR ${o.cardio}</div>
           <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
           <span class="tendency ${rivalry?'rival-pill':''}">${rivalry?'🔥 RIVAL · ':''}${o.tag}</span>
@@ -906,8 +935,10 @@
           <div class="opp-note">${note}</div>
         </div>
         <button class="fight-btn ${declined?'declined':status}" data-fight-key="${o.key}" ${disabled?'disabled':''}>${btn}</button>
-      </div>`;
-    }).join('');
+      </article>`;
+    };
+    const groups=[['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'],['current','AVAILABLE · YOUR LEVEL','FULL PURSE · 15 ENERGY'],['passed','AVAILABLE · PAST LEVELS','HALF PURSE · 15 ENERGY'],['retired','RETIRED FIGHTERS','CAREER ARCHIVE'],['locked','LOCKED · UPCOMING','SCOUT NOW · FIGHT LATER']];
+    $('#opponentList').innerHTML=groups.map(([status,label,meta])=>{const cards=opponents.filter(o=>opponentState(o)===status);return cards.length?`<div class="roster-group"><span>${label}</span><small>${meta}</small></div><div class="opponent-grid">${cards.map(renderCard).join('')}</div>`:''}).join('');
   }
 
   function drawHero(){
@@ -1212,11 +1243,11 @@
 
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;
-    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,milestonesBefore=new Set(state.milestones);let cash=0,fans=0,xp=0,loot='',gearDrop=null;o.meetings=(o.meetings||0)+1;
+    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null;o.meetings=(o.meetings||0)+1;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);const streakBonus=Math.min(.25,Math.max(0,state.winStreak-1)*.05),upsetBonus=upset?.25:0,rivalryBonus=rivalry?.15:0;cash=Math.round(basePurse*(1+state.hype/130)*(1+ownedBonus('cashBonus')/100)*(1+streakBonus+upsetBonus+rivalryBonus)*rand(.9,1.15));fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
-      const titleWon=state.milestones.some(id=>!milestonesBefore.has(id));gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
-      if(upset)loot=[loot,'⚡ UPSET BONUS +25%'].filter(Boolean).join(' · ');if(rivalry)loot=[loot,'🔥 RIVALRY FIGHT BONUS +15%'].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`🔥 ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(o.lossesToPlayer>=o.retireAt){o.retired=true;o.retiredAt=Date.now();state.retiredCount++;loot=[loot,`🏁 ${o.name} RETIRES AFTER ${o.lossesToPlayer} LOSSES TO YOU`].filter(Boolean).join(' · ');ensureRoster()}
+      const titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
+      if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${title.icon} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,'⚡ UPSET BONUS +25%'].filter(Boolean).join(' · ');if(rivalry)loot=[loot,'🔥 RIVALRY FIGHT BONUS +15%'].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`🔥 ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship&&o.lossesToPlayer>=o.retireAt){o.retired=true;o.retiredAt=Date.now();state.retiredCount++;loot=[loot,`🏁 ${o.name} RETIRES AFTER ${o.lossesToPlayer} LOSSES TO YOU`].filter(Boolean).join(' · ');ensureRoster()}
       $('#resultTitle').textContent=fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;state.losses++;state.winStreak=0;cash=Math.round(basePurse*.08);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
@@ -1265,6 +1296,7 @@
     const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
     const st=e.target.closest('[data-style]');if(st){chooseStyle(st.dataset.style);return}
+    const city=e.target.closest('[data-city]');if(city){chooseCity(city.dataset.city);return}
     const df=e.target.closest('[data-daily-fight]');if(df&&state.dailyChallenge&&!state.dailyChallenge.attempted){startFight(state.dailyChallenge.opponent);return}
     const fi=e.target.closest('[data-fight-key]');if(fi){const opponent=state.roster.find(o=>o.key===fi.dataset.fightKey);if(opponent)startFight(opponent);return}
   });
@@ -1284,7 +1316,7 @@
 
   window.addEventListener('resize',drawHero);
   window.addEventListener('beforeunload',saveState);
-  ensureLoadout();ensureRoster();awardMilestones();
+  ensureLoadout();ensureRoster();
   recoveryReport=applyOfflineRecovery();
   updateUI();
   if(recoveryReport)setTimeout(()=>{const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push(`fight booking refunded`);toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff')},350);

@@ -11,14 +11,17 @@ generated league.
 
 ### Fighting and progression
 
-- Choose a permanent fighter identity: Brawler, Technician, Grappler, or
-  Endurance.
+- Choose a permanent fighting style and a "Fighting Out Of" hometown: Phoenix,
+  Los Angeles, Chicago, New York, Miami, Houston, or Cleveland.
 - Pick an opening plan and adjust tactics between rounds. Pressure, Counter,
   Wrestle, and Recover create favorable and risky matchups against opponent
   tendencies.
 - Watch fights normally, use 2× speed, or skip directly to the result.
-- Complete daily contracts, build win streaks, earn upset and rivalry bonuses,
-  and pursue authored belt milestones through the World Title at level 15.
+- Complete daily contracts, build win streaks, and earn upset and rivalry
+  bonuses.
+- Progress through a hometown title, its regional title, the U.S. Title, and
+  the World Title. Reaching a championship threshold only unlocks its reigning
+  champion; the belt is awarded only after that fighter is defeated.
 - Generated progression continues beyond level 15.
 
 ### Living league
@@ -30,7 +33,11 @@ generated league.
 - An opponent you defeat can decline another fight. Repeated losses to the
   player eventually cause retirement and generate a replacement fighter.
 - The roster shows available current and past opponents, retired fighters, and
-  a locked preview of the next level.
+  a locked preview of the next level. Fighters are presented as fixed-ratio
+  collectible-style cards, two across on mobile.
+- Title champions are persistent named fighters with professional records and
+  attributes. A failed title challenge leaves the champion available for
+  another attempt; a win archives the defeated former champion.
 - A deterministic daily opponent provides one seeded attempt per day.
 
 ### Collectible drops
@@ -67,10 +74,11 @@ generated league.
 ### Persistence
 
 Progress is stored locally in the browser with `localStorage`. Save migration
-preserves existing fighters, generated rosters, rivalries, retirements,
-collections, loadouts, milestones, daily challenges, Cash, and Career
-Earnings. The game also keeps a last-known-good backup and refunds energy from
-an interrupted fight when the save is restored.
+preserves existing fighters, hometown identity, generated rosters, rivalries,
+retirements, collections, loadouts, championships, daily challenges, Cash, and
+Career Earnings. Legacy District and National belt progress migrates into the
+new title ladder. The game also keeps a last-known-good backup and refunds
+energy from an interrupted fight when the save is restored.
 
 ## Development
 
