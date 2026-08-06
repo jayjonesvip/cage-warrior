@@ -17,6 +17,10 @@ generated league.
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
   Submission Hunter, or Wrestle-Boxer. Choose a "Fighting Out Of" hometown:
   Phoenix, Los Angeles, Chicago, New York, Miami, Houston, or Cleveland.
+- New careers begin with two separate Home-screen identity choices. Each
+  selector disappears as soon as its permanent choice is locked; career
+  systems and navigation unlock only after both choices are complete. The
+  selected archetype and hometown then live in the Career Identity card.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
@@ -41,7 +45,7 @@ generated league.
   champion; the belt is awarded only after that fighter is defeated.
 - Generated progression continues beyond level 15.
 
-### Living league
+### Career opponents
 
 - Opponents are generated locally with persistent names, attributes,
   archetypes, professional records, and head-to-head history.
@@ -49,9 +53,10 @@ generated league.
   opponents remain available for half purse.
 - An opponent you defeat can decline another fight. Repeated losses to the
   player eventually cause retirement and generate a replacement fighter.
-- The roster shows available current and past opponents, retired fighters, and
+- The Career Opponents roster shows available current and past opponents,
+  retired fighters, and
   a locked preview of the next level. Fighters are presented as fixed-ratio
-  collectible-style cards, two across on mobile.
+  collectible-style cards, two across on mobile, with proportional artwork.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.

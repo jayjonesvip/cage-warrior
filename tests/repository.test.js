@@ -85,11 +85,15 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(readme, /belt is awarded only after that fighter is defeated/);
 });
 
-test('living roster uses two-across collectible fighter cards', () => {
+test('career opponent roster uses proportional two-across collectible fighter cards', () => {
   assert.match(html, /\.opponent-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.opponent\{[^}]*aspect-ratio:2\/3/);
+  assert.match(html, /\.opp-sprite\{[^}]*aspect-ratio:3\/5[^}]*background-size:500% 200%/);
+  assert.match(html, /Career Opponents/);
+  assert.doesNotMatch(html, /The Living Roster/);
   assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}">/);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
+  assert.match(script, /:`FIGHT!<br><small>\$\$\{fmt\(purse\)\}<\/small>`/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {
@@ -99,8 +103,23 @@ test('gear collection shows owned quantities and rarity above icons', () => {
   assert.match(script, /rarity-card-\$\{rarity\.toLowerCase\(\)\}/);
   assert.match(script, /<div class="gear-hero"><span class="gear-flair"><\/span><span class="equip-burst"><\/span><div class="gear-icon">/);
   for (const rarity of ['common', 'rare', 'epic', 'legendary']) assert.match(html, new RegExp(`\\.rarity-${rarity}\\{`));
-  assert.match(html, /\.build-choice\.locked-choice\{[^}]*opacity:\.3!important[^}]*filter:grayscale\(1\) saturate\(0\)!important/);
-  assert.match(script, /locked\?'locked-choice':''/);
+});
+
+test('permanent identity onboarding gates the career and removes completed selectors', () => {
+  const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
+  const trainStart = html.indexOf('<section class="screen" data-screen="train">');
+  for (const id of ['careerIdentityCard', 'archetypeSetup', 'citySetup', 'careerGameContent']) {
+    const position = html.indexOf(`id="${id}"`);
+    assert.ok(position > homeStart && position < trainStart, `${id} should be on the Home screen`);
+  }
+  assert.match(html, /#app\.career-setup #careerGameContent,#app\.career-setup \.career-after-setup\{display:none\}/);
+  assert.match(html, /#app\.career-setup \.resource-hud,#app\.career-setup \.bottomnav\{display:none\}/);
+  assert.match(script, /\$\('#app'\)\.classList\.toggle\('career-setup',!ready\)/);
+  assert.match(script, /\$\('#archetypeSetup'\)\.hidden=!!style/);
+  assert.match(script, /\$\('#citySetup'\)\.hidden=!!city/);
+  assert.match(script, /\$\('#buildChoices'\)\.innerHTML=style\?'':fighterStyles\.map/);
+  assert.match(script, /\$\('#cityChoices'\)\.innerHTML=city\?'':fighterCities\.map/);
+  assert.match(script, /if\(!\(state\.fighterStyle&&state\.fighterCity\)\)screen='home'/);
 });
 
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
@@ -139,7 +158,7 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
 });
 
 test('daily drop guarantees a deterministic collectible without resetting fight pity', () => {
-  const dailyCollectible = script.match(/function awardDailyCollectible\(date\)\{([\s\S]*?)\n\s*\}\n\s*function ensureDailyCounters/)?.[1] || '';
+  const dailyCollectible = script.match(/function awardDailyCollectible\(date\)\{([\s\S]*?)\r?\n\s*\}\r?\n\s*function ensureDailyCounters/)?.[1] || '';
   assert.match(dailyCollectible, /daily-collectible-v1/);
   assert.match(dailyCollectible, /state\.gearCounts\[item\.id\]=gearCount\(item\.id\)\+1/);
   assert.doesNotMatch(dailyCollectible, /gearWinsSinceDrop/);
