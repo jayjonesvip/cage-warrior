@@ -58,7 +58,8 @@ test('gear collection shows owned quantities and rarity above icons', () => {
   assert.match(script, /owned=gearItems\.filter\(g=>gearCount\(g\.id\)>0\)/);
   assert.match(script, /<div class="gear-top"><span class="rarity-tag rarity-\$\{rarity\.toLowerCase\(\)\}">\$\{rarity\}<\/span><span class="gear-count">×\$\{gearCount\(g\.id\)\}<\/span><\/div><div class="gear-icon">/);
   for (const rarity of ['common', 'rare', 'epic', 'legendary']) assert.match(html, new RegExp(`\\.rarity-${rarity}\\{`));
-  assert.match(html, /\.build-choice:disabled\{[^}]*opacity:\.48[^}]*filter:grayscale\(1\)/);
+  assert.match(html, /\.build-choice\.locked-choice\{[^}]*opacity:\.3!important[^}]*filter:grayscale\(1\) saturate\(0\)!important/);
+  assert.match(script, /locked\?'locked-choice':''/);
 });
 
 test('gear is deterministic win loot with pity, title rarity, and non-stacking duplicates', () => {
@@ -79,4 +80,7 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
 
 test('fight result action celebrates wins without labeling losses as reward claims', () => {
   assert.match(script, /\$\('#continueBtn'\)\.textContent=win\?'CLAIM REWARDS':'CONTINUE'/);
+  assert.match(script, /function handleResultAction\(\)\{if\(revealGearDrop\(\)\)return;closeResult\(\)\}/);
+  assert.match(script, /BONUS GEAR DROP READY/);
+  assert.match(script, /drop-icon/);
 });
