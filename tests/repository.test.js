@@ -33,3 +33,10 @@ test('save recovery and one-time league migration remain enabled', () => {
   assert.match(script, /const bootstrapPast=!state\.leagueInitialized&&state\.roster\.length===0/);
   assert.match(script, /state\.leagueInitialized=true/);
 });
+
+test('rematch and exhausted-gig labels reflect actual state', () => {
+  assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
+  assert.match(script, /hasHistory\?`REMATCH/);
+  assert.match(script, /limited\?'gig-unavailable'/);
+  assert.match(html, /\.action\.future\.gig-unavailable:after\{content:"NO GIGS LEFT"/);
+});
