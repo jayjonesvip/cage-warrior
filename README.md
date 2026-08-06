@@ -13,11 +13,22 @@ generated league.
 
 ### Fighting and progression
 
-- Choose a permanent fighting style and a "Fighting Out Of" hometown: Phoenix,
-  Los Angeles, Chicago, New York, Miami, Houston, or Cleveland.
-- Pick an opening plan and adjust tactics between rounds. Pressure, Counter,
-  Wrestle, and Recover create favorable and risky matchups against opponent
-  tendencies.
+- Choose one of seven permanent MMA archetypes: Pressure Fighter,
+  Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
+  Submission Hunter, or Wrestle-Boxer. Choose a "Fighting Out Of" hometown:
+  Phoenix, Los Angeles, Chicago, New York, Miami, Houston, or Cleveland.
+- Every generated opponent uses the same seven-archetype system. Their card,
+  tale of the tape, attributes, scouting report, and in-fight behavior all
+  reflect that archetype.
+- Pick an opening plan and adjust tactics between rounds. All seven archetypes
+  are available as round plans. The result combines the plan's matchup against
+  the opponent with your fighter's proficiency: a signature plan earns an
+  edge, while crossing into an unfamiliar striking or grappling discipline
+  carries a real penalty. The plan affects initiative, technique selection,
+  accuracy, damage, takedowns, control, and knockout risk.
+- Submission Hunters can finish a fight by tap after a successful takedown.
+  Speed, cardio, opponent condition, and signature-plan proficiency affect the
+  submission chance.
 - When condition falls to 25% or lower between rounds, the corner presents a
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it
@@ -33,7 +44,7 @@ generated league.
 ### Living league
 
 - Opponents are generated locally with persistent names, attributes,
-  tendencies, professional records, and head-to-head history.
+  archetypes, professional records, and head-to-head history.
 - Current-level fighters are available at full purse. Unbeaten past-level
   opponents remain available for half purse.
 - An opponent you defeat can decline another fight. Repeated losses to the
@@ -82,9 +93,12 @@ generated league.
 Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, generated rosters, rivalries,
 retirements, collections, loadouts, championships, daily challenges, Cash, and
-Career Earnings. Legacy District and National belt progress migrates into the
-new title ladder. The game also keeps a last-known-good backup and refunds
-energy from an interrupted fight when the save is restored.
+Career Earnings. Legacy Technician, Grappler, and Endurance identities map to
+Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
+tendencies migrate without losing records or rivalries. Legacy District and
+National belt progress migrates into the new title ladder. The game also keeps
+a last-known-good backup and refunds energy from an interrupted fight when the
+save is restored.
 
 ## Development
 

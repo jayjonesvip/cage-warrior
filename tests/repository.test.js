@@ -156,6 +156,47 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(script, /drop-icon/);
 });
 
+test('fighters, opponents, and round plans share the seven MMA archetypes', () => {
+  assert.match(html, /Fighter Archetype/);
+  assert.match(html, /Choose Your Fighter Archetype/);
+  for (const id of ['pressure', 'counter', 'brawler', 'trickster', 'control', 'submission', 'wrestleBox']) {
+    assert.match(script, new RegExp(`id:'${id}'`));
+  }
+  for (const name of ['PRESSURE FIGHTER', 'COUNTER-STRIKER', 'BRAWLER', 'TRICKSTER', 'CONTROL GRAPPLER', 'SUBMISSION HUNTER', 'WRESTLE-BOXER']) {
+    assert.match(script, new RegExp(name));
+  }
+  assert.match(script, /archetype:arch\.id,tendency:arch\.tendency/);
+  assert.match(script, /function normalizeOpponentArchetype\(o\)/);
+  assert.match(script, /const legacy=\{wrestle:'control',wrestler:'control',tank:'brawler',cardio:'pressure'\}/);
+  assert.match(script, /const legacyStyle=\{technician:'counter',grappler:'control',endurance:'pressure'\}/);
+  assert.match(script, /\['pressure','counter','brawler','trickster','control','submission','wrestleBox'\]\.includes\(s\.fighterStyle\)/);
+  assert.match(readme, /seven permanent MMA archetypes/);
+});
+
+test('round strategy combines matchup and player proficiency', () => {
+  assert.match(script, /function planFamiliarity\(styleId,planId\)/);
+  assert.match(script, /if\(styleId===planId\)return \.10/);
+  assert.match(script, /grappling\.includes\(planId\)\?-\.11/);
+  assert.match(script, /striking\.includes\(planId\)\?-\.09/);
+  assert.match(script, /function matchupEdge\(planId,opponentId\)/);
+  assert.match(script, /matchupEdge\(planId,tendency\)\+planFamiliarity\(state\.fighterStyle,planId\)/);
+  assert.match(script, /class="plan-badge signature">SIGNATURE/);
+  assert.match(script, /class="plan-badge unfamiliar">UNFAMILIAR/);
+  assert.match(script, /class="plan-badge good">GOOD VS THEM/);
+  assert.match(script, /class="plan-badge risky">RISKY VS THEM/);
+  assert.match(script, /function techniqueFor\(archetype,roll\)/);
+});
+
+test('submission hunters can produce tap-out finishes', () => {
+  assert.match(script, /landed&&type==='takedown'&&attackingStyle==='submission'/);
+  assert.match(script, /signatureBoost=side==='player'&&state\.fighterStyle==='submission'\?\.05:0/);
+  assert.match(script, /sim\.method='SUBMISSION'/);
+  assert.match(script, /TAP!/);
+  assert.match(script, /SUBMISSION WIN!/);
+  assert.match(script, /SUBMITTED\./);
+  assert.match(readme, /finish a fight by tap/);
+});
+
 test('low-condition corner crisis offers towel or last-chance haymaker outcomes', () => {
   assert.match(script, /crisisThreshold=25/);
   assert.match(script, /fight\.playerCondition<=crisisThreshold&&!fight\.crisisUsed/);
