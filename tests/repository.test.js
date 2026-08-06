@@ -43,7 +43,8 @@ test('save recovery and one-time league migration remain enabled', () => {
 
 test('rematch and exhausted-gig states reflect actual state without masking locks', () => {
   assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
-  assert.match(script, /hasHistory\?`REMATCH/);
+  assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · revenge rematch payout/);
+  assert.match(script, /`TALE OF THE TAPE<br><small>/);
   assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
   assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
   assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
@@ -92,7 +93,29 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.doesNotMatch(html, /The Living Roster/);
   assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}">/);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
-  assert.match(script, /:`FIGHT!<br><small>\$\$\{fmt\(purse\)\}<\/small>`/);
+  assert.match(script, /`TALE OF THE TAPE<br><small>\$\{status==='title'\?'TITLE · ':''\}\$\$\{fmt\(purse\)\}<\/small>`/);
+});
+
+test('career fights use a reversible tale-of-the-tape preview and a two-choice round-one opening', () => {
+  assert.match(html, /id="tapePurse"/);
+  assert.match(html, /class="tape-fighter-card player-card"/);
+  assert.match(html, /class="tape-fighter-card opponent-card"/);
+  assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
+  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT! · 15 ENERGY/);
+  assert.match(script, /function openTaleOfTape\(o\)/);
+  assert.match(script, /function closeFightPreview\(\)/);
+  assert.match(script, /function commitFight\(o=fight\?\.o\)/);
+  const preview = script.match(/function openTaleOfTape\(o\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+  assert.doesNotMatch(preview, /spendEnergy|pendingFight/);
+  assert.match(html, /data-opening-approach="aggressive"/);
+  assert.match(html, /data-opening-approach="feel"/);
+  assert.doesNotMatch(html, /id="openingPlanGrid"/);
+  assert.match(script, /const signature=state\.fighterStyle\|\|'pressure'/);
+  assert.match(script, /roundOnePlan=approach==='aggressive'\?signature:'counter'/);
+  assert.match(script, /fight\.tendencyRevealed=approach==='feel'/);
+  assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
+  assert.match(script, /fight\?\.tendencyRevealed&&matchup>=\.08/);
+  assert.match(script, /TENDENCY REVEALED/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {

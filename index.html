@@ -171,12 +171,13 @@
   .sim-header small{font-family:system-ui,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:right}
   .sim-stage{min-height:0;flex:1;display:flex;flex-direction:column;gap:10px}.sim-stage.hidden{display:none}
   .tape-card,.live-card{border:1px solid #474b51;border-radius:14px;background:linear-gradient(155deg,#24272c,#101215 72%);box-shadow:inset 0 1px #ffffff12,0 12px 30px #0009;overflow:hidden}
-  .tape-card{margin:auto 0}.tape-title,.live-title{padding:10px 12px;border-bottom:1px solid #373b41;background:linear-gradient(#2c3035,#1a1c20);display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.8px}
+  .tape-card{margin:auto 0;padding-bottom:10px}.tape-title,.live-title{padding:10px 12px;border-bottom:1px solid #373b41;background:linear-gradient(#2c3035,#1a1c20);display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.8px}
   .tape-title b,.live-title b{font-size:16px}.tape-title small,.live-title small{font-family:system-ui,sans-serif;color:var(--gold);font-size:9px;letter-spacing:.8px}
   .tape-names{display:grid;grid-template-columns:1fr 42px 1fr;gap:7px;align-items:center;padding:15px 12px 12px;text-align:center}
   .tape-name b{display:block;font-size:21px;line-height:.95}.tape-name small{display:block;margin-top:5px;font-family:system-ui,sans-serif;font-size:8.5px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase}.versus{font-size:23px;color:var(--red);font-style:italic;text-shadow:2px 2px #000}
   .tape-stats{padding:0 12px 13px}.tape-row{display:grid;grid-template-columns:1fr 76px 1fr;gap:7px;align-items:center;padding:8px 0;border-top:1px solid #30343a;text-align:center}.tape-row strong{font-size:20px;color:#fff}.tape-row label{font-family:system-ui,sans-serif;font-size:8.5px;color:#9da1a7;text-transform:uppercase;letter-spacing:.8px}
   .walkout{padding:11px 13px;background:#090a0c;border-top:1px solid #34383e;font-family:system-ui,sans-serif;font-size:10px;color:#c4c6c9;line-height:1.4;text-align:center}
+  .tape-purse{text-align:center;padding:12px 10px 9px;background:radial-gradient(circle at 50% 15%,#ffc94a2b,transparent 66%)}.tape-purse small{display:block;color:#b7a16d;font-size:8.5px;font-weight:900;letter-spacing:1.4px}.tape-purse strong{display:block;margin-top:2px;color:#ffe084;font-size:35px;line-height:1;text-shadow:0 2px #452500,0 0 18px #ffbd3850}.tape-versus-cards{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 10px}.tape-fighter-card{position:relative;aspect-ratio:2/3;min-width:0;overflow:hidden;border:2px solid #4cbfff;border-radius:12px;background:linear-gradient(155deg,#124a78,#07111d 70%);box-shadow:inset 0 0 22px #4ac5ff26,0 7px 16px #000b;padding:7px;display:flex;flex-direction:column}.tape-fighter-card.opponent-card{border-color:#ef755e;background:linear-gradient(155deg,#6e281e,#160b0c 70%);box-shadow:inset 0 0 22px #ff6c4a26,0 7px 16px #000b}.tape-card-top{display:flex;align-items:center;justify-content:space-between;gap:4px;color:#cdefff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:950}.opponent-card .tape-card-top{color:#ffd0c7}.tape-card-portrait{position:relative;flex:1;min-height:0;margin:5px 0;overflow:hidden;border:1px solid #ffffff24;border-radius:8px;background:radial-gradient(circle at 50% 42%,#46bfff38,transparent 45%),#050a10}.opponent-card .tape-card-portrait{background:radial-gradient(circle at 50% 42%,#ef6b5430,transparent 45%),#100708}.tape-player-art{width:100%;height:115%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 6px 9px #000)}.tape-opp-sprite{position:absolute;inset:0;background-repeat:no-repeat;background-size:500% 200%;filter:drop-shadow(0 5px 5px #000)}.tape-fighter-card h3{margin:0;text-align:center;font-size:15px;line-height:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tape-style{text-align:center;margin:4px 0;color:#9edfff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.opponent-card .tape-style{color:#ffb3a6}.tape-mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px}.tape-mini-stats span{padding:3px;border-radius:4px;background:#0005;color:#dcefff;text-align:center;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900}.tape-vs-badge{position:absolute;z-index:3;left:50%;top:42%;transform:translate(-50%,-50%) rotate(-8deg);width:34px;height:34px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#ff4537,#8b100a);box-shadow:0 3px 9px #000;color:#fff;font-size:15px;font-style:italic}.tape-scout{margin:9px 10px 0;padding:7px 8px;border:1px solid #313941;border-radius:7px;background:#090b0e;color:#aeb6bf;text-align:center;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.3}.tape-actions{display:grid;grid-template-columns:1fr 1.5fr;gap:8px;padding:9px 10px 0}.tape-action{min-height:42px;border:1px solid #46515e;border-radius:8px;background:linear-gradient(#30363d,#171b20);color:#d4dae1;font-size:11px;box-shadow:0 3px 0 #050607}.tape-action.fight{border-color:#69d8ff;background:linear-gradient(#49b9ff,#1161ce);color:#fff;box-shadow:0 3px 0 #06336f}.tape-action:disabled{border-color:#3b4148;background:#24282d;color:#737d87;box-shadow:none}.tape-clearance{grid-column:1/-1;min-height:11px;margin-top:-3px;color:#ff9b8f;text-align:center;font-family:system-ui,sans-serif;font-size:8.5px}.opening-card{margin:auto 0;border:1px solid #416e9d;border-radius:14px;background:radial-gradient(circle at 50% 0,#258eff30,transparent 40%),linear-gradient(155deg,#152b45,#080c12 72%);box-shadow:inset 0 1px #ffffff14,0 12px 30px #0009;overflow:hidden}.opening-copy{padding:18px 14px 12px;text-align:center}.opening-kicker{color:#ffcf69;font-family:system-ui,sans-serif;font-size:9px;font-weight:950;letter-spacing:1.4px}.opening-copy h2{margin:5px 0 6px;font-size:29px;line-height:.94}.opening-copy p{margin:0;color:#aebfd0;font-family:system-ui,sans-serif;font-size:10px;line-height:1.4}.opening-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 11px 13px}.opening-choice{min-height:142px;border:1px solid;border-radius:11px;padding:11px 9px;text-align:left;box-shadow:0 4px 0 #020509;transition:.15s}.opening-choice:active{transform:translateY(3px);box-shadow:0 1px 0 #020509}.opening-choice.aggressive{border-color:#f06a53;background:radial-gradient(circle at 50% 10%,#ff70443d,transparent 35%),linear-gradient(150deg,#562016,#160a0a);color:#ffd2c8}.opening-choice.feel{border-color:#4aa9e9;background:radial-gradient(circle at 50% 10%,#49b9ff30,transparent 35%),linear-gradient(150deg,#123b61,#07101b);color:#cdeeff}.opening-choice .opening-icon{display:block;text-align:center;font-size:31px}.opening-choice b{display:block;margin:8px 0 4px;text-align:center;font-size:14px}.opening-choice small{display:block;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.35}.opening-signature{padding:9px 11px;border-top:1px solid #263f5b;background:#07101b;color:#86d9ff;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:900}.tendency-read{margin-bottom:8px;padding:8px;border:1px solid #3d916e;border-radius:8px;background:#0a2b1e;color:#9eebbf;font-family:system-ui,sans-serif;font-size:9px;line-height:1.35}.tendency-read b{display:block;margin-bottom:2px;color:#c9ffdf;font-size:10px}.sim-controls.hidden{display:none}
   .live-card{display:flex;flex:1;min-height:0;flex-direction:column}
   .live-title .round-live{color:var(--gold);font-size:18px}.live-title .clock-live{font-family:system-ui,sans-serif;color:#fff;font-weight:900;font-size:12px}
   .live-score{display:grid;grid-template-columns:1fr 50px 1fr;gap:8px;align-items:center;padding:10px 12px;background:#111317;border-bottom:1px solid #34383e}.live-fighter.right{text-align:right}.live-fighter b{display:block;font-size:13px}.live-fighter small{font-family:system-ui,sans-serif;font-size:8.5px;color:var(--muted)}
@@ -220,7 +221,7 @@
   .result-section-title{background:#0d1a2b;border-color:#243e60}
 
   /* Impact is display-only and never bold; functional UI stays highly readable. */
-  .logo,.hero-copy h1,.choice h3,.card-title,.opponent h3,.action h3,.gear h3,.trainer-card h3,.fight-plan h3,.corner-panel h3,.tape-title b,.live-title b,.tape-name b,.result-card h2,.gig-modal h2{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400}
+  .logo,.hero-copy h1,.choice h3,.card-title,.opponent h3,.action h3,.gear h3,.trainer-card h3,.fight-plan h3,.corner-panel h3,.tape-title b,.live-title b,.tape-name b,.tape-purse strong,.tape-fighter-card h3,.tape-vs-badge,.opening-copy h2,.opening-choice b,.result-card h2,.gig-modal h2{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400}
   button,.rank-chip,.record,.stat,.rewardbox,.result-method,.result-section-title,.streak-pill,.objective-copy,.objective-progress,.opp-badge,.fight-btn,.level-tag,.limit-pill{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 
   /* Career publicity and endorsements */
@@ -344,7 +345,7 @@
     <section class="screen" data-screen="fight">
       <div class="card daily-fight-card"><div class="card-title">Daily Seeded Challenge <small>ONE ATTEMPT</small></div><div id="dailyFightCard"></div></div>
       <div class="card"><div class="card-title">Career Opponents <small id="rosterSummary">15 energy per fight</small></div><div id="opponentList"></div></div>
-      <div class="section-note">Choose an opponent, set an opening plan, and adjust tactics between rounds. Use FAST for a quick watch or SKIP when you only want the result.</div>
+      <div class="section-note">Preview an opponent's Tale of the Tape, confirm the fight, then choose Aggressive or Feel Them Out for Round 1. Your full tactical corner opens between rounds.</div>
     </section>
 
     <section class="screen" data-screen="hustle">
@@ -390,24 +391,27 @@
 
   <section id="fightOverlay">
     <div class="sim-shell">
-      <div class="sim-header"><b>CAGE WARRIOR <span>FIGHT NIGHT</span></b><div class="sim-controls"><button class="sim-control" id="speedBtn" type="button">FAST ×2</button><button class="sim-control skip" id="skipBtn" type="button">SKIP</button></div></div>
+      <div class="sim-header"><b>CAGE WARRIOR <span>FIGHT NIGHT</span></b><div class="sim-controls hidden" id="fightControls"><button class="sim-control" id="speedBtn" type="button">FAST ×2</button><button class="sim-control skip" id="skipBtn" type="button">SKIP</button></div></div>
 
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
-          <div class="tape-names">
-            <div class="tape-name"><b id="tapePlayerName">ROOKIE</b><small id="tapePlayerTag">UNRANKED</small></div>
-            <div class="versus">VS</div>
-            <div class="tape-name"><b id="tapeOppName">OPPONENT</b><small id="tapeOppTag">RANKED</small></div>
+          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong></div>
+          <div class="tape-versus-cards">
+            <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div><div class="tape-mini-stats"><span id="tapePPower">PWR 5</span><span id="tapePSpeed">SPD 5</span><span id="tapePChin">CHN 5</span><span id="tapePCardio">CAR 5</span></div></article>
+            <div class="tape-vs-badge">VS</div>
+            <article class="tape-fighter-card opponent-card"><div class="tape-card-top"><span>OPPONENT</span><span id="tapeOppRecord">PRO 0-0</span></div><div class="tape-card-portrait"><div class="tape-opp-sprite" id="tapeOppSprite" aria-label="Opponent silhouette"></div></div><h3 id="tapeOppName">OPPONENT</h3><div class="tape-style" id="tapeOppTag">RANKED</div><div class="tape-mini-stats"><span id="tapeOPower">PWR 5</span><span id="tapeOSpeed">SPD 5</span><span id="tapeOChin">CHN 5</span><span id="tapeOCardio">CAR 5</span></div></article>
           </div>
-          <div class="tape-stats">
-            <div class="tape-row"><strong id="tapePPower">5</strong><label>Power</label><strong id="tapeOPower">5</strong></div>
-            <div class="tape-row"><strong id="tapePSpeed">5</strong><label>Speed</label><strong id="tapeOSpeed">5</strong></div>
-            <div class="tape-row"><strong id="tapePChin">5</strong><label>Chin</label><strong id="tapeOChin">5</strong></div>
-            <div class="tape-row"><strong id="tapePCardio">5</strong><label>Cardio</label><strong id="tapeOCardio">5</strong></div>
-          </div>
-          <div class="walkout" id="walkoutText">The cage door closes. The crowd leans forward.</div>
-          <div class="fight-plan" id="openingPlan"><h3>CHOOSE YOUR OPENING PLAN</h3><p>Balance your archetype proficiency against the opponent matchup.</p><div class="plan-grid" id="openingPlanGrid"></div></div>
+          <div class="tape-scout" id="walkoutText">Compare the matchup before you sign for the fight.</div>
+          <div class="tape-actions"><button class="tape-action" id="tapeBackBtn" type="button">GO BACK</button><button class="tape-action fight" id="tapeFightBtn" type="button">FIGHT! · 15 ENERGY</button><div class="tape-clearance" id="tapeClearance"></div></div>
+        </div>
+      </div>
+
+      <div class="sim-stage hidden" id="openingStage">
+        <div class="opening-card">
+          <div class="opening-copy"><span class="opening-kicker">ROUND 1 · OPENING CALL</span><h2>HOW DO YOU ENTER THE CAGE?</h2><p>This choice applies only to the first round. Your corner can change the fight plan after the bell.</p></div>
+          <div class="opening-options"><button class="opening-choice aggressive" data-opening-approach="aggressive" type="button"><span class="opening-icon">💥</span><b>AGGRESSIVE</b><small>Impose your signature style immediately. Gain initiative, but learn no new tactical read.</small></button><button class="opening-choice feel" data-opening-approach="feel" type="button"><span class="opening-icon">👁️</span><b>FEEL THEM OUT</b><small>Give up early initiative to study reactions. Reveal their tendencies before Round 2.</small></button></div>
+          <div class="opening-signature" id="openingSignature">AGGRESSIVE USES YOUR SIGNATURE · FEEL THEM OUT EARNS THE READ</div>
         </div>
       </div>
 
@@ -937,8 +941,8 @@
       const y=Math.floor(sprite/5)*100;
       const badge=o.championship?(status==='title'?'TITLE FIGHT':status==='retired'?'FORMER CHAMP':'TITLE LOCKED'):status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='retired'?'RETIRED':'YOUR LEVEL';
       const hasHistory=(o.meetings||0)>0,declined=!o.championship&&available&&(o.lossesToPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=o.championship?(status==='title'?`Beat the reigning champion for the ${o.titleName}`:status==='retired'?`You defeated ${o.name} for the ${o.titleName}`:`Reigning ${o.titleName} champion · not yet unlocked`):status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='retired'?`Career closed · retired after ${o.lossesToPlayer} losses to you`:declined?`You beat ${o.name} · they declined another fight`:status==='passed'?(hasHistory?`Past level ${o.tier} · revenge rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · revenge rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
-      const btn=status==='title'?`FIGHT FOR TITLE<br><small>$${fmt(purse)}</small>`:status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='retired'?`${o.championship?'DEFEATED':'RETIRED'}<br><small>${o.championship?'FORMER CHAMP':'CAREER OVER'}</small>`:declined?`DECLINED<br><small>YOU WON</small>`:hasHistory?`REMATCH<br><small>$${fmt(purse)}</small>`:`FIGHT!<br><small>$${fmt(purse)}</small>`;
-      const disabled=!available||declined||state.energy<15||state.health<20;
+      const btn=status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='retired'?`${o.championship?'DEFEATED':'RETIRED'}<br><small>${o.championship?'FORMER CHAMP':'CAREER OVER'}</small>`:declined?`DECLINED<br><small>YOU WON</small>`:`TALE OF THE TAPE<br><small>${status==='title'?'TITLE · ':''}$${fmt(purse)}</small>`;
+      const disabled=!available||declined;
       return `<article class="opponent ${status} ${o.championship?'champion':''}">
         <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
         <div class="opp-face">
@@ -1138,7 +1142,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:'pressure',crisisUsed:false,cornerTowel:false,haymakerMiss:false};
+    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false};
   }
 
   function planFamiliarity(styleId,planId){
@@ -1174,16 +1178,17 @@
   }
 
   function simulateRound(sim,round,planId,opening=null){
-      if(sim.winner||round>3)return;const plan=planDefs.find(p=>p.id===planId)||planDefs[0],edge=strategyEdge(plan.id,sim.o.tendency),familiarity=planFamiliarity(state.fighterStyle,plan.id);sim.lastPlan=plan.id;sim.plans.push(plan.id);
+      if(sim.winner||round>3)return;const plan=planDefs.find(p=>p.id===planId)||planDefs[0],edge=opening?.mode==='feel'?0:strategyEdge(plan.id,sim.o.tendency),familiarity=opening?.mode==='feel'?0:planFamiliarity(state.fighterStyle,plan.id);sim.lastPlan=plan.id;sim.plans.push(plan.id);
       const P=sim.player,O=sim.opp,rs={round,plan:plan.id,player:emptyFightStats(),opp:emptyFightStats(),scoreP:0,scoreO:0};let stopped=false;
       sim.timeline.push({type:'roundStart',round,clock:'5:00'});
-      if(opening){const damage=opening.damage,knockdown=damage>=26||sim.oppCondition-damage<32;rs.player.attempted++;rs.player.landed++;rs.player.sig++;rs.player.damage+=damage;if(knockdown)rs.player.kd++;sim.oppCondition=clamp(sim.oppCondition-damage,0,100);sim.timeline.push({type:'action',round,clock:'4:56',text:`HAYMAKER LANDS! ${P.name} detonates a desperate right hand${knockdown?` and drops ${O.name}`:''}!`,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,landed:true,side:'player'});const finishChance=sim.oppCondition<=0?1:sim.oppCondition<18?.42:0;if(finishChance&&Math.random()<finishChance){sim.winner='player';sim.method='KO';sim.finishRound=round;sim.finishClock='4:54';stopped=true;sim.timeline.push({type:'ko',round,clock:'4:54',text:`IT'S OVER! ${P.name} came back from the brink!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}}
-      if(!stopped){const discipline=familiarity<=-.08?' It is outside their natural discipline.':'';sim.timeline.push({type:'action',round,clock:opening?'4:48':'5:00',text:opening?`${P.name} has life again and pours on pressure.`:`${P.name} opens with the ${plan.name.toLowerCase()} game plan.${discipline}`,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}
+      if(opening?.damage){const damage=opening.damage,knockdown=damage>=26||sim.oppCondition-damage<32;rs.player.attempted++;rs.player.landed++;rs.player.sig++;rs.player.damage+=damage;if(knockdown)rs.player.kd++;sim.oppCondition=clamp(sim.oppCondition-damage,0,100);sim.timeline.push({type:'action',round,clock:'4:56',text:`HAYMAKER LANDS! ${P.name} detonates a desperate right hand${knockdown?` and drops ${O.name}`:''}!`,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,landed:true,side:'player'});const finishChance=sim.oppCondition<=0?1:sim.oppCondition<18?.42:0;if(finishChance&&Math.random()<finishChance){sim.winner='player';sim.method='KO';sim.finishRound=round;sim.finishClock='4:54';stopped=true;sim.timeline.push({type:'ko',round,clock:'4:54',text:`IT'S OVER! ${P.name} came back from the brink!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}}
+      if(!stopped){const discipline=familiarity<=-.08?' It is outside their natural discipline.':'',openingText=opening?.damage?`${P.name} has life again and pours on pressure.`:opening?.mode==='aggressive'?`${P.name} storms forward and imposes the signature ${plan.name.toLowerCase()} style.`:opening?.mode==='feel'?`${P.name} stays patient, measuring ${O.name}'s range and reactions.`:`${P.name} opens with the ${plan.name.toLowerCase()} game plan.${discipline}`;sim.timeline.push({type:'action',round,clock:opening?.damage?'4:48':'5:00',text:openingText,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}
       const exchanges=rint(7,9);
       for(let ex=1;ex<=exchanges&&!stopped;ex++){
         const initiativeMod={pressure:.12,counter:-.05,brawler:.06,trickster:.03,control:.02,submission:-.01,wrestleBox:.04}[plan.id]||0;
         const tendencyInitiative={pressure:-.09,counter:.04,brawler:-.05,trickster:.01,control:-.04,submission:-.02,wrestleBox:-.03}[sim.o.tendency]||0;
-        const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative,.14,.86);
+        const openingInitiative=round===1&&opening?.mode==='aggressive'?.08:round===1&&opening?.mode==='feel'?-.07:0;
+        const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative+openingInitiative,.14,.86);
         const side=Math.random()<pInitiative?'player':'opp',A=side==='player'?P:O,D=side==='player'?O:P,aStats=rs[side],attackingStyle=side==='player'?plan.id:sim.o.tendency;
         const type=techniqueFor(attackingStyle,Math.random());aStats.attempted++;
         const roundFatigue=(round-1)*.025+ex*Math.max(0,10-A.cardio)*.0018;
@@ -1220,24 +1225,34 @@
   }
 
   function fillTape(f){
-    $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapeOppName').textContent=f.opp.name;$('#tapeOppTag').textContent=f.o.tag;
-    $('#tapePPower').textContent=f.player.power;$('#tapeOPower').textContent=f.opp.power;$('#tapePSpeed').textContent=f.player.speed;$('#tapeOSpeed').textContent=f.opp.speed;$('#tapePChin').textContent=f.player.chin;$('#tapeOChin').textContent=f.opp.chin;$('#tapePCardio').textContent=f.player.cardio;$('#tapeOCardio').textContent=f.opp.cardio;
+    const sprite=spriteIndexForOpponent(f.o),x=(sprite%5)*25,y=Math.floor(sprite/5)*100,cleared=state.energy>=15&&state.health>=20;
+    $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppTag').textContent=f.o.tag;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
+    $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').style.cssText=`background-image:url(${silhouetteSheet});background-position:${x}% ${y}%`;
+    $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<15?'YOU NEED 15 ENERGY TO FIGHT':'';
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio);
-    const matchup=edge>4?'Your corner likes the numbers.':edge<-4?`${f.o.name} enters as the favorite.`:'The numbers are close.';$('#walkoutText').textContent=`${matchup} SCOUT: ${f.o.scout}`;
+    const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.`;
   }
 
-  function startFight(o){
+  function showFightStage(stage){['tapeStage','openingStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
+  function openTaleOfTape(o){
+    if(!o.daily&&(o.lossesToPlayer||0)>0){toast(`${o.name} declined another fight after you beat them.`,'#d4989e');return}
+    clearFightTimers();fight=createFight(o);combatLocked=false;fightSpeed=1;fightTimelineIndex=0;$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#fightControls').classList.add('hidden');fillTape(fight);sfx.tap();
+  }
+  function closeFightPreview(){if(combatLocked)return;clearFightTimers();$('#fightOverlay').classList.remove('active');fight=null;sfx.tap()}
+  function commitFight(o=fight?.o){
+    if(!o)return;
     if(!o.daily&&(o.lossesToPlayer||0)>0){toast(`${o.name} declined another fight after you beat them.`,'#d4989e');return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
     if(!spendEnergy(15))return;
     initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;state.pendingFight={key:o.key,cost:15,startedAt:Date.now()};
-    $('#fightOverlay').classList.add('active');$('#tapeStage').classList.remove('hidden');$('#liveStage').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#skipBtn').disabled=true;renderPlanGrid($('#openingPlanGrid'),'opening');fillTape(fight);sfx.tap();saveState();updateUI();
+    $('#fightOverlay').classList.add('active');showFightStage('openingStage');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#skipBtn').disabled=true;$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS THE READ`;sfx.tap();saveState();updateUI();
   }
 
-  function renderPlanGrid(container,context){container.innerHTML=planDefs.map(p=>{const matchup=fight?matchupEdge(p.id,fight.o.tendency):0,familiarity=planFamiliarity(state.fighterStyle,p.id),badges=[];if(state.fighterStyle===p.id)badges.push('<span class="plan-badge signature">SIGNATURE</span>');else if(familiarity<=-.08)badges.push('<span class="plan-badge unfamiliar">UNFAMILIAR</span>');if(matchup>=.08)badges.push('<span class="plan-badge good">GOOD VS THEM</span>');else if(matchup<=-.08)badges.push('<span class="plan-badge risky">RISKY VS THEM</span>');return `<button class="plan-btn" data-fight-plan="${p.id}" data-plan-context="${context}"><b class="plan-title">${p.icon} ${p.name}</b><small>${p.text}</small>${badges.length?`<span class="plan-badges">${badges.join('')}</span>`:''}</button>`}).join('')}
+  function renderPlanGrid(container,context){container.innerHTML=planDefs.map(p=>{const matchup=fight?matchupEdge(p.id,fight.o.tendency):0,familiarity=planFamiliarity(state.fighterStyle,p.id),badges=[];if(state.fighterStyle===p.id)badges.push('<span class="plan-badge signature">SIGNATURE</span>');else if(familiarity<=-.08)badges.push('<span class="plan-badge unfamiliar">UNFAMILIAR</span>');if(fight?.tendencyRevealed&&matchup>=.08)badges.push('<span class="plan-badge good">GOOD VS THEM</span>');else if(fight?.tendencyRevealed&&matchup<=-.08)badges.push('<span class="plan-badge risky">RISKY VS THEM</span>');return `<button class="plan-btn" data-fight-plan="${p.id}" data-plan-context="${context}"><b class="plan-title">${p.icon} ${p.name}</b><small>${p.text}</small>${badges.length?`<span class="plan-badges">${badges.join('')}</span>`:''}</button>`}).join('')}
   function haymakerChance(sim){return clamp(.34+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.20,.68)}
-  function beginFight(planId){
-    if(!fight||fight.rounds.length)return;simulateRound(fight,1,planId);$('#tapeStage').classList.add('hidden');$('#liveStage').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;$('#skipBtn').disabled=false;appendFightLine({clock:'5:00',text:'The cage door locks. Your plan is set.',className:'big'});fightTimelineIndex=0;playFightTimeline(0);
+  function beginFightApproach(approach){
+    if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure',roundOnePlan=approach==='aggressive'?signature:'counter';fight.openingApproach=approach;fight.tendencyRevealed=approach==='feel';simulateRound(fight,1,roundOnePlan,{mode:approach});showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;$('#skipBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} gives ground and starts gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
   }
   function showCornerChoice(){
     if(!fight||fight.winner||fight.rounds.length>=3){finishFightSimulation();return}
@@ -1247,7 +1262,7 @@
       box.innerHTML=`<div class="corner-panel crisis-panel"><h3>🚨 ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>🏳️ THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker"><b>💥 THROW A HAYMAKER</b><small>${chance}% chance to land. Miss and you are knocked out.</small></button></div></div>`;
       return;
     }
-    $('#skipBtn').disabled=false;box.innerHTML=`<div class="corner-panel"><h3>ROUND ${next}: CORNER CALL</h3><p>Read the fight and change tactics for the next round.</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderPlanGrid($('#cornerPlanGrid'),'corner');
+    const style=fighterStyles.find(s=>s.id===fight.o.tendency),read=fight.tendencyRevealed&&next===2?`<div class="tendency-read"><b>👁️ TENDENCY REVEALED · ${style?.name||fight.o.tag}</b>${fight.o.scout} Green and red plan badges now show your tactical matchup.</div>`:'';$('#skipBtn').disabled=false;box.innerHTML=`<div class="corner-panel"><h3>ROUND ${next}: CORNER CALL</h3>${read}<p>${fight.tendencyRevealed?'Use the read and change tactics for the next round.':'You pressed the action, but your corner has no deeper tendency read yet.'}</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderPlanGrid($('#cornerPlanGrid'),'corner');
   }
   function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
@@ -1335,7 +1350,8 @@
   document.addEventListener('pointerdown',initAudio,{once:true});
   document.addEventListener('click',e=>{
     const crisis=e.target.closest('[data-crisis]');if(crisis){resolveFightCrisis(crisis.dataset.crisis);return}
-    const fp=e.target.closest('[data-fight-plan]');if(fp){fp.dataset.planContext==='opening'?beginFight(fp.dataset.fightPlan):chooseCornerPlan(fp.dataset.fightPlan);return}
+    const opening=e.target.closest('[data-opening-approach]');if(opening){beginFightApproach(opening.dataset.openingApproach);return}
+    const fp=e.target.closest('[data-fight-plan]');if(fp){chooseCornerPlan(fp.dataset.fightPlan);return}
     const nav=e.target.closest('[data-nav]');if(nav){navTo(nav.dataset.nav);return}
     const go=e.target.closest('[data-go]');if(go){navTo(go.dataset.go);return}
     const tt=e.target.closest('#trainerToggle');if(tt){state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
@@ -1347,10 +1363,11 @@
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
     const st=e.target.closest('[data-style]');if(st){chooseStyle(st.dataset.style);return}
     const city=e.target.closest('[data-city]');if(city){chooseCity(city.dataset.city);return}
-    const df=e.target.closest('[data-daily-fight]');if(df&&state.dailyChallenge&&!state.dailyChallenge.attempted){startFight(state.dailyChallenge.opponent);return}
-    const fi=e.target.closest('[data-fight-key]');if(fi){const opponent=state.roster.find(o=>o.key===fi.dataset.fightKey);if(opponent)startFight(opponent);return}
+    const df=e.target.closest('[data-daily-fight]');if(df&&state.dailyChallenge&&!state.dailyChallenge.attempted){commitFight(state.dailyChallenge.opponent);return}
+    const fi=e.target.closest('[data-fight-key]');if(fi){const opponent=state.roster.find(o=>o.key===fi.dataset.fightKey);if(opponent)openTaleOfTape(opponent);return}
   });
   $('#dailyBtn').addEventListener('click',claimDaily);$('#continueBtn').addEventListener('click',handleResultAction);
+  $('#tapeBackBtn').addEventListener('click',closeFightPreview);$('#tapeFightBtn').addEventListener('click',()=>commitFight());
   $('#speedBtn').addEventListener('click',toggleFightSpeed);$('#skipBtn').addEventListener('click',skipFight);$('#detailsToggle').addEventListener('click',()=>{const details=$('#resultDetails'),open=!details.classList.contains('open');details.classList.toggle('open',open);$('#detailsToggle').textContent=open?'HIDE STATS':'SCORECARD'});
   $('#autographPrice').addEventListener('input',updateAutographAdvice);
   $('#autographRun').addEventListener('click',runAutographSigning);

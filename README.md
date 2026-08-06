@@ -29,12 +29,12 @@ generated league.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
-- Pick an opening plan and adjust tactics between rounds. All seven archetypes
-  are available as round plans. The result combines the plan's matchup against
-  the opponent with your fighter's proficiency: a signature plan earns an
-  edge, while crossing into an unfamiliar striking or grappling discipline
-  carries a real penalty. The plan affects initiative, technique selection,
-  accuracy, damage, takedowns, control, and knockout risk.
+- Round 1 starts with a one-time opening choice. **Aggressive** immediately
+  imposes your permanent signature style and gains initiative. **Feel Them
+  Out** concedes some early initiative, then reveals the opponent's tactical
+  tendency, scouting advice, and favorable or risky plan matchups before Round
+  2. All seven archetypes become available as corner plans between rounds;
+  unfamiliar striking or grappling disciplines still carry a real penalty.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
@@ -62,6 +62,11 @@ generated league.
   retired fighters, and
   a locked preview of the next level. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork.
+- An available opponent's **Tale of the Tape** opens a reversible pre-fight
+  preview without spending energy. It emphasizes the purse above your fighter
+  card and the opponent's card, then offers **Go Back** or **Fight!**. The 15
+  energy cost is charged only after Fight is confirmed and the cage-opening
+  choice begins.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.
