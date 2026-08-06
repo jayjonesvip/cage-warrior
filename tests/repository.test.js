@@ -53,9 +53,26 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
   assert.match(script, /cash=Math\.round\(basePurse/);
 });
 
-test('gear metadata stays above buttons and permanent identities remain readable', () => {
+test('gear collection shows owned quantities and rarity above icons', () => {
   assert.match(html, /\.gear\{[^}]*padding:9px 9px 54px[^}]*min-height:206px/);
-  assert.match(script, /<span class="rarity-tag rarity-\$\{rarity\.toLowerCase\(\)\}">\$\{rarity\}<\/span><div class="gear-icon">/);
+  assert.match(script, /owned=gearItems\.filter\(g=>gearCount\(g\.id\)>0\)/);
+  assert.match(script, /<div class="gear-top"><span class="rarity-tag rarity-\$\{rarity\.toLowerCase\(\)\}">\$\{rarity\}<\/span><span class="gear-count">×\$\{gearCount\(g\.id\)\}<\/span><\/div><div class="gear-icon">/);
   for (const rarity of ['common', 'rare', 'epic', 'legendary']) assert.match(html, new RegExp(`\\.rarity-${rarity}\\{`));
   assert.match(html, /\.build-choice:disabled\{[^}]*opacity:1[^}]*filter:none/);
+});
+
+test('gear is deterministic win loot with pity, title rarity, and non-stacking duplicates', () => {
+  assert.match(script, /function awardDeterministicGearDrop/);
+  assert.match(script, /seededRandom\(hashSeed\(`\$\{state\.gearSeed\}\|\$\{state\.wins\}\|\$\{opponent\.key\}\|\$\{state\.level\}\|gear-v1`\)\)/);
+  assert.match(script, /if\(level<=3\)return \[80,18,2,0\]/);
+  assert.match(script, /if\(level<=6\)return \[62,29,8,1\]/);
+  assert.match(script, /if\(level<=10\)return \[45,36,16,3\]/);
+  assert.match(script, /return \[30,40,23,7\]/);
+  assert.match(script, /chance=Math\.min\(\.75,\.25\+\(upset\?\.10:0\)\+\(rivalry\?\.10:0\)\+\(opponent\.daily\?\.10:0\)\+\(ko\?\.05:0\)\)/);
+  assert.match(script, /gearWinsSinceDrop>=4/);
+  assert.match(script, /minRarity=titleWon\?'RARE':'COMMON'/);
+  assert.match(script, /state\.gearCounts\[item\.id\]=gearCount\(item\.id\)\+1/);
+  assert.match(script, /function ownedBonus\(prop\)\{return state\.gear\.reduce/);
+  assert.doesNotMatch(script, /data-buy|function buyGear|function openCrate|Mystery Gear Crate/);
+  assert.doesNotMatch(script, /price:\d/);
 });
