@@ -50,3 +50,8 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
   assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
   assert.match(script, /cash=Math\.round\(basePurse/);
 });
+
+test('gear metadata stays above buttons and permanent identities remain readable', () => {
+  assert.match(html, /\.gear\{[^}]*padding:9px 9px 54px[^}]*min-height:196px/);
+  assert.match(html, /\.build-choice:disabled\{[^}]*opacity:1[^}]*filter:none/);
+});
