@@ -45,7 +45,9 @@ test('rematch and exhausted-gig states reflect actual state without masking lock
 test('opponents have pro records, conditional H2H, and consent-aware rematches', () => {
   assert.match(script, /function payoutForOpponent\(o\).*o\.tier>=state\.level\?1:\.5/);
   assert.match(script, /recordInitialized:true/);
-  assert.match(script, /H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}/);
+  assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
+  assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:''/);
+  assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
   assert.match(script, /declined=available&&\(o\.lossesToPlayer\|\|0\)>0/);
   assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
   assert.match(script, /cash=Math\.round\(basePurse/);

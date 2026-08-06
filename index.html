@@ -124,7 +124,7 @@
   .opponent.passed .opp-sprite{filter:saturate(.72) brightness(.82);opacity:.92;transform:scale(.97)}
   .opp-badge{position:absolute;left:7px;top:7px;padding:4px 6px;border-radius:999px;background:rgba(5,11,19,.84);border:1px solid #315c90;color:#86d7ff;font-family:system-ui,sans-serif;font-size:8px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;z-index:1}
   .opp-face .sil-label{position:absolute;inset:auto 0 8px 0;text-align:center;font-family:system-ui,sans-serif;font-size:8px;font-weight:900;letter-spacing:1px;color:#d9e7f7;text-shadow:0 1px 2px #000;z-index:1;opacity:.92}
-  .opp-main h3{margin:0 0 3px;font-size:16px;line-height:.95}.opp-main p{font-family:system-ui,sans-serif;font-size:9px;color:var(--muted);margin:0 0 6px}.opp-stats{font-family:system-ui,sans-serif;font-size:8px;color:#9db9d8;line-height:1.35;margin:3px 0 7px}.opp-stats b{color:#eef8ff;font-size:9px}
+  .opp-title{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}.opp-title h3{margin:0;font-size:16px;line-height:.95}.opp-record{flex:0 0 auto;padding:3px 5px;border:1px solid #34597e;border-radius:999px;background:#071421;color:#a9dcff;font-family:system-ui,sans-serif;font-size:7px;font-weight:900;letter-spacing:.45px;white-space:nowrap}.opp-stats{font-family:system-ui,sans-serif;font-size:8px;color:#9db9d8;line-height:1.35;margin:3px 0 7px}.opp-stats b{color:#eef8ff;font-size:9px}
   .opp-note{font-family:system-ui,sans-serif;font-size:8px;color:#71cfff;text-transform:uppercase;letter-spacing:.75px}
   .opponent.passed .opp-note{color:#8ea1b9}.opponent.locked .opp-note{color:#7dbbe3}
   .stars{color:var(--gold);letter-spacing:1px;font-size:11px}
@@ -826,7 +826,7 @@
       const y=Math.floor(sprite/5)*100;
       const badge=status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='retired'?'RETIRED':'YOUR LEVEL';
       const hasHistory=(o.meetings||0)>0,declined=available&&(o.lossesToPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='retired'?`Career closed · retired after ${o.lossesToPlayer} losses to you`:declined?`You beat ${o.name} · they declined another fight`:status==='passed'?(hasHistory?`Past level ${o.tier} · revenge rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · revenge rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
-      const btn=status==='locked'?`LOCKED<br><small>LVL ${o.tier}</small>`:status==='retired'?`RETIRED<br><small>${o.wins}-${o.losses}</small>`:declined?`DECLINED<br><small>YOU WON</small>`:hasHistory?`REMATCH<br><small>$${fmt(purse)}</small>`:`BOOK<br><small>$${fmt(purse)}</small>`;
+      const btn=status==='locked'?`LOCKED<br><small>LVL ${o.tier}</small>`:status==='retired'?`RETIRED<br><small>CAREER OVER</small>`:declined?`DECLINED<br><small>YOU WON</small>`:hasHistory?`REMATCH<br><small>$${fmt(purse)}</small>`:`BOOK<br><small>$${fmt(purse)}</small>`;
       const disabled=!available||declined||state.energy<15||state.health<20,group=status!==lastStatus?(lastStatus=status,`<div class="roster-group"><span>${status==='current'?'AVAILABLE · YOUR LEVEL':status==='passed'?'AVAILABLE · PAST LEVELS':status==='retired'?'RETIRED FIGHTERS':'LOCKED · NEXT LEVEL'}</span><small>${status==='locked'?'SCOUT NOW · FIGHT LATER':status==='retired'?'CAREER ARCHIVE':status==='passed'?'HALF PURSE · 15 ENERGY':'15 ENERGY'}</small></div>`):'';
       return `${group}<div class="opponent ${status}">
         <div class="opp-face">
@@ -835,11 +835,11 @@
           ${status==='locked'?'<span class="sil-label">SCOUT REPORT</span>':status==='passed'?`<span class="sil-label">${hasHistory?'PAST OPPONENT':'AVAILABLE'}</span>`:status==='retired'?'<span class="sil-label">CAREER OVER</span>':''}
         </div>
         <div class="opp-main">
-          <h3>${o.name}</h3><p>${o.tag}</p>
+          <div class="opp-title"><h3>${o.name}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
           <div class="opp-stats"><b>PWR ${o.power}</b> · SPD ${o.speed} · CHN ${o.chin} · CAR ${o.cardio}</div>
           <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
           <span class="tendency ${rivalry?'rival-pill':''}">${rivalry?'🔥 RIVAL · ':''}${o.tag}</span>
-          <div class="opp-history">PRO ${o.wins}-${o.losses}${hasHistory?` · H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}`:''}</div>
+          ${hasHistory?`<div class="opp-history">H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}</div>`:''}
           <div class="opp-note">${note}</div>
         </div>
         <button class="fight-btn ${declined?'declined':status}" data-fight-key="${o.key}" ${disabled?'disabled':''}>${btn}</button>
