@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const html = fs.readFileSync('index.html', 'utf8');
+const readme = fs.readFileSync('README.md', 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 
 test('embedded game script parses', () => {
@@ -103,6 +104,17 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
   assert.match(script, /function ownedBonus\(prop\)\{return state\.gear\.reduce/);
   assert.doesNotMatch(script, /data-buy|function buyGear|function openCrate|Mystery Gear Crate/);
   assert.doesNotMatch(script, /price:\d/);
+});
+
+test('daily drop guarantees a deterministic collectible without resetting fight pity', () => {
+  const dailyCollectible = script.match(/function awardDailyCollectible\(date\)\{([\s\S]*?)\n\s*\}\n\s*function ensureDailyCounters/)?.[1] || '';
+  assert.match(dailyCollectible, /daily-collectible-v1/);
+  assert.match(dailyCollectible, /state\.gearCounts\[item\.id\]=gearCount\(item\.id\)\+1/);
+  assert.doesNotMatch(dailyCollectible, /gearWinsSinceDrop/);
+  assert.match(script, /gearDrop=awardDailyCollectible\(today\)/);
+  assert.match(script, /COLLECTIBLE CARD READY/);
+  assert.match(script, /rewardXpLabel'\)\.textContent='Collectible'/);
+  assert.match(readme, /Daily Drop awards Cash, energy, and one deterministic/);
 });
 
 test('fight result action celebrates wins without labeling losses as reward claims', () => {

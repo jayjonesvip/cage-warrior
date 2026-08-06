@@ -35,7 +35,10 @@ generated league.
 
 ### Collectible drops
 
-- Equipment is earned only from fight wins; it is never purchased.
+- Equipment is earned from fight wins and the guaranteed Daily Drop; it is
+  never purchased.
+- The home-screen Daily Drop awards Cash, energy, and one deterministic,
+  level-eligible collectible every day. It does not reset fight-drop pity.
 - A win has a 25% base drop chance. Upsets, rivalries, daily fights, and
   KO/TKO finishes improve the chance, up to 75%.
 - The fourth win without a drop guarantees one. Winning a title guarantees a
