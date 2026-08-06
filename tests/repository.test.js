@@ -76,3 +76,7 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
   assert.doesNotMatch(script, /data-buy|function buyGear|function openCrate|Mystery Gear Crate/);
   assert.doesNotMatch(script, /price:\d/);
 });
+
+test('fight result action celebrates wins without labeling losses as reward claims', () => {
+  assert.match(script, /\$\('#continueBtn'\)\.textContent=win\?'CLAIM REWARDS':'CONTINUE'/);
+});
