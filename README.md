@@ -16,6 +16,10 @@ generated league.
 - Pick an opening plan and adjust tactics between rounds. Pressure, Counter,
   Wrestle, and Recover create favorable and risky matchups against opponent
   tendencies.
+- When condition falls to 25% or lower between rounds, the corner presents a
+  one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
+  throwing a last-chance haymaker can swing or finish the fight, but missing it
+  results in an immediate knockout loss.
 - Watch fights normally, use 2× speed, or skip directly to the result.
 - Complete daily contracts, build win streaks, and earn upset and rivalry
   bonuses.

@@ -155,3 +155,19 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(script, /BONUS GEAR DROP READY/);
   assert.match(script, /drop-icon/);
 });
+
+test('low-condition corner crisis offers towel or last-chance haymaker outcomes', () => {
+  assert.match(script, /crisisThreshold=25/);
+  assert.match(script, /fight\.playerCondition<=crisisThreshold&&!fight\.crisisUsed/);
+  assert.match(script, /data-crisis="towel"/);
+  assert.match(script, /data-crisis="haymaker"/);
+  assert.match(script, /function haymakerChance\(sim\).*\.20,\.68/);
+  assert.match(script, /fight\.cornerTowel=true;fight\.winner='opp';fight\.method='TKO'/);
+  assert.match(script, /fight\.haymakerMiss=true;fight\.playerCondition=0;fight\.winner='opp';fight\.method='KO'/);
+  assert.match(script, /simulateRound\(fight,next,'pressure',\{damage\}\)/);
+  assert.match(script, /HAYMAKER LANDS!/);
+  assert.match(script, /Miss and you are knocked out/);
+  assert.match(script, /\$\('#skipBtn'\)\.disabled=true/);
+  assert.match(html, /\.corner-panel\.crisis-panel\{/);
+  assert.match(readme, /Throwing in the towel gives the opponent a TKO win/);
+});
