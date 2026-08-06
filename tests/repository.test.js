@@ -34,9 +34,19 @@ test('save recovery and one-time league migration remain enabled', () => {
   assert.match(script, /state\.leagueInitialized=true/);
 });
 
-test('rematch and exhausted-gig labels reflect actual state', () => {
+test('rematch and exhausted-gig states reflect actual state without masking locks', () => {
   assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
   assert.match(script, /hasHistory\?`REMATCH/);
-  assert.match(script, /limited\?'gig-unavailable'/);
-  assert.match(html, /\.action\.future\.gig-unavailable:after\{content:"NO GIGS LEFT"/);
+  assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
+  assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
+  assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
+});
+
+test('opponents have pro records, conditional H2H, and consent-aware rematches', () => {
+  assert.match(script, /function payoutForOpponent\(o\).*o\.tier>=state\.level\?1:\.5/);
+  assert.match(script, /recordInitialized:true/);
+  assert.match(script, /H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}/);
+  assert.match(script, /declined=available&&\(o\.lossesToPlayer\|\|0\)>0/);
+  assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
+  assert.match(script, /cash=Math\.round\(basePurse/);
 });
