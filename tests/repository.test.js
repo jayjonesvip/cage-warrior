@@ -68,7 +68,6 @@ test('career identity includes a permanent hometown and a fight-earned title lad
     assert.match(script, new RegExp(`region:'${region}'`));
   }
   assert.match(html, /Fighting Out Of/);
-  assert.match(html, /Fighter Attributes/);
   assert.match(script, /function chooseCity\(id\)/);
   assert.match(script, /function generateTitleChampion\(m\)/);
   assert.match(script, /championship:true,titleId:m\.id/);
@@ -122,19 +121,18 @@ test('permanent identity onboarding gates the career and removes completed selec
   assert.match(script, /if\(!\(state\.fighterStyle&&state\.fighterCity\)\)screen='home'/);
 });
 
-test('fighter attributes form one Home-only row directly beneath the condition HUD', () => {
-  assert.match(html, /\.stat-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
-  const attributes = html.indexOf('id="homeAttributes"');
-  const hero = html.indexOf('<div class="hero">');
-  const trainStart = html.indexOf('<section class="screen" data-screen="train">');
-  assert.ok(attributes > homeStart && attributes < hero, 'attributes should be the first career panel on Home');
-  assert.equal(html.indexOf('id="homeAttributes"', attributes + 1), -1, 'attributes should not be repeated on other screens');
-  assert.ok(attributes < trainStart);
-  const fightStart = html.indexOf('<section class="screen" data-screen="fight">');
-  const trainMarkup = html.slice(trainStart, fightStart);
-  assert.doesNotMatch(trainMarkup, /stat-grid|trainStatGrid|Fighter Attributes/);
-  assert.doesNotMatch(script, /\$\('#trainStatGrid'\)/);
+test('fighter attributes share the persistent condition HUD across game screens', () => {
+  assert.match(html, /\.hud-attributes-row\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(html, /<section class="resource-hud" aria-label="Current fighter condition and attributes">[\s\S]*class="hud-condition-row"[\s\S]*class="hud-attributes-row"/);
+  const hudStart = html.indexOf('<section class="resource-hud"');
+  const mainStart = html.indexOf('<main class="main">');
+  for (const id of ['powerStat', 'speedStat', 'chinStat', 'cardioStat']) {
+    const position = html.indexOf(`id="${id}"`);
+    assert.ok(position > hudStart && position < mainStart, `${id} should live in the persistent HUD`);
+  }
+  assert.match(html, /\.main\{[^}]*top:calc\(150px \+ var\(--safe-top\)\)/);
+  assert.match(html, /#app\.career-setup \.resource-hud,#app\.career-setup \.bottomnav\{display:none\}/);
+  assert.doesNotMatch(html, /homeAttributes|trainStatGrid/);
 });
 
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {

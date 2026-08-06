@@ -21,8 +21,8 @@ generated league.
   selector disappears as soon as its permanent choice is locked; career
   systems and navigation unlock only after both choices are complete. The
   selected archetype and hometown then live in the Career Identity card.
-- The Home screen keeps all four fighter attributes in one compact row directly
-  beneath the energy and health HUD. The row is not repeated on other screens.
+- The persistent top HUD keeps all four fighter attributes in one compact row
+  directly beneath energy and health across every unlocked game screen.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
