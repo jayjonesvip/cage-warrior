@@ -135,6 +135,19 @@ test('fighter attributes share the persistent condition HUD across game screens'
   assert.doesNotMatch(html, /homeAttributes|trainStatGrid/);
 });
 
+test('XP and Hype live in the top bar without a duplicate Home resource card', () => {
+  const headerStart = html.indexOf('<header class="topbar">');
+  const headerEnd = html.indexOf('</header>', headerStart);
+  for (const id of ['xpText', 'hypeText']) {
+    const position = html.indexOf(`id="${id}"`);
+    assert.ok(position > headerStart && position < headerEnd, `${id} should live in the top bar`);
+  }
+  assert.match(html, /id="rankText"[^>]*>UNRANKED<\/span><\/div><div class="top-progress"><span>XP<\/span><b id="xpText"/);
+  assert.match(html, /id="fansText"[^>]*>0<\/span> FANS<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
+  assert.doesNotMatch(html, /card bars|id="energyBar"|id="healthBar"|id="xpBar"|id="hypeBar"/);
+  assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
+});
+
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
   assert.match(html, /\.gear\.equip-bursting\{animation:equipCardBurst/);
   assert.match(html, /@keyframes equipRays/);

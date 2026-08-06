@@ -46,10 +46,12 @@
     background:linear-gradient(145deg,#173d6e,#07101d);border:1px solid #3d78bb;border-radius:8px;text-shadow:3px 3px 0 #071d44;box-shadow:inset 0 0 0 3px #020711,0 3px 0 #000,0 0 18px #1678ff33;transform:skew(-3deg)}
   .identity{min-width:0;flex:1;line-height:1}
   .identity .name{font-family:system-ui,sans-serif;font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .identity .sub{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.7px}
+  .identity .sub{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .money{text-align:right;line-height:1}
-  .money b{display:block;color:var(--green);font-size:17px}
-  .money small{font-family:system-ui,sans-serif;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px}
+  .money> b{display:block;color:var(--green);font-size:17px}
+  .money small{display:block;font-family:system-ui,sans-serif;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+  .top-progress{display:flex;align-items:center;gap:5px;margin-top:4px;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;line-height:1;color:#7890aa;letter-spacing:.55px;text-transform:uppercase;white-space:nowrap}
+  .top-progress b{color:#7ddcff;font-size:9px}.money .top-progress{justify-content:flex-end}.money .top-progress b{color:#92a9ff}
   .resource-hud{
     position:absolute;z-index:21;left:0;right:0;top:calc(72px + var(--safe-top));height:78px;padding:5px 9px;
     display:flex;flex-direction:column;gap:4px;background:linear-gradient(180deg,#081426,#030811);
@@ -107,8 +109,6 @@
   .record b{font-size:22px}.record small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px}
   .rank-chip{position:absolute;top:10px;left:10px;z-index:5;background:#0b0c0ecf;border:1px solid #555;padding:7px 9px;border-radius:8px;font-size:11px;letter-spacing:.8px;box-shadow:0 4px 10px #0008}.rank-chip strong{color:var(--gold)}
   .daily{position:absolute;top:10px;right:10px;z-index:5;border:0;border-radius:9px;padding:8px 10px;background:linear-gradient(#6ed7ff,#1768cf);color:#020814;box-shadow:0 4px 0 #07336d,0 7px 14px #000;font-size:12px;letter-spacing:.5px}.daily:disabled{filter:grayscale(1);opacity:.55;box-shadow:0 3px 0 #333}
-
-  .bars{padding:8px 10px 10px}.barrow{display:grid;grid-template-columns:58px 1fr 48px;gap:7px;align-items:center;margin:6px 0}.barrow label{font-size:11px;letter-spacing:.5px}.barrow span{font-family:system-ui,sans-serif;font-size:10px;color:#c8c9cb;text-align:right}.bar{height:10px;border-radius:20px;background:#090a0c;border:1px solid #444;overflow:hidden;box-shadow:inset 0 2px 5px #000}.fill{height:100%;width:50%;border-radius:20px;transition:width .25s;box-shadow:inset 0 1px #fff7}.energy{background:linear-gradient(90deg,#0f5f8f,#43d7ff)}.health{background:linear-gradient(90deg,#103f8f,#2b8cff)}.xp{background:linear-gradient(90deg,#184f9e,#6ed7ff)}.hype{background:linear-gradient(90deg,#2434a8,#668cff)}
 
   .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
   .choice{min-height:128px;padding:11px;border:1px solid #444;border-radius:12px;background:linear-gradient(150deg,#2a2d32,#111316);position:relative;overflow:hidden;box-shadow:0 6px 15px #0007;text-align:left}
@@ -281,8 +281,8 @@
 <div id="app" class="career-setup">
   <header class="topbar">
     <div class="logo"><span>CAGE</span><span>WARRIOR</span></div>
-    <div class="identity"><div class="name" id="fighterName">ROOKIE</div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div></div>
-    <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FANS</small></div>
+    <div class="identity"><div class="name" id="fighterName">ROOKIE</div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
+    <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FANS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
   </header>
 
   <section class="resource-hud" aria-label="Current fighter condition and attributes">
@@ -317,13 +317,6 @@
         <div class="rank-chip">CAGE RANK <strong id="cageRank">#999</strong></div>
         <button class="daily" id="dailyBtn">DAILY DROP</button>
         <div class="hero-copy"><h1>FROM NOBODY<br>TO <span>MAIN EVENT</span></h1><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
-      </div>
-
-      <div class="card bars">
-        <div class="barrow"><label>ENERGY</label><div class="bar"><div class="fill energy" id="energyBar"></div></div><span id="energyText">100/100</span></div>
-        <div class="barrow"><label>HEALTH</label><div class="bar"><div class="fill health" id="healthBar"></div></div><span id="healthText">100/100</span></div>
-        <div class="barrow"><label>XP</label><div class="bar"><div class="fill xp" id="xpBar"></div></div><span id="xpText">0/100</span></div>
-        <div class="barrow"><label>HYPE</label><div class="bar"><div class="fill hype" id="hypeBar"></div></div><span id="hypeText">0%</span></div>
       </div>
 
       <div class="card objective-card" id="objectiveCard">
@@ -863,12 +856,10 @@
     if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
     if(lastShownHealth!==null&&healthNow<lastShownHealth)flashResource('health',lastShownHealth-healthNow);
     lastShownEnergy=energyNow;lastShownHealth=healthNow;
-    $('#energyText').textContent=`${energyNow}/${state.maxEnergy}`;$('#energyBar').style.width=(state.energy/state.maxEnergy*100)+'%';
-    $('#healthText').textContent=`${healthNow}/${state.maxHealth}`;$('#healthBar').style.width=(state.health/state.maxHealth*100)+'%';
     $('#hudEnergyText').textContent=`${energyNow}/${state.maxEnergy}`;$('#hudEnergyBar').style.width=(state.energy/state.maxEnergy*100)+'%';
     $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';
-    $('#xpText').textContent=`${Math.floor(state.xp)}/${xpNeed()}`;$('#xpBar').style.width=(state.xp/xpNeed()*100)+'%';
-    $('#hypeText').textContent=Math.floor(state.hype)+'%';$('#hypeBar').style.width=state.hype+'%';
+    $('#xpText').textContent=`${Math.floor(state.xp)}/${xpNeed()}`;
+    $('#hypeText').textContent=Math.floor(state.hype)+'%';
     ['power','speed','chin','cardio'].forEach(k=>{$('#'+k+'Stat').textContent=effectiveStat(k);$('#'+k+'Mini').style.width=clamp(effectiveStat(k)*4,5,100)+'%'});
     const today=todayKey();$('#dailyBtn').disabled=state.lastDaily===today;$('#dailyBtn').textContent=state.lastDaily===today?'DROP CLAIMED':'DAILY DROP';
     const objective=activeObjective(),bonus=objectiveBonus(),progress=Math.min(objective.target,state.dailyObjective.progress||0);
