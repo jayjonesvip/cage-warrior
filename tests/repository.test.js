@@ -60,12 +60,28 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {
-  assert.match(html, /\.gear\{[^}]*padding:9px 9px 54px[^}]*min-height:206px/);
   assert.match(script, /owned=gearItems\.filter\(g=>gearCount\(g\.id\)>0\)/);
-  assert.match(script, /<div class="gear-top"><span class="rarity-tag rarity-\$\{rarity\.toLowerCase\(\)\}">\$\{rarity\}<\/span><span class="gear-count">×\$\{gearCount\(g\.id\)\}<\/span><\/div><div class="gear-icon">/);
+  assert.match(html, /\.gear\.collectible-card\{[^}]*aspect-ratio:2\/3[^}]*grid-template-rows:/);
+  assert.match(html, /\.gear-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(script, /rarity-card-\$\{rarity\.toLowerCase\(\)\}/);
+  assert.match(script, /<div class="gear-hero"><span class="gear-flair"><\/span><span class="equip-burst"><\/span><div class="gear-icon">/);
   for (const rarity of ['common', 'rare', 'epic', 'legendary']) assert.match(html, new RegExp(`\\.rarity-${rarity}\\{`));
   assert.match(html, /\.build-choice\.locked-choice\{[^}]*opacity:\.3!important[^}]*filter:grayscale\(1\) saturate\(0\)!important/);
   assert.match(script, /locked\?'locked-choice':''/);
+});
+
+test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
+  assert.match(html, /\.gear\.equip-bursting\{animation:equipCardBurst/);
+  assert.match(html, /@keyframes equipRays/);
+  assert.match(script, /toggleEquip\(eq\.dataset\.equip,eq\)/);
+  assert.match(script, /card\.classList\.add\('equip-bursting'\)/);
+  assert.match(script, /setTimeout\(updateUI,680\)/);
+});
+
+test('money is cumulative career earnings and is never spent on training', () => {
+  assert.match(html, /CAREER EARNINGS/);
+  assert.doesNotMatch(script, /state\.cash\s*-=/);
+  assert.doesNotMatch(script, /cashCost|trainerFee|Training costs/);
 });
 
 test('gear is deterministic win loot with pity, title rarity, and non-stacking duplicates', () => {

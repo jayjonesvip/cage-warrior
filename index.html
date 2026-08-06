@@ -233,6 +233,30 @@
   .modal-actions{display:grid;grid-template-columns:1fr 1.5fr;gap:8px;margin-top:13px}.modal-actions button{border:0;border-radius:10px;padding:12px;font-size:13px}.modal-cancel{background:#1a2430;color:#aebdcd;border:1px solid #34495e!important}.modal-run{background:linear-gradient(#66d4ff,#1760bd);color:#02101f;box-shadow:0 4px 0 #07376f}.modal-run:disabled{opacity:.45;box-shadow:none}
   .signing-result{display:none;margin:12px 0 2px;padding:12px;border:1px solid #2e719d;border-radius:11px;background:#071725;text-align:center}.signing-result.show{display:block}.signing-result b{display:block;color:#6ed7ff;font-size:22px}.signing-result span{display:block;margin-top:5px;font-family:system-ui,sans-serif;color:#c2d2e2;font-size:10px;line-height:1.45}
 
+  /* Collectible drop cards: fixed 2:3 ratio, two across, with full rarity frames. */
+  .gear-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:8px;padding:8px}
+  .gear.collectible-card{--rarity:#8d9aaa;--rarity-bright:#d6e0ea;--rarity-dark:#202936;--rarity-glow:rgba(150,170,190,.34);aspect-ratio:2/3;min-width:0;min-height:0;padding:8px;display:grid;grid-template-rows:auto minmax(64px,1fr) auto auto;gap:6px;border:2px solid var(--rarity-bright);border-radius:13px;background:radial-gradient(circle at 50% 31%,var(--rarity-glow),transparent 34%),linear-gradient(150deg,var(--rarity) 0%,var(--rarity-dark) 44%,#06090e 100%);box-shadow:inset 0 0 0 2px #ffffff20,inset 0 0 30px #0008,0 7px 16px #0008;isolation:isolate;overflow:hidden}
+  .gear.collectible-card:before{content:"";position:absolute;z-index:-1;inset:5px;border:1px solid #ffffff24;border-radius:9px;clip-path:polygon(0 0,82% 0,100% 12%,100% 100%,18% 100%,0 88%)}
+  .gear.collectible-card:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 18%,#ffffff18 20%,transparent 24% 70%,#ffffff12 72%,transparent 76%);opacity:.85;pointer-events:none}
+  .gear.rarity-card-common{--rarity:#62758a;--rarity-bright:#d5e0ea;--rarity-dark:#182330;--rarity-glow:rgba(185,205,220,.3)}
+  .gear.rarity-card-rare{--rarity:#087e9f;--rarity-bright:#75e9ff;--rarity-dark:#062b3c;--rarity-glow:rgba(67,222,255,.5)}
+  .gear.rarity-card-epic{--rarity:#7938a9;--rarity-bright:#ddb0ff;--rarity-dark:#28113e;--rarity-glow:rgba(193,101,255,.5)}
+  .gear.rarity-card-legendary{--rarity:#b7790a;--rarity-bright:#ffe589;--rarity-dark:#3a2605;--rarity-glow:rgba(255,193,51,.58);box-shadow:inset 0 0 0 2px #fff2a542,inset 0 0 34px #4f2500aa,0 0 18px #ffbd3247,0 8px 18px #0009}
+  .collectible-card .gear-top{margin:0;padding:4px 5px;border:1px solid #ffffff2e;border-radius:7px;background:linear-gradient(90deg,#05080bc9,#10151cc2);box-shadow:0 2px 7px #0008}
+  .collectible-card .rarity-tag{margin:0;padding:2px 5px;border:0;background:transparent;color:var(--rarity-bright);font-size:8.5px;letter-spacing:.9px;text-shadow:0 1px 3px #000}
+  .collectible-card .gear-count{border-color:#ffffff38;background:#0008;color:#fff;padding:2px 5px}
+  .gear-hero{position:relative;min-height:0;display:grid;place-items:center;overflow:hidden;border:1px solid #ffffff25;border-radius:8px;background:radial-gradient(circle,#ffffff1c 0 8%,transparent 9%),linear-gradient(145deg,#020407b8,#ffffff0d);box-shadow:inset 0 0 22px #000b}
+  .gear-flair{position:absolute;width:78%;aspect-ratio:1;border-radius:50%;background:repeating-conic-gradient(from 0deg,var(--rarity-bright) 0 3deg,transparent 3deg 18deg);opacity:.24;filter:drop-shadow(0 0 5px var(--rarity-bright));animation:gearFlairSpin 16s linear infinite}
+  .gear-flair:after{content:"";position:absolute;inset:22%;border:1px solid var(--rarity-bright);border-radius:50%;box-shadow:0 0 16px var(--rarity-glow),inset 0 0 12px var(--rarity-glow)}
+  .collectible-card .gear-icon{position:relative;z-index:2;display:grid;place-items:center;width:68%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffffff36,transparent 66%);font-size:clamp(38px,12vw,58px);filter:drop-shadow(0 7px 7px #000a) drop-shadow(0 0 8px var(--rarity-bright));transform:translateZ(0)}
+  .gear-copy{min-width:0;text-align:center}.collectible-card .gear-copy h3{margin:0;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:clamp(11px,3.3vw,15px);font-weight:950;line-height:1.05;text-shadow:0 2px 4px #000;max-width:none}.collectible-card .gear-copy p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:5px 1px 0;color:#d9e2eb;font-size:8.5px;line-height:1.22;text-align:center}
+  .gear-footer{align-self:end;display:grid;gap:5px}.collectible-card .level-tag{justify-self:center;margin:0;border-color:#ffffff35;background:#030609a8;color:#dce7f1}
+  .gear.collectible-card .gear-footer .equip-btn{position:relative;left:auto;right:auto;bottom:auto;width:100%;min-height:30px;padding:7px 5px;border:1px solid #ffffff6b;border-radius:7px;background:linear-gradient(#e9f9ff,#69cfff 48%,#1d68c8 52%,#124589);color:#03101b;box-shadow:0 3px 0 #061d3d,0 0 11px var(--rarity-glow);font-size:10px;font-weight:950;letter-spacing:.7px;overflow:hidden}.gear.collectible-card .gear-footer .equip-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #061d3d}.gear.collectible-card.equipped .gear-footer .equip-btn{background:linear-gradient(#effff7,#6ee9b1 48%,#178159 52%,#0d5238);box-shadow:0 3px 0 #062d1f,0 0 13px #56efab66}
+  .gear.collectible-card .gear-footer .gear-status{position:static;padding:7px 4px;border-color:#ffffff55;background:#07150dd4;color:#b5f3d2;font-size:8.5px}
+  .equip-burst{position:absolute;z-index:8;left:50%;top:40%;width:24px;height:24px;transform:translate(-50%,-50%);pointer-events:none;opacity:0}.equip-burst:before,.equip-burst:after{content:"";position:absolute;inset:-70px;border-radius:50%}.equip-burst:before{background:repeating-conic-gradient(from 0deg,#fff 0 3deg,var(--rarity-bright) 3deg 7deg,transparent 7deg 18deg);mask:radial-gradient(circle,transparent 0 26%,#000 28% 50%,transparent 52%);-webkit-mask:radial-gradient(circle,transparent 0 26%,#000 28% 50%,transparent 52%)}.equip-burst:after{inset:-24px;border:3px solid #fff;box-shadow:0 0 18px var(--rarity-bright),inset 0 0 18px var(--rarity-bright)}
+  .gear.equip-bursting{animation:equipCardBurst .68s cubic-bezier(.2,.9,.2,1)}.gear.equip-bursting .gear-icon{animation:equipIconBurst .65s cubic-bezier(.15,1.5,.3,1)}.gear.equip-bursting .gear-flair{animation:equipFlairBurst .68s ease-out}.gear.equip-bursting .equip-burst{animation:equipBurstShow .68s ease-out}.gear.equip-bursting .equip-burst:before{animation:equipRays .68s ease-out}.gear.equip-bursting .equip-burst:after{animation:equipRing .68s ease-out}.gear.equip-bursting .equip-btn{animation:equipButtonFlash .68s ease-out}
+  @keyframes gearFlairSpin{to{transform:rotate(360deg)}}@keyframes equipCardBurst{0%{transform:scale(1)}35%{transform:scale(1.035);filter:brightness(1.55)}100%{transform:scale(1)}}@keyframes equipIconBurst{0%{transform:scale(.75) rotate(-10deg)}42%{transform:scale(1.3) rotate(5deg)}100%{transform:none}}@keyframes equipFlairBurst{0%{transform:scale(.35) rotate(0);opacity:0}42%{opacity:.9}100%{transform:scale(1.45) rotate(75deg);opacity:0}}@keyframes equipBurstShow{0%,100%{opacity:0}12%,68%{opacity:1}}@keyframes equipRays{from{transform:scale(.15) rotate(0)}to{transform:scale(1.35) rotate(70deg);opacity:0}}@keyframes equipRing{from{transform:scale(.2);opacity:1}to{transform:scale(2.4);opacity:0}}@keyframes equipButtonFlash{0%,100%{filter:none}35%{filter:brightness(2);box-shadow:0 0 26px #fff}}
+
 </style>
 </head>
 <body>
@@ -240,7 +264,7 @@
   <header class="topbar">
     <div class="logo"><span>CAGE</span><span>WARRIOR</span></div>
     <div class="identity"><div class="name" id="fighterName">ROOKIE</div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div></div>
-    <div class="money"><b id="cashText">$0</b><small><span id="fansText">0</span> fans</small></div>
+    <div class="money"><b id="cashText">$0</b><small>CAREER EARNINGS · <span id="fansText">0</span> FANS</small></div>
   </header>
 
   <section class="resource-hud" aria-label="Current fighter condition">
@@ -296,7 +320,7 @@
 
     <section class="screen" data-screen="train">
       <div class="card build-card"><div class="card-title">Choose Your Fight Identity <small>Permanent style</small></div><div class="build-grid" id="buildChoices"></div><div class="loadout-note" id="buildDescription">Your identity adds permanent strengths and improves its matching fight plan.</div></div>
-      <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega per session for +1 extra skill gain, more XP, and a better perfect-session chance. The price rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional per session</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
+      <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Bring Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. Training uses energy and daily sessions—not money.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="section-note">Training now costs gym money as well as energy. Sparring counts as two sessions, drains more energy, and can improve two skills at once—but you may lose a little health.</div>
       <div class="card"><div class="card-title">Coach's Board <small id="coachTip">Keep your hands up.</small></div><div class="stat-grid" id="trainStatGrid"></div></div>
@@ -392,7 +416,7 @@
     <h2 id="resultTitle" class="win">DECISION WIN!</h2>
     <div class="result-method" id="resultMethod">UNANIMOUS DECISION · 3 ROUNDS</div>
     <p id="resultLine">You gave the crowd something to remember.</p>
-    <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small>Cash</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small>Fans</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small>XP</small></div></div>
+    <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small>Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small>Fans</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small>XP</small></div></div>
     <div class="loot" id="lootBox" style="display:none"></div>
     <div class="result-actions"><button class="continue-btn" id="continueBtn">CLAIM REWARDS</button><button class="details-toggle" id="detailsToggle" type="button">SCORECARD</button></div>
     <div class="result-details" id="resultDetails">
@@ -564,11 +588,11 @@
   ];
 
   const trainDefs = [
-    {icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,cashCost:45,gain:1,xp:9,sessions:1},
-    {icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,cashCost:45,gain:1,xp:9,sessions:1},
-    {icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,cashCost:60,gain:1,xp:11,sessions:1},
-    {icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,cashCost:35,gain:1,xp:10,sessions:1},
-    {icon:'🤼',title:'Hard Sparring',text:'Live rounds against a gym killer. Improves two random skills, but costs health.',stat:'spar',cost:20,cashCost:180,gain:2,xp:28,sessions:2,damage:[3,9]}
+    {icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,xp:9,sessions:1},
+    {icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,xp:9,sessions:1},
+    {icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,xp:11,sessions:1},
+    {icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1},
+    {icon:'🤼',title:'Hard Sparring',text:'Live rounds against a gym killer. Improves two random skills, but costs health.',stat:'spar',cost:20,gain:2,xp:28,sessions:2,damage:[3,9]}
   ];
 
   const hustleDefs = [
@@ -698,7 +722,6 @@
     const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;state.gearWinsSinceDrop=0;ensureLoadout();
     return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:titleWon||pity,reason:titleWon?'TITLE DROP':pity?'PITY DROP':'FIGHT DROP'};
   }
-  function trainerFee(){return 90+state.level*25}
   function ensureDailyCounters(){
     const today=todayKey();
     if(!state.dailyCounters||state.dailyCounters.date!==today)state.dailyCounters={date:today,train:0,hustle:0,risk:0,publicity:0};
@@ -763,7 +786,7 @@
     while(state.xp>=xpNeed()){
       state.xp-=xpNeed();state.level++;state.maxEnergy+=3;state.energy=state.maxEnergy;state.maxHealth+=5;state.health=state.maxHealth;state.cash+=100*state.level;leveled=true;
     }
-    if(leveled){sfx.level();confettiBurst();toast(`LEVEL ${state.level}! Full refill + cash bonus`, '#f4c34a')}
+    if(leveled){sfx.level();confettiBurst();toast(`LEVEL ${state.level}! Full refill + earnings bonus`, '#f4c34a')}
     if(leveled){ensureRoster();awardMilestones()}
   }
   function spendEnergy(n){if(state.energy<n){toast('Not enough energy. It refills over time.','#ff766d');return false}state.energy-=n;return true}
@@ -802,10 +825,10 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',4),coach=state.trainerOn,fee=trainerFee();
+    const left=sessionsLeft('train',4),coach=state.trainerOn;
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
-    const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>${coach?`+$${fee} per session`:'Optional per session'}</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
-    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const money=a.cashCost+(coach?fee*a.sessions:0),locked=state.energy<a.cost||state.cash<money||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy · $${money}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
+    const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>${coach?'BONUS ACTIVE':'Optional boost'}</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
+    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const locked=state.energy<a.cost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
     $('#trainStatGrid').innerHTML=['power','speed','chin','cardio'].map(k=>`<div class="stat"><div class="row"><small>${k}</small><b>${effectiveStat(k)}</b></div><div class="mini"><i style="width:${clamp(effectiveStat(k)*4,5,100)}%"></i></div></div>`).join('');
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
@@ -843,9 +866,9 @@
     const order=['Fight Gear','Bling','Lifestyle','Property & Rides'],owned=gearItems.filter(g=>gearCount(g.id)>0);
     const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive fan bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
     if(!owned.length){$('#gearShop').innerHTML='<div class="gear-empty"><b>NO GEAR YET</b><span>Win fights to earn deterministic drops. Your fourth win without a drop is guaranteed to produce one.</span></div>';return}
-    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear owned ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag rarity-${rarity.toLowerCase()}">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-icon">${g.icon}</div><h3>${g.name}</h3><p>${g.desc}</p><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div>`}).join('')}</div></div>`}).join('');
+    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${g.icon}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
   }
-  function toggleEquip(id){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0)state.equippedGear.splice(at,1);else if(state.equippedGear.length<4)state.equippedGear.push(id);else{toast('Loadout full. Unequip one item first.','#ffcc75');return}sfx.tap();updateUI()}
+  function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);sfx.tap();updateUI();return}if(state.equippedGear.length>=4){toast('Loadout full. Unequip one item first.','#ffcc75');return}state.equippedGear.push(id);initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
     refreshOpponents();const activeCount=state.roster.filter(o=>!o.retired&&o.tier<=state.level).length;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${state.retiredCount} RETIRED`;
     let lastStatus='';$('#opponentList').innerHTML=opponents.map(o=>{
@@ -933,10 +956,9 @@
   }
 
   function handleTrain(i){
-    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn,money=a.cashCost+(coach?trainerFee()*a.sessions:0);
+    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn;
     if(sessionsLeft('train',4)<a.sessions){toast('No training sessions left today.','#ff766d');return}
-    if(state.cash<money){toast(`Training costs $${money}. Hustle first.`, '#ff766d');return}
-    if(!spendEnergy(a.cost))return;initAudio();state.cash-=money;state.dailyCounters.train+=a.sessions;
+    if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.train+=a.sessions;
     const perfect=Math.random()<(coach?.27:.17),boost=coach?1:0,baseGain=a.gain+boost,gain=baseGain*(perfect?2:1);
     if(a.stat==='spar'){
       const skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,2);skills.forEach(k=>state.stats[k]+=gain);const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));sfx.crit();shake(true);toast(`${perfect?'ELITE SPAR! ':'SPAR COMPLETE! '}+${gain} ${skills[0].toUpperCase()} & ${skills[1].toUpperCase()} · -${d} health`,perfect?'#f4c34a':'#77d13e');$('#coachTip').textContent='Live rounds expose the truth. Recover before you book a fight.';
@@ -946,7 +968,7 @@
     updateUI();
   }
   function handleHustle(i){
-    ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);state.cash+=cash;gainXp(a.xp);sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
+    ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);state.cash+=cash;gainXp(a.xp);sfx.coin();toast(`+$${cash} career earnings · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
   }
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
@@ -1231,7 +1253,7 @@
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}
     const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
-    const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip);return}
+    const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
     const st=e.target.closest('[data-style]');if(st){chooseStyle(st.dataset.style);return}
     const df=e.target.closest('[data-daily-fight]');if(df&&state.dailyChallenge&&!state.dailyChallenge.attempted){startFight(state.dailyChallenge.opponent);return}
     const fi=e.target.closest('[data-fight-key]');if(fi){const opponent=state.roster.find(o=>o.key===fi.dataset.fightKey);if(opponent)startFight(opponent);return}
