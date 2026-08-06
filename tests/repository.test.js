@@ -54,6 +54,8 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
 });
 
 test('gear metadata stays above buttons and permanent identities remain readable', () => {
-  assert.match(html, /\.gear\{[^}]*padding:9px 9px 54px[^}]*min-height:196px/);
+  assert.match(html, /\.gear\{[^}]*padding:9px 9px 54px[^}]*min-height:206px/);
+  assert.match(script, /<span class="rarity-tag rarity-\$\{rarity\.toLowerCase\(\)\}">\$\{rarity\}<\/span><div class="gear-icon">/);
+  for (const rarity of ['common', 'rare', 'epic', 'legendary']) assert.match(html, new RegExp(`\\.rarity-${rarity}\\{`));
   assert.match(html, /\.build-choice:disabled\{[^}]*opacity:1[^}]*filter:none/);
 });
