@@ -21,6 +21,12 @@ test('mobile viewport permits accessibility zoom', () => {
   assert.doesNotMatch(viewport, /maximum-scale\s*=\s*1/i);
 });
 
+test('interface text never renders below 8.5px', () => {
+  const fontSizes = [...html.matchAll(/font-size:\s*([\d.]+)px/g)].map(match => Number(match[1]));
+  assert.ok(fontSizes.length > 0, 'expected pixel font sizes in the interface');
+  assert.ok(fontSizes.every(size => size >= 8.5), `found undersized text: ${fontSizes.filter(size => size < 8.5).join(', ')}`);
+});
+
 test('daily challenge uses its independent deterministic generator', () => {
   assert.match(script, /function generateDailyOpponent\(date,tier\)/);
   const ensureDaily = script.match(/function ensureDailyChallenge\(\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
