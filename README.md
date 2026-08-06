@@ -1,5 +1,7 @@
 # Cage Warrior
 
+[![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
+
 Cage Warrior is a mobile-first, single-player fight-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
 
