@@ -19,6 +19,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `nav-fight.png` | 🥊 | Fight navigation |
 | `nav-hustle.png` | 💵 | Hustle navigation |
 | `nav-gear.png` | 🛡 | Gear navigation |
+| `nav-feed.png` | ◉ | Cage Feed navigation and unread-post badge |
 | `edit-fighter-name.png` | ✎ | Fighter-name pencil control |
 | `thank-followers.png` | ♡ | Thank the Followers Cage Feed post |
 | `fight-aggressive.png` | 💥 | Aggressive Round 1 choice |

@@ -349,7 +349,13 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(html, /id="homeFeedPreview"/);
   assert.match(html, /data-screen="feed"/);
   assert.match(html, /id="socialTimeline"/);
-  assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0/);
+  assert.match(html, /data-nav="feed"[\s\S]*data-icon-name="nav-feed"[\s\S]*id="feedNavBadge"/);
+  assert.match(html, /class="card feed-page-card"[\s\S]*id="socialTimeline"[\s\S]*id="socialActions"/);
+  assert.doesNotMatch(html, /class="feed-back"/);
+  assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
+  assert.match(script, /function socialUnreadCount\(\)/);
+  assert.match(script, /currentScreen==='feed'\)state\.socialLastReadSerial=state\.socialSerial/);
+  assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
   assert.match(script, /function createSocialAccount\(\)/);
   assert.match(script, /Hello, fight fans! Stay tuned—the climb starts now/);
   assert.match(script, /if\(!state\.socialAccountCreated\)return 0/);
