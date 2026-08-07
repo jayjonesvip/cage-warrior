@@ -31,11 +31,14 @@ generated league.
   reflect that archetype.
 - Round 1 starts with a one-time opening choice. **Aggressive** immediately
   imposes your permanent signature style and gains initiative. **Feel Them
-  Out** concedes some early initiative in exchange for a deeper corner read.
-  Either choice reveals the opponent's basic tendency after Round 1, but only
-  Feel Them Out supplies scouting advice and favorable or risky matchup badges.
-  All seven archetypes become available as corner plans between rounds;
-  unfamiliar striking or grappling disciplines still carry a real penalty.
+  Out** uses that same signature discipline more cautiously, conceding some
+  early initiative in exchange for a deeper corner read. Either choice reveals
+  the opponent's basic tendency after Round 1.
+- Before Rounds 2 and 3, the corner offers only grounded tactical choices:
+  stay with your signature style or challenge the opponent in their revealed
+  style. Fighting outside your own discipline carries a real penalty. When
+  both fighters share an archetype, the duplicate choice collapses into one
+  **Start Round** action.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.

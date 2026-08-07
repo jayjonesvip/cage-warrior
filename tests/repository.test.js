@@ -125,11 +125,14 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.doesNotMatch(html, /id="tapeOppTag"/);
   assert.doesNotMatch(script, /\$\{rivalry\?'🔥 RIVAL · ':''\}\$\{o\.tag\}/);
   assert.doesNotMatch(script, /\$\{o\.tag\} · PRO \$\{o\.wins\}-\$\{o\.losses\}/);
-  assert.match(script, /const signature=state\.fighterStyle\|\|'pressure'/);
-  assert.match(script, /roundOnePlan=approach==='aggressive'\?signature:'counter'/);
-  assert.match(script, /fight\.tendencyRevealed=true;fight\.deepRead=approach==='feel'/);
+  assert.match(script, /const signature=state\.fighterStyle\|\|'pressure';fight\.openingApproach=approach;fight\.deepRead=approach==='feel';simulateRound\(fight,1,signature,\{mode:approach\}\);fight\.tendencyRevealed=true/);
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
-  assert.match(script, /fight\?\.deepRead&&matchup>=\.08/);
+  assert.match(script, /function renderCornerPlans\(container,nextRound\)/);
+  assert.match(script, /sameStyle\?\[signature\]:\[signature,opponentStyle\]/);
+  assert.match(script, /STICK TO YOUR STYLE/);
+  assert.match(script, /FIGHT THEM IN THEIR STYLE/);
+  assert.match(script, /START ROUND \$\{nextRound\}/);
+  assert.doesNotMatch(script, /renderPlanGrid/);
   assert.match(script, /TENDENCY REVEALED/);
   assert.match(script, /DEEP READ/);
 });
@@ -264,10 +267,10 @@ test('round strategy combines matchup and player proficiency', () => {
   assert.match(script, /striking\.includes\(planId\)\?-\.09/);
   assert.match(script, /function matchupEdge\(planId,opponentId\)/);
   assert.match(script, /matchupEdge\(planId,tendency\)\+planFamiliarity\(state\.fighterStyle,planId\)/);
-  assert.match(script, /class="plan-badge signature">SIGNATURE/);
-  assert.match(script, /class="plan-badge unfamiliar">UNFAMILIAR/);
-  assert.match(script, /class="plan-badge good">GOOD VS THEM/);
-  assert.match(script, /class="plan-badge risky">RISKY VS THEM/);
+  assert.match(script, /class="plan-badge signature">YOUR SIGNATURE/);
+  assert.match(script, /class="plan-badge unfamiliar">THEIR STYLE/);
+  assert.match(script, /class="plan-badge good">TACTICAL EDGE/);
+  assert.match(script, /class="plan-badge risky">TACTICAL RISK/);
   assert.match(script, /function techniqueFor\(archetype,roll\)/);
 });
 
