@@ -396,6 +396,8 @@ test('equipping fight gear triggers the collectible-card burst before rerenderin
 });
 
 test('cash pays the scaling coach fee while career earnings remain cumulative', () => {
+  assert.doesNotMatch(html, /Coach's Board|id="coachTip"/);
+  assert.doesNotMatch(script, /\$\('#coachTip'\)/);
   assert.match(html, /id="careerEarningsText"/);
   assert.match(script, /function coachFee\(\)\{return 35\+state\.level\*20\}/);
   assert.match(script, /coachCost=coach\?fee\*a\.sessions:0/);

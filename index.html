@@ -356,7 +356,6 @@
       <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. His per-session fee rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health.</div>
-      <div class="card"><div class="card-title">Coach's Board</div><div class="loadout-note" id="coachTip">Keep your hands up.</div></div>
     </section>
 
     <section class="screen" data-screen="fight">
@@ -1142,9 +1141,9 @@
     if(!spendEnergy(a.cost))return;initAudio();state.cash-=fee;state.dailyCounters.train+=a.sessions;
     const perfect=Math.random()<(coach?.27:.17),boost=coach?1:0,baseGain=a.gain+boost,gain=baseGain*(perfect?2:1);
     if(a.stat==='spar'){
-      const skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,2);skills.forEach(k=>state.stats[k]+=gain);const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));sfx.crit();shake(true);toast(`${perfect?'ELITE SPAR! ':'SPAR COMPLETE! '}+${gain} ${skills[0].toUpperCase()} & ${skills[1].toUpperCase()} · -${d} health`,perfect?'#f4c34a':'#77d13e');$('#coachTip').textContent='Live rounds expose the truth. Recover before you book a fight.';
+      const skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,2);skills.forEach(k=>state.stats[k]+=gain);const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));sfx.crit();shake(true);toast(`${perfect?'ELITE SPAR! ':'SPAR COMPLETE! '}+${gain} ${skills[0].toUpperCase()} & ${skills[1].toUpperCase()} · -${d} health`,perfect?'#f4c34a':'#77d13e');
     }else{
-      state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');$('#coachTip').textContent=perfect?'Coach Vega calls that a breakthrough.':'Good work. Spend the money, keep the gains.';
+      state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
     }
     updateUI();
   }
