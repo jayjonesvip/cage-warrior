@@ -293,16 +293,16 @@
   <header class="topbar">
     <div class="logo"><span>CAGE</span><span>WARRIOR</span></div>
     <div class="identity"><div class="name" id="fighterName">ROOKIE</div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
-    <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FANS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
+    <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FOLLOWERS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
   </header>
 
   <section class="resource-hud" aria-label="Current fighter condition and attributes">
     <div class="hud-condition-row">
       <div class="hud-resource energy-hud" id="energyHud">
-        <span><i data-icon-name="hud-energy" data-icon-fallback="⚡">⚡</i> ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
+        <span>ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
       </div>
       <div class="hud-resource health-hud" id="healthHud">
-        <span><i data-icon-name="hud-health" data-icon-fallback="♥">♥</i> HEALTH</span><div class="hud-meter"><i id="hudHealthBar"></i></div><b id="hudHealthText">100/100</b><em id="hudHealthDelta"></em>
+        <span>HEALTH</span><div class="hud-meter"><i id="hudHealthBar"></i></div><b id="hudHealthText">100/100</b><em id="hudHealthDelta"></em>
       </div>
     </div>
     <div class="hud-attributes-row" aria-label="Fighter attributes">
@@ -362,7 +362,7 @@
       <div class="card"><div class="card-title">Underground Buzz <span class="limit-pill" id="riskLimitText">1 RISK LEFT</span></div><div class="action-list" id="riskActions"></div></div>
       <div class="card career-card"><div class="card-title">Career Spotlight <span class="limit-pill" id="publicityLimitText">2 GIGS LEFT</span></div><div class="action-list" id="publicityActions"></div></div>
       <div class="card career-card"><div class="card-title">Endorsement Deals <small>One active contract</small></div><div id="activeEndorsement"></div><div class="action-list" id="endorsementActions"></div></div>
-      <div class="section-note">Future opportunities remain visible so you can see what more levels and fans will unlock.</div>
+      <div class="section-note">Future opportunities remain visible so you can see what more levels and followers will unlock.</div>
     </section>
 
     <section class="screen" data-screen="gear">
@@ -382,11 +382,11 @@
   <div class="modal-overlay" id="autographModal" aria-hidden="true">
     <div class="gig-modal" role="dialog" aria-modal="true" aria-labelledby="autographTitle">
       <h2 id="autographTitle">Autograph <span>Signing</span></h2>
-      <p>Set your price per autograph. The final payday stays unknown until fans show up and decide whether your price is worth it.</p>
+      <p>Set your price per autograph. The final payday stays unknown until followers show up and decide whether your price is worth it.</p>
       <div class="price-readout"><small>Charge per autograph</small><b id="autographPriceText">$0</b></div>
       <input class="price-slider" id="autographPrice" type="range" min="0" max="50" value="0" step="1">
       <div class="price-scale"><span>FREE</span><span>$25</span><span>$50</span></div>
-      <div class="pricing-advice good" id="autographAdvice">Free signings build the most goodwill and fans, but pay nothing.</div>
+      <div class="pricing-advice good" id="autographAdvice">Free signings build the most goodwill and followers, but pay nothing.</div>
       <div class="signing-result" id="autographResult"></div>
       <div class="modal-actions">
         <button class="modal-cancel" id="autographCancel">CANCEL</button>
@@ -417,7 +417,7 @@
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
-          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy"><i data-icon-name="hud-energy" data-icon-fallback="⚡">⚡</i> 15 ENERGY REQUIRED</span></div>
+          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy">15 ENERGY REQUIRED</span></div>
           <div class="tape-versus-cards">
             <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div><div class="tape-mini-stats"><span id="tapePPower">PWR 5</span><span id="tapePSpeed">SPD 5</span><span id="tapePChin">CHN 5</span><span id="tapePCardio">CAR 5</span></div></article>
             <div class="tape-vs-badge">VS</div>
@@ -456,7 +456,7 @@
     <h2 id="resultTitle" class="win">DECISION WIN!</h2>
     <div class="result-method" id="resultMethod">UNANIMOUS DECISION · 3 ROUNDS</div>
     <p id="resultLine">You gave the crowd something to remember.</p>
-    <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Fans</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
+    <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="loot" id="lootBox" style="display:none"></div>
     <div class="result-actions"><button class="continue-btn" id="continueBtn">CLAIM REWARDS</button><button class="details-toggle" id="detailsToggle" type="button">SCORECARD</button></div>
     <div class="result-details" id="resultDetails">
@@ -645,13 +645,13 @@
     {id:'champ-gloves',category:'Fight Gear',name:'Championship Gloves',icon:'🥊',rarity:'LEGENDARY',minLevel:11,desc:'+9 Power. Gold-trimmed and level-gated for a reason.',stat:'power',bonus:9},
     {id:'main-event-kit',category:'Fight Gear',name:'Main Event Ring Gear',icon:'🩳',rarity:'LEGENDARY',minLevel:13,desc:'+8 Speed. Cameras, sponsors, and no cheap fabric.',stat:'speed',bonus:8},
 
-    // Bling — increases fan payouts
-    {id:'steel-chain',category:'Bling',name:'Steel Chain',icon:'⛓️',rarity:'RARE',minLevel:2,desc:'+3% fans from fight wins.',prestige:3},
-    {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+5% fans from fight wins.',prestige:5},
-    {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'EPIC',minLevel:5,desc:'+8% fans from fight wins.',prestige:8},
-    {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% fans from fight wins.',prestige:12},
-    {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% fans from fight wins.',prestige:18},
-    {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% fans from fight wins.',prestige:25},
+    // Bling — increases follower payouts
+    {id:'steel-chain',category:'Bling',name:'Steel Chain',icon:'⛓️',rarity:'RARE',minLevel:2,desc:'+3% followers from fight wins.',prestige:3},
+    {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+5% followers from fight wins.',prestige:5},
+    {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'EPIC',minLevel:5,desc:'+8% followers from fight wins.',prestige:8},
+    {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% followers from fight wins.',prestige:12},
+    {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% followers from fight wins.',prestige:18},
+    {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
 
     // Lifestyle — improves passive recovery
     {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'Better company. +0.03 health every recovery tick.',healthRegen:.03},
@@ -662,10 +662,10 @@
 
     // Property & rides — money and prestige
     {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'EPIC',minLevel:5,desc:'+3% fight money. You finally leave the gym couch.',cashBonus:3},
-    {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight fans.',cashBonus:7,prestige:5},
+    {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
     {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better recovery.',cashBonus:10,energyRegen:.10,healthRegen:.05},
-    {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight fans.',cashBonus:15,prestige:12},
-    {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight fans, and recovery.',cashBonus:25,prestige:20,energyRegen:.15,healthRegen:.12}
+    {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight followers.',cashBonus:15,prestige:12},
+    {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and recovery.',cashBonus:25,prestige:20,energyRegen:.15,healthRegen:.12}
   ];
 
   const trainDefs = [
@@ -684,14 +684,14 @@
 
   const riskDefs = [
     {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]},
-    {id:'call-out-rival',icon:'📣',title:'Call Out a Rival',text:'75% chance to gain hype. Sometimes you get roasted.',cost:5,success:.75,hype:[8,18]}
+    {id:'call-out-rival',icon:'📣',title:'Post a Rival Callout',text:'Tag a rival in a public post. If it lands, gain Hype and Followers. If it flops, the comments cook you.',cost:5,success:.75,hype:[8,18],followers:[20,60]}
   ];
 
   const publicityDefs = [
-    {id:'social-post',icon:'📱',title:'Influencer Brand Post',text:'Post a sponsored training clip. Small money, steady fan growth.',minLevel:2,minFans:100,cost:4,cash:[45,125],fans:[15,45],xp:7,payout:'$45–125'},
+    {id:'social-post',icon:'📱',title:'Influencer Brand Post',text:'Post a sponsored training clip. Small money, steady follower growth.',minLevel:2,minFans:100,cost:4,cash:[45,125],fans:[15,45],xp:7,payout:'$45–125'},
     {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
-    {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and fan reaction.',minLevel:4,minFans:300,cost:10,autograph:true,xp:14,payout:'UNKNOWN'},
-    {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet fans at a combat-sports booth and work the convention floor.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],xp:16,payout:'$350–900'},
+    {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:10,autograph:true,xp:14,payout:'UNKNOWN'},
+    {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],xp:16,payout:'$350–900'},
     {id:'commercial',icon:'🎬',title:'Regional Commercial',text:'Shoot an ad. Solid payday with a chance for the clip to go viral.',minLevel:6,minFans:1500,cost:15,cash:[900,2400],fans:[120,360],xp:22,viral:.18,payout:'$900–2.4K'},
     {id:'expo',icon:'🏟️',title:'National Fitness Expo',text:'Featured guest appearance with photos, interviews, and a packed signing line.',minLevel:8,minFans:5000,cost:20,cash:[3500,8000],fans:[450,1100],xp:32,payout:'$3.5K–8K'},
     {id:'tv-spot',icon:'📺',title:'Prime-Time Sports Segment',text:'National television appearance. One good quote can change your career.',minLevel:10,minFans:15000,cost:24,cash:[9000,18000],fans:[1200,3000],xp:45,viral:.28,payout:'$9K–18K'}
@@ -918,7 +918,7 @@
   function requirementText(a){
     const missing=[];
     if(state.level<a.minLevel)missing.push(`LVL ${a.minLevel}`);
-    if(state.fans<a.minFans)missing.push(`${fmt(a.minFans)} FANS`);
+    if(state.fans<a.minFans)missing.push(`${fmt(a.minFans)} FOLLOWERS`);
     return missing.length?`NEEDS ${missing.join(' + ')}`:'AVAILABLE NOW';
   }
   function renderHustle(){
@@ -935,19 +935,19 @@
       return `<button class="action future ${unlocked?'':'locked-opportunity'} ${unavailable}" data-publicity="${i}" ${!unlocked||limited||energyLow?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p><span class="unlock-copy">${availability}</span></div><div class="cost"><b>${a.payout}</b><small>-${a.cost} energy</small></div></button>`;
     }).join('');
     const active=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null;
-    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} fans after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FANS TO UNLOCK CONTRACT OFFERS</div>`;
+    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} followers after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FOLLOWERS TO UNLOCK CONTRACT OFFERS</div>`;
     $('#endorsementActions').innerHTML=endorsementDefs.map((d,i)=>{
       const unlocked=state.level>=d.minLevel&&state.fans>=d.minFans;
       const isActive=!!active&&active.id===d.id;
       const blocked=!!active&&!isActive;
-      const req=[];if(state.level<d.minLevel)req.push(`LVL ${d.minLevel}`);if(state.fans<d.minFans)req.push(`${fmt(d.minFans)} FANS`);
+      const req=[];if(state.level<d.minLevel)req.push(`LVL ${d.minLevel}`);if(state.fans<d.minFans)req.push(`${fmt(d.minFans)} FOLLOWERS`);
       const status=isActive?'ACTIVE CONTRACT':blocked?'FINISH CURRENT DEAL':unlocked?'OFFER AVAILABLE':`NEEDS ${req.join(' + ')}`;
-      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${!unlocked||blocked||isActive?'disabled':''}><div class="ico">${gameIcon(d.id,d.icon)}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} fans</small></div></button>`;
+      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${!unlocked||blocked||isActive?'disabled':''}><div class="ico">${gameIcon(d.id,d.icon)}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} followers</small></div></button>`;
     }).join('');
   }
   function renderGear(){
     const order=['Fight Gear','Bling','Lifestyle','Property & Rides'],owned=gearItems.filter(g=>gearCount(g.id)>0);
-    const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive fan bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
+    const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive follower bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
     if(!owned.length){$('#gearShop').innerHTML='<div class="gear-empty"><b>NO GEAR YET</b><span>Win fights to earn deterministic drops. Your fourth win without a drop is guaranteed to produce one.</span></div>';return}
     $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
   }
@@ -1072,8 +1072,8 @@
     let cash=rint(...a.cash),fans=rint(...a.fans),viral=false;
     if(a.viral&&Math.random()<a.viral){cash=Math.round(cash*1.65);fans=Math.round(fans*2.2);viral=true}
     receiveMoney(cash,true);state.fans+=fans;gainXp(a.xp);sfx.coin();
-    if(viral){confettiBurst();sfx.win();toast(`THE CLIP WENT VIRAL! +$${fmt(cash)} · +${fmt(fans)} fans`,'#6ed7ff')}
-    else toast(`+$${fmt(cash)} · +${fmt(fans)} fans`,'#77d13e');
+    if(viral){confettiBurst();sfx.win();toast(`THE CLIP WENT VIRAL! +$${fmt(cash)} · +${fmt(fans)} followers`,'#6ed7ff')}
+    else toast(`+$${fmt(cash)} · +${fmt(fans)} followers`,'#77d13e');
     updateUI();
   }
   function openAutographModal(){
@@ -1091,11 +1091,11 @@
   function updateAutographAdvice(){
     const price=Number($('#autographPrice').value)||0;$('#autographPriceText').textContent='$'+price;
     const box=$('#autographAdvice');box.className='pricing-advice';
-    if(price===0){box.classList.add('good');box.textContent='Free signings build the most goodwill and fans, but pay nothing.'}
-    else if(price<=12){box.classList.add('good');box.textContent='Fan-friendly pricing. Expect a long line, decent income, and positive buzz.'}
-    else if(price<=25){box.classList.add('risky');box.textContent='Premium but believable. Fewer signatures, better money per fan.'}
-    else if(price<=35){box.classList.add('risky');box.textContent='Expensive. The line will shrink and fan growth may disappear.'}
-    else{box.classList.add('danger');box.textContent='Danger zone. You may make money, but fans could call you greedy and unfollow.'}
+    if(price===0){box.classList.add('good');box.textContent='Free signings build the most goodwill and followers, but pay nothing.'}
+    else if(price<=12){box.classList.add('good');box.textContent='Accessible pricing. Expect a long line, decent income, and positive buzz.'}
+    else if(price<=25){box.classList.add('risky');box.textContent='Premium but believable. Fewer signatures, better money per follower.'}
+    else if(price<=35){box.classList.add('risky');box.textContent='Expensive. The line will shrink and follower growth may disappear.'}
+    else{box.classList.add('danger');box.textContent='Danger zone. You may make money, but people could call you greedy and unfollow.'}
   }
   function runAutographSigning(){
     const a=publicityDefs.find(x=>x.autograph);if(!a||sessionsLeft('publicity',2)<1)return;
@@ -1113,7 +1113,7 @@
     else if(price<=35)fanChange=Math.round(signatures*rand(-.04,.04));
     else fanChange=-Math.max(4,Math.round((price-34)*rand(.5,1.3)+state.fans*rand(.004,.012)));
     receiveMoney(cash,true);state.fans=Math.max(0,state.fans+fanChange);gainXp(a.xp);
-    const fanText=fanChange>=0?`+${fmt(fanChange)} fans`:`-${fmt(Math.abs(fanChange))} fans`;
+    const fanText=fanChange>=0?`+${fmt(fanChange)} followers`:`-${fmt(Math.abs(fanChange))} followers`;
     $('#autographResult').innerHTML=`<b>${fmt(signatures)} AUTOGRAPHS SIGNED</b><span>+$${fmt(cash)} income · ${fanText}<br>${price===0?'The free signing created a packed line and strong goodwill.':price>35?'The price caused backlash despite the payday.':'Your price shaped the turnout and final payment.'}</span>`;
     $('#autographResult').classList.add('show');$('#autographRun').style.display='none';$('#autographCancel').textContent='COLLECT & CLOSE';
     if(fanChange>=0){sfx.coin();if(price===0)confettiBurst()}else{sfx.lose();shake()}
@@ -1122,7 +1122,7 @@
   function handleEndorsement(i){
     const d=endorsementDefs[i];if(!d)return;
     if(state.activeEndorsement){toast('Finish your current endorsement first.','#ffcf78');return}
-    if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} fans`,'#75cfff');return}
+    if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} followers`,'#75cfff');return}
     initAudio();state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory.push(d.id);receiveMoney(d.signing,true);state.fans+=Math.round(d.fansPerFight*.5);sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
   }
   function handleRisk(i){
@@ -1131,10 +1131,10 @@
     if(!spendEnergy(a.cost))return;state.dailyCounters.risk++;
     if(Math.random()<a.success){
       if(a.cash){const c=rint(...a.cash);receiveMoney(c);sfx.coin();toast(`YOU WON $${c}`,'#f4c34a');confettiBurst()}
-      if(a.hype){const h=rint(...a.hype);state.hype=clamp(state.hype+h,0,100);sfx.win();toast(`CALL-OUT LANDED! +${h}% hype`,'#ad72ff')}
+      if(a.hype){const h=rint(...a.hype),followers=rint(...a.followers);state.hype=clamp(state.hype+h,0,100);state.fans+=followers;sfx.win();toast(`POST CAUGHT FIRE! +${h}% HYPE · +${followers} FOLLOWERS`,'#ad72ff')}
     }else{
       if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
-      else{state.hype=clamp(state.hype-5,0,100);sfx.lose();toast('Nobody cared. -5% hype','#ff6157')}
+      else{state.hype=clamp(state.hype-5,0,100);sfx.lose();toast('POST FLOPPED. THE COMMENTS COOKED YOU. -5% HYPE','#ff6157')}
     }updateUI();
   }
   function claimDaily(){
@@ -1353,12 +1353,12 @@
       if(deal){
         cash+=deal.perFight;fans+=deal.fansPerFight;receiveMoney(deal.perFight,true);state.fans+=deal.fansPerFight;state.activeEndorsement.fightsLeft--;
         const contractDone=state.activeEndorsement.fightsLeft<=0;
-        const sponsorNote=`SPONSOR: ${deal.brand} +$${fmt(deal.perFight)} +${fmt(deal.fansPerFight)} fans${contractDone?' · CONTRACT COMPLETE':''}`;
+        const sponsorNote=`SPONSOR: ${deal.brand} +$${fmt(deal.perFight)} +${fmt(deal.fansPerFight)} followers${contractDone?' · CONTRACT COMPLETE':''}`;
         loot=[loot,sponsorNote].filter(Boolean).join(' · ');
         if(contractDone)state.activeEndorsement=null;
       }
     }
-    state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Fans';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function revealGearDrop(){
@@ -1425,7 +1425,7 @@
     'One Daily Drop, every day. Free cash, free energy, collectible included. Do not ask who paid.',
     'Coach Vega wants $35 plus $20 per level. Talent is temporary; invoices are forever.',
     'Need trainer money? Hustle. Side gigs pay cash, even when nobody calls it career earnings.',
-    'Fans open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
+    'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
     'A title only unlocks the champion. Nobody mails you a belt—you take it from the man holding it.',
     'If the corner offers a towel or a haymaker, the safe money is gone. Pick the ending you can live with.'
   ];let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);

@@ -154,7 +154,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /id="tapePurse"/);
   assert.match(html, /class="tape-fighter-card player-card"/);
   assert.match(html, /class="tape-fighter-card opponent-card"/);
-  assert.match(html, /class="tape-energy"><i data-icon-name="hud-energy"[^>]*>⚡<\/i> 15 ENERGY REQUIRED/);
+  assert.match(html, /class="tape-energy">15 ENERGY REQUIRED/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
   assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
@@ -266,9 +266,11 @@ test('rendered icons support stable per-file PNG overrides with fallbacks', () =
   assert.match(script, /gameIcon\(g\.id,g\.icon\)/);
   assert.match(script, /gameIcon\(item\.id,item\.icon\)/);
   const catalog = fs.readFileSync('assets/icons/README.md', 'utf8');
-  for (const name of ['hud-energy', 'hud-health', 'nav-home', 'fight-aggressive', 'rematch', 'corner-towel', 'daily-collectible', 'title-world', 'heavy-bag-rounds', 'call-out-rival', 'tv-spot', 'titan-global', 'champ-gloves', 'ice-ring', 'home-gym', 'mansion']) {
+  for (const name of ['nav-home', 'fight-aggressive', 'rematch', 'corner-towel', 'daily-collectible', 'title-world', 'heavy-bag-rounds', 'call-out-rival', 'tv-spot', 'titan-global', 'champ-gloves', 'ice-ring', 'home-gym', 'mansion']) {
     assert.match(catalog, new RegExp('`' + name + '\\.png`'));
   }
+  assert.doesNotMatch(html, /data-icon-name="hud-(?:energy|health)"/);
+  assert.doesNotMatch(catalog, /`hud-(?:energy|health)\.png`/);
 });
 
 test('home ticker teaches current mechanics in a shady promoter voice', () => {
@@ -321,9 +323,19 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
     assert.ok(position > headerStart && position < headerEnd, `${id} should live in the top bar`);
   }
   assert.match(html, /id="rankText"[^>]*>UNRANKED<\/span><\/div><div class="top-progress"><span>XP<\/span><b id="xpText"/);
-  assert.match(html, /id="fansText"[^>]*>0<\/span> FANS<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
+  assert.match(html, /id="fansText"[^>]*>0<\/span> FOLLOWERS<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
   assert.doesNotMatch(html, /card bars|id="energyBar"|id="healthBar"|id="xpBar"|id="hypeBar"/);
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
+});
+
+test('followers are the visible audience resource and rival callouts are social posts', () => {
+  assert.match(script, /title:'Post a Rival Callout'/);
+  assert.match(script, /Tag a rival in a public post/);
+  assert.match(script, /followers:\[20,60\]/);
+  assert.match(script, /state\.fans\+=followers/);
+  assert.match(script, /POST CAUGHT FIRE! \+\$\{h\}% HYPE · \+\$\{followers\} FOLLOWERS/);
+  assert.match(script, /THE COMMENTS COOKED YOU/);
+  assert.doesNotMatch(html, />FANS<|>Fans</);
 });
 
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {

@@ -39,8 +39,11 @@ generated league.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
 - XP sits beneath level and rank in the top-left identity block, while Hype
-  sits beneath Cash and Fans on the right. The redundant Home resource card is
-  removed.
+  sits beneath Cash and Followers on the right. The redundant Home resource
+  card is removed.
+- Followers are the fighter's lasting social audience, while Hype represents
+  short-term attention. Posting a public rival callout can build both when it
+  lands, or cost Hype when the post flops.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.

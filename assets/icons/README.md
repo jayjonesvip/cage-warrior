@@ -14,8 +14,6 @@ file, use a hard refresh if the browser previously cached the missing image.
 
 | Filename | Current fallback | Used for |
 | --- | --- | --- |
-| `hud-energy.png` | ⚡ | Energy HUD and fight requirement |
-| `hud-health.png` | ♥ | Health HUD |
 | `nav-home.png` | ⌂ | Home navigation |
 | `nav-train.png` | 🏋 | Training navigation |
 | `nav-fight.png` | 🥊 | Fight navigation |
@@ -62,7 +60,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `nightclub-door.png` | 🚪 | Nightclub Door |
 | `corner-gym-cleanup.png` | 🔧 | Corner Gym Cleanup |
 | `backroom-spar.png` | 🎲 | Backroom Spar |
-| `call-out-rival.png` | 📣 | Call Out a Rival |
+| `call-out-rival.png` | 📣 | Post a Rival Callout |
 
 ## Publicity icons
 
@@ -133,4 +131,3 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `house.png` | 🏠 | Modern Fighter House |
 | `supercar.png` | 🏁 | Midnight Supercar |
 | `mansion.png` | 🏰 | Champion Mansion |
-
