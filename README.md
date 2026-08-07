@@ -31,9 +31,10 @@ generated league.
   reflect that archetype.
 - Round 1 starts with a one-time opening choice. **Aggressive** immediately
   imposes your permanent signature style and gains initiative. **Feel Them
-  Out** concedes some early initiative, then reveals the opponent's tactical
-  tendency, scouting advice, and favorable or risky plan matchups before Round
-  2. All seven archetypes become available as corner plans between rounds;
+  Out** concedes some early initiative in exchange for a deeper corner read.
+  Either choice reveals the opponent's basic tendency after Round 1, but only
+  Feel Them Out supplies scouting advice and favorable or risky matchup badges.
+  All seven archetypes become available as corner plans between rounds;
   unfamiliar striking or grappling disciplines still carry a real penalty.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
@@ -54,6 +55,8 @@ generated league.
 
 - Opponents are generated locally with persistent names, attributes,
   archetypes, professional records, and head-to-head history.
+- Pre-fight roster, daily, and Tale of the Tape cards conceal the opponent's
+  tendency and scouting report until the first round has been completed.
 - Current-level fighters are available at full purse. Unbeaten past-level
   opponents remain available for half purse.
 - An opponent you defeat can decline another fight. Repeated losses to the
@@ -64,10 +67,10 @@ generated league.
   collectible-style cards, two across on mobile, with proportional artwork.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
-  spends no energy and emphasizes the purse above your fighter
-  card and the opponent's card, then offers **Go Back** or **Fight!**. The 15
-  energy cost is charged only after Fight is confirmed and the cage-opening
-  choice begins.
+  spends no energy and emphasizes the purse with the 15-energy requirement
+  directly beneath it, above your fighter card and the opponent's card. It then
+  offers **Go Back** or **Fight!**; energy is charged only after Fight is
+  confirmed and the cage-opening choice begins.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.

@@ -100,8 +100,9 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /id="tapePurse"/);
   assert.match(html, /class="tape-fighter-card player-card"/);
   assert.match(html, /class="tape-fighter-card opponent-card"/);
+  assert.match(html, /class="tape-energy">⚡ 15 ENERGY REQUIRED/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
-  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT! · 15 ENERGY/);
+  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
   assert.match(script, /function closeFightPreview\(\)/);
   assert.match(script, /function commitFight\(o=fight\?\.o\)/);
@@ -110,12 +111,16 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /data-opening-approach="aggressive"/);
   assert.match(html, /data-opening-approach="feel"/);
   assert.doesNotMatch(html, /id="openingPlanGrid"/);
+  assert.doesNotMatch(html, /id="tapeOppTag"/);
+  assert.doesNotMatch(script, /\$\{rivalry\?'🔥 RIVAL · ':''\}\$\{o\.tag\}/);
+  assert.doesNotMatch(script, /\$\{o\.tag\} · PRO \$\{o\.wins\}-\$\{o\.losses\}/);
   assert.match(script, /const signature=state\.fighterStyle\|\|'pressure'/);
   assert.match(script, /roundOnePlan=approach==='aggressive'\?signature:'counter'/);
-  assert.match(script, /fight\.tendencyRevealed=approach==='feel'/);
+  assert.match(script, /fight\.tendencyRevealed=true;fight\.deepRead=approach==='feel'/);
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
-  assert.match(script, /fight\?\.tendencyRevealed&&matchup>=\.08/);
+  assert.match(script, /fight\?\.deepRead&&matchup>=\.08/);
   assert.match(script, /TENDENCY REVEALED/);
+  assert.match(script, /DEEP READ/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {
