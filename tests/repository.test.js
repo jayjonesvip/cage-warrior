@@ -54,7 +54,7 @@ test('opponents have pro records, conditional H2H, and consent-aware rematches',
   assert.match(script, /function payoutForOpponent\(o\).*o\.tier>=state\.level\?1:\.5/);
   assert.match(script, /recordInitialized:true/);
   assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
-  assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:''/);
+  assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY<\/div>'/);
   assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
   assert.match(script, /declined=!o\.championship&&available&&\(o\.lossesToPlayer\|\|0\)>0/);
   assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
@@ -91,7 +91,18 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(html, /\.opp-sprite\{[^}]*aspect-ratio:3\/5[^}]*background-size:500% 200%/);
   assert.match(html, /Career Opponents/);
   assert.doesNotMatch(html, /The Living Roster/);
-  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}">/);
+  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}" data-card-flip="true"/);
+  assert.match(html, /\.opponent-flip\{[^}]*transform-style:preserve-3d/);
+  assert.match(html, /\.opponent\.flipped \.opponent-flip\{transform:rotateY\(180deg\)\}/);
+  assert.match(script, /class="opponent-side opponent-front"/);
+  assert.match(script, /class="opponent-side opponent-back"/);
+  assert.match(script, /TAP CARD FOR DETAILS/);
+  assert.match(script, /TAP CARD TO RETURN/);
+  assert.match(script, /function toggleOpponentCard\(card\)/);
+  assert.match(script, /front\.setAttribute\('aria-hidden',String\(flipped\)\)/);
+  assert.match(script, /button\.tabIndex=flipped\?-1:0/);
+  assert.match(script, /flip&&!e\.target\.closest\('button'\)/);
+  assert.match(script, /data-card-flip.*e\.key==='Enter'/s);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
   assert.match(script, /:'SEE MATCHUP'/);
 });

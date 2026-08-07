@@ -65,6 +65,10 @@ generated league.
   retired fighters, and
   a locked preview of the next level. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork.
+  The front stays focused on identity and booking; tapping the card body flips
+  it to a fixed-height details side with attributes, rating, availability,
+  purse context, rivalry status, and head-to-head history. See Matchup remains
+  a separate action and does not trigger the flip.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
   spends no energy and emphasizes the purse with the 15-energy requirement
