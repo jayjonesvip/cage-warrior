@@ -122,6 +122,7 @@
 
   .action-list{padding:9px;display:grid;gap:9px}.action{width:100%;border:1px solid #42464d;border-radius:11px;padding:10px;background:linear-gradient(160deg,#282b30,#141619);display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;text-align:left;box-shadow:0 5px 10px #0005}.action:active{transform:scale(.99)}.action:disabled{opacity:.45;filter:grayscale(1)}
   .action .ico{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;background:#0d0f12;border:1px solid #444;font-size:26px}.action h3{margin:0 0 3px;font-size:16px}.action p{margin:0;font-family:system-ui,sans-serif;font-size:9.5px;color:#afb2b7;line-height:1.25}.action .cost{text-align:right}.action .cost b{display:block;color:var(--gold);font-size:12px}.action .cost small{font-family:system-ui,sans-serif;font-size:9px;color:var(--muted)}
+  .game-icon{display:inline-grid;place-items:center;width:1em;height:1em;line-height:1;vertical-align:-.12em}.game-icon>*{grid-area:1/1}.game-icon .icon-asset{display:none;width:100%;height:100%;object-fit:contain}.game-icon.asset-ready .icon-asset{display:block}.game-icon.asset-ready .icon-fallback{visibility:hidden}.action .ico .game-icon{width:34px;height:34px}.gear-icon .game-icon,.drop-icon .game-icon{width:1em;height:1em}.drop-teaser>.game-icon{margin-right:5px}.loot .game-icon{vertical-align:-.16em}
   .section-note{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);padding:0 4px 10px;line-height:1.4}
 
   .opponent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:9px;background:#050b13}
@@ -297,10 +298,10 @@
   <section class="resource-hud" aria-label="Current fighter condition and attributes">
     <div class="hud-condition-row">
       <div class="hud-resource energy-hud" id="energyHud">
-        <span>⚡ ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
+        <span><i data-icon-name="hud-energy" data-icon-fallback="⚡">⚡</i> ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
       </div>
       <div class="hud-resource health-hud" id="healthHud">
-        <span>♥ HEALTH</span><div class="hud-meter"><i id="hudHealthBar"></i></div><b id="hudHealthText">100/100</b><em id="hudHealthDelta"></em>
+        <span><i data-icon-name="hud-health" data-icon-fallback="♥">♥</i> HEALTH</span><div class="hud-meter"><i id="hudHealthBar"></i></div><b id="hudHealthText">100/100</b><em id="hudHealthDelta"></em>
       </div>
     </div>
     <div class="hud-attributes-row" aria-label="Fighter attributes">
@@ -369,11 +370,11 @@
   </main>
 
   <nav class="bottomnav">
-    <button class="navbtn active" data-nav="home"><span class="ni">⌂</span>Home</button>
-    <button class="navbtn" data-nav="train"><span class="ni">🏋</span>Train</button>
-    <button class="navbtn" data-nav="fight"><span class="ni">🥊</span>Fight</button>
-    <button class="navbtn" data-nav="hustle"><span class="ni">💵</span>Hustle</button>
-    <button class="navbtn" data-nav="gear"><span class="ni">🛡</span>Gear</button>
+    <button class="navbtn active" data-nav="home"><span class="ni" data-icon-name="nav-home" data-icon-fallback="⌂">⌂</span>Home</button>
+    <button class="navbtn" data-nav="train"><span class="ni" data-icon-name="nav-train" data-icon-fallback="🏋">🏋</span>Train</button>
+    <button class="navbtn" data-nav="fight"><span class="ni" data-icon-name="nav-fight" data-icon-fallback="🥊">🥊</span>Fight</button>
+    <button class="navbtn" data-nav="hustle"><span class="ni" data-icon-name="nav-hustle" data-icon-fallback="💵">💵</span>Hustle</button>
+    <button class="navbtn" data-nav="gear"><span class="ni" data-icon-name="nav-gear" data-icon-fallback="🛡">🛡</span>Gear</button>
   </nav>
 
   <div class="modal-overlay" id="autographModal" aria-hidden="true">
@@ -414,7 +415,7 @@
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
-          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy">⚡ 15 ENERGY REQUIRED</span></div>
+          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy"><i data-icon-name="hud-energy" data-icon-fallback="⚡">⚡</i> 15 ENERGY REQUIRED</span></div>
           <div class="tape-versus-cards">
             <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div><div class="tape-mini-stats"><span id="tapePPower">PWR 5</span><span id="tapePSpeed">SPD 5</span><span id="tapePChin">CHN 5</span><span id="tapePCardio">CAR 5</span></div></article>
             <div class="tape-vs-badge">VS</div>
@@ -428,7 +429,7 @@
       <div class="sim-stage hidden" id="openingStage">
         <div class="opening-card">
           <div class="opening-copy"><span class="opening-kicker">ROUND 1 · OPENING CALL</span><h2>HOW DO YOU ENTER THE CAGE?</h2><p>This choice applies only to the first round. Both approaches use your signature style and reveal their tendency after the bell.</p></div>
-          <div class="opening-options"><button class="opening-choice aggressive" data-opening-approach="aggressive" type="button"><span class="opening-icon">💥</span><b>AGGRESSIVE</b><small>Impose your signature style immediately and gain early initiative.</small></button><button class="opening-choice feel" data-opening-approach="feel" type="button"><span class="opening-icon">👁️</span><b>FEEL THEM OUT</b><small>Use your signature style cautiously. Give up early initiative for a deeper corner read.</small></button></div>
+          <div class="opening-options"><button class="opening-choice aggressive" data-opening-approach="aggressive" type="button"><span class="opening-icon" data-icon-name="fight-aggressive" data-icon-fallback="💥">💥</span><b>AGGRESSIVE</b><small>Impose your signature style immediately and gain early initiative.</small></button><button class="opening-choice feel" data-opening-approach="feel" type="button"><span class="opening-icon" data-icon-name="fight-feel-out" data-icon-fallback="👁️">👁️</span><b>FEEL THEM OUT</b><small>Use your signature style cautiously. Give up early initiative for a deeper corner read.</small></button></div>
           <div class="opening-signature" id="openingSignature">AGGRESSIVE USES YOUR SIGNATURE · FEEL THEM OUT EARNS A DEEP READ</div>
         </div>
       </div>
@@ -475,6 +476,9 @@
   const rand = (a,b) => Math.random()*(b-a)+a;
   const rint = (a,b) => Math.floor(rand(a,b+1));
   const fmt = n => Math.floor(n).toLocaleString();
+  const ICON_ASSET_PATH = 'assets/icons/';
+  function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
+  function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
   const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
   let saveWarningShown = false;
@@ -489,7 +493,7 @@
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,milestones:[],equippedGear:[],leagueInitialized:false
   };
 
-  let state = loadState();
+  let state;
   let recoveryReport = null;
   let audioCtx = null;
   let currentScreen = 'home';
@@ -545,6 +549,7 @@
     {id:'fighter-19',asset:'assets/fighter-avatar-19.jpg',stats:{power:6,speed:3,chin:4,cardio:7}},
     {id:'fighter-20',asset:'assets/fighter-avatar-20.jpg',stats:{power:5,speed:2,chin:5,cardio:8}}
   ];
+  state = loadState();
   const fighterCities = [
     {id:'phoenix',name:'PHOENIX',region:'SOUTHWEST'},
     {id:'los-angeles',name:'LOS ANGELES',region:'WEST COAST'},
@@ -555,10 +560,10 @@
     {id:'cleveland',name:'CLEVELAND',region:'GREAT LAKES'}
   ];
   const milestoneDefs=[
-    {level:5,id:'city',scope:'city',icon:'🥉'},
-    {level:9,id:'regional',scope:'region',icon:'🥈'},
-    {level:12,id:'us',scope:'us',icon:'🏆'},
-    {level:15,id:'world',name:'WORLD TITLE',icon:'🥇'}
+    {level:5,id:'city',scope:'city',iconName:'title-city',icon:'🥉'},
+    {level:9,id:'regional',scope:'region',iconName:'title-regional',icon:'🥈'},
+    {level:12,id:'us',scope:'us',iconName:'title-us',icon:'🏆'},
+    {level:15,id:'world',name:'WORLD TITLE',iconName:'title-world',icon:'🥇'}
   ];
 
   let opponents=[];
@@ -662,22 +667,22 @@
   ];
 
   const trainDefs = [
-    {icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,xp:9,sessions:1},
-    {icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,xp:9,sessions:1},
-    {icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,xp:11,sessions:1},
-    {icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1},
-    {icon:'🤼',title:'Hard Sparring',text:'Live rounds against a gym killer. Improves two random skills, but costs health.',stat:'spar',cost:20,gain:2,xp:28,sessions:2,damage:[3,9]}
+    {id:'heavy-bag-rounds',icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,xp:9,sessions:1},
+    {id:'slip-rope-drill',icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,xp:9,sessions:1},
+    {id:'body-conditioning',icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,xp:11,sessions:1},
+    {id:'roadwork-at-dawn',icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1},
+    {id:'hard-sparring',icon:'🤼',title:'Hard Sparring',text:'Live rounds against a gym killer. Improves two random skills, but costs health.',stat:'spar',cost:20,gain:2,xp:28,sessions:2,damage:[3,9]}
   ];
 
   const hustleDefs = [
-    {icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90],xp:4},
-    {icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],xp:5},
-    {icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],xp:3}
+    {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90],xp:4},
+    {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],xp:5},
+    {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],xp:3}
   ];
 
   const riskDefs = [
-    {icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]},
-    {icon:'📣',title:'Call Out a Rival',text:'75% chance to gain hype. Sometimes you get roasted.',cost:5,success:.75,hype:[8,18]}
+    {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]},
+    {id:'call-out-rival',icon:'📣',title:'Call Out a Rival',text:'75% chance to gain hype. Sometimes you get roasted.',cost:5,success:.75,hype:[8,18]}
   ];
 
   const publicityDefs = [
@@ -719,11 +724,10 @@
       return s;
   }
   function loadState(){
-    const candidates=[SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1'];
-    for(const key of candidates){
-      try{const raw=localStorage.getItem(key);if(raw)return normalizeState(JSON.parse(raw))}catch(e){/* Try the last-known-good save. */}
-    }
-    return structuredClone(defaultState);
+    const read=key=>{try{const raw=localStorage.getItem(key);return raw?normalizeState(JSON.parse(raw)):null}catch(e){return null}},primary=read(SAVE_KEY),backup=read(SAVE_BACKUP_KEY),legacy=read('fytr-save-v1');
+    const blank=s=>!s||(!s.fighterCity&&!s.fighterAvatar&&!s.fighterStyle&&s.level===1&&s.xp===0&&s.wins===0&&s.losses===0&&s.gear.length===0&&s.careerEarnings===0);
+    if(primary&&blank(primary)&&backup&&!blank(backup))return backup;
+    return primary||backup||legacy||structuredClone(defaultState);
   }
   function saveState(){
     state.lastSave=Date.now();
@@ -762,7 +766,7 @@
   function currentAvatar(){return fighterAvatars.find(a=>a.id===state.fighterAvatar)||null}
   function validFighterAllocation(stats){const keys=['power','speed','chin','cardio'];return !!stats&&keys.every(k=>Number.isInteger(stats[k])&&stats[k]>=2&&stats[k]<=8)&&keys.reduce((sum,k)=>sum+stats[k],0)===20}
   function milestoneName(m){const city=currentCity();if(m.scope==='city')return city?`${city.name} TITLE`:'CITY TITLE';if(m.scope==='region')return city?`${city.region} TITLE`:'REGIONAL TITLE';if(m.scope==='us')return 'U.S. TITLE';return m.name}
-  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);state.fans+=m.level*75;toast(`${m.icon} ${milestoneName(m)} WON!`,'#ffd36e');confettiBurst();return true}
+  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);state.fans+=m.level*75;toast(`${milestoneName(m)} WON!`,'#ffd36e',m.iconName,m.icon);confettiBurst();return true}
   function gearCount(id){return Math.max(0,Math.floor(Number(state.gearCounts&&state.gearCounts[id]))||0)}
   function ownedBonus(prop){return state.gear.reduce((sum,id)=>{const g=gearItems.find(x=>x.id===id);return sum+(g&&g[prop]?g[prop]:0)},0)}
   function receiveMoney(amount,career=false){const value=Math.max(0,Math.round(Number(amount)||0));state.cash+=value;if(career)state.careerEarnings+=value;return value}
@@ -833,8 +837,8 @@
     level(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,.13,'triangle',.04),i*70))}
   };
 
-  function toast(msg,color='white'){
-    const t=$('#toast');t.textContent=msg;t.style.color=color;t.classList.add('show-toast');
+  function toast(msg,color='white',iconName='',iconFallback=''){
+    const t=$('#toast');t.textContent=msg;if(iconName)t.insertAdjacentHTML('afterbegin',gameIcon(iconName,iconFallback)+' ');t.style.color=color;t.classList.add('show-toast');
     clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show-toast'),1700);
   }
   function floatText(text,x,y,color='#fff'){
@@ -905,7 +909,7 @@
     const left=sessionsLeft('train',4),coach=state.trainerOn,fee=coachFee();
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
     const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
-    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
+    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
   function requirementText(a){
@@ -920,29 +924,29 @@
     $('#hustleLimitText').textContent=`${hustleLeft} SHIFT${hustleLeft===1?'':'S'} LEFT`;
     $('#riskLimitText').textContent=`${riskLeft} RISK LEFT`;
     $('#publicityLimitText').textContent=`${publicityLeft} GIG${publicityLeft===1?'':'S'} LEFT`;$('#publicityLimitText').classList.toggle('exhausted',publicityLeft<1);
-    $('#hustleActions').innerHTML=hustleDefs.map((a,i)=>`<button class="action" data-hustle="${i}" ${state.energy<a.cost||hustleLeft<1?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>$${a.cash[0]}–${a.cash[1]}</b><small>-${a.cost} energy</small></div></button>`).join('');
-    $('#riskActions').innerHTML=riskDefs.map((a,i)=>`<button class="action" data-risk="${i}" ${state.energy<a.cost||riskLeft<1?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>-${a.cost} energy</b><small>${Math.round(a.success*100)}% success</small></div></button>`).join('');
+    $('#hustleActions').innerHTML=hustleDefs.map((a,i)=>`<button class="action" data-hustle="${i}" ${state.energy<a.cost||hustleLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>$${a.cash[0]}–${a.cash[1]}</b><small>-${a.cost} energy</small></div></button>`).join('');
+    $('#riskActions').innerHTML=riskDefs.map((a,i)=>`<button class="action" data-risk="${i}" ${state.energy<a.cost||riskLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>-${a.cost} energy</b><small>${Math.round(a.success*100)}% success</small></div></button>`).join('');
     $('#publicityActions').innerHTML=publicityDefs.map((a,i)=>{
       const unlocked=opportunityUnlocked(a),limited=publicityLeft<1,energyLow=state.energy<a.cost;
       const unavailable=limited&&unlocked?'gig-unavailable':'',availability=!unlocked?requirementText(a):limited?'NO GIGS LEFT':energyLow?`NEEDS ${a.cost} ENERGY`:'AVAILABLE NOW';
-      return `<button class="action future ${unlocked?'':'locked-opportunity'} ${unavailable}" data-publicity="${i}" ${!unlocked||limited||energyLow?'disabled':''}><div class="ico">${a.icon}</div><div><h3>${a.title}</h3><p>${a.text}</p><span class="unlock-copy">${availability}</span></div><div class="cost"><b>${a.payout}</b><small>-${a.cost} energy</small></div></button>`;
+      return `<button class="action future ${unlocked?'':'locked-opportunity'} ${unavailable}" data-publicity="${i}" ${!unlocked||limited||energyLow?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p><span class="unlock-copy">${availability}</span></div><div class="cost"><b>${a.payout}</b><small>-${a.cost} energy</small></div></button>`;
     }).join('');
     const active=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null;
-    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${active.icon} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} fans after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FANS TO UNLOCK CONTRACT OFFERS</div>`;
+    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} fans after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FANS TO UNLOCK CONTRACT OFFERS</div>`;
     $('#endorsementActions').innerHTML=endorsementDefs.map((d,i)=>{
       const unlocked=state.level>=d.minLevel&&state.fans>=d.minFans;
       const isActive=!!active&&active.id===d.id;
       const blocked=!!active&&!isActive;
       const req=[];if(state.level<d.minLevel)req.push(`LVL ${d.minLevel}`);if(state.fans<d.minFans)req.push(`${fmt(d.minFans)} FANS`);
       const status=isActive?'ACTIVE CONTRACT':blocked?'FINISH CURRENT DEAL':unlocked?'OFFER AVAILABLE':`NEEDS ${req.join(' + ')}`;
-      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${!unlocked||blocked||isActive?'disabled':''}><div class="ico">${d.icon}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} fans</small></div></button>`;
+      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${!unlocked||blocked||isActive?'disabled':''}><div class="ico">${gameIcon(d.id,d.icon)}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} fans</small></div></button>`;
     }).join('');
   }
   function renderGear(){
     const order=['Fight Gear','Bling','Lifestyle','Property & Rides'],owned=gearItems.filter(g=>gearCount(g.id)>0);
     const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive fan bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
     if(!owned.length){$('#gearShop').innerHTML='<div class="gear-empty"><b>NO GEAR YET</b><span>Win fights to earn deterministic drops. Your fourth win without a drop is guaranteed to produce one.</span></div>';return}
-    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${g.icon}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
+    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
   }
   function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);sfx.tap();updateUI();return}if(state.equippedGear.length>=4){toast('Loadout full. Unequip one item first.','#ffcc75');return}state.equippedGear.push(id);initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
@@ -963,7 +967,7 @@
             <div class="opp-face">
               <img class="opp-sprite" src="${silhouette}" alt="${o.name} silhouette" loading="lazy">
               ${o.championship?`<span class="sil-label">${o.titleName}</span>`:status==='locked'?'<span class="sil-label">UPCOMING</span>':status==='passed'?`<span class="sil-label">${hasHistory?'PAST OPPONENT':'AVAILABLE'}</span>`:status==='rival'?'<span class="sil-label">PAST RIVAL</span>':''}
-              ${rematch?'<span class="rematch-banner">⚡ REMATCH</span>':''}
+              ${rematch?`<span class="rematch-banner">${gameIcon('rematch','⚡')} REMATCH</span>`:''}
             </div>
             <div class="opp-title"><h3>${o.name}</h3></div>
             <div class="flip-hint">↻ TAP CARD FOR DETAILS</div>
@@ -973,7 +977,7 @@
             <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="flip-hint">DETAILS</span></div>
             <div class="opp-back-title"><h3>${o.name}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
             <div class="opp-back-stats"><div class="opp-back-stat"><small>PWR</small><b>${o.power}</b></div><div class="opp-back-stat"><small>SPD</small><b>${o.speed}</b></div><div class="opp-back-stat"><small>CHN</small><b>${o.chin}</b></div><div class="opp-back-stat"><small>CAR</small><b>${o.cardio}</b></div></div>
-            <div class="opp-back-info"><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div><div class="opp-note">${note}</div>${rivalry?'<span class="tendency rival-pill">🔥 RIVAL</span>':''}${hasHistory?`<div class="opp-history">H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}</div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY</div>'}</div>
+            <div class="opp-back-info"><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div><div class="opp-note">${note}</div>${rivalry?`<span class="tendency rival-pill">${gameIcon('rival','🔥')} RIVAL</span>`:''}${hasHistory?`<div class="opp-history">H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}</div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY</div>'}</div>
             <div class="flip-hint">↻ TAP CARD TO RETURN</div>
           </div>
         </div>
@@ -1131,7 +1135,7 @@
     }updateUI();
   }
   function claimDaily(){
-    const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20,gearDrop=awardDailyCollectible(today);receiveMoney(cash);state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;updateUI();if(!gearDrop){toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');return}pendingResultDrop=Object.assign({extras:`+$${cash} CASH · +${energy} ENERGY`},gearDrop);resultDropRevealed=false;$('#resultTitle').textContent='DAILY DROP!';$('#resultTitle').className='win';$('#resultMethod').textContent='GUARANTEED COLLECTIBLE';$('#resultLine').textContent='Your daily package has a rarity card inside.';$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Cash';$('#rewardFans').textContent='+'+energy;$('#rewardFansLabel').textContent='Energy';$('#rewardXp').textContent='1';$('#rewardXpLabel').textContent='Collectible';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML='<span class="drop-teaser">🎁 COLLECTIBLE CARD READY<small>Reveal today’s guaranteed item</small></span>';$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
+    const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20,gearDrop=awardDailyCollectible(today);receiveMoney(cash);state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;updateUI();if(!gearDrop){toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');return}pendingResultDrop=Object.assign({extras:`+$${cash} CASH · +${energy} ENERGY`},gearDrop);resultDropRevealed=false;$('#resultTitle').textContent='DAILY DROP!';$('#resultTitle').className='win';$('#resultMethod').textContent='GUARANTEED COLLECTIBLE';$('#resultLine').textContent='Your daily package has a rarity card inside.';$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Cash';$('#rewardFans').textContent='+'+energy;$('#rewardFansLabel').textContent='Energy';$('#rewardXp').textContent='1';$('#rewardXpLabel').textContent='Collectible';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('daily-collectible','🎁')} COLLECTIBLE CARD READY<small>Reveal today’s guaranteed item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
   }
 
   function emptyFightStats(){return {attempted:0,landed:0,sig:0,takedowns:0,control:0,damage:0,kd:0}}
@@ -1286,10 +1290,10 @@
     const next=fight.rounds.length+1,box=$('#cornerChoice'),crisisThreshold=25;
     if(fight.playerCondition<=crisisThreshold&&!fight.crisisUsed){
       const chance=Math.round(haymakerChance(fight)*100);
-      box.innerHTML=`<div class="corner-panel crisis-panel"><h3>🚨 ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>🏳️ THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker"><b>💥 THROW A HAYMAKER</b><small>${chance}% chance to land. Miss and you are knocked out.</small></button></div></div>`;
+      box.innerHTML=`<div class="corner-panel crisis-panel"><h3>${gameIcon('corner-danger','🚨')} ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>${gameIcon('corner-towel','🏳️')} THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker"><b>${gameIcon('corner-haymaker','💥')} THROW A HAYMAKER</b><small>${chance}% chance to land. Miss and you are knocked out.</small></button></div></div>`;
       return;
     }
-    const style=fighterStyles.find(s=>s.id===fight.o.tendency),read=fight.tendencyRevealed&&next===2?`<div class="tendency-read"><b>👁️ ${fight.deepRead?'DEEP READ':'TENDENCY REVEALED'} · ${style?.name||fight.o.tag}</b>${fight.deepRead?`${fight.o.scout} Your corner can now judge the risk of meeting them in their own style.`:'One round exposed their core approach.'}</div>`:'';box.innerHTML=`<div class="corner-panel"><h3>ROUND ${next}: CORNER CALL</h3>${read}<p>${state.fighterStyle===fight.o.tendency?'You share the same archetype. Stay disciplined and start the next round.':'Stay with your signature or challenge them in their revealed style.'}</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
+    const style=fighterStyles.find(s=>s.id===fight.o.tendency),read=fight.tendencyRevealed&&next===2?`<div class="tendency-read"><b>${gameIcon('tendency-revealed','👁️')} ${fight.deepRead?'DEEP READ':'TENDENCY REVEALED'} · ${style?.name||fight.o.tag}</b>${fight.deepRead?`${fight.o.scout} Your corner can now judge the risk of meeting them in their own style.`:'One round exposed their core approach.'}</div>`:'';box.innerHTML=`<div class="corner-panel"><h3>ROUND ${next}: CORNER CALL</h3>${read}<p>${state.fighterStyle===fight.o.tendency?'You share the same archetype. Stay disciplined and start the next round.':'Stay with your signature or challenge them in their revealed style.'}</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
   function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
@@ -1335,7 +1339,7 @@
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);const streakBonus=Math.min(.25,Math.max(0,state.winStreak-1)*.05),upsetBonus=upset?.25:0,rivalryBonus=rivalry?.15:0;cash=Math.round(basePurse*(1+state.hype/130)*(1+ownedBonus('cashBonus')/100)*(1+streakBonus+upsetBonus+rivalryBonus)*rand(.9,1.15));fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
       const titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
-      if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${title.icon} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,'⚡ UPSET BONUS +25%'].filter(Boolean).join(' · ');if(rivalry)loot=[loot,'🔥 RIVALRY FIGHT BONUS +15%'].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`🔥 ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship)ensureRoster()
+      if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${gameIcon(title.iconName,title.icon)} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,`${gameIcon('upset-bonus','⚡')} UPSET BONUS +25%`].filter(Boolean).join(' · ');if(rivalry)loot=[loot,`${gameIcon('rivalry-bonus','🔥')} RIVALRY FIGHT BONUS +15%`].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`${gameIcon('win-streak','🔥')} ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship)ensureRoster()
       $('#resultTitle').textContent=fight.method==='SUBMISSION'?'SUBMISSION WIN!':fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=Math.round(basePurse*.08);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
@@ -1351,11 +1355,11 @@
         if(contractDone)state.activeEndorsement=null;
       }
     }
-    state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Fans';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML='<span class="drop-teaser">🎁 BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>';else lootBox.textContent=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Fans';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function revealGearDrop(){
-    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${item.icon}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
+    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${gameIcon(item.id,item.icon)}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
   }
 
   function handleResultAction(){if(revealGearDrop())return;closeResult()}
@@ -1425,7 +1429,7 @@
 
   window.addEventListener('resize',drawHero);
   window.addEventListener('beforeunload',saveState);
-  ensureLoadout();ensureRoster();
+  hydrateStaticIcons();ensureLoadout();ensureRoster();
   recoveryReport=applyOfflineRecovery();
   updateUI();
   if(recoveryReport)setTimeout(()=>{const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push(`fight booking refunded`);toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff')},350);

@@ -153,7 +153,17 @@ tendencies migrate without losing records or rivalries, and previously retired
 regular fighters return to the permanent Past Rivals system. Legacy District and
 National belt progress migrates into the new title ladder. The game also keeps
 a last-known-good backup and refunds energy from an interrupted fight when the
-save is restored.
+save is restored. If a blank rookie save is ever written over a progressed
+career, startup prefers the progressed last-known-good backup automatically.
+
+### Replaceable icons
+
+Interface, fight, training, hustle, publicity, sponsor, title, and collectible
+icons support individual PNG overrides. Add a correctly named file under
+`assets/icons/`; the PNG replaces the built-in symbol automatically, while a
+missing file safely leaves the original fallback visible. The complete
+filename inventory and usage map lives in
+[`assets/icons/README.md`](assets/icons/README.md).
 
 ## Development
 
@@ -163,8 +173,8 @@ Run the repository checks with:
 npm test
 ```
 
-The game remains self-contained in `index.html`. Fighter portraits and
-standalone opponent silhouettes in the
+The game remains self-contained in `index.html`. Fighter portraits, replaceable
+icons, and standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and
 cover script parsing, save behavior, roster rules, readable text sizing,

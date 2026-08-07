@@ -38,6 +38,11 @@ test('save recovery and one-time league migration remain enabled', () => {
   assert.match(script, /cage-warrior-save-backup-v1/);
   assert.match(script, /const bootstrapPast=!state\.leagueInitialized&&state\.roster\.length===0/);
   assert.match(script, /state\.leagueInitialized=true/);
+  const avatarsReady = script.indexOf("const fighterAvatars = [");
+  const stateLoaded = script.indexOf('state = loadState();');
+  assert.ok(avatarsReady >= 0 && stateLoaded > avatarsReady, 'saved state must load only after avatar migration data is initialized');
+  assert.doesNotMatch(script, /let state = loadState\(\)/);
+  assert.match(script, /if\(primary&&blank\(primary\)&&backup&&!blank\(backup\)\)return backup/);
 });
 
 test('rematch, taunt, and exhausted-gig states reflect actual state without masking locks', () => {
@@ -45,7 +50,7 @@ test('rematch, taunt, and exhausted-gig states reflect actual state without mask
   assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · rematch payout/);
   assert.match(script, /:'SEE MATCHUP'/);
   assert.match(script, /rematch=available&&\(o\.winsVsPlayer\|\|0\)>0/);
-  assert.match(script, /\$\{rematch\?'<span class="rematch-banner">⚡ REMATCH<\/span>':''\}/);
+  assert.match(script, /gameIcon\('rematch','⚡'\).*REMATCH/);
   assert.match(script, /rematch available':tauntable\?', taunt available'/);
   assert.match(script, /data-taunt-key="\$\{o\.key\}"/);
   assert.match(script, /function tauntOpponent\(key\)/);
@@ -136,7 +141,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /id="tapePurse"/);
   assert.match(html, /class="tape-fighter-card player-card"/);
   assert.match(html, /class="tape-fighter-card opponent-card"/);
-  assert.match(html, /class="tape-energy">⚡ 15 ENERGY REQUIRED/);
+  assert.match(html, /class="tape-energy"><i data-icon-name="hud-energy"[^>]*>⚡<\/i> 15 ENERGY REQUIRED/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
   assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
@@ -232,6 +237,23 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
+});
+
+test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
+  assert.ok(fs.existsSync('assets/icons/README.md'));
+  assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
+  assert.match(script, /function gameIcon\(name,fallback\)/);
+  assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png"/);
+  assert.match(script, /classList\.add\('asset-ready'\)/);
+  assert.match(script, /onerror="this\.remove\(\)"/);
+  assert.match(script, /gameIcon\(a\.id,a\.icon\)/);
+  assert.match(script, /gameIcon\(d\.id,d\.icon\)/);
+  assert.match(script, /gameIcon\(g\.id,g\.icon\)/);
+  assert.match(script, /gameIcon\(item\.id,item\.icon\)/);
+  const catalog = fs.readFileSync('assets/icons/README.md', 'utf8');
+  for (const name of ['hud-energy', 'hud-health', 'nav-home', 'fight-aggressive', 'rematch', 'corner-towel', 'daily-collectible', 'title-world', 'heavy-bag-rounds', 'call-out-rival', 'tv-spot', 'titan-global', 'champ-gloves', 'ice-ring', 'home-gym', 'mansion']) {
+    assert.match(catalog, new RegExp('`' + name + '\\.png`'));
+  }
 });
 
 test('home ticker teaches current mechanics in a shady promoter voice', () => {
