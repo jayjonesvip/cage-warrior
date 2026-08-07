@@ -26,8 +26,9 @@ generated league.
 - Each selector disappears as soon as its choice is locked. Career systems,
   the HUD, and navigation remain hidden until hometown, fighter, and archetype
   are complete. All three choices then live in the Career Identity card beside
-  the editable fighter name, Followers, career earnings, and next milestone.
-  The pencil beside the fighter name opens a persistent inline rename editor.
+  Followers, career earnings, and the next milestone. A pencil beside the
+  top-bar fighter name remains visibly locked for rookies; its naming modal
+  unlocks at level 2 with Club Fighter status.
 - Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
@@ -44,8 +45,8 @@ generated league.
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
 - Followers are the fighter's lasting social audience, while Hype represents
-  short-term attention. Posting a public rival callout can build both when it
-  lands, or cost Hype when the post flops.
+  short-term attention. Cage Feed actions can build both, while a failed rival
+  callout can cost Hype.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
@@ -69,7 +70,8 @@ generated league.
   results in an immediate knockout loss.
 - Watch fights normally or use 2× speed. There is no result skip: every
   surviving round requires its corner decision.
-- Build win streaks and earn upset and rivalry bonuses.
+- Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
+  become notable Cage Feed headlines after every additional win.
 - Progress through a hometown title, its regional title, the U.S. Title, and
   the World Title. Reaching a championship threshold only unlocks its reigning
   champion; the belt is awarded only after that fighter is defeated.
@@ -77,6 +79,26 @@ generated league.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, full restoration,
   career bonus, and any newly unlocked title challenge.
+
+### Cage Feed
+
+- A fighter has no social account and earns no Followers until Cage Feed is
+  opened for the first time. That first visit creates the account, publishes a
+  "Hello, fight fans" introduction, and draws the first reactions and Followers.
+  Existing saved careers that already have Followers are treated as connected
+  accounts and keep their audience.
+- Home previews the two newest Cage Feed posts and opens a full latest-first
+  timeline stored with the career.
+- Fights, win streaks, losses, appearances, autograph signings, and sponsor
+  deals generate contextual posts from reporters, promoters, gyms, rivals,
+  fans, and haters. Ordinary accounts use generated-style names such as
+  `FightFan99`, `MMA4Life`, and `ScorecardBandit`.
+- Each notable event starts a news cycle with one player post available. The
+  player may thank Followers for safe growth, post a volatile rival callout
+  that can unlock a rematch, or publish an Influencer Brand Post for Cash and
+  Followers. There is only one player post per news cycle.
+- Rival Callout and Influencer Brand Post live in Cage Feed rather than the
+  Underground Buzz or Career Spotlight lists.
 
 ### Career opponents
 

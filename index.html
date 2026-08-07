@@ -45,7 +45,7 @@
   .logo{width:91px;height:50px;display:grid;place-items:center;font-size:34px;letter-spacing:2px;font-style:italic;color:white;
     background:linear-gradient(145deg,#173d6e,#07101d);border:1px solid #3d78bb;border-radius:8px;text-shadow:3px 3px 0 #071d44;box-shadow:inset 0 0 0 3px #020711,0 3px 0 #000,0 0 18px #1678ff33;transform:skew(-3deg)}
   .identity{min-width:0;flex:1;line-height:1}
-  .identity .name{font-family:system-ui,sans-serif;font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .identity-name-row{display:flex;align-items:center;gap:4px;min-width:0}.identity .name{min-width:0;font-family:system-ui,sans-serif;font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top-name-edit{flex:0 0 22px;width:22px;height:22px;padding:3px;border:1px solid #3d6e9e;border-radius:7px;background:#102944;color:#8de1ff}.top-name-edit .game-icon{width:13px;height:13px}.top-name-edit.locked{border-color:#35404c;background:#141a21;color:#596775;filter:grayscale(1);opacity:.62}
   .identity .sub{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .money{text-align:right;line-height:1}
   .money> b{display:block;color:var(--green);font-size:17px}
@@ -118,6 +118,8 @@
   .choice.red{border-color:#245b9e;background:linear-gradient(145deg,#102d52,#080d16);box-shadow:0 6px 18px #001a3a99,inset 0 0 22px #176bd018}
   .choice.hustle{border-color:#267057;background:linear-gradient(145deg,#12362d,#080f0d);box-shadow:0 6px 18px #001f1699,inset 0 0 22px #2aba8618}.choice.hustle .choice-art{filter:brightness(0) saturate(100%) invert(79%) sepia(32%) saturate(1104%) hue-rotate(105deg) brightness(94%);opacity:.24}.choice.hustle .choice-action{background:linear-gradient(#79e7b7,#20a56c);box-shadow:0 3px 0 #075b3a}
   .choice.gear{border-color:#6550a0;background:linear-gradient(145deg,#251d45,#0b0912);box-shadow:0 6px 18px #10002b99,inset 0 0 22px #7d5cff1f}.choice.gear .choice-art{filter:brightness(0) saturate(100%) invert(62%) sepia(44%) saturate(1638%) hue-rotate(206deg) brightness(102%);opacity:.25}.choice.gear .choice-action{background:linear-gradient(#b9a5ff,#7152d2);box-shadow:0 3px 0 #352174}
+
+  .feed-preview{border-color:#315b80;background:linear-gradient(155deg,#10233a,#060c14)}.feed-preview-list{padding:0 9px}.feed-preview-empty{padding:12px;color:#8096aa;font-family:system-ui,sans-serif;font-size:9px;text-align:center}.feed-open{width:calc(100% - 18px);margin:8px 9px 10px;padding:9px;border:1px solid #55bdeb;border-radius:8px;background:linear-gradient(#49bfff,#1761b8);box-shadow:0 3px 0 #07346a;color:#03101d;font-family:system-ui,sans-serif;font-size:10px;font-weight:950;letter-spacing:.55px}.feed-status{padding:9px 10px;border-bottom:1px solid #274866;background:#071421;color:#9db2c5;font-family:system-ui,sans-serif;font-size:9px;line-height:1.35}.feed-status strong{color:#77dcff}.social-actions{display:grid;gap:8px;padding:9px}.social-action{width:100%;display:grid;grid-template-columns:40px 1fr auto;gap:9px;align-items:center;padding:9px;border:1px solid #31577d;border-radius:10px;background:linear-gradient(155deg,#10243a,#07101a);color:#eaf7ff;text-align:left}.social-action:disabled{opacity:.43;filter:grayscale(1)}.social-action .social-action-icon{width:40px;height:40px;display:grid;place-items:center;border:1px solid #315f8d;border-radius:9px;background:#06111d;font-size:23px}.social-action .social-action-icon .game-icon{width:27px;height:27px}.social-action b{display:block;font-family:system-ui,sans-serif;font-size:11px;font-weight:950}.social-action small{display:block;margin-top:3px;color:#90a6bb;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.3}.social-action em{color:#74d9ff;font-family:system-ui,sans-serif;font-size:8.5px;font-style:normal;font-weight:900;text-align:right}.feed-list{display:grid}.feed-post{display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;padding:10px;border-bottom:1px solid #21364d;background:#070d15}.feed-post:last-child{border-bottom:0}.feed-post.player-post{background:linear-gradient(90deg,#102b47,#08111c)}.feed-avatar{width:36px;height:36px;display:grid;place-items:center;border:1px solid #4785b8;border-radius:50%;background:linear-gradient(145deg,#1d5b8e,#09223c);color:#e8f8ff;font-family:system-ui,sans-serif;font-size:11px;font-weight:1000}.feed-post.hater .feed-avatar{border-color:#9a4e58;background:linear-gradient(145deg,#702a34,#260b10)}.feed-post.fan .feed-avatar{border-color:#4b9875;background:linear-gradient(145deg,#267358,#09251a)}.feed-post.rival .feed-avatar{border-color:#ba713c;background:linear-gradient(145deg,#85451c,#2c1305)}.feed-post-copy{min-width:0;font-family:system-ui,sans-serif}.feed-post-head{display:flex;gap:5px;align-items:baseline;min-width:0}.feed-post-head b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#edf8ff;font-size:10px}.feed-post-head span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#71869a;font-size:8.5px}.feed-post-head time{margin-left:auto;color:#61778b;font-size:8.5px;white-space:nowrap}.feed-post p{margin:4px 0 6px;color:#c1d0df;font-size:9.5px;line-height:1.38}.feed-reactions{display:flex;gap:14px;color:#71879a;font-size:8.5px}.feed-back{width:100%;margin:0 0 10px;padding:10px;border:1px solid #365f86;border-radius:9px;background:#091523;color:#91dfff;font-family:system-ui,sans-serif;font-size:10px;font-weight:900}
 
   .ticker{font-family:system-ui,sans-serif;font-size:11px;color:#d7d7d7;padding:9px 11px;display:flex;gap:7px;align-items:center}.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 0 rgba(34,124,255,.7);animation:pulse 1.5s infinite}@keyframes pulse{to{box-shadow:0 0 0 8px rgba(34,124,255,0)}}
 
@@ -200,7 +202,6 @@
   .result-card.revealing h2{animation:resultPop .35s both}.result-card.revealing .result-method{animation:resultPop .35s .18s both}.result-card.revealing #resultLine{animation:resultPop .35s .32s both}.result-card.revealing .rewards{animation:resultPop .4s .48s both}.result-card.revealing .result-actions{animation:resultPop .35s .68s both}@keyframes resultPop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}.result-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.details-toggle{border:1px solid #31557d;border-radius:9px;background:#081421;color:#93cfff;padding:0 10px;font-size:9px}.result-details{display:none}.result-details.open{display:block;animation:feedIn .25s both}
   .objective-card{border-color:#2c659d;background:linear-gradient(145deg,#0d2138,#060c14)}.objective-body{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:10px}.objective-icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:#071426;border:1px solid #315f8e;font-size:22px}.objective-copy b{display:block;font-size:13px;color:#dff5ff}.objective-copy small{display:block;margin-top:3px;font-family:system-ui,sans-serif;color:#8da6bd;font-size:8.5px;line-height:1.3}.objective-progress{text-align:right}.objective-progress b{display:block;color:#77dfff;font-size:15px}.objective-progress small{font-family:system-ui,sans-serif;color:#7f95aa;font-size:8.5px}.streak-pill{color:#ffca63!important}.objective-complete{border-color:#4b9a76;box-shadow:inset 0 0 25px #28aa7125}.objective-complete .objective-progress b{color:#7de5a9}
   .roster-group{width:100%;padding:8px 11px;border:0;border-top:1px solid #244362;border-bottom:1px solid #244362;background:#081523;color:#82d9ff;font-family:system-ui,sans-serif;font-size:10px;font-weight:900;letter-spacing:.8px;text-align:left;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;gap:8px}.roster-group>span{display:flex;align-items:center;gap:6px}.roster-count{min-width:18px;padding:2px 5px;border:1px solid #315a7d;border-radius:999px;background:#050d15;color:#b7e9ff;font-size:8.5px;text-align:center}.roster-group small{display:flex;align-items:center;gap:7px;color:#748ba1;font-size:8.5px}.roster-chevron{width:17px;color:#9be5ff;font-size:15px;font-style:normal;line-height:1;text-align:center}.opponent-grid[hidden]{display:none}.tendency{display:inline-block;margin-top:5px;padding:3px 6px;border:1px solid #31577c;border-radius:12px;background:#071421;color:#8edbff;font-size:8.5px;letter-spacing:.4px}.rival-pill{color:#ffbd65;border-color:#8b6031;background:#24180a}.opp-history{margin-top:4px;color:#899db1;font-size:8.5px}.build-card{border-color:#375e88;background:linear-gradient(145deg,#10243a,#070d15)}.build-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:9px}.build-choice{border:1px solid #31577d;border-radius:10px;background:#091727;color:#dcefff;padding:9px;text-align:left}.build-choice b{display:block;color:#82d9ff;font-size:11px}.build-choice small{display:block;margin-top:3px;color:#8fa4b8;font-size:8.5px;line-height:1.3}.build-choice.locked-choice{opacity:.3!important;filter:grayscale(1) saturate(0)!important;-webkit-filter:grayscale(1) saturate(0)!important;cursor:not-allowed;background:#05080b!important;border-color:#343a40!important;color:#68717a!important;box-shadow:none!important}.build-choice.locked-choice b{color:#68717a!important}.build-choice.locked-choice small{color:#626a72!important}.build-choice.selected{opacity:1;border-color:#65d1ff;background:#12385d;box-shadow:inset 0 0 18px #46bfff22}.career-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}.career-token{min-width:0;padding:9px;border:1px solid #2e4e70;border-radius:9px;background:#081421}.career-token small{display:block;color:#8196aa;font-size:8.5px;text-transform:uppercase}.career-token b{display:block;margin-top:3px;color:#dff5ff;font-size:12px;line-height:1.15;overflow-wrap:anywhere}.rarity-tag{display:inline-block;margin:0 0 7px;padding:3px 7px;border:1px solid;border-radius:999px;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.65px}.rarity-common{color:#b8c7d8;border-color:#53667a;background:#182330}.rarity-rare{color:#75e5ff;border-color:#2586a7;background:#082936}.rarity-epic{color:#d5a5ff;border-color:#8151b0;background:#28133d}.rarity-legendary{color:#ffd66e;border-color:#a97819;background:#332407;box-shadow:0 0 9px #f3aa2233}.loadout-note{padding:8px 10px;color:#91a7bc;font-size:8.5px}.gear.equipped{border-color:#68cfff;box-shadow:inset 0 0 22px #35aaff2d}.gear button.equip-btn{background:linear-gradient(#8ee2ff,#247bcf)}
-  .career-name-display{display:flex;align-items:center;gap:5px;min-width:0}.career-name-display b{min-width:0;flex:1}.name-edit-btn{flex:0 0 25px;width:25px;height:25px;padding:3px;border:1px solid #3d6e9e;border-radius:7px;background:#102944;color:#8de1ff}.name-edit-btn .game-icon{width:14px;height:14px}.career-name-form{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px;margin-top:5px}.career-name-form input{min-width:0;width:100%;padding:6px;border:1px solid #4f8fc4;border-radius:6px;background:#020811;color:#effaff;font-family:system-ui,sans-serif;font-size:11px;font-weight:800;outline:none}.career-name-form input:focus{border-color:#7ce5ff;box-shadow:0 0 0 2px #39bfff33}.career-name-form button{padding:5px 6px;border:1px solid #345b80;border-radius:6px;background:#10243a;color:#9edfff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900}.career-name-form .name-save{background:#1768ad;color:white;border-color:#4ebeff}
   .career-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.identity-subhead{padding:10px 9px 0;color:#78d7ff;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}.city-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:8px 9px 9px}.city-choice{min-width:0;padding:8px 6px;border:1px solid #31577d;border-radius:9px;background:#091727;color:#dcefff;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;letter-spacing:.35px;text-transform:uppercase}.city-choice.selected{border-color:#65d1ff;background:#12385d;box-shadow:inset 0 0 18px #46bfff22}.city-choice.locked-choice{opacity:.3;filter:grayscale(1) saturate(0);cursor:not-allowed;background:#05080b;border-color:#343a40;color:#68717a;box-shadow:none}
   .gear-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:7px}.gear-top .rarity-tag{margin:0}.gear-count{padding:3px 7px;border:1px solid #38638d;border-radius:999px;background:#091a2b;color:#d9efff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;white-space:nowrap}.gear.owned h3{max-width:100%}.gear-status{position:absolute;left:9px;right:9px;bottom:9px;border:1px solid #356e59;border-radius:7px;padding:8px;background:#0b281d;color:#82dfb0;font-family:system-ui,sans-serif;font-size:9px;font-weight:900;text-align:center;letter-spacing:.45px}.gear-empty{margin:10px;padding:24px 16px;border:1px dashed #315477;border-radius:12px;background:#07111d;text-align:center}.gear-empty b{display:block;color:#9bddff;font-family:system-ui,sans-serif;font-size:14px}.gear-empty span{display:block;margin-top:7px;color:#8299b0;font-family:system-ui,sans-serif;font-size:9px;line-height:1.45}
   .loot{margin:10px auto 4px;padding:10px;border:1px dashed #2f8ee8;background:#2185ff18;border-radius:10px;color:var(--gold);font-family:system-ui,sans-serif;font-size:11px;animation:lootPop .5s both}.loot.drop-pending{padding:14px;border-style:solid;border-color:#dcae45;background:linear-gradient(135deg,#322305,#0c1723);box-shadow:0 0 22px #ffc23a33}.drop-teaser{display:block;color:#ffe08a;font-size:15px;font-weight:950;letter-spacing:.8px}.drop-teaser small{display:block;margin-top:5px;color:#a9b7c5;font-size:9px;letter-spacing:.3px}.loot.drop-reveal{position:relative;overflow:hidden;padding:17px 12px 15px;border-width:2px;border-style:solid;animation:dropReveal .65s cubic-bezier(.2,1.45,.35,1) both}.loot.drop-reveal:before{content:"";position:absolute;inset:-70%;background:conic-gradient(transparent,#ffffff40,transparent 22%);animation:dropShine 2.2s linear infinite}.loot.drop-reveal>*{position:relative;z-index:1}.drop-kicker{font-size:9px;font-weight:950;letter-spacing:1.8px}.drop-icon{display:block;margin:7px 0 3px;font-size:56px;line-height:1;filter:drop-shadow(0 6px 10px #0009);animation:dropIcon .7s .16s cubic-bezier(.2,1.5,.35,1) both}.drop-name{display:block;color:#fff;font-size:22px;line-height:1.05;text-shadow:0 2px 7px #000}.drop-meta{display:inline-block;margin-top:8px;padding:4px 9px;border:1px solid currentColor;border-radius:20px;font-size:9px;font-weight:950}.drop-reason,.drop-extras{display:block;margin-top:8px;color:#c3ced8;font-size:9px;line-height:1.35}.drop-extras{color:#ffe092}.result-card.drop-celebration{border-color:#e8bd55;box-shadow:0 0 40px #e8bd5540,0 20px 70px #000}.loot.drop-common{border-color:#71869b;color:#d1deea;background:#60748824}.loot.drop-rare{border-color:#4edfff;color:#8cecff;background:#25bde828;box-shadow:0 0 28px #25cfff40}.loot.drop-epic{border-color:#bd7aff;color:#dfbaff;background:#8e43d632;box-shadow:0 0 34px #a652ff55}.loot.drop-legendary{border-color:#ffd35e;color:#ffe394;background:#e8a61932;box-shadow:0 0 42px #ffbd3266}@keyframes lootPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}@keyframes dropReveal{from{opacity:0;transform:scale(.35) rotate(-4deg)}to{opacity:1;transform:none}}@keyframes dropIcon{from{opacity:0;transform:scale(.25) rotate(-18deg)}to{opacity:1;transform:none}}@keyframes dropShine{to{transform:rotate(360deg)}}
@@ -261,6 +262,7 @@
   .pricing-advice{margin:12px 0;padding:10px;border:1px solid #284b72;border-radius:10px;background:#081421;font-family:system-ui,sans-serif;font-size:9px;color:#c1d1e1;line-height:1.4}
   .pricing-advice.good{border-color:#27835c;color:#8ee7bc}.pricing-advice.risky{border-color:#8a5b27;color:#ffd18a}.pricing-advice.danger{border-color:#9c3c49;color:#ff939f}
   .modal-actions{display:grid;grid-template-columns:1fr 1.5fr;gap:8px;margin-top:13px}.modal-actions button{border:0;border-radius:10px;padding:12px;font-size:13px}.modal-cancel{background:#1a2430;color:#aebdcd;border:1px solid #34495e!important}.modal-run{background:linear-gradient(#66d4ff,#1760bd);color:#02101f;box-shadow:0 4px 0 #07376f}.modal-run:disabled{opacity:.45;box-shadow:none}
+  .fighter-name-field{display:block;width:100%;margin-top:10px;padding:11px;border:1px solid #4f8fc4;border-radius:9px;background:#020811;color:#effaff;font-family:system-ui,sans-serif;font-size:14px;font-weight:850;outline:none}.fighter-name-field:focus{border-color:#7ce5ff;box-shadow:0 0 0 3px #39bfff33}.name-rule{margin-top:7px;color:#748ba1;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.35}
   .signing-result{display:none;margin:12px 0 2px;padding:12px;border:1px solid #2e719d;border-radius:11px;background:#071725;text-align:center}.signing-result.show{display:block}.signing-result b{display:block;color:#6ed7ff;font-size:22px}.signing-result span{display:block;margin-top:5px;font-family:system-ui,sans-serif;color:#c2d2e2;font-size:10px;line-height:1.45}
 
   /* Collectible drop cards: fixed 2:3 ratio, two across, with full rarity frames. */
@@ -293,7 +295,7 @@
 <div id="app" class="career-setup">
   <header class="topbar">
     <div class="logo"><span>CAGE</span><span>WARRIOR</span></div>
-    <div class="identity"><div class="name" id="fighterName">ROOKIE</div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
+    <div class="identity"><div class="identity-name-row"><div class="name" id="fighterName">ROOKIE</div><button class="top-name-edit locked" id="editFighterNameBtn" type="button" aria-label="Edit fighter name" aria-disabled="true"><span data-icon-name="edit-fighter-name" data-icon-fallback="✎">✎</span></button></div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
     <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FOLLOWERS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
   </header>
 
@@ -318,7 +320,7 @@
     <section class="screen active" data-screen="home">
       <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: every fight burns 15 energy. No gas, no payday.</span></div></div>
 
-      <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Avatar</small><b id="homeAvatarText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Fighter Name</small><div class="career-name-display" id="fighterNameDisplay"><b id="homeFighterNameText">ROOKIE</b><button class="name-edit-btn" id="editFighterNameBtn" type="button" aria-label="Edit fighter name"><span data-icon-name="edit-fighter-name" data-icon-fallback="✎">✎</span></button></div><form class="career-name-form" id="fighterNameForm" hidden><input id="fighterNameInput" type="text" minlength="2" maxlength="24" autocomplete="off" aria-label="Fighter name"><button class="name-save" type="submit">SAVE</button><button id="cancelFighterNameBtn" type="button">CANCEL</button></form></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
+      <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Avatar</small><b id="homeAvatarText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
       <div class="card build-card identity-setup" id="citySetup"><div class="card-title">Choose Fighting Out Of <small>Permanent</small></div><div class="city-grid" id="cityChoices"></div><div class="loadout-note" id="cityDescription">Choose your hometown. It defines the opening rungs of your title journey.</div></div>
 
@@ -336,6 +338,8 @@
         <div class="hero-copy"><h1>FROM NOBODY<br>TO <span>MAIN EVENT</span></h1><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
       </div>
 
+      <div class="card feed-preview"><div class="card-title">Latest Buzz <small id="homeFeedStatus">CAGE FEED</small></div><div class="feed-preview-list" id="homeFeedPreview"></div><button class="feed-open" type="button" data-go="feed">OPEN CAGE FEED</button></div>
+
       <div class="choice-grid">
         <article class="choice red"><h3>BIG WIN POTENTIAL</h3><p>Pick an opponent, call the tactics, and chase a finish through every round.</p><img class="choice-art" src="assets/home-fight.png" alt="" aria-hidden="true"><button class="choice-action" data-go="fight">TAKE A FIGHT</button></article>
         <article class="choice"><h3>GUARANTEED GROWTH</h3><p>Turn energy into permanent stats. Perfect sessions pay extra.</p><img class="choice-art" src="assets/home-training.png" alt="" aria-hidden="true"><button class="choice-action" data-go="train">HIT THE GYM</button></article>
@@ -344,6 +348,13 @@
       </div>
 
       </div>
+    </section>
+
+    <section class="screen" data-screen="feed">
+      <button class="feed-back" type="button" data-go="home">← BACK HOME</button>
+      <div class="card"><div class="card-title">Cage Feed <small id="feedCycleStatus">YOUR POST IS READY</small></div><div class="feed-status" id="feedStatus"></div><div class="social-actions" id="socialActions"></div></div>
+      <div class="card"><div class="card-title">The Timeline <small>Latest first</small></div><div class="feed-list" id="socialTimeline"></div></div>
+      <div class="section-note">The feed reacts to real career events. You may publish one post per news cycle; fights, appearances, and major career moments start a new cycle.</div>
     </section>
 
     <section class="screen" data-screen="train">
@@ -394,6 +405,16 @@
         <button class="modal-run" id="autographRun">RUN SIGNING · 10 ENERGY</button>
       </div>
     </div>
+  </div>
+
+  <div class="modal-overlay" id="fighterNameModal" aria-hidden="true">
+    <form class="gig-modal" id="fighterNameForm" role="dialog" aria-modal="true" aria-labelledby="fighterNameTitle">
+      <h2 id="fighterNameTitle">Choose Your <span>Fighter Name</span></h2>
+      <p>The rookie label is gone. Pick the name the crowd, commentators, and Cage Feed will use.</p>
+      <input class="fighter-name-field" id="fighterNameInput" type="text" minlength="2" maxlength="24" autocomplete="off" aria-label="Fighter name">
+      <div class="name-rule">2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.</div>
+      <div class="modal-actions"><button class="modal-cancel" id="cancelFighterNameBtn" type="button">CANCEL</button><button class="modal-run" type="submit">SAVE NAME</button></div>
+    </form>
   </div>
 
   <div id="toast"></div>
@@ -487,11 +508,12 @@
   let saveWarningShown = false;
 
   const defaultState = {
-    version:10,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:11,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0},
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
+    socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,
     pendingFight:null,
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,milestones:[],equippedGear:[],leagueInitialized:false
   };
@@ -684,12 +706,10 @@
   ];
 
   const riskDefs = [
-    {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]},
-    {id:'call-out-rival',icon:'📣',title:'Post a Rival Callout',text:'Tag a rival in a public post. If it lands, gain Hype and Followers. If it flops, the comments cook you.',cost:5,success:.75,hype:[8,18],followers:[20,60]}
+    {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]}
   ];
 
   const publicityDefs = [
-    {id:'social-post',icon:'📱',title:'Influencer Brand Post',text:'Post a sponsored training clip. Small money, steady follower growth.',minLevel:2,minFans:100,cost:4,cash:[45,125],fans:[15,45],xp:7,payout:'$45–125'},
     {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
     {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:10,autograph:true,xp:14,payout:'UNKNOWN'},
     {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],xp:16,payout:'$350–900'},
@@ -720,11 +740,12 @@
       s.endorsementHistory = Array.isArray(s.endorsementHistory)?s.endorsementHistory:[];
       s.activeEndorsement = s.activeEndorsement&&typeof s.activeEndorsement==='object'?s.activeEndorsement:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);
+      s.socialAccountCreated=typeof parsed.socialAccountCreated==='boolean'?parsed.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);if(!s.socialAccountCreated)s.fans=0;
       s.winStreak = Math.max(0,Number(s.winStreak)||0);s.bestStreak=Math.max(s.winStreak,Number(s.bestStreak)||0);
       s.pendingFight = s.pendingFight&&typeof s.pendingFight==='object'?s.pendingFight:null;
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=parsed.leagueInitialized===true;
-      s.version=10;
+      s.version=11;
       return s;
   }
   function loadState(){
@@ -769,12 +790,14 @@
   function currentCity(){return fighterCities.find(c=>c.id===state.fighterCity)||null}
   function currentAvatar(){return fighterAvatars.find(a=>a.id===state.fighterAvatar)||null}
   function normalizeFighterName(value){const name=typeof value==='string'?value.trim().replace(/\s+/g,' '):'';return name.length>=2&&name.length<=24&&/^[\p{L}\p{N} .'-]+$/u.test(name)?name:''}
+  function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
   function validFighterAllocation(stats){const keys=['power','speed','chin','cardio'];return !!stats&&keys.every(k=>Number.isInteger(stats[k])&&stats[k]>=2&&stats[k]<=8)&&keys.reduce((sum,k)=>sum+stats[k],0)===20}
   function milestoneName(m){const city=currentCity();if(m.scope==='city')return city?`${city.name} TITLE`:'CITY TITLE';if(m.scope==='region')return city?`${city.region} TITLE`:'REGIONAL TITLE';if(m.scope==='us')return 'U.S. TITLE';return m.name}
-  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);state.fans+=m.level*75;toast(`${milestoneName(m)} WON!`,'#ffd36e',m.iconName,m.icon);confettiBurst();return true}
+  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);changeFollowers(m.level*75);toast(`${milestoneName(m)} WON!`,'#ffd36e',m.iconName,m.icon);confettiBurst();return true}
   function gearCount(id){return Math.max(0,Math.floor(Number(state.gearCounts&&state.gearCounts[id]))||0)}
   function ownedBonus(prop){return state.gear.reduce((sum,id)=>{const g=gearItems.find(x=>x.id===id);return sum+(g&&g[prop]?g[prop]:0)},0)}
   function receiveMoney(amount,career=false){const value=Math.max(0,Math.round(Number(amount)||0));state.cash+=value;if(career)state.careerEarnings+=value;return value}
+  function changeFollowers(amount){if(!state.socialAccountCreated)return 0;const before=state.fans,value=Math.round(Number(amount)||0);state.fans=Math.max(0,before+value);return state.fans-before}
   const gearRarityOrder=['COMMON','RARE','EPIC','LEGENDARY'];
   function gearRarityWeights(level){
     if(level<=3)return [80,18,2,0];
@@ -878,6 +901,7 @@
 
   function updateUI(){
     $('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;$('#rankText').textContent=rankName();
+    const nameUnlocked=state.level>=2,nameButton=$('#editFighterNameBtn');nameButton.classList.toggle('locked',!nameUnlocked);nameButton.setAttribute('aria-disabled',String(!nameUnlocked));nameButton.title=nameUnlocked?'Edit fighter name':'Unlocks at LVL 2 · Club Fighter';
     $('#cashText').textContent='$'+fmt(state.cash);$('#fansText').textContent=fmt(state.fans);$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageRank').textContent='#'+cageRank();
     const energyNow=Math.floor(state.energy),healthNow=Math.floor(state.health);
     if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
@@ -889,11 +913,11 @@
     $('#hypeText').textContent=Math.floor(state.hype)+'%';
     ['power','speed','chin','cardio'].forEach(k=>{$('#'+k+'Stat').textContent=effectiveStat(k);$('#'+k+'Mini').style.width=clamp(effectiveStat(k)*4,5,100)+'%'});
     const today=todayKey();$('#dailyBtn').disabled=state.lastDaily===today;$('#dailyBtn').textContent=state.lastDaily===today?'DROP CLAIMED':'DAILY DROP';
-    renderCareer();renderTrain();renderHustle();renderGear();renderOpponents();drawHero();saveState();
+    renderCareer();renderSocial();renderTrain();renderHustle();renderGear();renderOpponents();drawHero();saveState();
   }
 
   function renderCareer(){
-    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeAvatarText').textContent=avatar?`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')}`:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#homeFighterNameText').textContent=state.name;$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
+    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeAvatarText').textContent=avatar?`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')}`:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
     const sponsor=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,sponsorBadge=$('#heroSponsor');sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${sponsor.brand}</b><em>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</em></span>`:'';
     $('#buildChoices').innerHTML=style?'':fighterStyles.map(s=>`<button class="build-choice" data-style="${s.id}"><b>${s.name}</b><small>${s.text}</small></button>`).join('');
     $('#cityChoices').innerHTML=city?'':fighterCities.map(c=>`<button class="city-choice" data-city="${c.id}">${c.name}</button>`).join('');
@@ -903,11 +927,75 @@
   function chooseStyle(id){if(state.fighterStyle||!state.fighterCity||!state.fighterAvatar)return;const style=fighterStyles.find(s=>s.id===id);if(!style)return;state.fighterStyle=id;sfx.win();confettiBurst();toast(`${style.name} IDENTITY LOCKED IN`,'#76dcff');updateUI()}
   function chooseCity(id){if(state.fighterCity)return;const city=fighterCities.find(c=>c.id===id);if(!city)return;state.fighterCity=id;ensureTitleChampions();sfx.win();confettiBurst();toast(`FIGHTING OUT OF ${city.name}`,'#76dcff');updateUI()}
   function chooseAvatar(id){if(state.fighterAvatar||!state.fighterCity)return;const avatar=fighterAvatars.find(a=>a.id===id);if(!avatar||!validFighterAllocation(avatar.stats)){toast('Fighter build must use exactly 20 points with every attribute from 2 through 8.','#ff766d');return}const keys=['power','speed','chin','cardio'],earned=Object.fromEntries(keys.map(k=>[k,Math.max(0,(Number(state.stats[k])||5)-5)]));state.fighterAvatar=id;state.fighterBaseStats=Object.assign({},avatar.stats);state.stats=Object.fromEntries(keys.map(k=>[k,avatar.stats[k]+earned[k]]));sfx.win();confettiBurst();toast(`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')} LOCKED IN · 20 POINT BUILD`,'#76dcff');updateUI()}
-  function setFighterNameEditor(open){$('#fighterNameDisplay').hidden=open;$('#fighterNameForm').hidden=!open;if(open){const input=$('#fighterNameInput');input.value=state.name;requestAnimationFrame(()=>{input.focus();input.select()})}}
-  function saveFighterName(e){e.preventDefault();const name=normalizeFighterName($('#fighterNameInput').value);if(!name){toast("Use 2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.",'#ff766d');return}state.name=name;setFighterNameEditor(false);sfx.tap();toast('FIGHTER NAME UPDATED','#76dcff');updateUI()}
+  function openFighterNameModal(){if(state.level<2){toast('NAME EDITING UNLOCKS AT LVL 2 · EARN CLUB FIGHTER STATUS','#ffcf78');sfx.lose();return}const input=$('#fighterNameInput');input.value=state.name;$('#fighterNameModal').classList.add('open');$('#fighterNameModal').setAttribute('aria-hidden','false');sfx.tap();requestAnimationFrame(()=>{input.focus();input.select()})}
+  function closeFighterNameModal(){$('#fighterNameModal').classList.remove('open');$('#fighterNameModal').setAttribute('aria-hidden','true')}
+  function saveFighterName(e){e.preventDefault();const name=normalizeFighterName($('#fighterNameInput').value);if(!name){toast("Use 2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.",'#ff766d');return}state.name=name;closeFighterNameModal();sfx.tap();toast('FIGHTER NAME UPDATED','#76dcff');updateUI()}
+
+  function socialProfile(key){
+    const profiles={media:{author:'Cage Report',handle:'@CageReport',tone:'media'},promoter:{author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},gym:{author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},rival:{author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}};
+    if(key==='fan'||key==='hater'){const names=key==='fan'?['FightFan99','MMA4Life','CageSideSara','FiveRoundFaithful','SouthpawSam','GroundGameGuru','JustBleedJay','UppercutUpdates']:['TapeWatcher88','ScorecardBandit','CasualTakeKing','NoChinChecked','OverratedAlert','SplitDecisionDan','BenchCoach77','FlukeWinPolice'],username=names[hashSeed(`${key}|${state.socialCycle}|${state.socialSerial+1}`)%names.length];return {author:username,handle:`@${username.toLowerCase()}`,tone:key}}
+    if(key==='player'){const slug=state.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18)||'cagefighter';return {author:state.name,handle:`@${slug}`,tone:'player player-post'}}
+    return profiles[key]||profiles.media;
+  }
+  function socialHandle(name){return `@${String(name).toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18)||'cagefighter'}`}
+  function makeSocialPost(entry){const profile=socialProfile(entry.profile),author=entry.author||profile.author,handle=entry.handle||socialHandle(author)||profile.handle,id=++state.socialSerial,seed=hashSeed(`${id}|${entry.text}|${state.socialCycle}`);return {id,cycle:state.socialCycle,author,handle,tone:profile.tone,text:String(entry.text),likes:5+seed%Math.max(18,36+state.level*12),reposts:seed%Math.max(4,7+state.level*3)}}
+  function addSocialPosts(entries){const posts=entries.map(makeSocialPost);state.socialFeed=[...posts,...state.socialFeed].slice(0,30)}
+  function ensureSocialFeed(){return !!(state.socialAccountCreated&&state.socialFeed.length)}
+  function createSocialAccount(){
+    if(ensureSocialFeed())return;
+    const firstAccount=!state.socialAccountCreated;state.socialAccountCreated=true;state.socialCycle=Math.max(1,state.socialCycle);state.socialPostedCycle=state.socialCycle;
+    addSocialPosts([{profile:'player',text:`Hello, fight fans! Stay tuned—the climb starts now.`},{profile:'fan',text:`First follow. Let’s see where this goes.`},{profile:'promoter',text:`Account is live. Now give the timeline something worth talking about, ${state.name}.`}]);
+    const firstFollowers=firstAccount?changeFollowers(5):0;toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
+  }
+  function openSocialCycle(type,data={}){
+    if(!ensureSocialFeed())return;state.socialCycle=Math.max(1,state.socialCycle+1);
+    const name=state.name,posts=[];
+    if(type==='fight'){
+      const finish=String(data.method||'decision').toUpperCase();
+      if(data.win){if(data.winStreak>=2)posts.push({profile:'media',text:`WIN STREAK: ${name} has now won ${data.winStreak} straight fights. The division has to pay attention.`});posts.push({profile:'media',text:`${name} defeats ${data.opponent} by ${finish}.${data.title?` The new ${data.title} champion has arrived.`:''}`},{profile:'rival',author:data.opponent,text:`Enjoy the win, ${name}. If they book it again, I know what changes.`},{profile:'fan',text:`That was the kind of performance that turns a prospect into must-watch television. ${name} showed up.`},{profile:'hater',text:data.winStreak>=2?`${data.winStreak} straight? Wake me up when ${name} beats someone I picked.`:`Everybody relax. One win does not make ${name} unbeatable. Book the rematch.`})}
+      else posts.push({profile:'media',text:`${data.opponent} hands ${name} a loss by ${finish}. The comeback starts with the response.`},{profile:'rival',author:data.opponent,text:`Respect for taking the fight, ${name}. But tonight belonged to me.`},{profile:'hater',text:`The hype train needed brakes. ${name} just found them.`},{profile:'fan',text:`Losses happen. Still here, still following, and waiting for the comeback.`});
+    }else if(type==='appearance'){
+      posts.push({profile:'media',text:`${name} made an appearance on ${data.title}. The fight world is starting to notice.`},{profile:'fan',text:data.viral?`That ${name} clip is everywhere. The timeline belongs to a cage fighter today.`:`Saw ${name} making the rounds today. Good energy and no fake superstar routine.`},{profile:'hater',text:`Another appearance? I would rather see ${name} book a fight.`});
+    }else if(type==='autograph'){
+      posts.push({profile:'media',text:`${name} signed ${data.signatures} autographs at today’s appearance.`},{profile:data.price>35?'hater':'fan',text:data.price===0?`${name} signed for free and stayed until the line was done. That is how you build real followers.`:data.price>35?`Charging $${data.price} for an autograph? ${name} is speed-running the unfollow button.`:`Met ${name} today. Worth the wait and actually talked to the fans.`});
+    }else if(type==='sponsor'){
+      posts.push({profile:'media',text:`${data.brand} signs ${name} to a new fight contract.`},{profile:'fan',text:`From unknown rookie to sponsored fighter. ${name} is building something.`},{profile:'hater',text:`A sponsor check does not improve your takedown defense, ${name}.`});
+    }
+    if(posts.length)addSocialPosts(posts);
+  }
+  function calloutRival(){return state.roster.filter(o=>!o.championship&&(o.lossesToPlayer||0)>0&&!o.rematchAccepted).sort((a,b)=>(b.meetings||0)-(a.meetings||0)||(b.createdAt||0)-(a.createdAt||0))[0]||null}
+  function feedAge(post){const age=Math.max(0,state.socialCycle-(Number(post.cycle)||0));return age===0?'NOW':age===1?'1 EVENT AGO':`${age} EVENTS AGO`}
+  function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase();return `<article class="feed-post ${escapeHtml(post.tone||'media')}"><div class="feed-avatar">${escapeHtml(initials)}</div><div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b><span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p><div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div></div></article>`}
+  function renderSocial(){
+    const accountReady=ensureSocialFeed(),used=!accountReady||state.socialPostedCycle>=state.socialCycle,rival=calloutRival(),brandLocked=state.level<2||state.fans<100,posts=state.socialFeed||[];
+    $('#homeFeedPreview').innerHTML=accountReady?posts.slice(0,2).map(renderFeedPost).join(''):'<div class="feed-preview-empty">Open Cage Feed to create your fighter account and publish your first post.</div>';
+    $('#homeFeedStatus').textContent=accountReady?(used?'POST USED':'1 POST READY'):'CREATE ACCOUNT';$('#feedCycleStatus').textContent=accountReady?(used?'POST USED THIS CYCLE':'1 POST READY'):'ACCOUNT NOT CREATED';
+    $('#feedStatus').innerHTML=used?`<strong>You already posted.</strong> Create another headline through a fight, appearance, or career moment to start the next news cycle.`:`<strong>The timeline is talking.</strong> You get one post this news cycle. Choose the message that helps your career.`;
+    const choices=[
+      {id:'thank',iconName:'thank-followers',icon:'♡',title:'Thank the Followers',text:'Safe audience growth and a small Hype lift.',status:'SAFE'},
+      {id:'callout',iconName:'call-out-rival',icon:'📣',title:'Post a Rival Callout',text:rival?`Tag ${rival.name}. A strong post can force the rematch.`:'Beat a fighter before you can call them back out.',status:rival?'75% HIT':'NEEDS RIVAL',locked:!rival},
+      {id:'brand',iconName:'social-post',icon:'📱',title:'Influencer Brand Post',text:'Post a sponsored training clip for Cash and Followers.',status:brandLocked?'LVL 2 · 100 FOLLOWERS':'4 ENERGY',locked:brandLocked||state.energy<4}
+    ];
+    $('#socialActions').innerHTML=choices.map(choice=>`<button class="social-action" type="button" data-social-post="${choice.id}" ${used||choice.locked?'disabled':''}><span class="social-action-icon">${gameIcon(choice.iconName,choice.icon)}</span><span><b>${choice.title}</b><small>${choice.text}</small></span><em>${used?'POST USED':choice.status}</em></button>`).join('');
+    $('#socialTimeline').innerHTML=posts.length?posts.map(renderFeedPost).join(''):'<div class="feed-preview-empty">No posts yet.</div>';
+  }
+  function handleSocialPost(type){
+    if(!ensureSocialFeed()){createSocialAccount();updateUI();return}if(state.socialPostedCycle>=state.socialCycle){toast('ONE POST PER NEWS CYCLE','#ffcf78');return}initAudio();let playerText='',reactions=[];
+    if(type==='thank'){
+      const followers=changeFollowers(12+state.level*6+rint(0,8));state.hype=clamp(state.hype+2,0,100);playerText=`Appreciate everybody following the climb. I hear the support. Back to work.`;reactions=[{profile:'fan',text:`This is why we follow ${state.name}. No speech, no excuses—just work.`},{profile:'gym',text:`Message posted. Now put the phone down and finish the session.`}];toast(`+${followers} FOLLOWERS · +2% HYPE`,'#77d13e');sfx.win();
+    }else if(type==='callout'){
+      const rival=calloutRival();if(!rival){toast('BEAT A FIGHTER BEFORE CALLING FOR A REMATCH','#ffcf78');return}const success=Math.random()<.75;playerText=`${rival.name}, the first fight answered nothing. Sign the rematch and meet me in the cage.`;
+      if(success){const hype=rint(8,18),followers=changeFollowers(rint(20,60));state.hype=clamp(state.hype+hype,0,100);rival.rematchAccepted=true;reactions=[{profile:'rival',author:rival.name,text:`You wanted my attention, ${state.name}. You have it. Rematch accepted.`},{profile:'fan',text:`That callout had some heat. Book ${state.name} versus ${rival.name} again.`}];toast(`CALLOUT CAUGHT FIRE · +${hype}% HYPE · +${followers} FOLLOWERS`,'#ad72ff');sfx.win();confettiBurst()}
+      else{state.hype=clamp(state.hype-5,0,100);reactions=[{profile:'hater',text:`${rival.name} left ${state.name} on read. Tough night for the mentions.`},{profile:'promoter',text:`A callout without a response is just free advertising for the other fighter.`}];toast('POST FLOPPED · THE COMMENTS COOKED YOU · -5% HYPE','#ff6157');sfx.lose()}
+    }else if(type==='brand'){
+      if(state.level<2||state.fans<100){toast('BRAND POSTS NEED LVL 2 AND 100 FOLLOWERS','#ffcf78');return}if(!spendEnergy(4))return;let cash=rint(45,125),followers=rint(15,45),viral=Math.random()<.18;if(viral){cash=Math.round(cash*1.65);followers=Math.round(followers*2.2)}receiveMoney(cash,true);followers=changeFollowers(followers);gainXp(7);playerText=`Paid partnership. Training day powered by people who believe in the climb. #ad`;reactions=[{profile:viral?'fan':'hater',text:viral?`${state.name} somehow made an ad look like a fight trailer. This clip is everywhere.`:`The sponsored-post era arrived fast. Hope the product comes with better cardio.`},{profile:'promoter',text:`Sponsors like reach. I like fighters who turn reach into ticket sales.`}];toast(`${viral?'BRAND POST WENT VIRAL':'BRAND POSTED'} · +$${fmt(cash)} · +${fmt(followers)} FOLLOWERS`,viral?'#6ed7ff':'#77d13e');sfx.coin();if(viral)confettiBurst();
+    }else return;
+    state.socialPostedCycle=state.socialCycle;addSocialPosts([{profile:'player',text:playerText},...reactions]);updateUI();
+  }
 
   function navTo(screen){
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
+    if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
     currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));
     sfx.tap();updateUI();
   }
@@ -1076,9 +1164,10 @@
     initAudio();state.dailyCounters.publicity++;
     let cash=rint(...a.cash),fans=rint(...a.fans),viral=false;
     if(a.viral&&Math.random()<a.viral){cash=Math.round(cash*1.65);fans=Math.round(fans*2.2);viral=true}
-    receiveMoney(cash,true);state.fans+=fans;gainXp(a.xp);sfx.coin();
+    receiveMoney(cash,true);fans=changeFollowers(fans);gainXp(a.xp);sfx.coin();
     if(viral){confettiBurst();sfx.win();toast(`THE CLIP WENT VIRAL! +$${fmt(cash)} · +${fmt(fans)} followers`,'#6ed7ff')}
     else toast(`+$${fmt(cash)} · +${fmt(fans)} followers`,'#77d13e');
+    openSocialCycle('appearance',{title:a.title,viral,followers:fans});
     updateUI();
   }
   function openAutographModal(){
@@ -1117,18 +1206,19 @@
     else if(price<=25)fanChange=Math.round(signatures*rand(.03,.12));
     else if(price<=35)fanChange=Math.round(signatures*rand(-.04,.04));
     else fanChange=-Math.max(4,Math.round((price-34)*rand(.5,1.3)+state.fans*rand(.004,.012)));
-    receiveMoney(cash,true);state.fans=Math.max(0,state.fans+fanChange);gainXp(a.xp);
+    receiveMoney(cash,true);fanChange=changeFollowers(fanChange);gainXp(a.xp);
     const fanText=fanChange>=0?`+${fmt(fanChange)} followers`:`-${fmt(Math.abs(fanChange))} followers`;
     $('#autographResult').innerHTML=`<b>${fmt(signatures)} AUTOGRAPHS SIGNED</b><span>+$${fmt(cash)} income · ${fanText}<br>${price===0?'The free signing created a packed line and strong goodwill.':price>35?'The price caused backlash despite the payday.':'Your price shaped the turnout and final payment.'}</span>`;
     $('#autographResult').classList.add('show');$('#autographRun').style.display='none';$('#autographCancel').textContent='COLLECT & CLOSE';
     if(fanChange>=0){sfx.coin();if(price===0)confettiBurst()}else{sfx.lose();shake()}
+    openSocialCycle('autograph',{price,signatures,followers:fanChange});
     saveState();updateUI();
   }
   function handleEndorsement(i){
     const d=endorsementDefs[i];if(!d)return;
     if(state.activeEndorsement){toast('Finish your current endorsement first.','#ffcf78');return}
     if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} followers`,'#75cfff');return}
-    initAudio();state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory.push(d.id);receiveMoney(d.signing,true);state.fans+=Math.round(d.fansPerFight*.5);sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
+    initAudio();state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory.push(d.id);receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
   }
   function handleRisk(i){
     ensureDailyCounters();const a=riskDefs[i];initAudio();
@@ -1136,10 +1226,8 @@
     if(!spendEnergy(a.cost))return;state.dailyCounters.risk++;
     if(Math.random()<a.success){
       if(a.cash){const c=rint(...a.cash);receiveMoney(c);sfx.coin();toast(`YOU WON $${c}`,'#f4c34a');confettiBurst()}
-      if(a.hype){const h=rint(...a.hype),followers=rint(...a.followers);state.hype=clamp(state.hype+h,0,100);state.fans+=followers;sfx.win();toast(`POST CAUGHT FIRE! +${h}% HYPE · +${followers} FOLLOWERS`,'#ad72ff')}
     }else{
       if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
-      else{state.hype=clamp(state.hype-5,0,100);sfx.lose();toast('POST FLOPPED. THE COMMENTS COOKED YOU. -5% HYPE','#ff6157')}
     }updateUI();
   }
   function claimDaily(){
@@ -1343,26 +1431,27 @@
 
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;
-    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null;o.meetings=(o.meetings||0)+1;
+    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null,titleWon=false;o.meetings=(o.meetings||0)+1;
     if(win){
-      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);const streakBonus=Math.min(.25,Math.max(0,state.winStreak-1)*.05),upsetBonus=upset?.25:0,rivalryBonus=rivalry?.15:0;cash=Math.round(basePurse*(1+state.hype/130)*(1+ownedBonus('cashBonus')/100)*(1+streakBonus+upsetBonus+rivalryBonus)*rand(.9,1.15));fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
-      const titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
+      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);const streakBonus=Math.min(.25,Math.max(0,state.winStreak-1)*.05),upsetBonus=upset?.25:0,rivalryBonus=rivalry?.15:0;cash=Math.round(basePurse*(1+state.hype/130)*(1+ownedBonus('cashBonus')/100)*(1+streakBonus+upsetBonus+rivalryBonus)*rand(.9,1.15));fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
+      titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
       if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${gameIcon(title.iconName,title.icon)} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,`${gameIcon('upset-bonus','⚡')} UPSET BONUS +25%`].filter(Boolean).join(' · ');if(rivalry)loot=[loot,`${gameIcon('rivalry-bonus','🔥')} RIVALRY FIGHT BONUS +15%`].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`${gameIcon('win-streak','🔥')} ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship)ensureRoster()
       $('#resultTitle').textContent=fight.method==='SUBMISSION'?'SUBMISSION WIN!':fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
-      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=Math.round(basePurse*.08);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);state.fans+=fans;state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
+      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=Math.round(basePurse*.08);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
       $('#resultTitle').textContent=fight.cornerTowel?'CORNER STOPPAGE.':fight.haymakerMiss?'KNOCKED OUT.':fight.method==='SUBMISSION'?'SUBMITTED.':fight.method.includes('KO')?'STOPPED.':'DECISION LOSS.';$('#resultTitle').className='loss';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.';
     }
     if(state.activeEndorsement){
       const deal=endorsementDefs.find(d=>d.id===state.activeEndorsement.id);
       if(deal){
-        cash+=deal.perFight;fans+=deal.fansPerFight;receiveMoney(deal.perFight,true);state.fans+=deal.fansPerFight;state.activeEndorsement.fightsLeft--;
+        const sponsorFollowers=changeFollowers(deal.fansPerFight);cash+=deal.perFight;fans+=sponsorFollowers;receiveMoney(deal.perFight,true);state.activeEndorsement.fightsLeft--;
         const contractDone=state.activeEndorsement.fightsLeft<=0;
-        const sponsorNote=`SPONSOR: ${deal.brand} +$${fmt(deal.perFight)} +${fmt(deal.fansPerFight)} followers${contractDone?' · CONTRACT COMPLETE':''}`;
+        const sponsorNote=`SPONSOR: ${deal.brand} +$${fmt(deal.perFight)} +${fmt(sponsorFollowers)} followers${contractDone?' · CONTRACT COMPLETE':''}`;
         loot=[loot,sponsorNote].filter(Boolean).join(' · ');
         if(contractDone)state.activeEndorsement=null;
       }
     }
+    openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
     state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
@@ -1397,6 +1486,7 @@
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}
     const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
+    const social=e.target.closest('[data-social-post]');if(social){handleSocialPost(social.dataset.socialPost);return}
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
     const st=e.target.closest('[data-style]');if(st){chooseStyle(st.dataset.style);return}
     const city=e.target.closest('[data-city]');if(city){chooseCity(city.dataset.city);return}
@@ -1411,10 +1501,11 @@
   $('#autographRun').addEventListener('click',runAutographSigning);
   $('#autographCancel').addEventListener('click',closeAutographModal);
   $('#autographModal').addEventListener('click',e=>{if(e.target===$('#autographModal'))closeAutographModal()});
-  $('#editFighterNameBtn').addEventListener('click',()=>setFighterNameEditor(true));
-  $('#cancelFighterNameBtn').addEventListener('click',()=>setFighterNameEditor(false));
+  $('#editFighterNameBtn').addEventListener('click',openFighterNameModal);
+  $('#cancelFighterNameBtn').addEventListener('click',closeFighterNameModal);
   $('#fighterNameForm').addEventListener('submit',saveFighterName);
-  $('#fighterNameInput').addEventListener('keydown',e=>{if(e.key==='Escape')setFighterNameEditor(false)});
+  $('#fighterNameInput').addEventListener('keydown',e=>{if(e.key==='Escape')closeFighterNameModal()});
+  $('#fighterNameModal').addEventListener('click',e=>{if(e.target===$('#fighterNameModal'))closeFighterNameModal()});
 
   // passive regen and healing
   setInterval(()=>{

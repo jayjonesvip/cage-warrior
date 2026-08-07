@@ -101,7 +101,7 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(script, /function generateTitleChampion\(m\)/);
   assert.match(script, /championship:true,titleId:m\.id/);
   assert.match(script, /function awardTitle\(o\).*o&&o\.championship/);
-  assert.match(script, /const titleWon=awardTitle\(o\)/);
+  assert.match(script, /titleWon=awardTitle\(o\)/);
   assert.doesNotMatch(script, /awardMilestones/);
   assert.match(script, /s\.milestones\.includes\('district'\).*s\.milestones\.push\('city'\)/);
   assert.match(script, /s\.milestones\.includes\('national'\).*s\.milestones\.push\('city','regional','us'\)/);
@@ -113,17 +113,21 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(readme, /belt is awarded only after that fighter is defeated/);
 });
 
-test('career identity shows followers and supports persistent fighter renaming', () => {
+test('career identity shows followers and fighter renaming unlocks from the top bar', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
-  assert.match(html, /id="homeFighterNameText">ROOKIE<\/b>/);
-  assert.match(html, /id="editFighterNameBtn"[^>]*aria-label="Edit fighter name"/);
+  assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
+  assert.match(html, /class="identity-name-row"[\s\S]*id="editFighterNameBtn"[^>]*aria-disabled="true"/);
   assert.match(html, /data-icon-name="edit-fighter-name"/);
+  assert.match(html, /id="fighterNameModal"[^>]*aria-hidden="true"/);
   assert.match(html, /id="fighterNameInput"[^>]*minlength="2"[^>]*maxlength="24"/);
   assert.match(script, /function normalizeFighterName\(value\)/);
   assert.match(script, /s\.name=normalizeFighterName\(s\.name\)\|\|defaultState\.name/);
-  assert.match(script, /state\.name=name;setFighterNameEditor\(false\)/);
+  assert.match(script, /function openFighterNameModal\(\)\{if\(state\.level<2\)/);
+  assert.match(script, /NAME EDITING UNLOCKS AT LVL 2/);
+  assert.match(script, /state\.name=name;closeFighterNameModal\(\)/);
+  assert.match(script, /nameButton\.classList\.toggle\('locked',!nameUnlocked\)/);
   assert.match(script, /\$\('#careerFollowersText'\)\.textContent=fmt\(state\.fans\)/);
-  assert.match(readme, /persistent inline rename editor/);
+  assert.match(readme, /naming modal\s+unlocks at level 2/);
 });
 
 test('career opponent roster uses proportional two-across collectible fighter cards', () => {
@@ -341,14 +345,36 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
 });
 
-test('followers are the visible audience resource and rival callouts are social posts', () => {
-  assert.match(script, /title:'Post a Rival Callout'/);
-  assert.match(script, /Tag a rival in a public post/);
-  assert.match(script, /followers:\[20,60\]/);
-  assert.match(script, /state\.fans\+=followers/);
-  assert.match(script, /POST CAUGHT FIRE! \+\$\{h\}% HYPE · \+\$\{followers\} FOLLOWERS/);
+test('Cage Feed turns career events into one strategic player post per news cycle', () => {
+  assert.match(html, /id="homeFeedPreview"/);
+  assert.match(html, /data-screen="feed"/);
+  assert.match(html, /id="socialTimeline"/);
+  assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0/);
+  assert.match(script, /function createSocialAccount\(\)/);
+  assert.match(script, /Hello, fight fans! Stay tuned—the climb starts now/);
+  assert.match(script, /if\(!state\.socialAccountCreated\)return 0/);
+  assert.match(script, /if\(screen==='feed'&&!ensureSocialFeed\(\)\)createSocialAccount\(\)/);
+  assert.match(script, /\(Number\(s\.fans\)\|\|0\)>0/);
+  assert.match(script, /function openSocialCycle\(type,data=\{\}\)/);
+  assert.match(script, /openSocialCycle\('fight'/);
+  assert.match(script, /openSocialCycle\('appearance'/);
+  assert.match(script, /openSocialCycle\('autograph'/);
+  assert.match(script, /openSocialCycle\('sponsor'/);
+  assert.match(script, /state\.socialPostedCycle>=state\.socialCycle/);
+  assert.match(script, /id:'thank'.*Thank the Followers/);
+  assert.match(script, /id:'callout'.*Post a Rival Callout/);
+  assert.match(script, /id:'brand'.*Influencer Brand Post/);
+  assert.match(script, /rival\.rematchAccepted=true/);
+  assert.match(script, /state\.socialPostedCycle=state\.socialCycle/);
+  assert.match(script, /WIN STREAK:.*won \$\{data\.winStreak\} straight fights/);
+  for (const name of ['FightFan99', 'MMA4Life', 'ScorecardBandit', 'FlukeWinPolice']) assert.match(script, new RegExp(name));
+  const riskDefs = script.match(/const riskDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
+  const publicityDefs = script.match(/const publicityDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
+  assert.doesNotMatch(riskDefs, /call-out-rival|Post a Rival Callout/);
+  assert.doesNotMatch(publicityDefs, /social-post|Influencer Brand Post/);
   assert.match(script, /THE COMMENTS COOKED YOU/);
   assert.doesNotMatch(html, />FANS<|>Fans</);
+  assert.match(readme, /one player post per news cycle/);
 });
 
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
