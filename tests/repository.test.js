@@ -28,11 +28,10 @@ test('interface text never renders below 8.5px', () => {
   assert.ok(fontSizes.every(size => size >= 8.5), `found undersized text: ${fontSizes.filter(size => size < 8.5).join(', ')}`);
 });
 
-test('daily challenge uses its independent deterministic generator', () => {
-  assert.match(script, /function generateDailyOpponent\(date,tier\)/);
-  const ensureDaily = script.match(/function ensureDailyChallenge\(\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
-  assert.match(ensureDaily, /generateDailyOpponent\(date,state\.level\)/);
-  assert.doesNotMatch(ensureDaily, /generateOpponent\(/);
+test('daily contract and seeded challenge are removed while the daily drop remains', () => {
+  assert.doesNotMatch(html, /Daily Contract|Daily Seeded Challenge/i);
+  assert.doesNotMatch(script, /generateDailyOpponent|ensureDailyChallenge|dailyChallenge|dailyObjective|updateObjectiveFromFight/);
+  assert.match(html, /Daily Drop/);
 });
 
 test('save recovery and one-time league migration remain enabled', () => {
@@ -99,7 +98,12 @@ test('career identity includes a permanent hometown and a fight-earned title lad
 test('career opponent roster uses proportional two-across collectible fighter cards', () => {
   assert.match(html, /\.opponent-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.opponent\{[^}]*aspect-ratio:2\/3/);
-  assert.match(html, /\.opp-sprite\{[^}]*aspect-ratio:3\/5[^}]*background-size:500% 200%/);
+  assert.match(html, /\.opp-sprite\{[^}]*width:100%;height:100%;object-fit:contain;object-position:center bottom/);
+  assert.match(script, /const fighterSilhouettes=Array\.from\(\{length:14\},\(_,i\)=>`assets\/fighter-silhouette-\$\{i\+1\}\.png`\)/);
+  assert.match(script, /function silhouetteForOpponent\(o\)/);
+  assert.match(script, /<img class="opp-sprite" src="\$\{silhouette\}"/);
+  assert.match(script, /\$\('#tapeOppSprite'\)\.src=silhouetteForOpponent\(f\.o\)/);
+  assert.doesNotMatch(script, /background-image:url\(\$\{silhouetteSheet\}\)/);
   assert.match(html, /Career Opponents/);
   assert.doesNotMatch(html, /The Living Roster/);
   assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\} \$\{rematch\?'rematch':''\}" data-card-flip="true"/);
@@ -176,18 +180,42 @@ test('gear collection shows owned quantities and rarity above icons', () => {
 test('permanent identity onboarding gates the career and removes completed selectors', () => {
   const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
   const trainStart = html.indexOf('<section class="screen" data-screen="train">');
-  for (const id of ['careerIdentityCard', 'archetypeSetup', 'citySetup', 'careerGameContent']) {
+  for (const id of ['careerIdentityCard', 'citySetup', 'fighterSetup', 'archetypeSetup', 'careerGameContent']) {
     const position = html.indexOf(`id="${id}"`);
     assert.ok(position > homeStart && position < trainStart, `${id} should be on the Home screen`);
   }
   assert.match(html, /#app\.career-setup #careerGameContent,#app\.career-setup \.career-after-setup\{display:none\}/);
   assert.match(html, /#app\.career-setup \.resource-hud,#app\.career-setup \.bottomnav\{display:none\}/);
   assert.match(script, /\$\('#app'\)\.classList\.toggle\('career-setup',!ready\)/);
-  assert.match(script, /\$\('#archetypeSetup'\)\.hidden=!!style/);
+  assert.match(script, /\$\('#fighterSetup'\)\.hidden=!city\|\|!!avatar/);
+  assert.match(script, /\$\('#archetypeSetup'\)\.hidden=!city\|\|!avatar\|\|!!style/);
   assert.match(script, /\$\('#citySetup'\)\.hidden=!!city/);
   assert.match(script, /\$\('#buildChoices'\)\.innerHTML=style\?'':fighterStyles\.map/);
   assert.match(script, /\$\('#cityChoices'\)\.innerHTML=city\?'':fighterCities\.map/);
-  assert.match(script, /if\(!\(state\.fighterStyle&&state\.fighterCity\)\)screen='home'/);
+  assert.match(script, /function chooseAvatar\(id\)/);
+  assert.match(script, /if\(!\(state\.fighterStyle&&state\.fighterCity&&state\.fighterAvatar&&validFighterAllocation\(state\.fighterBaseStats\)\)\)screen='home'/);
+});
+
+test('fighter avatar cards enforce a valid permanent 20-point allocation', () => {
+  const avatarSource = script.match(/const fighterAvatars = (\[[\s\S]*?\n\s*\]);/)?.[1];
+  assert.ok(avatarSource, 'fighter avatar definitions should be present');
+  const avatars = new Function(`return ${avatarSource}`)();
+  assert.equal(avatars.length, 20);
+  assert.equal(new Set(avatars.map(avatar => avatar.asset)).size, 20);
+  for (const avatar of avatars) {
+    const values = ['power', 'speed', 'chin', 'cardio'].map(key => avatar.stats[key]);
+    assert.ok(values.every(value => Number.isInteger(value) && value >= 2 && value <= 8));
+    assert.equal(values.reduce((sum, value) => sum + value, 0), 20);
+    assert.ok(fs.existsSync(avatar.asset), `${avatar.asset} should exist`);
+  }
+  assert.match(html, /\.avatar-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.avatar-card\{[^}]*aspect-ratio:2\/3/);
+  assert.match(script, /function validFighterAllocation\(stats\)/);
+  assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
+  assert.match(script, /===20/);
+  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 20);
+  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name)).length, 14);
+  assert.equal(fs.readdirSync('assets').filter(name => /^grok_image_/i.test(name)).length, 0);
 });
 
 test('fighter attributes share the persistent condition HUD across game screens', () => {
@@ -258,7 +286,7 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
   assert.match(script, /if\(level<=6\)return \[62,29,8,1\]/);
   assert.match(script, /if\(level<=10\)return \[45,36,16,3\]/);
   assert.match(script, /return \[30,40,23,7\]/);
-  assert.match(script, /chance=Math\.min\(\.75,\.25\+\(upset\?\.10:0\)\+\(rivalry\?\.10:0\)\+\(opponent\.daily\?\.10:0\)\+\(ko\?\.05:0\)\)/);
+  assert.match(script, /chance=Math\.min\(\.75,\.25\+\(upset\?\.10:0\)\+\(rivalry\?\.10:0\)\+\(ko\?\.05:0\)\)/);
   assert.match(script, /gearWinsSinceDrop>=4/);
   assert.match(script, /minRarity=titleWon\?'RARE':'COMMON'/);
   assert.match(script, /state\.gearCounts\[item\.id\]=gearCount\(item\.id\)\+1/);

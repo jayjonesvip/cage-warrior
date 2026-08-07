@@ -13,14 +13,19 @@ generated league.
 
 ### Fighting and progression
 
-- Choose one of seven permanent MMA archetypes: Pressure Fighter,
+- New careers complete three permanent Home-screen choices in order. First,
+  choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
+  Miami, Houston, or Cleveland. Next, choose one of 20 fighter avatar cards.
+  Finally, choose one of seven permanent MMA archetypes: Pressure Fighter,
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
-  Submission Hunter, or Wrestle-Boxer. Choose a "Fighting Out Of" hometown:
-  Phoenix, Los Angeles, Chicago, New York, Miami, Houston, or Cleveland.
-- New careers begin with two separate Home-screen identity choices. Each
-  selector disappears as soon as its permanent choice is locked; career
-  systems and navigation unlock only after both choices are complete. The
-  selected archetype and hometown then live in the Career Identity card.
+  Submission Hunter, or Wrestle-Boxer.
+- Every avatar has a unique base allocation across Power, Speed, Chin, and
+  Cardio. Each value is a whole number from 2 through 8 and the four values
+  always total exactly 20. The game validates that allocation before locking
+  the fighter in.
+- Each selector disappears as soon as its choice is locked. Career systems,
+  the HUD, and navigation remain hidden until hometown, fighter, and archetype
+  are complete. All three choices then live in the Career Identity card.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
 - XP sits beneath level and rank in the top-left identity block, while Hype
@@ -49,8 +54,7 @@ generated league.
   results in an immediate knockout loss.
 - Watch fights normally or use 2× speed. There is no result skip: every
   surviving round requires its corner decision.
-- Complete daily contracts, build win streaks, and earn upset and rivalry
-  bonuses.
+- Build win streaks and earn upset and rivalry bonuses.
 - Progress through a hometown title, its regional title, the U.S. Title, and
   the World Title. Reaching a championship threshold only unlocks its reigning
   champion; the belt is awarded only after that fighter is defeated.
@@ -63,7 +67,7 @@ generated league.
 
 - Opponents are generated locally with persistent names, attributes,
   archetypes, professional records, and head-to-head history.
-- Pre-fight roster, daily, and Tale of the Tape cards conceal the opponent's
+- Pre-fight roster and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
 - The current level always replenishes to three fresh contenders, so the fight
   path cannot run dry before a level-up. Fresh current-level fights pay a full
@@ -80,7 +84,9 @@ generated league.
   rivals, former champions, and a locked preview of the next level. The
   current-level group starts open; all other groups start
   collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
-  collectible-style cards, two across on mobile, with proportional artwork.
+  collectible-style cards, two across on mobile, with proportional artwork
+  selected deterministically from 14 standalone transparent fighter
+  silhouettes.
   The front stays focused on identity and booking; tapping the card body flips
   it to a fixed-height details side with attributes, rating, availability,
   purse context, rivalry status, and head-to-head history. See Matchup remains
@@ -94,7 +100,8 @@ generated league.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.
-- A deterministic daily opponent provides one seeded attempt per day.
+- Daily Contracts and the seeded Daily Challenge are currently removed. The
+  guaranteed Daily Drop remains available and may be expanded later.
 
 ### Collectible drops
 
@@ -102,8 +109,8 @@ generated league.
   never purchased.
 - The home-screen Daily Drop awards Cash, energy, and one deterministic,
   level-eligible collectible every day. It does not reset fight-drop pity.
-- A win has a 25% base drop chance. Upsets, rivalries, daily fights, and
-  KO/TKO finishes improve the chance, up to 75%.
+- A win has a 25% base drop chance. Upsets, rivalries, and KO/TKO finishes
+  improve the chance, up to 75%.
 - The fourth win without a drop guarantees one. Winning a title guarantees a
   drop of at least Rare quality.
 - Minimum level controls when an item enters the permanent pool. Earlier items
@@ -130,8 +137,8 @@ generated league.
 ### Persistence
 
 Progress is stored locally in the browser with `localStorage`. Save migration
-preserves existing fighters, hometown identity, generated rosters, rivalries,
-collections, loadouts, championships, daily challenges, Cash, and
+preserves existing fighters, hometown identity, avatar and base allocation,
+generated rosters, rivalries, collections, loadouts, championships, Cash, and
 Career Earnings. Legacy Technician, Grappler, and Endurance identities map to
 Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
 tendencies migrate without losing records or rivalries, and previously retired
@@ -148,8 +155,10 @@ Run the repository checks with:
 npm test
 ```
 
-The game remains self-contained in `index.html`. PNG files under `assets/` are
-source copies of the visual artwork. Regression tests live under `tests/` and
+The game remains self-contained in `index.html`. Fighter portraits and
+standalone opponent silhouettes in the
+[GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
+are source copies of the visual artwork. Regression tests live under `tests/` and
 cover script parsing, save behavior, roster rules, readable text sizing,
 equipment drops, collectible-card presentation, reward reveals, and the
 Cash/Career Earnings economy.
