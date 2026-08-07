@@ -151,6 +151,8 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.doesNotMatch(preview, /spendEnergy|pendingFight/);
   assert.match(html, /data-opening-approach="aggressive"/);
   assert.match(html, /data-opening-approach="feel"/);
+  assert.match(html, /\.opening-choice\{min-height:158px/);
+  assert.match(html, /\.opening-choice \.opening-icon\{[^}]*font-size:52px/);
   assert.doesNotMatch(html, /id="openingPlanGrid"/);
   assert.doesNotMatch(html, /id="tapeOppTag"/);
   assert.doesNotMatch(script, /\$\{rivalry\?'🔥 RIVAL · ':''\}\$\{o\.tag\}/);
