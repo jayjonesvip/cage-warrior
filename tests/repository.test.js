@@ -216,6 +216,26 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 20);
   assert.equal(fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name)).length, 14);
   assert.equal(fs.readdirSync('assets').filter(name => /^grok_image_/i.test(name)).length, 0);
+  assert.match(script, /<span class="avatar-total">SELECT<\/span>/);
+  assert.doesNotMatch(script, /SELECT · 20 POINTS/);
+});
+
+test('home fight and training choices use artwork cards with explicit bottom actions', () => {
+  assert.ok(fs.existsSync('assets/home-fight.png'));
+  assert.ok(fs.existsSync('assets/home-training.png'));
+  assert.match(html, /<article class="choice red"><h3>BIG WIN POTENTIAL<\/h3>[\s\S]*?src="assets\/home-fight\.png"[\s\S]*?<button class="choice-action" data-go="fight">TAKE A FIGHT<\/button><\/article>/);
+  assert.match(html, /<article class="choice"><h3>GUARANTEED GROWTH<\/h3>[\s\S]*?src="assets\/home-training\.png"[\s\S]*?<button class="choice-action" data-go="train">HIT THE GYM<\/button><\/article>/);
+  assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
+  assert.doesNotMatch(html, /class="bigicon"/);
+  assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
+});
+
+test('archetype presentation uses clean text labels without decorative icons', () => {
+  assert.match(script, /<b>\$\{s\.name\}<\/b>/);
+  assert.match(script, /\$\('#homeStyleText'\)\.textContent=style\?style\.name:'NOT SELECTED'/);
+  assert.match(script, /toast\(`\$\{style\.name\} IDENTITY LOCKED IN`/);
+  assert.match(script, /\$\{isSignature\?'YOUR STYLE':'THEIR STYLE'\} · \$\{plan\.name\}/);
+  assert.doesNotMatch(script, /\$\{(?:s|style|plan)\.icon\}/);
 });
 
 test('fighter attributes share the persistent condition HUD across game screens', () => {
