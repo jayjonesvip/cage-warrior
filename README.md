@@ -56,13 +56,14 @@ generated league.
   Out** uses that same signature discipline more cautiously, conceding some
   early initiative in exchange for a deeper corner read. Either choice reveals
   the opponent's basic tendency after Round 1.
-- Before Rounds 2 and 3, the corner offers only grounded tactical choices:
-  stay with your signature style or challenge the opponent in their revealed
-  style. Style descriptions and tactical warnings sit above simple, stacked
-  action buttons. Fighting outside your own discipline carries a real penalty.
-  When both fighters share an archetype, the duplicate choice collapses into
-  one **Start Round** action. The corner-call surface snaps directly to the
-  live fight card edges.
+- Round 2 is a **Style Decision** and the final round asks the player to
+  **Make Your Call**. The grounded tactical choices are **Fight Your Way** with
+  the signature style or **Adapt To** the opponent's revealed archetype. Style
+  descriptions and warnings sit above stacked blue and slate-grey buttons.
+  Fighting outside your discipline carries a real penalty. When both fighters
+  share an archetype, the duplicate choice collapses into one **Fight Your
+  Way** action. The corner-call surface snaps directly to the live fight card
+  edges.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
@@ -101,7 +102,8 @@ generated league.
 - Each notable event starts a news cycle with one player post available. The
   player may thank Followers for safe growth, post a volatile rival callout
   that can unlock a rematch, or publish an Influencer Brand Post for Cash and
-  Followers. There is only one player post per news cycle.
+  Followers. There is only one player post per news cycle, and publishing
+  scrolls the timeline to the new post at the top.
 - Rival Callout and Influencer Brand Post live in Cage Feed rather than the
   Underground Buzz or Career Spotlight lists.
 

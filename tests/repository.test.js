@@ -201,14 +201,16 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
   assert.match(script, /function renderCornerPlans\(container,nextRound\)/);
   assert.match(script, /sameStyle\?\[signature\]:\[signature,opponentStyle\]/);
-  assert.match(script, /`STICK WITH \$\{plan\.name\}`/);
-  assert.match(script, /`FIGHT AS \$\{plan\.name\}`/);
-  assert.match(script, /START ROUND \$\{nextRound\}/);
+  assert.match(script, /isSignature\?'FIGHT YOUR WAY':`ADAPT TO \$\{plan\.name\}`/);
+  assert.match(script, /next===3\?'FINAL ROUND: MAKE YOUR CALL':'ROUND 2: STYLE DECISION'/);
+  assert.doesNotMatch(script, /STICK WITH|FIGHT AS|ROUND \$\{next\}: CORNER CALL/);
   assert.doesNotMatch(script, /renderPlanGrid/);
   assert.match(script, /class="corner-style-options"/);
   assert.match(script, /class="plan-btn \$\{isSignature\?'signature':'mirror'\}"[^>]*>\$\{label\}<\/button>/);
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
+  assert.match(css, /\.plan-btn\.signature\{[^}]*background:linear-gradient\(#42b8f3,#1160b8\)/);
+  assert.match(css, /\.plan-btn\.mirror\{[^}]*background:linear-gradient\(#3b4856,#18212b\)/);
   assert.match(script, /TENDENCY REVEALED/);
   assert.match(script, /DEEP READ/);
   assert.doesNotMatch(html, /id="skipBtn"/);
@@ -373,6 +375,7 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(script, /function socialUnreadCount\(\)/);
   assert.match(script, /currentScreen==='feed'\)state\.socialLastReadSerial=state\.socialSerial/);
   assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
+  assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#socialTimeline'\)\.scrollTo\(\{top:0,behavior:'smooth'\}\)\)/);
   assert.match(script, /function createSocialAccount\(\)/);
   assert.match(script, /Hello, fight fans! Stay tuned—the climb starts now/);
   assert.match(script, /if\(!state\.socialAccountCreated\)return 0/);

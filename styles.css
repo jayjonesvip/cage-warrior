@@ -284,3 +284,6 @@
   .screen[data-screen="feed"].active{padding-bottom:0}
   .social-composer{margin:8px -10px 0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
   .corner-panel{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
+  .plan-btn.signature{border-color:#63ceff;background:linear-gradient(#42b8f3,#1160b8);color:#fff;box-shadow:0 4px 0 #052f63,0 0 12px #39bfff22}
+  .plan-btn.mirror{border-color:#6d7d8d;background:linear-gradient(#3b4856,#18212b);color:#e2eaf2;box-shadow:0 4px 0 #080d12,0 0 12px #8ca4ba1f}
+  .plan-btn.signature:active,.plan-btn.mirror:active{box-shadow:0 1px 0 #02070d}
