@@ -337,7 +337,7 @@
         <article class="choice gear"><h3>BUILD YOUR LEGACY</h3><p>Equip fight-earned collectibles and track the gear and status your wins have built.</p><img class="choice-art" src="assets/home-gear.png" alt="" aria-hidden="true"><button class="choice-action" data-go="gear">VIEW GEAR</button></article>
       </div>
 
-      <div class="card"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Local promoter is looking for fresh blood tonight.</span></div></div>
+      <div class="card"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: every fight burns 15 energy. No gas, no payday.</span></div></div>
 
       </div>
     </section>
@@ -1405,7 +1405,23 @@
     const oldE=Math.floor(state.energy),oldH=Math.floor(state.health);state.energy=clamp(state.energy+.5+ownedBonus('energyRegen'),0,state.maxEnergy);state.health=clamp(state.health+.12+ownedBonus('healthRegen'),0,state.maxHealth);if(Math.floor(state.energy)!==oldE||Math.floor(state.health)!==oldH){updateUI()}
   },15000);
 
-  const tickerLines=['Local promoter is looking for fresh blood tonight.','Fans are replaying your last clean hook.','The old coach says cardio wins ugly fights.','A rival just called you “overrated” on local radio.','Rumor: the main event pays double under the table.'];let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);
+  const tickerLines=[
+    'Listen, kid: every fight burns 15 energy. No gas, no payday.',
+    'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
+    'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
+    'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',
+    'First round, choose your hustle: attack for initiative or feel him out for the deeper read.',
+    'By round two we know his tendency. Trust your own style unless you fancy losing at his game.',
+    'No shop, no refunds. You want gear, you win fights and hope the drop lands in your locker.',
+    'Fourth win without a gear drop? Even my supplier has to put something in the bag.',
+    'Duplicate gear looks impressive, kid, but the perk still only counts once.',
+    'One Daily Drop, every day. Free cash, free energy, collectible included. Do not ask who paid.',
+    'Coach Vega wants $35 plus $20 per level. Talent is temporary; invoices are forever.',
+    'Need trainer money? Hustle. Side gigs pay cash, even when nobody calls it career earnings.',
+    'Fans open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
+    'A title only unlocks the champion. Nobody mails you a belt—you take it from the man holding it.',
+    'If the corner offers a towel or a haymaker, the safe money is gone. Pick the ending you can live with.'
+  ];let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);
 
   window.addEventListener('resize',drawHero);
   window.addEventListener('beforeunload',saveState);

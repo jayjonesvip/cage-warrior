@@ -234,6 +234,20 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
 });
 
+test('home ticker teaches current mechanics in a shady promoter voice', () => {
+  const ticker = script.match(/const tickerLines=\[([\s\S]*?)\];let ti=0/)?.[1] || '';
+  assert.match(ticker, /fight burns 15 energy/);
+  assert.match(ticker, /20 health before a bout/);
+  assert.match(ticker, /Old names pay half/);
+  assert.match(ticker, /Taunt a past rival/);
+  assert.match(ticker, /Fourth win without a gear drop/);
+  assert.match(ticker, /perk still only counts once/);
+  assert.match(ticker, /\$35 plus \$20 per level/);
+  assert.match(ticker, /Nobody mails you a belt/);
+  assert.ok((ticker.match(/'/g) || []).length >= 30, 'expected at least 15 rotating promoter tips');
+  assert.doesNotMatch(ticker, /Rumor: the main event pays double under the table/);
+});
+
 test('archetype presentation uses clean text labels without decorative icons', () => {
   assert.match(script, /<b>\$\{s\.name\}<\/b>/);
   assert.match(script, /\$\('#homeStyleText'\)\.textContent=style\?style\.name:'NOT SELECTED'/);

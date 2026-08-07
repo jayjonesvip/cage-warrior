@@ -30,6 +30,9 @@ generated league.
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
   obvious.
+- A rotating promoter ticker teaches the active rules—fight costs, medical
+  clearance, purses, rematches, tactics, drops, coaching, and titles—in the
+  voice of a suspiciously well-informed fight agent.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
 - XP sits beneath level and rank in the top-left identity block, while Hype
