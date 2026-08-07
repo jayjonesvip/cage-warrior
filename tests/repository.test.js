@@ -48,7 +48,7 @@ test('rematch and exhausted-gig states reflect actual state without masking lock
   assert.match(script, /rematch=available&&\(o\.winsVsPlayer\|\|0\)>0&&!declined/);
   assert.match(script, /\$\{rematch\?'<span class="rematch-banner">⚡ REMATCH<\/span>':''\}/);
   assert.match(script, /aria-label="\$\{o\.name\} fighter card\$\{rematch\?', rematch available':''\}/);
-  assert.match(html, /\.rematch-banner\{[^}]*transform:rotate\(36deg\)[^}]*font-size:8\.5px/);
+  assert.match(html, /\.rematch-banner\{[^}]*left:7px;right:7px;bottom:8px[^}]*font-size:8\.5px/);
   assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
   assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
   assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
@@ -224,6 +224,21 @@ test('cash pays the scaling coach fee while career earnings remain cumulative', 
   assert.match(script, /receiveMoney\(cash,true\)/);
   assert.match(script, /receiveMoney\(cash\);gainXp\(a\.xp\).*shifts left/);
   assert.match(script, /s\.careerEarnings=Number\.isFinite\(savedCareerEarnings\).*:s\.cash/);
+});
+
+test('level ups receive a dedicated promotion celebration', () => {
+  assert.match(html, /id="levelUpModal"/);
+  assert.match(html, /CAREER BREAKTHROUGH/);
+  assert.match(html, /id="levelUpEnergy"/);
+  assert.match(html, /id="levelUpHealth"/);
+  assert.match(html, /id="levelUpCash"/);
+  assert.match(html, /\.level-up-overlay\.active\{display:flex\}/);
+  assert.match(script, /function showLevelUp\(summary\)/);
+  assert.match(script, /levelUpSummary=\{fromLevel:previous\?\.fromLevel\|\|startingLevel,toLevel:state\.level,earningsBonus:/);
+  assert.match(script, /newTitles=milestoneDefs\.filter/);
+  assert.match(script, /modal\._burstTimer=setTimeout\(confettiBurst,620\)/);
+  assert.match(script, /function closeLevelUp\(\)/);
+  assert.match(script, /\$\('#levelUpContinue'\)\.addEventListener\('click',closeLevelUp\)/);
 });
 
 test('gear is deterministic win loot with pity, title rarity, and non-stacking duplicates', () => {

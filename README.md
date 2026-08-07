@@ -55,6 +55,9 @@ generated league.
   the World Title. Reaching a championship threshold only unlocks its reigning
   champion; the belt is awarded only after that fighter is defeated.
 - Generated progression continues beyond level 15.
+- Level-ups trigger a dedicated promotion celebration showing the new level
+  and rank, cumulative max-energy and max-health gains, full restoration,
+  career bonus, and any newly unlocked title challenge.
 
 ### Career opponents
 
@@ -65,8 +68,8 @@ generated league.
 - Current-level fighters are available at full purse. Unbeaten past-level
   opponents remain available for half purse; past-level fighters already
   defeated by the player are hidden from the active roster.
-- Any available opponent who has beaten the player carries a bright diagonal
-  **Rematch** banner on the front of their fighter card.
+- Any available opponent who has beaten the player carries a bright horizontal
+  **Rematch** banner across the lower part of their fighter image.
 - An opponent you defeat can decline another fight. Repeated losses to the
   player eventually cause retirement and generate a replacement fighter.
 - The Career Opponents roster shows available current and past opponents,
