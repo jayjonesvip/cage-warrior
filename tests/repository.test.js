@@ -2,13 +2,23 @@ const fs = require('node:fs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const html = fs.readFileSync('index.html', 'utf8');
+const page = fs.readFileSync('index.html', 'utf8');
+const css = fs.readFileSync('styles.css', 'utf8');
+const html = `${page}\n<style>${css}</style>`;
 const readme = fs.readFileSync('README.md', 'utf8');
-const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+const script = fs.readFileSync('game.js', 'utf8');
 
-test('embedded game script parses', () => {
-  assert.ok(script, 'index.html must contain an embedded script');
+test('external game assets are linked and the game script parses', () => {
+  assert.match(page, /<link rel="stylesheet" href="styles\.css">/);
+  assert.match(page, /<script src="game\.js"><\/script>/);
+  assert.doesNotMatch(page, /<style>|<script>(?!<\/script>)/);
   assert.doesNotThrow(() => new Function(script));
+});
+
+test('generated Cage Warrior logo is used in the top-left header', () => {
+  assert.match(page, /<img class="logo" src="assets\/cage-warrior-logo\.png" alt="Cage Warrior">/);
+  assert.match(css, /\.logo\{[^}]*object-fit:contain/);
+  assert.ok(fs.statSync('assets/cage-warrior-logo.png').size > 0);
 });
 
 test('DOM ids are unique', () => {
