@@ -37,6 +37,10 @@ generated league.
   obvious.
 - An active endorsement appears in the Home hero directly beneath Cage Rank,
   showing the sponsor brand and the number of contracted fights remaining.
+- Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,
+  80,000, and 200,000 Followers. Only the next brand may offer a contract, so
+  crossing several milestones at once never produces competing offers. Older
+  saves repair incomplete sponsor history before rendering or accepting deals.
 - A rotating promoter ticker leads the unlocked Home screen and teaches the
   active rules—fight costs, medical clearance, purses, rematches, tactics,
   drops, coaching, and titles—in the voice of a suspiciously well-informed

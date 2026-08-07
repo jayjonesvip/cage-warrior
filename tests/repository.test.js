@@ -457,6 +457,20 @@ test('active sponsor appears beneath Cage Rank in the Home hero', () => {
   assert.match(script, /state\.activeEndorsement\.fightsLeft\} FIGHTS LEFT/);
 });
 
+test('endorsements unlock as one crash-safe sequential offer', () => {
+  for (const threshold of [2500, 10000, 30000, 80000, 200000]) assert.match(script, new RegExp(`minFans:${threshold}`));
+  assert.match(script, /function nextEndorsementOffer\(\)/);
+  assert.match(script, /endorsementDefs\.find\(d=>!history\.includes\(d\.id\)\)/);
+  assert.match(script, /isNext=!!nextOffer&&nextOffer\.id===d\.id,unlocked=!active&&isNext&&qualified/);
+  assert.match(script, /ONLY OFFER AVAILABLE/);
+  assert.match(script, /PREVIOUS PARTNER/);
+  assert.match(script, /const furthestEndorsement=Math\.max\(-1/);
+  assert.match(script, /s\.activeEndorsement=savedActiveId\?\{id:savedActiveId,fightsLeft:clamp/);
+  assert.ok(script.indexOf('const ENDORSEMENT_IDS') < script.indexOf('state = loadState()'), 'endorsement migration data must exist before saved state loads');
+  assert.match(script, /state\.endorsementHistory=\[\.\.\.new Set\(\[\.\.\.history,d\.id\]\)\]/);
+  assert.match(script, /changeFollowers\(Math\.round\(d\.fansPerFight\*\.5\)\);saveState\(\);openSocialCycle\('sponsor'/);
+});
+
 test('level ups receive a dedicated promotion celebration', () => {
   assert.match(html, /id="levelUpModal"/);
   assert.match(html, /CAREER BREAKTHROUGH/);

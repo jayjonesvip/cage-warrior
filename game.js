@@ -17,10 +17,12 @@
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
   const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
+  const ENDORSEMENT_FIGHTS = {volt:4,ironhide:5,'apex-wireless':6,'northline-auto':7,'titan-global':8};
+  const ENDORSEMENT_IDS = Object.keys(ENDORSEMENT_FIGHTS);
   let saveWarningShown = false;
 
   const defaultState = {
-    version:12,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:13,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0},
@@ -231,11 +233,11 @@
   ];
 
   const endorsementDefs = [
-    {id:'volt',icon:'⚡',brand:'Volt Energy',product:'Energy drink',minLevel:4,minFans:500,signing:1200,perFight:350,fansPerFight:35,fights:4},
-    {id:'ironhide',icon:'🥊',brand:'Ironhide Athletics',product:'Gloves and training apparel',minLevel:6,minFans:2000,signing:5500,perFight:1100,fansPerFight:95,fights:5},
-    {id:'apex-wireless',icon:'📡',brand:'Apex Wireless',product:'Phones and wireless service',minLevel:8,minFans:6000,signing:18000,perFight:3200,fansPerFight:240,fights:6},
-    {id:'northline-auto',icon:'🏎️',brand:'Northline Auto',product:'Performance cars',minLevel:10,minFans:15000,signing:65000,perFight:9500,fansPerFight:650,fights:7},
-    {id:'titan-global',icon:'🌐',brand:'Titan Global',product:'Worldwide lifestyle campaign',minLevel:13,minFans:50000,signing:250000,perFight:30000,fansPerFight:2200,fights:8}
+    {id:'volt',icon:'⚡',brand:'Volt Energy',product:'Energy drink',minLevel:4,minFans:2500,signing:1200,perFight:350,fansPerFight:35,fights:4},
+    {id:'ironhide',icon:'🥊',brand:'Ironhide Athletics',product:'Gloves and training apparel',minLevel:6,minFans:10000,signing:5500,perFight:1100,fansPerFight:95,fights:5},
+    {id:'apex-wireless',icon:'📡',brand:'Apex Wireless',product:'Phones and wireless service',minLevel:8,minFans:30000,signing:18000,perFight:3200,fansPerFight:240,fights:6},
+    {id:'northline-auto',icon:'🏎️',brand:'Northline Auto',product:'Performance cars',minLevel:10,minFans:80000,signing:65000,perFight:9500,fansPerFight:650,fights:7},
+    {id:'titan-global',icon:'🌐',brand:'Titan Global',product:'Worldwide lifestyle campaign',minLevel:13,minFans:200000,signing:250000,perFight:30000,fansPerFight:2200,fights:8}
   ];
 
   function normalizeState(parsed){
@@ -249,15 +251,15 @@
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
       s.dailyCounters = Object.assign({},defaultState.dailyCounters,s.dailyCounters||{});
       s.trainerOn = !!s.trainerOn;
-      s.endorsementHistory = Array.isArray(s.endorsementHistory)?s.endorsementHistory:[];
-      s.activeEndorsement = s.activeEndorsement&&typeof s.activeEndorsement==='object'?s.activeEndorsement:null;
+      const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
+      const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);
       s.socialAccountCreated=typeof parsed.socialAccountCreated==='boolean'?parsed.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=parsed.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(parsed.socialLastReadSerial))||0,0,s.socialSerial);if(!s.socialAccountCreated)s.fans=0;
       s.winStreak = Math.max(0,Number(s.winStreak)||0);s.bestStreak=Math.max(s.winStreak,Number(s.bestStreak)||0);
       s.pendingFight = s.pendingFight&&typeof s.pendingFight==='object'?s.pendingFight:null;
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=parsed.leagueInitialized===true;
-      s.version=12;
+      s.version=13;
       return s;
   }
   function loadState(){
@@ -520,6 +522,7 @@
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
+  function nextEndorsementOffer(){const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];return endorsementDefs.find(d=>!history.includes(d.id))||null}
   function requirementText(a){
     const missing=[];
     if(state.level<a.minLevel)missing.push(`LVL ${a.minLevel}`);
@@ -539,15 +542,13 @@
       const unavailable=limited&&unlocked?'gig-unavailable':'',availability=!unlocked?requirementText(a):limited?'NO GIGS LEFT':energyLow?`NEEDS ${a.cost} ENERGY`:'AVAILABLE NOW';
       return `<button class="action future ${unlocked?'':'locked-opportunity'} ${unavailable}" data-publicity="${i}" ${!unlocked||limited||energyLow?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p><span class="unlock-copy">${availability}</span></div><div class="cost"><b>${a.payout}</b><small>-${a.cost} energy</small></div></button>`;
     }).join('');
-    const active=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null;
+    const active=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,nextOffer=nextEndorsementOffer(),history=new Set(Array.isArray(state.endorsementHistory)?state.endorsementHistory:[]);
     $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} followers after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FOLLOWERS TO UNLOCK CONTRACT OFFERS</div>`;
     $('#endorsementActions').innerHTML=endorsementDefs.map((d,i)=>{
-      const unlocked=state.level>=d.minLevel&&state.fans>=d.minFans;
-      const isActive=!!active&&active.id===d.id;
-      const blocked=!!active&&!isActive;
+      const qualified=state.level>=d.minLevel&&state.fans>=d.minFans,isActive=!!active&&active.id===d.id,isPast=history.has(d.id)&&!isActive,isNext=!!nextOffer&&nextOffer.id===d.id,unlocked=!active&&isNext&&qualified;
       const req=[];if(state.level<d.minLevel)req.push(`LVL ${d.minLevel}`);if(state.fans<d.minFans)req.push(`${fmt(d.minFans)} FOLLOWERS`);
-      const status=isActive?'ACTIVE CONTRACT':blocked?'FINISH CURRENT DEAL':unlocked?'OFFER AVAILABLE':`NEEDS ${req.join(' + ')}`;
-      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${!unlocked||blocked||isActive?'disabled':''}><div class="ico">${gameIcon(d.id,d.icon)}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} followers</small></div></button>`;
+      const status=isActive?'ACTIVE CONTRACT':isPast?'PREVIOUS PARTNER':active?'FINISH CURRENT DEAL':!isNext?`LOCKED · LAND ${nextOffer?nextOffer.brand.toUpperCase():'EVERY'} DEAL FIRST`:unlocked?'ONLY OFFER AVAILABLE':`NEEDS ${req.join(' + ')}`;
+      return `<button class="action future endorsement-action ${unlocked?'':'locked-opportunity'} ${isActive?'active-contract':''}" data-endorsement="${i}" ${unlocked?'':'disabled'}><div class="ico">${gameIcon(d.id,d.icon)}</div><div><h3>${d.brand}</h3><p>${d.product}. ${d.fights}-fight deal with a $${fmt(d.signing)} signing bonus.</p><span class="unlock-copy">${status}</span></div><div class="cost"><b>+$${fmt(d.perFight)}/FIGHT</b><small>+${fmt(d.fansPerFight)} followers</small></div></button>`;
     }).join('');
   }
   function renderGear(){
@@ -729,8 +730,9 @@
   function handleEndorsement(i){
     const d=endorsementDefs[i];if(!d)return;
     if(state.activeEndorsement){toast('Finish your current endorsement first.','#ffcf78');return}
+    const nextOffer=nextEndorsementOffer();if(!nextOffer){toast('Every endorsement tier is complete.','#6ed7ff');return}if(d.id!==nextOffer.id){toast(`${nextOffer.brand} is the only offer on the table. Land that deal first.`,'#ffcf78');return}
     if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} followers`,'#75cfff');return}
-    initAudio();state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory.push(d.id);receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
+    initAudio();const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory=[...new Set([...history,d.id])];receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));saveState();openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
   }
   function handleRisk(i){
     ensureDailyCounters();const a=riskDefs[i];initAudio();
