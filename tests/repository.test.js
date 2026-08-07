@@ -220,11 +220,15 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   assert.doesNotMatch(script, /SELECT · 20 POINTS/);
 });
 
-test('home fight and training choices use artwork cards with explicit bottom actions', () => {
+test('home career choices use artwork cards with explicit bottom actions', () => {
   assert.ok(fs.existsSync('assets/home-fight.png'));
   assert.ok(fs.existsSync('assets/home-training.png'));
+  assert.ok(fs.existsSync('assets/home-hustle.png'));
+  assert.ok(fs.existsSync('assets/home-gear.png'));
   assert.match(html, /<article class="choice red"><h3>BIG WIN POTENTIAL<\/h3>[\s\S]*?src="assets\/home-fight\.png"[\s\S]*?<button class="choice-action" data-go="fight">TAKE A FIGHT<\/button><\/article>/);
   assert.match(html, /<article class="choice"><h3>GUARANTEED GROWTH<\/h3>[\s\S]*?src="assets\/home-training\.png"[\s\S]*?<button class="choice-action" data-go="train">HIT THE GYM<\/button><\/article>/);
+  assert.match(html, /<article class="choice hustle"><h3>FUND THE DREAM<\/h3>[\s\S]*?src="assets\/home-hustle\.png"[\s\S]*?<button class="choice-action" data-go="hustle">HUSTLE<\/button><\/article>/);
+  assert.match(html, /<article class="choice gear"><h3>BUILD YOUR LEGACY<\/h3>[\s\S]*?src="assets\/home-gear\.png"[\s\S]*?<button class="choice-action" data-go="gear">VIEW GEAR<\/button><\/article>/);
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);

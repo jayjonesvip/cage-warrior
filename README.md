@@ -26,9 +26,10 @@ generated league.
 - Each selector disappears as soon as its choice is locked. Career systems,
   the HUD, and navigation remain hidden until hometown, fighter, and archetype
   are complete. All three choices then live in the Career Identity card.
-- Home presents Take a Fight and Hit the Gym as illustrated choice cards. The
-  cards explain the outcome while distinct bottom buttons perform the actual
-  navigation, so the action remains visually obvious.
+- Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
+  choice cards. The cards explain each career path while distinct bottom
+  buttons perform the actual navigation, so every action remains visually
+  obvious.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
 - XP sits beneath level and rank in the top-left identity block, while Hype
