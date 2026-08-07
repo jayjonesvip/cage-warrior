@@ -4,7 +4,8 @@
 
 Cage Warrior is a mobile-first, single-player fight-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
-The page loads its presentation from `styles.css` and game logic from `game.js`.
+The page loads its presentation from `styles.css`, scalable copy pools from
+`strings.js`, and game logic from `game.js`.
 
 ## Current game
 
@@ -210,7 +211,10 @@ Run the repository checks with:
 npm test
 ```
 
-The game uses `index.html`, `styles.css`, and `game.js` without a build step.
+The game uses `index.html`, `styles.css`, `strings.js`, and `game.js` without a
+build step. `strings.js` groups opponent names, fight commentary, Cage Feed
+copy, generated social usernames, and promoter ticker lines so new variations
+can be added without editing simulation logic.
 The generated transparent header wordmark lives at
 `assets/cage-warrior-logo.png`. Fighter portraits, replaceable icons, and
 standalone opponent silhouettes in the

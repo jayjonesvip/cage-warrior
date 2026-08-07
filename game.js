@@ -1,6 +1,11 @@
 (() => {
   'use strict';
 
+  const STRINGS=globalThis.CAGE_STRINGS;
+  if(!STRINGS)throw new Error('strings.js must load before game.js');
+  function copyText(template,values={}){return String(template).replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(match,key)=>Object.prototype.hasOwnProperty.call(values,key)?String(values[key]):match)}
+  function copyPosts(entries,values={}){return entries.map(entry=>Object.assign({},entry,{text:copyText(entry.text,values)},entry.author?{author:copyText(entry.author,values)}:{}))}
+
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
@@ -99,8 +104,8 @@
   ];
 
   let opponents=[];
-  const firstNames=['AARON','ACE','ADAM','ALEKSEI','ANDRE','ANTON','AXEL','BOONE','BRYCE','CALEB','CARLOS','CHRIS','CRUZ','DAMON','DANTE','DARIUS','DIEGO','DMITRI','DOM','ELI','ENZO','ERIK','FINN','GABE','HECTOR','ISAAC','IVAN','JACE','JAMAL','JAVIER','JONAH','JULIAN','KAI','LEO','MALIK','MARCUS','MATEO','MIKHAIL','NICO','NIKOLAI','OMAR','PAVEL','RAFA','ROMAN','RYAN','SERGEI','SILAS','TATE','TOMAS','TY','VANCE','VIKTOR','YURI','ZANE'];
-  const lastNames=['ANDERSON','BISHOP','BLACK','BLAZE','BROWN','CARTER','CASTILLO','COLE','CROW','DAVIS','DIAZ','DRAKE','FEDOROV','FROST','GARCIA','GONZALEZ','GRAVES','HALE','HAYES','HERNANDEZ','IVANOV','JACKSON','JOHNSON','JONES','KARPOV','KNOX','KOZLOV','KUZNETSOV','LEBEDEV','MARTINEZ','MERCER','MILLER','MOROZOV','NASH','ORLOV','PETROV','PIKE','POPOV','QUINN','REYES','RODRIGUEZ','ROOK','SANTOS','SHAW','SMIRNOV','SMITH','SOKOLOV','STEEL','STONE','THOMPSON','VALE','VOLKOV','WARD','WILLIAMS','WOLFE','YOUNG','ZAITSEV'];
+  const firstNames=STRINGS.opponentNames.first;
+  const lastNames=STRINGS.opponentNames.last;
   const opponentArchetypes=[
     {id:'pressure',tag:'PRESSURE FIGHTER',tendency:'pressure',scout:'Counter the march or control the pace before the volume builds.',mods:{power:0,speed:0,chin:0,cardio:2}},
     {id:'counter',tag:'COUNTER-STRIKER',tendency:'counter',scout:'Feints and takedown threats deny the clean counter window.',mods:{power:0,speed:2,chin:0,cardio:0}},
@@ -439,8 +444,8 @@
   function saveFighterName(e){e.preventDefault();const name=normalizeFighterName($('#fighterNameInput').value);if(!name){toast("Use 2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.",'#ff766d');return}state.name=name;closeFighterNameModal();sfx.tap();toast('FIGHTER NAME UPDATED','#76dcff');updateUI()}
 
   function socialProfile(key){
-    const profiles={media:{author:'Cage Report',handle:'@CageReport',tone:'media'},promoter:{author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},gym:{author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},rival:{author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}};
-    if(key==='fan'||key==='hater'){const names=key==='fan'?['FightFan99','MMA4Life','CageSideSara','FiveRoundFaithful','SouthpawSam','GroundGameGuru','JustBleedJay','UppercutUpdates']:['TapeWatcher88','ScorecardBandit','CasualTakeKing','NoChinChecked','OverratedAlert','SplitDecisionDan','BenchCoach77','FlukeWinPolice'],username=names[hashSeed(`${key}|${state.socialCycle}|${state.socialSerial+1}`)%names.length];return {author:username,handle:`@${username.toLowerCase()}`,tone:key}}
+    const profiles=STRINGS.social.profiles;
+    if(key==='fan'||key==='hater'){const names=STRINGS.social.usernames[key],username=names[hashSeed(`${key}|${state.socialCycle}|${state.socialSerial+1}`)%names.length];return {author:username,handle:`@${username.toLowerCase()}`,tone:key}}
     if(key==='player'){const slug=state.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18)||'cagefighter';return {author:state.name,handle:`@${slug}`,tone:'player player-post'}}
     return profiles[key]||profiles.media;
   }
@@ -452,22 +457,22 @@
   function createSocialAccount(){
     if(ensureSocialFeed())return;
     const firstAccount=!state.socialAccountCreated;state.socialAccountCreated=true;state.socialCycle=Math.max(1,state.socialCycle);state.socialPostedCycle=state.socialCycle;
-    addSocialPosts([{profile:'player',text:`Hello, fight fans! Stay tuned—the climb starts now.`},{profile:'fan',text:`First follow. Let’s see where this goes.`},{profile:'promoter',text:`Account is live. Now give the timeline something worth talking about, ${state.name}.`}]);
+    addSocialPosts(copyPosts(STRINGS.social.account,{name:state.name}));
     const firstFollowers=firstAccount?changeFollowers(5):0;toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
   }
   function openSocialCycle(type,data={}){
     if(!ensureSocialFeed())return;state.socialCycle=Math.max(1,state.socialCycle+1);
-    const name=state.name,posts=[];
+    const name=state.name,posts=[],cycles=STRINGS.social.cycles;
     if(type==='fight'){
-      const finish=String(data.method||'decision').toUpperCase();
-      if(data.win){if(data.winStreak>=2)posts.push({profile:'media',text:`WIN STREAK: ${name} has now won ${data.winStreak} straight fights. The division has to pay attention.`});posts.push({profile:'media',text:`${name} defeats ${data.opponent} by ${finish}.${data.title?` The new ${data.title} champion has arrived.`:''}`},{profile:'rival',author:data.opponent,text:`Enjoy the win, ${name}. If they book it again, I know what changes.`},{profile:'fan',text:`That was the kind of performance that turns a prospect into must-watch television. ${name} showed up.`},{profile:'hater',text:data.winStreak>=2?`${data.winStreak} straight? Wake me up when ${name} beats someone I picked.`:`Everybody relax. One win does not make ${name} unbeatable. Book the rematch.`})}
-      else posts.push({profile:'media',text:`${data.opponent} hands ${name} a loss by ${finish}. The comeback starts with the response.`},{profile:'rival',author:data.opponent,text:`Respect for taking the fight, ${name}. But tonight belonged to me.`},{profile:'hater',text:`The hype train needed brakes. ${name} just found them.`},{profile:'fan',text:`Losses happen. Still here, still following, and waiting for the comeback.`});
+      const values={name,opponent:data.opponent,finish:String(data.method||'decision').toUpperCase(),winStreak:data.winStreak,titleSuffix:data.title?` The new ${data.title} champion has arrived.`:''};
+      if(data.win){if(data.winStreak>=2)posts.push(...copyPosts([cycles.fightStreakHeadline],values));posts.push(...copyPosts(cycles.fightWin,values),...copyPosts([data.winStreak>=2?cycles.fightStreakHater:cycles.fightWinHater],values))}
+      else posts.push(...copyPosts(cycles.fightLoss,values));
     }else if(type==='appearance'){
-      posts.push({profile:'media',text:`${name} made an appearance on ${data.title}. The fight world is starting to notice.`},{profile:'fan',text:data.viral?`That ${name} clip is everywhere. The timeline belongs to a cage fighter today.`:`Saw ${name} making the rounds today. Good energy and no fake superstar routine.`},{profile:'hater',text:`Another appearance? I would rather see ${name} book a fight.`});
+      posts.push(...copyPosts(data.viral?cycles.viralAppearance:cycles.appearance,{name,title:data.title}));
     }else if(type==='autograph'){
-      posts.push({profile:'media',text:`${name} signed ${data.signatures} autographs at today’s appearance.`},{profile:data.price>35?'hater':'fan',text:data.price===0?`${name} signed for free and stayed until the line was done. That is how you build real followers.`:data.price>35?`Charging $${data.price} for an autograph? ${name} is speed-running the unfollow button.`:`Met ${name} today. Worth the wait and actually talked to the fans.`});
+      const template=data.price===0?cycles.autographFree:data.price>35?cycles.autographExpensive:cycles.autographStandard;posts.push(...copyPosts(template,{name,price:data.price,signatures:data.signatures}));
     }else if(type==='sponsor'){
-      posts.push({profile:'media',text:`${data.brand} signs ${name} to a new fight contract.`},{profile:'fan',text:`From unknown rookie to sponsored fighter. ${name} is building something.`},{profile:'hater',text:`A sponsor check does not improve your takedown defense, ${name}.`});
+      posts.push(...copyPosts(cycles.sponsor,{name,brand:data.brand}));
     }
     if(posts.length)addSocialPosts(posts);
   }
@@ -487,15 +492,15 @@
     $('#socialTimeline').innerHTML=posts.length?posts.map(renderFeedPost).join(''):'<div class="feed-preview-empty">No posts yet.</div>';
   }
   function handleSocialPost(type){
-    if(!ensureSocialFeed()){createSocialAccount();updateUI();return}if(state.socialPostedCycle>=state.socialCycle){toast('ONE POST PER NEWS CYCLE','#ffcf78');return}initAudio();let playerText='',reactions=[];
+    if(!ensureSocialFeed()){createSocialAccount();updateUI();return}if(state.socialPostedCycle>=state.socialCycle){toast('ONE POST PER NEWS CYCLE','#ffcf78');return}initAudio();const actions=STRINGS.social.actions;let playerText='',reactions=[];
     if(type==='thank'){
-      const followers=changeFollowers(12+state.level*6+rint(0,8));state.hype=clamp(state.hype+2,0,100);playerText=`Appreciate everybody following the climb. I hear the support. Back to work.`;reactions=[{profile:'fan',text:`This is why we follow ${state.name}. No speech, no excuses—just work.`},{profile:'gym',text:`Message posted. Now put the phone down and finish the session.`}];toast(`+${followers} FOLLOWERS · +2% HYPE`,'#77d13e');sfx.win();
+      const followers=changeFollowers(12+state.level*6+rint(0,8));state.hype=clamp(state.hype+2,0,100);playerText=copyText(actions.thank.player,{name:state.name});reactions=copyPosts(actions.thank.reactions,{name:state.name});toast(`+${followers} FOLLOWERS · +2% HYPE`,'#77d13e');sfx.win();
     }else if(type==='callout'){
-      const rival=calloutRival();if(!rival){toast('BEAT A FIGHTER BEFORE CALLING FOR A REMATCH','#ffcf78');return}const success=Math.random()<.75;playerText=`${rival.name}, the first fight answered nothing. Sign the rematch and meet me in the cage.`;
-      if(success){const hype=rint(8,18),followers=changeFollowers(rint(20,60));state.hype=clamp(state.hype+hype,0,100);rival.rematchAccepted=true;reactions=[{profile:'rival',author:rival.name,text:`You wanted my attention, ${state.name}. You have it. Rematch accepted.`},{profile:'fan',text:`That callout had some heat. Book ${state.name} versus ${rival.name} again.`}];toast(`CALLOUT CAUGHT FIRE · +${hype}% HYPE · +${followers} FOLLOWERS`,'#ad72ff');sfx.win();confettiBurst()}
-      else{state.hype=clamp(state.hype-5,0,100);reactions=[{profile:'hater',text:`${rival.name} left ${state.name} on read. Tough night for the mentions.`},{profile:'promoter',text:`A callout without a response is just free advertising for the other fighter.`}];toast('POST FLOPPED · THE COMMENTS COOKED YOU · -5% HYPE','#ff6157');sfx.lose()}
+      const rival=calloutRival();if(!rival){toast('BEAT A FIGHTER BEFORE CALLING FOR A REMATCH','#ffcf78');return}const success=Math.random()<.75,values={name:state.name,rival:rival.name};playerText=copyText(actions.callout.player,values);
+      if(success){const hype=rint(8,18),followers=changeFollowers(rint(20,60));state.hype=clamp(state.hype+hype,0,100);rival.rematchAccepted=true;reactions=copyPosts(actions.callout.success,values);toast(`CALLOUT CAUGHT FIRE · +${hype}% HYPE · +${followers} FOLLOWERS`,'#ad72ff');sfx.win();confettiBurst()}
+      else{state.hype=clamp(state.hype-5,0,100);reactions=copyPosts(actions.callout.failure,values);toast('POST FLOPPED · THE COMMENTS COOKED YOU · -5% HYPE','#ff6157');sfx.lose()}
     }else if(type==='brand'){
-      if(state.level<2||state.fans<100){toast('BRAND POSTS NEED LVL 2 AND 100 FOLLOWERS','#ffcf78');return}if(!spendEnergy(4))return;let cash=rint(45,125),followers=rint(15,45),viral=Math.random()<.18;if(viral){cash=Math.round(cash*1.65);followers=Math.round(followers*2.2)}receiveMoney(cash,true);followers=changeFollowers(followers);gainXp(7);playerText=`Paid partnership. Training day powered by people who believe in the climb. #ad`;reactions=[{profile:viral?'fan':'hater',text:viral?`${state.name} somehow made an ad look like a fight trailer. This clip is everywhere.`:`The sponsored-post era arrived fast. Hope the product comes with better cardio.`},{profile:'promoter',text:`Sponsors like reach. I like fighters who turn reach into ticket sales.`}];toast(`${viral?'BRAND POST WENT VIRAL':'BRAND POSTED'} · +$${fmt(cash)} · +${fmt(followers)} FOLLOWERS`,viral?'#6ed7ff':'#77d13e');sfx.coin();if(viral)confettiBurst();
+      if(state.level<2||state.fans<100){toast('BRAND POSTS NEED LVL 2 AND 100 FOLLOWERS','#ffcf78');return}if(!spendEnergy(4))return;let cash=rint(45,125),followers=rint(15,45),viral=Math.random()<.18;if(viral){cash=Math.round(cash*1.65);followers=Math.round(followers*2.2)}receiveMoney(cash,true);followers=changeFollowers(followers);gainXp(7);playerText=copyText(actions.brand.player,{name:state.name});reactions=copyPosts(viral?actions.brand.viral:actions.brand.standard,{name:state.name});toast(`${viral?'BRAND POST WENT VIRAL':'BRAND POSTED'} · +$${fmt(cash)} · +${fmt(followers)} FOLLOWERS`,viral?'#6ed7ff':'#77d13e');sfx.coin();if(viral)confettiBurst();
     }else return;
     state.socialPostedCycle=state.socialCycle;addSocialPosts([{profile:'player',text:playerText},...reactions]);updateUI();requestAnimationFrame(()=>$('#socialTimeline').scrollTo({top:0,behavior:'smooth'}));
   }
@@ -749,22 +754,7 @@
   function fightClock(exchange,total){const seconds=Math.max(8,300-Math.round((exchange/Math.max(1,total))*292));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
 
   function commentaryFor(type,attacker,defender,landed,big=false){
-    const A=attacker.name,D=defender.name;
-    const hit={
-      jab:[`${A} snaps a jab through the guard.`,`${A} doubles the jab and finds the mark.`,`${A} touches ${D} with a sharp lead hand.`],
-      cross:[`${A} drives a straight right down the middle.`,`${A} lands the cross and backs ${D} toward the fence.`,`${A} cracks ${D} with a clean right hand.`],
-      hook:[`${A} whips a hook around the guard.`,`${A} digs a heavy hook into the ribs.`,`${A} lands a compact left hook in the pocket.`],
-      kick:[`${A} chops the lead leg with a hard kick.`,`${A} lands a body kick with a thud.`,`${A} fires a kick that turns ${D} sideways.`],
-      takedown:[`${A} changes levels and finishes the takedown.`,`${A} runs ${D} to the fence and drags the fight down.`,`${A} catches the hips and plants ${D} on the canvas.`]
-    };
-    const miss={
-      jab:[`${D} slips the jab and resets.`,`${A} paws with the lead hand but cannot find the target.`],
-      cross:[`${D} ducks under the right hand.`,`${A} loads up and swings past the target.`],
-      hook:[`${D} rolls under the hook and circles away.`,`${A} throws wide; ${D} is already gone.`],
-      kick:[`${D} checks the kick and holds position.`,`${A} misses the kick and has to scramble back into stance.`],
-      takedown:[`${D} sprawls hard and shuts down the shot.`,`${A} shoots from too far out; ${D} stuffs it.`]
-    };
-    const list=landed?hit[type]:miss[type];return list[rint(0,list.length-1)];
+    const list=STRINGS.fightCommentary[landed?'hit':'miss'][type],template=list[rint(0,list.length-1)];return copyText(template,{A:attacker.name,D:defender.name});
   }
 
   function createFight(o){
@@ -1019,23 +1009,7 @@
     const oldE=Math.floor(state.energy),oldH=Math.floor(state.health);state.energy=clamp(state.energy+.5+ownedBonus('energyRegen'),0,state.maxEnergy);state.health=clamp(state.health+.12+ownedBonus('healthRegen'),0,state.maxHealth);if(Math.floor(state.energy)!==oldE||Math.floor(state.health)!==oldH){updateUI()}
   },15000);
 
-  const tickerLines=[
-    'Listen, kid: every fight burns 15 energy. No gas, no payday.',
-    'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
-    'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
-    'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',
-    'First round, choose your hustle: attack for initiative or feel him out for the deeper read.',
-    'By round two we know his tendency. Trust your own style unless you fancy losing at his game.',
-    'No shop, no refunds. You want gear, you win fights and hope the drop lands in your locker.',
-    'Fourth win without a gear drop? Even my supplier has to put something in the bag.',
-    'Duplicate gear looks impressive, kid, but the perk still only counts once.',
-    'One Daily Drop, every day. Free cash, free energy, collectible included. Do not ask who paid.',
-    'Coach Vega wants $35 plus $20 per level. Talent is temporary; invoices are forever.',
-    'Need trainer money? Hustle. Side gigs pay cash, even when nobody calls it career earnings.',
-    'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
-    'A title only unlocks the champion. Nobody mails you a belt—you take it from the man holding it.',
-    'If the corner offers a towel or a haymaker, the safe money is gone. Pick the ending you can live with.'
-  ];let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);
+  const tickerLines=STRINGS.ticker;let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);
 
   window.addEventListener('resize',drawHero);
   window.addEventListener('beforeunload',saveState);

@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const vm = require('node:vm');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -6,13 +7,19 @@ const page = fs.readFileSync('index.html', 'utf8');
 const css = fs.readFileSync('styles.css', 'utf8');
 const html = `${page}\n<style>${css}</style>`;
 const readme = fs.readFileSync('README.md', 'utf8');
+const strings = fs.readFileSync('strings.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
+const contentContext = {};
+vm.runInNewContext(strings, contentContext);
+const stringsData = contentContext.CAGE_STRINGS;
 
 test('external game assets are linked and the game script parses', () => {
   assert.match(page, /<link rel="stylesheet" href="styles\.css">/);
-  assert.match(page, /<script src="game\.js"><\/script>/);
+  assert.match(page, /<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>/);
   assert.doesNotMatch(page, /<style>|<script>(?!<\/script>)/);
+  assert.doesNotThrow(() => new Function(strings));
   assert.doesNotThrow(() => new Function(script));
+  assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
 });
 
 test('generated Cage Warrior logo is used in the top-left header', () => {
@@ -87,16 +94,28 @@ test('opponents have pro records, persistent rival history, and consent-aware re
 });
 
 test('generated fighters draw from broad independently mixed name pools', () => {
-  const firstPool = script.match(/const firstNames=\[([^\]]+)\]/)?.[1] || '';
-  const lastPool = script.match(/const lastNames=\[([^\]]+)\]/)?.[1] || '';
-  const firstNames = [...firstPool.matchAll(/'([^']+)'/g)].map(match => match[1]);
-  const lastNames = [...lastPool.matchAll(/'([^']+)'/g)].map(match => match[1]);
+  const firstNames = stringsData.opponentNames.first;
+  const lastNames = stringsData.opponentNames.last;
   assert.ok(firstNames.length >= 50);
   assert.ok(lastNames.length >= 50);
   for (const name of ['GARCIA', 'JONES', 'IVANOV', 'PETROV', 'SMIRNOV', 'VOLKOV', 'KUZNETSOV']) assert.ok(lastNames.includes(name));
+  assert.match(script, /const firstNames=STRINGS\.opponentNames\.first/);
+  assert.match(script, /const lastNames=STRINGS\.opponentNames\.last/);
   assert.match(script, /rosterPick\(firstNames,hashSeed\(`first\|\$\{seed\}`\)\)/);
   assert.match(script, /rosterPick\(lastNames,hashSeed\(`last\|\$\{seed\}`\)\)/);
   assert.doesNotMatch(script, /rosterPick\(lastNames,seed\*5\+11\)/);
+});
+
+test('scalable copy pools are separated from gameplay logic', () => {
+  assert.ok(stringsData.fightCommentary.hit.jab.length >= 3);
+  assert.ok(stringsData.fightCommentary.miss.takedown.length >= 2);
+  assert.ok(stringsData.social.account.length >= 3);
+  assert.ok(stringsData.social.cycles.fightWin.length >= 3);
+  assert.ok(stringsData.social.actions.callout.success.length >= 2);
+  assert.match(script, /STRINGS\.fightCommentary\[landed\?'hit':'miss'\]\[type\]/);
+  assert.match(script, /copyPosts\(STRINGS\.social\.account/);
+  assert.match(script, /const actions=STRINGS\.social\.actions/);
+  assert.doesNotMatch(script, /snaps a jab through the guard|First follow\. Let’s see where this goes/);
 });
 
 test('career identity includes a permanent hometown and a fight-earned title ladder', () => {
@@ -310,16 +329,17 @@ test('home ticker teaches current mechanics in a shady promoter voice', () => {
   const heroPosition = html.indexOf('<div class="hero">', homeStart);
   assert.ok(tickerPosition > homeStart && tickerPosition < identityPosition && tickerPosition < heroPosition, 'ticker should lead the unlocked Home screen');
   assert.match(html.slice(homeStart, identityPosition), /class="card career-after-setup"/);
-  const ticker = script.match(/const tickerLines=\[([\s\S]*?)\];let ti=0/)?.[1] || '';
-  assert.match(ticker, /fight burns 15 energy/);
-  assert.match(ticker, /20 health before a bout/);
+  assert.ok(stringsData.ticker.some(line => /fight burns 15 energy/.test(line)));
+  assert.ok(stringsData.ticker.some(line => /20 health before a bout/.test(line)));
+  assert.match(script, /const tickerLines=STRINGS\.ticker/);
+  const ticker = stringsData.ticker.join('\n');
   assert.match(ticker, /Old names pay half/);
   assert.match(ticker, /Taunt a past rival/);
   assert.match(ticker, /Fourth win without a gear drop/);
   assert.match(ticker, /perk still only counts once/);
   assert.match(ticker, /\$35 plus \$20 per level/);
   assert.match(ticker, /Nobody mails you a belt/);
-  assert.ok((ticker.match(/'/g) || []).length >= 30, 'expected at least 15 rotating promoter tips');
+  assert.ok(stringsData.ticker.length >= 15, 'expected at least 15 rotating promoter tips');
   assert.doesNotMatch(ticker, /Rumor: the main event pays double under the table/);
 });
 
@@ -377,7 +397,7 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
   assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#socialTimeline'\)\.scrollTo\(\{top:0,behavior:'smooth'\}\)\)/);
   assert.match(script, /function createSocialAccount\(\)/);
-  assert.match(script, /Hello, fight fans! Stay tuned—the climb starts now/);
+  assert.match(strings, /Hello, fight fans! Stay tuned—the climb starts now/);
   assert.match(script, /if\(!state\.socialAccountCreated\)return 0/);
   assert.match(script, /if\(screen==='feed'&&!ensureSocialFeed\(\)\)createSocialAccount\(\)/);
   assert.match(script, /\(Number\(s\.fans\)\|\|0\)>0/);
@@ -392,8 +412,8 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(script, /id:'brand'.*Influencer Brand Post/);
   assert.match(script, /rival\.rematchAccepted=true/);
   assert.match(script, /state\.socialPostedCycle=state\.socialCycle/);
-  assert.match(script, /WIN STREAK:.*won \$\{data\.winStreak\} straight fights/);
-  for (const name of ['FightFan99', 'MMA4Life', 'ScorecardBandit', 'FlukeWinPolice']) assert.match(script, new RegExp(name));
+  assert.match(strings, /WIN STREAK: \{name\} has now won \{winStreak\} straight fights/);
+  for (const name of ['FightFan99', 'MMA4Life', 'ScorecardBandit', 'FlukeWinPolice']) assert.match(strings, new RegExp(name));
   const riskDefs = script.match(/const riskDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
   const publicityDefs = script.match(/const publicityDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
   assert.doesNotMatch(riskDefs, /call-out-rival|Post a Rival Callout/);
