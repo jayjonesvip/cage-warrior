@@ -65,17 +65,20 @@ generated league.
   archetypes, professional records, and head-to-head history.
 - Pre-fight roster, daily, and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
-- Current-level fighters are available at full purse. Unbeaten past-level
-  opponents remain available for half purse; past-level fighters already
-  defeated by the player are hidden from the active roster.
+- The current level always replenishes to three fresh contenders, so the fight
+  path cannot run dry before a level-up. Fresh current-level fights pay a full
+  purse; past-level fights and rival rematches pay half purse.
 - Any available opponent who has beaten the player carries a bright horizontal
-  **Rematch** banner across the lower part of their fighter image.
-- An opponent you defeat can decline another fight. Repeated losses to the
-  player eventually cause retirement and generate a replacement fighter.
-- The Career Opponents roster shows available current and past opponents,
-  retired fighters, and
-  a locked preview of the next level. The current-level group starts open;
-  title fights, past levels, retired fighters, and locked previews start
+  **Rematch** banner across the lower part of their fighter image and remains
+  immediately available.
+- Regular opponents never retire. Every defeated fighter persists in the
+  **Past Rivals** collection. A free **Taunt for Rematch** guarantees that rival
+  accepts one more fight; the bout costs the normal 15 energy, pays half purse,
+  and retains full fight XP. Winning closes the offer until another taunt, while
+  losing keeps the rematch immediately available.
+- The Career Opponents roster shows available current and past opponents, past
+  rivals, former champions, and a locked preview of the next level. The
+  current-level group starts open; all other groups start
   collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork.
   The front stays focused on identity and booking; tapping the card body flips
@@ -128,10 +131,11 @@ generated league.
 
 Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, generated rosters, rivalries,
-retirements, collections, loadouts, championships, daily challenges, Cash, and
+collections, loadouts, championships, daily challenges, Cash, and
 Career Earnings. Legacy Technician, Grappler, and Endurance identities map to
 Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
-tendencies migrate without losing records or rivalries. Legacy District and
+tendencies migrate without losing records or rivalries, and previously retired
+regular fighters return to the permanent Past Rivals system. Legacy District and
 National belt progress migrates into the new title ladder. The game also keeps
 a last-known-good backup and refunds energy from an interrupted fight when the
 save is restored.

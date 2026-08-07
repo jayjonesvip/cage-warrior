@@ -41,27 +41,34 @@ test('save recovery and one-time league migration remain enabled', () => {
   assert.match(script, /state\.leagueInitialized=true/);
 });
 
-test('rematch and exhausted-gig states reflect actual state without masking locks', () => {
+test('rematch, taunt, and exhausted-gig states reflect actual state without masking locks', () => {
   assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
-  assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · revenge rematch payout/);
+  assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · rematch payout/);
   assert.match(script, /:'SEE MATCHUP'/);
-  assert.match(script, /rematch=available&&\(o\.winsVsPlayer\|\|0\)>0&&!declined/);
+  assert.match(script, /rematch=available&&\(o\.winsVsPlayer\|\|0\)>0/);
   assert.match(script, /\$\{rematch\?'<span class="rematch-banner">⚡ REMATCH<\/span>':''\}/);
-  assert.match(script, /aria-label="\$\{o\.name\} fighter card\$\{rematch\?', rematch available':''\}/);
+  assert.match(script, /rematch available':tauntable\?', taunt available'/);
+  assert.match(script, /data-taunt-key="\$\{o\.key\}"/);
+  assert.match(script, /function tauntOpponent\(key\)/);
   assert.match(html, /\.rematch-banner\{[^}]*left:7px;right:7px;bottom:8px[^}]*font-size:8\.5px/);
   assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
   assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
   assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
 });
 
-test('opponents have pro records, conditional H2H, and consent-aware rematches', () => {
-  assert.match(script, /function payoutForOpponent\(o\).*o\.tier>=state\.level\?1:\.5/);
+test('opponents have pro records, persistent rival history, and consent-aware rematches', () => {
+  assert.match(script, /function payoutForOpponent\(o\).*o\.lossesToPlayer.*o\.tier>=state\.level.*\?1:\.5/);
   assert.match(script, /recordInitialized:true/);
   assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
   assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY<\/div>'/);
   assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
-  assert.match(script, /declined=!o\.championship&&available&&\(o\.lossesToPlayer\|\|0\)>0/);
-  assert.match(script, /DECLINED<br><small>YOU WON<\/small>/);
+  assert.match(script, /function opponentGroup\(o\).*\(o\.lossesToPlayer\|\|0\)>0\?'rival'/);
+  assert.match(script, /function opponentAvailable\(o\)/);
+  assert.match(script, /TAUNT<br><small>FOR REMATCH<\/small>/);
+  assert.match(script, /o\.rematchAccepted=false/);
+  assert.match(script, /o\.rematchAccepted=true/);
+  assert.doesNotMatch(script, /lossesToPlayer>=o\.retireAt/);
+  assert.doesNotMatch(script, /RETIRES AFTER/);
   assert.match(script, /cash=Math\.round\(basePurse/);
 });
 
@@ -109,7 +116,10 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(script, /data-card-flip.*e\.key==='Enter'/s);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
   assert.match(script, /:'SEE MATCHUP'/);
-  assert.match(script, /past=state\.roster\.filter\(o=>opponentState\(o\)==='passed'&&\(o\.lossesToPlayer\|\|0\)===0\)/);
+  assert.match(script, /rivals=state\.roster\.filter\(o=>opponentGroup\(o\)==='rival'\)/);
+  assert.match(script, /\['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'\]/);
+  assert.match(script, /active=state\.roster\.filter\(o=>o\.tier===tier&&!o\.championship&&\(o\.lossesToPlayer\|\|0\)===0\)/);
+  assert.match(script, /if\(!o\.championship\)ensureRoster\(\)/);
   assert.match(script, /const openRosterGroups = new Set\(\['current'\]\)/);
   assert.match(script, /data-roster-toggle="\$\{status\}" aria-expanded="\$\{expanded\}"/);
   assert.match(script, /function toggleRosterGroup\(button\)/);
