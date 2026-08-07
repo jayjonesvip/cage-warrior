@@ -235,6 +235,12 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 });
 
 test('home ticker teaches current mechanics in a shady promoter voice', () => {
+  const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
+  const tickerPosition = html.indexOf('id="tickerText"');
+  const identityPosition = html.indexOf('id="careerIdentityCard"');
+  const heroPosition = html.indexOf('<div class="hero">', homeStart);
+  assert.ok(tickerPosition > homeStart && tickerPosition < identityPosition && tickerPosition < heroPosition, 'ticker should lead the unlocked Home screen');
+  assert.match(html.slice(homeStart, identityPosition), /class="card career-after-setup"/);
   const ticker = script.match(/const tickerLines=\[([\s\S]*?)\];let ti=0/)?.[1] || '';
   assert.match(ticker, /fight burns 15 energy/);
   assert.match(ticker, /20 health before a bout/);
