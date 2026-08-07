@@ -91,8 +91,9 @@ generated league.
   timeline stored with the career.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
-- The full timeline and the available player-post actions share one card, with
-  actions placed below the latest-first timeline.
+- The timeline owns the Feed explanation and scrolls inside its own card. The
+  player-post controls sit in a detached action dock pinned to the bottom of
+  the Feed page.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual posts from reporters, promoters, gyms, rivals,
   fans, and haters. Ordinary accounts use generated-style names such as
