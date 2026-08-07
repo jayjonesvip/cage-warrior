@@ -105,6 +105,13 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(script, /data-card-flip.*e\.key==='Enter'/s);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
   assert.match(script, /:'SEE MATCHUP'/);
+  assert.match(script, /past=state\.roster\.filter\(o=>opponentState\(o\)==='passed'&&\(o\.lossesToPlayer\|\|0\)===0\)/);
+  assert.match(script, /const openRosterGroups = new Set\(\['current'\]\)/);
+  assert.match(script, /data-roster-toggle="\$\{status\}" aria-expanded="\$\{expanded\}"/);
+  assert.match(script, /function toggleRosterGroup\(button\)/);
+  assert.match(script, /grid\.hidden=!next/);
+  assert.match(script, /rosterToggle=e\.target\.closest\('\[data-roster-toggle\]'\)/);
+  assert.match(html, /\.opponent-grid\[hidden\]\{display:none\}/);
 });
 
 test('career fights use a reversible tale-of-the-tape preview and a two-choice round-one opening', () => {

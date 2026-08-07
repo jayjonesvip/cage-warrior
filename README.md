@@ -61,12 +61,15 @@ generated league.
 - Pre-fight roster, daily, and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
 - Current-level fighters are available at full purse. Unbeaten past-level
-  opponents remain available for half purse.
+  opponents remain available for half purse; past-level fighters already
+  defeated by the player are hidden from the active roster.
 - An opponent you defeat can decline another fight. Repeated losses to the
   player eventually cause retirement and generate a replacement fighter.
 - The Career Opponents roster shows available current and past opponents,
   retired fighters, and
-  a locked preview of the next level. Fighters are presented as fixed-ratio
+  a locked preview of the next level. The current-level group starts open;
+  title fights, past levels, retired fighters, and locked previews start
+  collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork.
   The front stays focused on identity and booking; tapping the card body flips
   it to a fixed-height details side with attributes, rating, availability,
