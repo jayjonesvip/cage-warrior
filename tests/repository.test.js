@@ -136,10 +136,13 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
   assert.match(script, /function renderCornerPlans\(container,nextRound\)/);
   assert.match(script, /sameStyle\?\[signature\]:\[signature,opponentStyle\]/);
-  assert.match(script, /STICK TO YOUR STYLE/);
-  assert.match(script, /FIGHT THEM IN THEIR STYLE/);
+  assert.match(script, /`STICK WITH \$\{plan\.name\}`/);
+  assert.match(script, /`FIGHT AS \$\{plan\.name\}`/);
   assert.match(script, /START ROUND \$\{nextRound\}/);
   assert.doesNotMatch(script, /renderPlanGrid/);
+  assert.match(script, /class="corner-style-options"/);
+  assert.match(script, /class="plan-btn \$\{isSignature\?'signature':'mirror'\}"[^>]*>\$\{label\}<\/button>/);
+  assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(script, /TENDENCY REVEALED/);
   assert.match(script, /DEEP READ/);
 });

@@ -36,9 +36,10 @@ generated league.
   the opponent's basic tendency after Round 1.
 - Before Rounds 2 and 3, the corner offers only grounded tactical choices:
   stay with your signature style or challenge the opponent in their revealed
-  style. Fighting outside your own discipline carries a real penalty. When
-  both fighters share an archetype, the duplicate choice collapses into one
-  **Start Round** action.
+  style. Style descriptions and tactical warnings sit above simple, stacked
+  action buttons. Fighting outside your own discipline carries a real penalty.
+  When both fighters share an archetype, the duplicate choice collapses into
+  one **Start Round** action.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
