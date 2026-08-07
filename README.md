@@ -61,7 +61,8 @@ generated league.
   style. Style descriptions and tactical warnings sit above simple, stacked
   action buttons. Fighting outside your own discipline carries a real penalty.
   When both fighters share an archetype, the duplicate choice collapses into
-  one **Start Round** action.
+  one **Start Round** action. The corner-call surface snaps directly to the
+  live fight card edges.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
@@ -92,7 +93,7 @@ generated league.
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The timeline owns the Feed explanation and scrolls inside its own card. The
   player-post controls sit in a detached action dock pinned to the bottom of
-  the Feed page.
+  the Feed page and snapped flush to its side and bottom edges.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual posts from reporters, promoters, gyms, rivals,
   fans, and haters. Ordinary accounts use generated-style names such as

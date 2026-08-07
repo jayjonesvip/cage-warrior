@@ -208,6 +208,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(script, /class="corner-style-options"/);
   assert.match(script, /class="plan-btn \$\{isSignature\?'signature':'mirror'\}"[^>]*>\$\{label\}<\/button>/);
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
+  assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
   assert.match(script, /TENDENCY REVEALED/);
   assert.match(script, /DEEP READ/);
   assert.doesNotMatch(html, /id="skipBtn"/);
@@ -365,6 +366,8 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.doesNotMatch(html, /Make Your Post|feed-compose-head/);
   assert.match(html, /\.screen\[data-screen="feed"\]\.active\{display:flex/);
   assert.match(html, /\.social-composer\{position:sticky/);
+  assert.match(css, /\.social-composer\{margin:8px -10px 0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
+  assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:0\}/);
   assert.doesNotMatch(html, /class="feed-back"/);
   assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
   assert.match(script, /function socialUnreadCount\(\)/);
