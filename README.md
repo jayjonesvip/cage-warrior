@@ -87,8 +87,6 @@ generated league.
   "Hello, fight fans" introduction, and draws the first reactions and Followers.
   Existing saved careers that already have Followers are treated as connected
   accounts and keep their audience.
-- Home previews the two newest Cage Feed posts and opens a full latest-first
-  timeline stored with the career.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The timeline owns the Feed explanation and scrolls inside its own card. The

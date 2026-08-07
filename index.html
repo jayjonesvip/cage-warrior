@@ -338,8 +338,6 @@
         <div class="hero-copy"><h1>FROM NOBODY<br>TO <span>MAIN EVENT</span></h1><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
       </div>
 
-      <div class="card feed-preview"><div class="card-title">Latest Buzz <small id="homeFeedStatus">CAGE FEED</small></div><div class="feed-preview-list" id="homeFeedPreview"></div><button class="feed-open" type="button" data-go="feed">OPEN CAGE FEED</button></div>
-
       <div class="choice-grid">
         <article class="choice red"><h3>BIG WIN POTENTIAL</h3><p>Pick an opponent, call the tactics, and chase a finish through every round.</p><img class="choice-art" src="assets/home-fight.png" alt="" aria-hidden="true"><button class="choice-action" data-go="fight">TAKE A FIGHT</button></article>
         <article class="choice"><h3>GUARANTEED GROWTH</h3><p>Turn energy into permanent stats. Perfect sessions pay extra.</p><img class="choice-art" src="assets/home-training.png" alt="" aria-hidden="true"><button class="choice-action" data-go="train">HIT THE GYM</button></article>
@@ -967,8 +965,7 @@
   function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase();return `<article class="feed-post ${escapeHtml(post.tone||'media')}"><div class="feed-avatar">${escapeHtml(initials)}</div><div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b><span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p><div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div></div></article>`}
   function renderSocial(){
     const accountReady=ensureSocialFeed();if(accountReady&&currentScreen==='feed')state.socialLastReadSerial=state.socialSerial;const unread=socialUnreadCount(),used=!accountReady||state.socialPostedCycle>=state.socialCycle,rival=calloutRival(),brandLocked=state.level<2||state.fans<100,posts=state.socialFeed||[],navBadge=$('#feedNavBadge');navBadge.hidden=unread<1;navBadge.textContent=unread>99?'99+':String(unread);navBadge.setAttribute('aria-label',`${unread} unread Cage Feed posts`);
-    $('#homeFeedPreview').innerHTML=accountReady?posts.slice(0,2).map(renderFeedPost).join(''):'<div class="feed-preview-empty">Open Cage Feed to create your fighter account and publish your first post.</div>';
-    $('#homeFeedStatus').textContent=accountReady?(used?'POST USED':'1 POST READY'):'CREATE ACCOUNT';$('#feedCycleStatus').textContent=accountReady?(used?'POST USED THIS CYCLE':'1 POST READY'):'ACCOUNT NOT CREATED';
+    $('#feedCycleStatus').textContent=accountReady?(used?'POST USED THIS CYCLE':'1 POST READY'):'ACCOUNT NOT CREATED';
     $('#feedStatus').innerHTML=used?`<strong>You already posted.</strong> Create another headline through a fight, appearance, or career moment to start the next news cycle.`:`<strong>The timeline is talking.</strong> You get one post this news cycle. Choose the message that helps your career.`;
     const choices=[
       {id:'thank',iconName:'thank-followers',icon:'♡',title:'Thank the Followers',text:'Safe audience growth and a small Hype lift.',status:'SAFE'},

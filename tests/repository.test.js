@@ -346,7 +346,7 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
 });
 
 test('Cage Feed turns career events into one strategic player post per news cycle', () => {
-  assert.match(html, /id="homeFeedPreview"/);
+  assert.doesNotMatch(html, /Latest Buzz|homeFeedPreview|homeFeedStatus/);
   assert.match(html, /data-screen="feed"/);
   assert.match(html, /id="socialTimeline"/);
   assert.match(html, /data-nav="feed"[\s\S]*data-icon-name="nav-feed"[\s\S]*id="feedNavBadge"/);
