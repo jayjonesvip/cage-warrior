@@ -136,7 +136,8 @@ generated league.
   collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork
   selected deterministically from 14 standalone transparent fighter
-  silhouettes.
+  silhouettes. Bright accent spotlights and subtle rim lighting keep the black
+  silhouettes readable against every roster status and Tale of the Tape card.
   The front stays focused on identity and booking; tapping the card body flips
   it to a fixed-height details side with attributes, rating, availability,
   purse context, rivalry status, and head-to-head history. See Matchup remains

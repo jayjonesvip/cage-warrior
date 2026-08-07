@@ -163,6 +163,9 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(html, /\.opponent-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.opponent\{[^}]*aspect-ratio:2\/3/);
   assert.match(html, /\.opp-sprite\{[^}]*width:100%;height:100%;object-fit:contain;object-position:center bottom/);
+  assert.match(html, /\.opp-face\{[^}]*color-mix\(in srgb,var\(--fighter-accent\) 72%,#d9f4ff\)/);
+  assert.match(html, /\.opp-sprite\{[^}]*filter:invert\(\.1\)[^}]*drop-shadow/);
+  assert.match(html, /\.opponent-card \.tape-card-portrait\{background:radial-gradient\(ellipse at 50% 42%,#ffad9d/);
   assert.match(script, /const fighterSilhouettes=Array\.from\(\{length:14\},\(_,i\)=>`assets\/fighter-silhouette-\$\{i\+1\}\.png`\)/);
   assert.match(script, /function silhouetteForOpponent\(o\)/);
   assert.match(script, /<img class="opp-sprite" src="\$\{silhouette\}"/);
