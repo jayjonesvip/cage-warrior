@@ -62,8 +62,9 @@ generated league.
   retired fighters, and
   a locked preview of the next level. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork.
-- An available opponent's **Tale of the Tape** opens a reversible pre-fight
-  preview without spending energy. It emphasizes the purse above your fighter
+- An available opponent's **See Matchup** button opens a reversible Tale of the
+  Tape preview without displaying the purse on the roster action. The preview
+  spends no energy and emphasizes the purse above your fighter
   card and the opponent's card, then offers **Go Back** or **Fight!**. The 15
   energy cost is charged only after Fight is confirmed and the cage-opening
   choice begins.

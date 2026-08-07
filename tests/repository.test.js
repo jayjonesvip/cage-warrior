@@ -44,7 +44,7 @@ test('save recovery and one-time league migration remain enabled', () => {
 test('rematch and exhausted-gig states reflect actual state without masking locks', () => {
   assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
   assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · revenge rematch payout/);
-  assert.match(script, /`TALE OF THE TAPE<br><small>/);
+  assert.match(script, /:'SEE MATCHUP'/);
   assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
   assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
   assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
@@ -93,7 +93,7 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.doesNotMatch(html, /The Living Roster/);
   assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}">/);
   assert.match(script, /\['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'\]/);
-  assert.match(script, /`TALE OF THE TAPE<br><small>\$\{status==='title'\?'TITLE · ':''\}\$\$\{fmt\(purse\)\}<\/small>`/);
+  assert.match(script, /:'SEE MATCHUP'/);
 });
 
 test('career fights use a reversible tale-of-the-tape preview and a two-choice round-one opening', () => {
