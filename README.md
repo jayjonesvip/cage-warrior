@@ -30,6 +30,8 @@ generated league.
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
   obvious.
+- An active endorsement appears in the Home hero directly beneath Cage Rank,
+  showing the sponsor brand and the number of contracted fights remaining.
 - A rotating promoter ticker leads the unlocked Home screen and teaches the
   active rules—fight costs, medical clearance, purses, rematches, tactics,
   drops, coaching, and titles—in the voice of a suspiciously well-informed

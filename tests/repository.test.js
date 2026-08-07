@@ -332,6 +332,19 @@ test('cash pays the scaling coach fee while career earnings remain cumulative', 
   assert.match(script, /s\.careerEarnings=Number\.isFinite\(savedCareerEarnings\).*:s\.cash/);
 });
 
+test('active sponsor appears beneath Cage Rank in the Home hero', () => {
+  const rankPosition = html.indexOf('class="rank-chip"');
+  const sponsorPosition = html.indexOf('id="heroSponsor"');
+  const dailyPosition = html.indexOf('id="dailyBtn"');
+  assert.ok(rankPosition >= 0 && sponsorPosition > rankPosition && sponsorPosition < dailyPosition);
+  assert.match(html, /\.hero-sponsor\{position:absolute;top:48px;left:10px/);
+  assert.match(html, /\.hero-sponsor\[hidden\]\{display:none\}/);
+  assert.match(script, /sponsorBadge\.hidden=!sponsor/);
+  assert.match(script, /gameIcon\(sponsor\.id,sponsor\.icon\)/);
+  assert.match(script, /SPONSORED BY/);
+  assert.match(script, /state\.activeEndorsement\.fightsLeft\} FIGHTS LEFT/);
+});
+
 test('level ups receive a dedicated promotion celebration', () => {
   assert.match(html, /id="levelUpModal"/);
   assert.match(html, /CAREER BREAKTHROUGH/);
