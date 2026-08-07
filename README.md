@@ -47,7 +47,8 @@ generated league.
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it
   results in an immediate knockout loss.
-- Watch fights normally, use 2× speed, or skip directly to the result.
+- Watch fights normally or use 2× speed. There is no result skip: every
+  surviving round requires its corner decision.
 - Complete daily contracts, build win streaks, and earn upset and rivalry
   bonuses.
 - Progress through a hometown title, its regional title, the U.S. Title, and

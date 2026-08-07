@@ -145,6 +145,9 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(script, /TENDENCY REVEALED/);
   assert.match(script, /DEEP READ/);
+  assert.doesNotMatch(html, /id="skipBtn"/);
+  assert.doesNotMatch(script, /function skipFight\(\)/);
+  assert.doesNotMatch(script, /fight\.rounds\.length<3\)simulateRound/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {
@@ -305,7 +308,7 @@ test('low-condition corner crisis offers towel or last-chance haymaker outcomes'
   assert.match(script, /simulateRound\(fight,next,'pressure',\{damage\}\)/);
   assert.match(script, /HAYMAKER LANDS!/);
   assert.match(script, /Miss and you are knocked out/);
-  assert.match(script, /\$\('#skipBtn'\)\.disabled=true/);
+  assert.doesNotMatch(script, /skipBtn/);
   assert.match(html, /\.corner-panel\.crisis-panel\{/);
   assert.match(readme, /Throwing in the towel gives the opponent a TKO win/);
 });
