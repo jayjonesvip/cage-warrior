@@ -76,6 +76,19 @@ test('opponents have pro records, persistent rival history, and consent-aware re
   assert.match(script, /cash=Math\.round\(basePurse/);
 });
 
+test('generated fighters draw from broad independently mixed name pools', () => {
+  const firstPool = script.match(/const firstNames=\[([^\]]+)\]/)?.[1] || '';
+  const lastPool = script.match(/const lastNames=\[([^\]]+)\]/)?.[1] || '';
+  const firstNames = [...firstPool.matchAll(/'([^']+)'/g)].map(match => match[1]);
+  const lastNames = [...lastPool.matchAll(/'([^']+)'/g)].map(match => match[1]);
+  assert.ok(firstNames.length >= 50);
+  assert.ok(lastNames.length >= 50);
+  for (const name of ['GARCIA', 'JONES', 'IVANOV', 'PETROV', 'SMIRNOV', 'VOLKOV', 'KUZNETSOV']) assert.ok(lastNames.includes(name));
+  assert.match(script, /rosterPick\(firstNames,hashSeed\(`first\|\$\{seed\}`\)\)/);
+  assert.match(script, /rosterPick\(lastNames,hashSeed\(`last\|\$\{seed\}`\)\)/);
+  assert.doesNotMatch(script, /rosterPick\(lastNames,seed\*5\+11\)/);
+});
+
 test('career identity includes a permanent hometown and a fight-earned title ladder', () => {
   for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND']) {
     assert.match(script, new RegExp(`name:'${city}'`));

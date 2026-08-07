@@ -75,8 +75,9 @@ generated league.
 
 ### Career opponents
 
-- Opponents are generated locally with persistent names, attributes,
-  archetypes, professional records, and head-to-head history.
+- Opponents are generated locally with persistent names drawn from a broad
+  international pool, plus attributes, archetypes, professional records, and
+  head-to-head history.
 - Pre-fight roster and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
 - The current level always replenishes to three fresh contenders, so the fight
