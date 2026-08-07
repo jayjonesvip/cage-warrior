@@ -65,6 +65,8 @@ generated league.
 - Current-level fighters are available at full purse. Unbeaten past-level
   opponents remain available for half purse; past-level fighters already
   defeated by the player are hidden from the active roster.
+- Any available opponent who has beaten the player carries a bright diagonal
+  **Rematch** banner on the front of their fighter card.
 - An opponent you defeat can decline another fight. Repeated losses to the
   player eventually cause retirement and generate a replacement fighter.
 - The Career Opponents roster shows available current and past opponents,

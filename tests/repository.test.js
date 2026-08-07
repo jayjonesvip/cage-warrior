@@ -45,6 +45,10 @@ test('rematch and exhausted-gig states reflect actual state without masking lock
   assert.match(script, /const hasHistory=\(o\.meetings\|\|0\)>0/);
   assert.match(script, /hasHistory\?`Current level \$\{o\.tier\} · revenge rematch payout/);
   assert.match(script, /:'SEE MATCHUP'/);
+  assert.match(script, /rematch=available&&\(o\.winsVsPlayer\|\|0\)>0&&!declined/);
+  assert.match(script, /\$\{rematch\?'<span class="rematch-banner">⚡ REMATCH<\/span>':''\}/);
+  assert.match(script, /aria-label="\$\{o\.name\} fighter card\$\{rematch\?', rematch available':''\}/);
+  assert.match(html, /\.rematch-banner\{[^}]*transform:rotate\(36deg\)[^}]*font-size:8\.5px/);
   assert.match(script, /limited&&unlocked\?'gig-unavailable'/);
   assert.match(script, /availability=!unlocked\?requirementText\(a\):limited\?'NO GIGS LEFT'/);
   assert.doesNotMatch(html, /\.action\.future\.gig-unavailable:after/);
@@ -91,7 +95,7 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(html, /\.opp-sprite\{[^}]*aspect-ratio:3\/5[^}]*background-size:500% 200%/);
   assert.match(html, /Career Opponents/);
   assert.doesNotMatch(html, /The Living Roster/);
-  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\}" data-card-flip="true"/);
+  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\} \$\{rematch\?'rematch':''\}" data-card-flip="true"/);
   assert.match(html, /\.opponent-flip\{[^}]*transform-style:preserve-3d/);
   assert.match(html, /\.opponent\.flipped \.opponent-flip\{transform:rotateY\(180deg\)\}/);
   assert.match(script, /class="opponent-side opponent-front"/);
