@@ -19,6 +19,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `nav-fight.png` | 🥊 | Fight navigation |
 | `nav-hustle.png` | 💵 | Hustle navigation |
 | `nav-gear.png` | 🛡 | Gear navigation |
+| `edit-fighter-name.png` | ✎ | Fighter-name pencil control |
 | `fight-aggressive.png` | 💥 | Aggressive Round 1 choice |
 | `fight-feel-out.png` | 👁️ | Feel Them Out Round 1 choice |
 | `rematch.png` | ⚡ | Rematch card banner |

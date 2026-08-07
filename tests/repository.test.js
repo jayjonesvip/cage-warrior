@@ -113,6 +113,19 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(readme, /belt is awarded only after that fighter is defeated/);
 });
 
+test('career identity shows followers and supports persistent fighter renaming', () => {
+  assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
+  assert.match(html, /id="homeFighterNameText">ROOKIE<\/b>/);
+  assert.match(html, /id="editFighterNameBtn"[^>]*aria-label="Edit fighter name"/);
+  assert.match(html, /data-icon-name="edit-fighter-name"/);
+  assert.match(html, /id="fighterNameInput"[^>]*minlength="2"[^>]*maxlength="24"/);
+  assert.match(script, /function normalizeFighterName\(value\)/);
+  assert.match(script, /s\.name=normalizeFighterName\(s\.name\)\|\|defaultState\.name/);
+  assert.match(script, /state\.name=name;setFighterNameEditor\(false\)/);
+  assert.match(script, /\$\('#careerFollowersText'\)\.textContent=fmt\(state\.fans\)/);
+  assert.match(readme, /persistent inline rename editor/);
+});
+
 test('career opponent roster uses proportional two-across collectible fighter cards', () => {
   assert.match(html, /\.opponent-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.opponent\{[^}]*aspect-ratio:2\/3/);
