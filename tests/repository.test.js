@@ -522,6 +522,22 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
   assert.doesNotMatch(script, /price:\d/);
 });
 
+test('the collectible drop pool includes early-career and status cards', () => {
+  for (const item of [
+    ['used-car', 'Used Car'],
+    ['bourbon', 'Small-Batch Bourbon'],
+    ['dog', 'Small Gym Dog'],
+    ['cuban-cigars', 'Cuban Cigars'],
+    ['tennis-shoes', 'Fresh Tennis Shoes'],
+    ['fur-coat', 'Full-Length Fur Coat']
+  ]) {
+    assert.match(script, new RegExp(`id:'${item[0]}'.*name:'${item[1]}'`));
+  }
+  assert.match(script, /id:'used-car'.*rarity:'COMMON'.*minLevel:1/);
+  assert.match(script, /id:'fur-coat'.*rarity:'EPIC'.*minLevel:7/);
+  assert.match(readme, /used car, small-batch bourbon, a small gym dog, Cuban cigars/);
+});
+
 test('daily drop guarantees a deterministic collectible without resetting fight pity', () => {
   const dailyCollectible = script.match(/function awardDailyCollectible\(date\)\{([\s\S]*?)\r?\n\s*\}\r?\n\s*function ensureDailyCounters/)?.[1] || '';
   assert.match(dailyCollectible, /daily-collectible-v1/);

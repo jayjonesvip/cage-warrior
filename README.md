@@ -174,6 +174,10 @@ generated league.
   opens a focused Loadout Full dialog explaining that an equipped item must be
   removed first. Bling, Lifestyle, Property, and Rides provide passive career
   bonuses.
+- The collectible pool also includes early-career and status drops such as a
+  used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
+  shoes, and a full-length fur coat. Each supports an optional same-name PNG
+  override in `assets/` through its stable item ID.
 
 ### Economy and training
 

@@ -184,21 +184,26 @@
     {id:'main-event-kit',category:'Fight Gear',name:'Main Event Ring Gear',icon:'🩳',rarity:'LEGENDARY',minLevel:13,desc:'+8 Speed. Cameras, sponsors, and no cheap fabric.',stat:'speed',bonus:8},
 
     // Bling — increases follower payouts
+    {id:'bourbon',category:'Bling',name:'Small-Batch Bourbon',icon:'🥃',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins. Save it for after the fight.',prestige:1},
     {id:'steel-chain',category:'Bling',name:'Steel Chain',icon:'⛓️',rarity:'RARE',minLevel:2,desc:'+3% followers from fight wins.',prestige:3},
+    {id:'cuban-cigars',category:'Bling',name:'Cuban Cigars',icon:'🚬',rarity:'RARE',minLevel:4,desc:'+5% followers from fight wins. Victory-lounge material.',prestige:5},
     {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+5% followers from fight wins.',prestige:5},
     {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'EPIC',minLevel:5,desc:'+8% followers from fight wins.',prestige:8},
+    {id:'fur-coat',category:'Bling',name:'Full-Length Fur Coat',icon:'🧥',rarity:'EPIC',minLevel:7,desc:'+10% followers from fight wins. Every entrance becomes a photo op.',prestige:10},
     {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% followers from fight wins.',prestige:12},
     {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% followers from fight wins.',prestige:18},
     {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
 
     // Lifestyle — improves passive recovery
-    {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'Better company. +0.03 health every recovery tick.',healthRegen:.03},
+    {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. Roadwork hurts a little less.',energyRegen:.02},
+    {id:'dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'Better company. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
     {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
     {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 energy every recovery tick.',energyRegen:.15},
     {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.20 energy and +0.10 health per tick.',energyRegen:.20,healthRegen:.10},
 
     // Property & rides — money and prestige
+    {id:'used-car',category:'Property & Rides',name:'Used Car',icon:'🚗',rarity:'COMMON',minLevel:1,desc:'+1% fight money. It starts most of the time.',cashBonus:1},
     {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'EPIC',minLevel:5,desc:'+3% fight money. You finally leave the gym couch.',cashBonus:3},
     {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
     {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better recovery.',cashBonus:10,energyRegen:.10,healthRegen:.05},
