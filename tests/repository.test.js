@@ -151,6 +151,7 @@ test('career identity shows followers and fighter renaming unlocks from the top 
   assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
   assert.match(html, /class="identity-name-row"[\s\S]*id="editFighterNameBtn"[^>]*aria-disabled="true"/);
   assert.match(html, /data-icon-name="edit-fighter-name"/);
+  assert.match(css, /\.top-name-edit \.game-icon\{[^}]*width:10px;height:10px[^}]*transform:scaleX\(-1\)/);
   assert.match(html, /id="fighterNameModal"[^>]*aria-hidden="true"/);
   assert.match(html, /id="fighterNameInput"[^>]*minlength="2"[^>]*maxlength="24"/);
   assert.match(script, /function normalizeFighterName\(value\)/);
