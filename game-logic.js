@@ -1,0 +1,152 @@
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  root.CAGE_LOGIC=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+
+  const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const finite=(value,fallback=0)=>{if(value===null||value==='')return fallback;const number=Number(value);return Number.isFinite(number)?number:fallback};
+  const whole=(value,fallback=0)=>Math.floor(finite(value,fallback));
+  const nonNegativeWhole=(value,fallback=0)=>Math.max(0,whole(value,fallback));
+
+  function localDateKey(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(!Number.isFinite(date.getTime()))return '';
+    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  }
+
+  function isBlankCareer(state){
+    if(!state||typeof state!=='object')return true;
+    return !state.fighterCity&&!state.fighterAvatar&&!state.fighterStyle&&
+      nonNegativeWhole(state.level,1)<=1&&nonNegativeWhole(state.xp)===0&&
+      nonNegativeWhole(state.wins)===0&&nonNegativeWhole(state.losses)===0&&
+      (!Array.isArray(state.gear)||state.gear.length===0);
+  }
+
+  function parseStoredState(raw,normalize){
+    if(typeof raw!=='string'||!raw.trim())return null;
+    try{
+      const parsed=JSON.parse(raw);
+      if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return null;
+      return normalize(parsed);
+    }catch(error){return null}
+  }
+
+  function selectStoredState(rawSaves,normalize,fallback){
+    const primary=parseStoredState(rawSaves.primary,normalize);
+    const backup=parseStoredState(rawSaves.backup,normalize);
+    const legacy=parseStoredState(rawSaves.legacy,normalize);
+    if(primary&&isBlankCareer(primary)&&backup&&!isBlankCareer(backup))return backup;
+    return primary||backup||legacy||structuredClone(fallback);
+  }
+
+  function shouldBackupRaw(raw,normalize){
+    const state=parseStoredState(raw,normalize);
+    return !!state&&!isBlankCareer(state);
+  }
+
+  function normalizeCoreState(state,defaults,raw={}){
+    state.level=Math.max(1,whole(state.level,defaults.level));
+    state.xp=Math.max(0,finite(state.xp,defaults.xp));
+    state.cash=Math.max(0,whole(state.cash,defaults.cash));
+    const careerEarnings=Number(raw.careerEarnings),hasLegacyCash=Object.prototype.hasOwnProperty.call(raw,'cash');
+    state.careerEarnings=Number.isFinite(careerEarnings)?Math.max(0,whole(careerEarnings)):hasLegacyCash?state.cash:Math.max(0,whole(defaults.careerEarnings));
+    state.fans=nonNegativeWhole(state.fans,defaults.fans);
+    state.wins=nonNegativeWhole(state.wins,defaults.wins);
+    state.losses=nonNegativeWhole(state.losses,defaults.losses);
+    state.winStreak=nonNegativeWhole(state.winStreak,defaults.winStreak);
+    state.bestStreak=Math.max(state.winStreak,nonNegativeWhole(state.bestStreak,defaults.bestStreak));
+    state.maxEnergy=Math.max(1,finite(state.maxEnergy,defaults.maxEnergy));
+    state.maxHealth=Math.max(1,finite(state.maxHealth,defaults.maxHealth));
+    state.energy=clamp(finite(state.energy,defaults.energy),0,state.maxEnergy);
+    state.health=clamp(finite(state.health,defaults.health),0,state.maxHealth);
+    state.hype=clamp(finite(state.hype,defaults.hype),0,100);
+    const stats=state.stats&&typeof state.stats==='object'&&!Array.isArray(state.stats)?state.stats:{};
+    state.stats={};
+    for(const key of ['power','speed','chin','cardio'])state.stats[key]=Math.max(1,finite(stats[key],defaults.stats[key]));
+    const usableOpponent=entry=>entry&&typeof entry==='object'&&!Array.isArray(entry)&&
+      typeof entry.key==='string'&&entry.key&&typeof entry.name==='string'&&entry.name.trim()&&
+      ['tier','min','power','speed','chin','cardio','reward','fans'].every(key=>Number.isFinite(entry[key]));
+    state.roster=Array.isArray(state.roster)?state.roster.filter(usableOpponent):[];
+    const pending=state.pendingFight;
+    state.pendingFight=pending&&typeof pending==='object'&&typeof pending.key==='string'&&pending.key?{
+      key:pending.key,
+      cost:clamp(whole(pending.cost,15),1,15),
+      startedAt:Math.max(0,finite(pending.startedAt,0))
+    }:null;
+    state.lastSave=Math.max(0,finite(state.lastSave,Date.now()));
+    state.lastDaily=typeof state.lastDaily==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(state.lastDaily)?state.lastDaily:'';
+    return state;
+  }
+
+  function dailyCountersFor(counters,today){
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,train:0,hustle:0,risk:0,publicity:0};
+    return {
+      date:today,
+      train:clamp(nonNegativeWhole(counters.train),0,4),
+      hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
+      risk:clamp(nonNegativeWhole(counters.risk),0,1),
+      publicity:clamp(nonNegativeWhole(counters.publicity),0,2)
+    };
+  }
+
+  function spendEnergy(state,cost){
+    const amount=Math.max(0,finite(cost));
+    if(state.energy<amount)return false;
+    state.energy=clamp(state.energy-amount,0,state.maxEnergy);
+    return true;
+  }
+
+  function bookFight(state,key,cost=15,startedAt=Date.now()){
+    if(state.pendingFight)return {ok:false,reason:'pending'};
+    if(!spendEnergy(state,cost))return {ok:false,reason:'energy'};
+    state.pendingFight={key,cost:Math.max(0,finite(cost)),startedAt:Math.max(0,finite(startedAt))};
+    return {ok:true,reason:''};
+  }
+
+  function trainingQuote(state,action,coach,coachFee,sessionsLeft){
+    const sessions=Math.max(1,nonNegativeWhole(action.sessions,1));
+    const cashCost=coach?Math.max(0,whole(coachFee))*sessions:0;
+    const energyCost=Math.max(0,finite(action.cost));
+    if(sessionsLeft<sessions)return {ok:false,reason:'limit',sessions,cashCost,energyCost};
+    if(state.cash<cashCost)return {ok:false,reason:'cash',sessions,cashCost,energyCost};
+    if(state.energy<energyCost)return {ok:false,reason:'energy',sessions,cashCost,energyCost};
+    return {ok:true,reason:'',sessions,cashCost,energyCost};
+  }
+
+  function trainingGain(baseGain,coach,perfect){return (finite(baseGain)+(coach?1:0))*(perfect?2:1)}
+
+  function payoutForOpponent(opponent,level){
+    const reward=Math.max(0,finite(opponent&&opponent.reward));
+    const tier=Math.max(1,whole(opponent&&opponent.tier,1));
+    const full=!!(opponent&&opponent.championship)||(!(opponent&&opponent.lossesToPlayer)&&tier>=Math.max(1,whole(level,1)));
+    return Math.round(reward*(full?1:.5));
+  }
+
+  function winFightCash({basePurse,hype=0,cashBonus=0,winStreak=0,upset=false,rivalry=false,variance=1}){
+    const streakBonus=Math.min(.25,Math.max(0,nonNegativeWhole(winStreak)-1)*.05);
+    return Math.round(Math.max(0,finite(basePurse))*(1+finite(hype)/130)*(1+finite(cashBonus)/100)*(1+streakBonus+(upset?.25:0)+(rivalry?.15:0))*finite(variance,1));
+  }
+
+  function lossFightCash(basePurse){return Math.round(Math.max(0,finite(basePurse))*.08)}
+
+  function opponentState(opponent,{level,milestones=[],titleOrder=[],hasCity=false}){
+    if(opponent.championship){
+      if(opponent.titleDefeated||milestones.includes(opponent.titleId))return 'former';
+      const index=titleOrder.indexOf(opponent.titleId),previousWon=index<=0||milestones.includes(titleOrder[index-1]);
+      return hasCity&&level>=opponent.tier&&previousWon?'title':'locked';
+    }
+    if(level<opponent.tier)return 'locked';
+    if(level>opponent.tier)return 'passed';
+    return 'current';
+  }
+
+  function opponentGroup(opponent,context){return !opponent.championship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
+  function opponentAvailable(opponent,context){const status=opponentGroup(opponent,context);return ['title','current','passed'].includes(status)||(status==='rival'&&opponent.rematchAccepted===true)}
+  function nextGearPityCount(value){return Math.min(4,nonNegativeWhole(value)+1)}
+  function isGearPity(value){return nonNegativeWhole(value)>=4}
+  function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
+
+  return {clamp,localDateKey,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,trainingQuote,trainingGain,payoutForOpponent,winFightCash,lossFightCash,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+});

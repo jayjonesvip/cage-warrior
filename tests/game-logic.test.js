@@ -1,0 +1,133 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const logic = require('../game-logic.js');
+
+const defaults = {
+  level:1,xp:0,cash:250,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+  energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
+  stats:{power:5,speed:5,chin:5,cardio:5},roster:[],pendingFight:null,lastSave:0,lastDaily:'',
+  fighterCity:'',fighterAvatar:'',fighterStyle:'',gear:[]
+};
+
+function normalize(raw={}){
+  const state=Object.assign(structuredClone(defaults),raw);
+  return logic.normalizeCoreState(state,defaults,raw);
+}
+
+test('a new game loads with valid default resources',()=>{
+  const state=logic.selectStoredState({primary:null,backup:null,legacy:null},normalize,defaults);
+  assert.equal(state.level,1);
+  assert.equal(state.cash,250);
+  assert.equal(state.careerEarnings,0);
+  assert.equal(state.energy,100);
+  assert.equal(state.health,100);
+  assert.deepEqual(state.stats,{power:5,speed:5,chin:5,cardio:5});
+});
+
+test('an older save keeps progression and fills newer resource fields',()=>{
+  const state=normalize({version:4,name:'OLD SAVE',level:4,wins:7,losses:2,cash:900,stats:{power:11}});
+  assert.equal(state.level,4);
+  assert.equal(state.wins,7);
+  assert.equal(state.losses,2);
+  assert.equal(state.careerEarnings,900);
+  assert.deepEqual(state.stats,{power:11,speed:5,chin:5,cardio:5});
+  assert.equal(state.maxEnergy,100);
+  assert.equal(state.health,100);
+});
+
+test('invalid and blank primary saves recover a progressed backup',()=>{
+  const backup=JSON.stringify({name:'BACKUP FIGHTER',level:4,wins:3,fighterCity:'phoenix',fighterAvatar:'fighter-16',fighterStyle:'counter',gear:[]});
+  const invalid=logic.selectStoredState({primary:'{broken',backup,legacy:null},normalize,defaults);
+  const blank=logic.selectStoredState({primary:'{}',backup,legacy:null},normalize,defaults);
+  assert.equal(invalid.name,'BACKUP FIGHTER');
+  assert.equal(blank.name,'BACKUP FIGHTER');
+  assert.equal(blank.level,4);
+});
+
+test('blank or invalid saves never replace a useful backup',()=>{
+  assert.equal(logic.shouldBackupRaw('',normalize),false);
+  assert.equal(logic.shouldBackupRaw('{broken',normalize),false);
+  assert.equal(logic.shouldBackupRaw('{}',normalize),false);
+  assert.equal(logic.shouldBackupRaw(JSON.stringify({level:3,wins:2,fighterCity:'miami'}),normalize),true);
+});
+
+test('resources and counters are clamped during save migration',()=>{
+  const opponent={key:'valid',name:'VALID FIGHTER',tier:2,min:2,power:6,speed:5,chin:5,cardio:6,reward:100,fans:20};
+  const state=normalize({energy:-50,maxEnergy:120,health:999,maxHealth:130,hype:250,cash:-40,fans:-1,stats:{power:-3,speed:'bad',chin:8,cardio:9},roster:[null,{key:'partial'},opponent,'bad'],pendingFight:{key:'rival',cost:900}});
+  assert.equal(state.energy,0);
+  assert.equal(state.health,130);
+  assert.equal(state.hype,100);
+  assert.equal(state.cash,0);
+  assert.equal(state.fans,0);
+  assert.deepEqual(state.stats,{power:1,speed:5,chin:8,cardio:9});
+  assert.deepEqual(state.roster,[opponent]);
+  assert.equal(state.pendingFight.cost,15);
+});
+
+test('fight booking charges energy exactly once and failed charges do not mutate state',()=>{
+  const state={energy:40,maxEnergy:100,pendingFight:null};
+  assert.equal(logic.bookFight(state,'opponent-1',15,1000).ok,true);
+  assert.equal(state.energy,25);
+  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:15,startedAt:1000});
+  assert.equal(logic.bookFight(state,'opponent-1',15,1001).reason,'pending');
+  assert.equal(state.energy,25);
+  state.pendingFight=null;
+  assert.equal(logic.bookFight(state,'opponent-2',30,1002).reason,'energy');
+  assert.equal(state.energy,25);
+});
+
+test('fight and rematch payouts preserve existing formulas',()=>{
+  const newOpponent={reward:200,tier:3,lossesToPlayer:0};
+  const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};
+  assert.equal(logic.payoutForOpponent(newOpponent,3),200);
+  assert.equal(logic.payoutForOpponent(beatenOpponent,3),100);
+  assert.equal(logic.payoutForOpponent({...beatenOpponent,championship:true},3),200);
+  assert.equal(logic.winFightCash({basePurse:200,hype:0,cashBonus:0,winStreak:1,variance:1}),200);
+  assert.equal(logic.lossFightCash(200),16);
+});
+
+test('opponent availability covers current fights, locked titles, and accepted rematches',()=>{
+  const context={level:5,milestones:[],titleOrder:['city','regional','us','world'],hasCity:true};
+  assert.equal(logic.opponentAvailable({tier:5,lossesToPlayer:0},context),true);
+  assert.equal(logic.opponentAvailable({tier:6,lossesToPlayer:0},context),false);
+  assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:false},context),false);
+  assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
+  assert.equal(logic.opponentAvailable({championship:true,titleId:'city',tier:5,titleDefeated:false},context),true);
+  assert.equal(logic.opponentAvailable({championship:true,titleId:'regional',tier:5,titleDefeated:false},context),false);
+});
+
+test('training quote enforces daily, cash, and energy costs before rewards',()=>{
+  const action={cost:20,sessions:2,gain:2};
+  assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');
+  assert.equal(logic.trainingQuote({cash:100,energy:50},action,true,75,4).reason,'cash');
+  assert.equal(logic.trainingQuote({cash:500,energy:10},action,true,75,4).reason,'energy');
+  assert.deepEqual(logic.trainingQuote({cash:500,energy:50},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
+  assert.equal(logic.trainingGain(2,false,false),2);
+  assert.equal(logic.trainingGain(2,true,true),6);
+});
+
+test('gear pity guarantees the fourth win without an earlier drop',()=>{
+  let count=0;
+  for(let win=1;win<=3;win++){
+    count=logic.nextGearPityCount(count);
+    assert.equal(logic.isGearPity(count),false);
+  }
+  count=logic.nextGearPityCount(count);
+  assert.equal(count,4);
+  assert.equal(logic.isGearPity(count),true);
+});
+
+test('endorsement progression exposes only the next unsigned deal',()=>{
+  const ids=['volt','ironhide','apex'];
+  assert.equal(logic.nextEndorsementId(ids,[]),'volt');
+  assert.equal(logic.nextEndorsementId(ids,['volt']),'ironhide');
+  assert.equal(logic.nextEndorsementId(ids,['volt','ironhide','apex']),'');
+});
+
+test('daily counters use local calendar dates, reset once, and clamp tampered limits',()=>{
+  const localDate=new Date(2026,0,2,0,30);
+  const today=logic.localDateKey(localDate);
+  assert.equal(today,'2026-01-02');
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',train:4,hustle:3,risk:1,publicity:2},today),{date:today,train:0,hustle:0,risk:0,publicity:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,train:99,hustle:-4,risk:8,publicity:3},today),{date:today,train:4,hustle:0,risk:1,publicity:2});
+});

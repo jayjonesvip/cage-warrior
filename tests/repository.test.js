@@ -8,6 +8,7 @@ const css = fs.readFileSync('styles.css', 'utf8');
 const html = `${page}\n<style>${css}</style>`;
 const readme = fs.readFileSync('README.md', 'utf8');
 const strings = fs.readFileSync('strings.js', 'utf8');
+const logic = fs.readFileSync('game-logic.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
 const contentContext = {};
 vm.runInNewContext(strings, contentContext);
@@ -15,10 +16,12 @@ const stringsData = contentContext.CAGE_STRINGS;
 
 test('external game assets are linked and the game script parses', () => {
   assert.match(page, /<link rel="stylesheet" href="styles\.css">/);
-  assert.match(page, /<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>/);
+  assert.match(page, /<script src="game-logic\.js"><\/script>\s*<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>/);
   assert.doesNotMatch(page, /<style>|<script>(?!<\/script>)/);
   assert.doesNotThrow(() => new Function(strings));
+  assert.doesNotThrow(() => new Function(logic));
   assert.doesNotThrow(() => new Function(script));
+  assert.match(script, /const LOGIC=globalThis\.CAGE_LOGIC/);
   assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
 });
 
@@ -59,7 +62,8 @@ test('save recovery and one-time league migration remain enabled', () => {
   const stateLoaded = script.indexOf('state = loadState();');
   assert.ok(avatarsReady >= 0 && stateLoaded > avatarsReady, 'saved state must load only after avatar migration data is initialized');
   assert.doesNotMatch(script, /let state = loadState\(\)/);
-  assert.match(script, /if\(primary&&blank\(primary\)&&backup&&!blank\(backup\)\)return backup/);
+  assert.match(script, /LOGIC\.selectStoredState/);
+  assert.match(script, /LOGIC\.shouldBackupRaw/);
 });
 
 test('rematch, taunt, and exhausted-gig states reflect actual state without masking locks', () => {
@@ -78,19 +82,19 @@ test('rematch, taunt, and exhausted-gig states reflect actual state without mask
 });
 
 test('opponents have pro records, persistent rival history, and consent-aware rematches', () => {
-  assert.match(script, /function payoutForOpponent\(o\).*o\.lossesToPlayer.*o\.tier>=state\.level.*\?1:\.5/);
+  assert.match(script, /function payoutForOpponent\(o\)\{return LOGIC\.payoutForOpponent\(o,state\.level\)\}/);
   assert.match(script, /recordInitialized:true/);
   assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
   assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY<\/div>'/);
   assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
-  assert.match(script, /function opponentGroup\(o\).*\(o\.lossesToPlayer\|\|0\)>0\?'rival'/);
+  assert.match(script, /function opponentGroup\(o\)\{return LOGIC\.opponentGroup/);
   assert.match(script, /function opponentAvailable\(o\)/);
   assert.match(script, /TAUNT<br><small>FOR REMATCH<\/small>/);
   assert.match(script, /o\.rematchAccepted=false/);
   assert.match(script, /o\.rematchAccepted=true/);
   assert.doesNotMatch(script, /lossesToPlayer>=o\.retireAt/);
   assert.doesNotMatch(script, /RETIRES AFTER/);
-  assert.match(script, /cash=Math\.round\(basePurse/);
+  assert.match(script, /cash=LOGIC\.winFightCash/);
 });
 
 test('generated fighters draw from broad independently mixed name pools', () => {
@@ -456,12 +460,12 @@ test('cash pays the scaling coach fee while career earnings remain cumulative', 
   assert.doesNotMatch(script, /\$\('#coachTip'\)/);
   assert.match(html, /id="careerEarningsText"/);
   assert.match(script, /function coachFee\(\)\{return 35\+state\.level\*20\}/);
-  assert.match(script, /coachCost=coach\?fee\*a\.sessions:0/);
-  assert.match(script, /state\.cash-=fee/);
+  assert.match(script, /LOGIC\.trainingQuote/);
+  assert.match(script, /state\.cash-=quote\.cashCost/);
   assert.match(script, /function receiveMoney\(amount,career=false\)/);
   assert.match(script, /receiveMoney\(cash,true\)/);
   assert.match(script, /receiveMoney\(cash\);gainXp\(a\.xp\).*shifts left/);
-  assert.match(script, /s\.careerEarnings=Number\.isFinite\(savedCareerEarnings\).*:s\.cash/);
+  assert.match(script, /LOGIC\.normalizeCoreState/);
 });
 
 test('active sponsor appears beneath Cage Rank in the Home hero', () => {
@@ -480,7 +484,7 @@ test('active sponsor appears beneath Cage Rank in the Home hero', () => {
 test('endorsements unlock as one crash-safe sequential offer', () => {
   for (const threshold of [2500, 10000, 30000, 80000, 200000]) assert.match(script, new RegExp(`minFans:${threshold}`));
   assert.match(script, /function nextEndorsementOffer\(\)/);
-  assert.match(script, /endorsementDefs\.find\(d=>!history\.includes\(d\.id\)\)/);
+  assert.match(script, /LOGIC\.nextEndorsementId/);
   assert.match(script, /isNext=!!nextOffer&&nextOffer\.id===d\.id,unlocked=!active&&isNext&&qualified/);
   assert.match(script, /ONLY OFFER AVAILABLE/);
   assert.match(script, /PREVIOUS PARTNER/);
@@ -514,7 +518,7 @@ test('gear is deterministic win loot with pity, title rarity, and non-stacking d
   assert.match(script, /if\(level<=10\)return \[45,36,16,3\]/);
   assert.match(script, /return \[30,40,23,7\]/);
   assert.match(script, /chance=Math\.min\(\.75,\.25\+\(upset\?\.10:0\)\+\(rivalry\?\.10:0\)\+\(ko\?\.05:0\)\)/);
-  assert.match(script, /gearWinsSinceDrop>=4/);
+  assert.match(script, /LOGIC\.isGearPity\(state\.gearWinsSinceDrop\)/);
   assert.match(script, /minRarity=titleWon\?'RARE':'COMMON'/);
   assert.match(script, /state\.gearCounts\[item\.id\]=gearCount\(item\.id\)\+1/);
   assert.match(script, /function ownedBonus\(prop\)\{return state\.gear\.reduce/);

@@ -5,7 +5,8 @@
 Cage Warrior is a mobile-first, single-player fight-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
 The page loads its presentation from `styles.css`, scalable copy pools from
-`strings.js`, and game logic from `game.js`.
+`strings.js`, testable gameplay rules from `game-logic.js`, and browser
+interactions from `game.js`.
 
 ## Current game
 
@@ -204,6 +205,10 @@ National belt progress migrates into the new title ladder. The game also keeps
 a last-known-good backup and refunds energy from an interrupted fight when the
 save is restored. If a blank rookie save is ever written over a progressed
 career, startup prefers the progressed last-known-good backup automatically.
+Invalid JSON and empty save values cannot replace that backup. Save migration
+also clamps resources to their valid ranges, discards malformed roster entries,
+and repairs interrupted-fight booking data before play resumes. Daily rewards
+and activity limits reset on the player's local calendar date.
 
 ### Replaceable icons
 
@@ -222,8 +227,10 @@ Run the repository checks with:
 npm test
 ```
 
-The game uses `index.html`, `styles.css`, `strings.js`, and `game.js` without a
-build step. `strings.js` groups opponent names, fight commentary, Cage Feed
+The game uses `index.html`, `styles.css`, `game-logic.js`, `strings.js`, and
+`game.js` without a build step. `game-logic.js` contains the small shared rule
+helpers used by both the browser and behavioral tests. `strings.js` groups
+opponent names, fight commentary, Cage Feed
 copy, generated social usernames, and promoter ticker lines so new variations
 can be added without editing simulation logic.
 The generated transparent header wordmark lives at
@@ -231,6 +238,7 @@ The generated transparent header wordmark lives at
 standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and
-cover script parsing, save behavior, roster rules, readable text sizing,
-equipment drops, collectible-card presentation, reward reveals, and the
-Cash/Career Earnings economy.
+cover script parsing plus behavioral save recovery and migration, resource
+clamping, fight booking and payouts, rematches, opponent availability, training,
+gear pity, endorsements, daily resets, roster rules, readable text sizing,
+equipment drops, reward reveals, and the Cash/Career Earnings economy.

@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  const LOGIC=globalThis.CAGE_LOGIC;
+  if(!LOGIC)throw new Error('game-logic.js must load before game.js');
   const STRINGS=globalThis.CAGE_STRINGS;
   if(!STRINGS)throw new Error('strings.js must load before game.js');
   function copyText(template,values={}){return String(template).replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(match,key)=>Object.prototype.hasOwnProperty.call(values,key)?String(values[key]):match)}
@@ -8,7 +10,7 @@
 
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
-  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const clamp = LOGIC.clamp;
   const rand = (a,b) => Math.random()*(b-a)+a;
   const rint = (a,b) => Math.floor(rand(a,b+1));
   const fmt = n => Math.floor(n).toLocaleString();
@@ -136,7 +138,7 @@
     if(!o)return;const legacy={wrestle:'control',wrestler:'control',tank:'brawler',cardio:'pressure'},id=legacy[o.archetype]||legacy[o.tendency]||o.archetype||o.tendency,arch=opponentArchetypes.find(a=>a.id===id)||opponentArchetypes[0];o.archetype=arch.id;o.tendency=arch.id;o.tag=arch.tag;o.scout=arch.scout;
   }
   function ensureProfessionalRecord(o){if(!o||o.recordInitialized)return;const seed=hashSeed(o.key||`${o.name}|${o.tier}`);o.wins=(Number(o.wins)||0)+Math.max(1,(Number(o.tier)||1)*2+(seed%7));o.losses=(Number(o.losses)||0)+((seed>>>5)%Math.max(2,(Number(o.tier)||1)+2));o.recordInitialized=true}
-  function payoutForOpponent(o){return Math.round(o.reward*(o.championship||(!(o.lossesToPlayer||0)&&o.tier>=state.level)?1:.5))}
+  function payoutForOpponent(o){return LOGIC.payoutForOpponent(o,state.level)}
   function ensureTitleChampions(){if(!currentCity())return;for(const m of milestoneDefs){let champ=state.roster.find(o=>o.championship&&o.titleId===m.id);if(!champ){champ=generateTitleChampion(m);state.roster.push(champ)}champ.titleName=milestoneName(m);if(state.milestones.includes(m.id))champ.titleDefeated=true}}
   function ensureRoster(){
     if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;const bootstrapPast=!state.leagueInitialized&&state.roster.length===0;
@@ -159,14 +161,10 @@
     return h%fighterSilhouettes.length;
   }
   function silhouetteForOpponent(o){return fighterSilhouettes[spriteIndexForOpponent(o)]}
-  function opponentState(o){
-    if(o.championship){if(o.titleDefeated||state.milestones.includes(o.titleId))return 'former';const index=milestoneDefs.findIndex(m=>m.id===o.titleId),previousWon=index<=0||state.milestones.includes(milestoneDefs[index-1].id);if(currentCity()&&state.level>=o.tier&&previousWon)return 'title';return 'locked'}
-    if(state.level<o.tier)return 'locked';
-    if(state.level>o.tier)return 'passed';
-    return 'current';
-  }
-  function opponentGroup(o){return !o.championship&&(o.lossesToPlayer||0)>0?'rival':opponentState(o)}
-  function opponentAvailable(o){const status=opponentGroup(o);return ['title','current','passed'].includes(status)||(status==='rival'&&o.rematchAccepted===true)}
+  function opponentContext(){return {level:state.level,milestones:state.milestones,titleOrder:milestoneDefs.map(m=>m.id),hasCity:!!currentCity()}}
+  function opponentState(o){return LOGIC.opponentState(o,opponentContext())}
+  function opponentGroup(o){return LOGIC.opponentGroup(o,opponentContext())}
+  function opponentAvailable(o){return LOGIC.opponentAvailable(o,opponentContext())}
 
   const gearItems = [
     // Fight Gear — earned from wins; minLevel controls when an item enters the permanent drop pool.
@@ -247,47 +245,43 @@
   ];
 
   function normalizeState(parsed){
-      const s = Object.assign(structuredClone(defaultState),parsed);
+      const source=parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
+      const s = Object.assign(structuredClone(defaultState),source);
       s.name=normalizeFighterName(s.name)||defaultState.name;
-      s.stats = Object.assign({},defaultState.stats,s.stats||{});
-      const savedCareerEarnings=Number(parsed.careerEarnings);s.cash=Math.max(0,Number(s.cash)||0);s.careerEarnings=Number.isFinite(savedCareerEarnings)?Math.max(0,savedCareerEarnings):s.cash;
+      LOGIC.normalizeCoreState(s,defaultState,source);
       const legacyGear=Array.isArray(s.gear)?s.gear.filter(id=>typeof id==='string'):[];
       const savedCounts=s.gearCounts&&typeof s.gearCounts==='object'&&!Array.isArray(s.gearCounts)?s.gearCounts:{};
       s.gear=[...new Set(legacyGear)];s.gearCounts={};for(const id of s.gear){const legacyCount=legacyGear.filter(x=>x===id).length;s.gearCounts[id]=Math.max(1,legacyCount,Math.floor(Number(savedCounts[id]))||0)}
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
-      s.dailyCounters = Object.assign({},defaultState.dailyCounters,s.dailyCounters||{});
+      s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());
       s.trainerOn = !!s.trainerOn;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);
-      s.socialAccountCreated=typeof parsed.socialAccountCreated==='boolean'?parsed.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=parsed.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(parsed.socialLastReadSerial))||0,0,s.socialSerial);if(!s.socialAccountCreated)s.fans=0;
-      s.winStreak = Math.max(0,Number(s.winStreak)||0);s.bestStreak=Math.max(s.winStreak,Number(s.bestStreak)||0);
-      s.pendingFight = s.pendingFight&&typeof s.pendingFight==='object'?s.pendingFight:null;
+      s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);if(!s.socialAccountCreated)s.fans=0;
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
-      s.roster=Array.isArray(s.roster)?s.roster:[];s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=parsed.leagueInitialized===true;
+      s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
       s.version=13;
       return s;
   }
   function loadState(){
-    const read=key=>{try{const raw=localStorage.getItem(key);return raw?normalizeState(JSON.parse(raw)):null}catch(e){return null}},primary=read(SAVE_KEY),backup=read(SAVE_BACKUP_KEY),legacy=read('fytr-save-v1');
-    const blank=s=>!s||(!s.fighterCity&&!s.fighterAvatar&&!s.fighterStyle&&s.level===1&&s.xp===0&&s.wins===0&&s.losses===0&&s.gear.length===0&&s.careerEarnings===0);
-    if(primary&&blank(primary)&&backup&&!blank(backup))return backup;
-    return primary||backup||legacy||structuredClone(defaultState);
+    const readRaw=key=>{try{return localStorage.getItem(key)}catch(e){return null}};
+    return LOGIC.selectStoredState({primary:readRaw(SAVE_KEY),backup:readRaw(SAVE_BACKUP_KEY),legacy:readRaw('fytr-save-v1')},normalizeState,defaultState);
   }
   function saveState(){
     state.lastSave=Date.now();
     try{
-      const current=localStorage.getItem(SAVE_KEY);if(current){try{JSON.parse(current);localStorage.setItem(SAVE_BACKUP_KEY,current)}catch(e){/* Preserve the existing backup. */}}
+      const current=localStorage.getItem(SAVE_KEY);if(LOGIC.shouldBackupRaw(current,normalizeState))localStorage.setItem(SAVE_BACKUP_KEY,current);
     }catch(e){/* A backup is helpful but must never block the primary save. */}
     try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));saveWarningShown=false}
     catch(e){if(!saveWarningShown){saveWarningShown=true;setTimeout(()=>toast('SAVE FAILED · Check browser storage before closing.','#ff766d'),0)}}
   }
-  function todayKey(){return new Date().toISOString().slice(0,10)}
+  function todayKey(){return LOGIC.localDateKey()}
   function applyOfflineRecovery(){
     const now=Date.now(),last=Number(state.lastSave)||now,elapsed=clamp(now-last,0,8*60*60*1000),ticks=Math.floor(elapsed/15000);
     const oldEnergy=state.energy,oldHealth=state.health;
     if(ticks>0){state.energy=clamp(state.energy+ticks*(.5+ownedBonus('energyRegen')),0,state.maxEnergy);state.health=clamp(state.health+ticks*(.12+ownedBonus('healthRegen')),0,state.maxHealth)}
-    let refunded=0;if(state.pendingFight){refunded=Number(state.pendingFight.cost)||15;state.energy=clamp(state.energy+refunded,0,state.maxEnergy);state.pendingFight=null}
+    let refunded=0;if(state.pendingFight){refunded=clamp(Number(state.pendingFight.cost)||15,1,15);state.energy=clamp(state.energy+refunded,0,state.maxEnergy);state.pendingFight=null}
     const energy=Math.max(0,Math.floor(state.energy)-Math.floor(oldEnergy)),health=Math.max(0,Math.floor(state.health)-Math.floor(oldHealth));
     return energy||health||refunded?{energy,health,refunded}:null;
   }
@@ -332,8 +326,8 @@
   }
   function eligibleGearAtLevel(level,rarity){return gearItems.filter(g=>(g.minLevel||1)<=level&&g.rarity===rarity)}
   function awardDeterministicGearDrop({opponent,upset=false,rivalry=false,titleWon=false,ko=false}){
-    state.gearWinsSinceDrop=Math.min(4,(state.gearWinsSinceDrop||0)+1);
-    const random=seededRandom(hashSeed(`${state.gearSeed}|${state.wins}|${opponent.key}|${state.level}|gear-v1`)),pity=state.gearWinsSinceDrop>=4,chance=Math.min(.75,.25+(upset?.10:0)+(rivalry?.10:0)+(ko?.05:0));
+    state.gearWinsSinceDrop=LOGIC.nextGearPityCount(state.gearWinsSinceDrop);
+    const random=seededRandom(hashSeed(`${state.gearSeed}|${state.wins}|${opponent.key}|${state.level}|gear-v1`)),pity=LOGIC.isGearPity(state.gearWinsSinceDrop),chance=Math.min(.75,.25+(upset?.10:0)+(rivalry?.10:0)+(ko?.05:0));
     if(!titleWon&&!pity&&random()>=chance)return null;
     const minRarity=titleWon?'RARE':'COMMON',minRank=gearRarityOrder.indexOf(minRarity);let rarity=rollGearRarity(state.level,random(),minRarity),rank=gearRarityOrder.indexOf(rarity),pool=eligibleGearAtLevel(state.level,rarity);
     for(let r=rank-1;!pool.length&&r>=minRank;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
@@ -349,8 +343,7 @@
     if(!pool.length)return null;const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
   }
   function ensureDailyCounters(){
-    const today=todayKey();
-    if(!state.dailyCounters||state.dailyCounters.date!==today)state.dailyCounters={date:today,train:0,hustle:0,risk:0,publicity:0};
+    state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,todayKey());
   }
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 35+state.level*20}
@@ -417,7 +410,7 @@
   }
   function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id));$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`Energy and health fully restored. ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
   function closeLevelUp(){const modal=$('#levelUpModal');modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
-  function spendEnergy(n){if(state.energy<n){toast('Not enough energy. It refills over time.','#ff766d');return false}state.energy-=n;return true}
+  function spendEnergy(n){if(!LOGIC.spendEnergy(state,n)){toast('Not enough energy. It refills over time.','#ff766d');return false}return true}
 
   function updateUI(){
     $('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;$('#rankText').textContent=rankName();
@@ -528,7 +521,7 @@
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
-  function nextEndorsementOffer(){const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];return endorsementDefs.find(d=>!history.includes(d.id))||null}
+  function nextEndorsementOffer(){const id=LOGIC.nextEndorsementId(ENDORSEMENT_IDS,state.endorsementHistory);return endorsementDefs.find(d=>d.id===id)||null}
   function requirementText(a){
     const missing=[];
     if(state.level<a.minLevel)missing.push(`LVL ${a.minLevel}`);
@@ -661,11 +654,11 @@
   }
 
   function handleTrain(i){
-    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn,fee=coach?coachFee()*a.sessions:0;
-    if(sessionsLeft('train',4)<a.sessions){toast('No training sessions left today.','#ff766d');return}
-    if(state.cash<fee){toast(`Coach Vega costs $${fee}. Pick up a side job first.`,'#ffcc75');return}
-    if(!spendEnergy(a.cost))return;initAudio();state.cash-=fee;state.dailyCounters.train+=a.sessions;
-    const perfect=Math.random()<(coach?.27:.17),boost=coach?1:0,baseGain=a.gain+boost,gain=baseGain*(perfect?2:1);
+    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn,quote=LOGIC.trainingQuote(state,a,coach,coachFee(),sessionsLeft('train',4));
+    if(quote.reason==='limit'){toast('No training sessions left today.','#ff766d');return}
+    if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
+    if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
+    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect);
     if(a.stat==='spar'){
       const skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,2);skills.forEach(k=>state.stats[k]+=gain);const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));sfx.crit();shake(true);toast(`${perfect?'ELITE SPAR! ':'SPAR COMPLETE! '}+${gain} ${skills[0].toUpperCase()} & ${skills[1].toUpperCase()} · -${d} health`,perfect?'#f4c34a':'#77d13e');
     }else{
@@ -874,10 +867,11 @@
   function closeFightPreview(){if(combatLocked)return;clearFightTimers();$('#fightOverlay').classList.remove('active');fight=null;sfx.tap()}
   function commitFight(o=fight?.o){
     if(!o)return;
+    if(combatLocked||state.pendingFight)return;
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
-    if(!spendEnergy(15))return;
-    initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;state.pendingFight={key:o.key,cost:15,startedAt:Date.now()};
+    const booking=LOGIC.bookFight(state,o.key,15,Date.now());if(!booking.ok){if(booking.reason==='energy')toast('Not enough energy. It refills over time.','#ff766d');return}
+    initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;
     $('#fightOverlay').classList.add('active');showFightStage('openingStage');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();
   }
 
@@ -940,12 +934,12 @@
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;
     const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null,titleWon=false;o.meetings=(o.meetings||0)+1;
     if(win){
-      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);const streakBonus=Math.min(.25,Math.max(0,state.winStreak-1)*.05),upsetBonus=upset?.25:0,rivalryBonus=rivalry?.15:0;cash=Math.round(basePurse*(1+state.hype/130)*(1+ownedBonus('cashBonus')/100)*(1+streakBonus+upsetBonus+rivalryBonus)*rand(.9,1.15));fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
+      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
       titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
       if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${gameIcon(title.iconName,title.icon)} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,`${gameIcon('upset-bonus','⚡')} UPSET BONUS +25%`].filter(Boolean).join(' · ');if(rivalry)loot=[loot,`${gameIcon('rivalry-bonus','🔥')} RIVALRY FIGHT BONUS +15%`].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`${gameIcon('win-streak','🔥')} ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship)ensureRoster()
       $('#resultTitle').textContent=fight.method==='SUBMISSION'?'SUBMISSION WIN!':fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
-      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=Math.round(basePurse*.08);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
+      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
       $('#resultTitle').textContent=fight.cornerTowel?'CORNER STOPPAGE.':fight.haymakerMiss?'KNOCKED OUT.':fight.method==='SUBMISSION'?'SUBMITTED.':fight.method.includes('KO')?'STOPPED.':'DECISION LOSS.';$('#resultTitle').className='loss';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.';
     }
     if(state.activeEndorsement){
