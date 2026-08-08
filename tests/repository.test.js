@@ -494,6 +494,16 @@ test('training includes one paid daily energy recovery treatment', () => {
   assert.match(script, /state\.dailyCounters\.recovery=1/);
 });
 
+test('training and hustle share one live local-midnight reset timer', () => {
+  assert.equal((page.match(/data-daily-reset-clock/g)||[]).length,2);
+  assert.match(page, /DAILY LIMITS RESET IN/);
+  assert.match(page, /YOUR LOCAL MIDNIGHT/);
+  assert.match(script, /function updateDailyResetClocks\(\)/);
+  assert.equal((script.match(/setInterval\(updateDailyResetClocks,1000\)/g)||[]).length,1);
+  assert.match(script, /date!==dailyResetDate/);
+  assert.match(css, /\.daily-reset-clock\{/);
+});
+
 test('endorsements unlock as one crash-safe sequential offer', () => {
   for (const threshold of [2500, 10000, 30000, 80000, 200000]) assert.match(script, new RegExp(`minFans:${threshold}`));
   assert.match(script, /function nextEndorsementOffer\(\)/);

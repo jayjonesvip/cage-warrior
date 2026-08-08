@@ -50,6 +50,7 @@
   const openRosterGroups = new Set(['current']);
   let lastShownEnergy = null;
   let lastShownHealth = null;
+  let dailyResetDate = '';
 
   const planDefs = [
     {id:'pressure',icon:'🌊',name:'PRESSURE FIGHTER',text:'Drown them with pace and volume. Vulnerable to clean counters.'},
@@ -353,6 +354,12 @@
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 35+state.level*20}
   function recoveryFee(){return 40+state.level*15}
+  function updateDailyResetClocks(){
+    const date=todayKey(),clocks=$$('[data-daily-reset-clock]');
+    if(dailyResetDate&&date!==dailyResetDate){dailyResetDate=date;ensureDailyCounters();updateUI();return}
+    dailyResetDate=date;
+    const countdown=LOGIC.formatCountdown(LOGIC.millisecondsUntilNextLocalDay());clocks.forEach(clock=>clock.textContent=countdown);
+  }
 
   function initAudio(){
     if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)()}
@@ -527,6 +534,7 @@
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
     $('#recoveryLimitText').textContent=`${recoveryLeft} TREATMENT${recoveryLeft===1?'':'S'} LEFT`;
     $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const quote=LOGIC.recoveryQuote(state,a,treatmentFee,recoveryLeft<1),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'USED TODAY':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
+    updateDailyResetClocks();
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
   function nextEndorsementOffer(){const id=LOGIC.nextEndorsementId(ENDORSEMENT_IDS,state.endorsementHistory);return endorsementDefs.find(d=>d.id===id)||null}
@@ -1052,6 +1060,7 @@
   },15000);
 
   const tickerLines=STRINGS.ticker;let ti=0;setInterval(()=>{$('#tickerText').textContent=tickerLines[++ti%tickerLines.length]},5200);
+  setInterval(updateDailyResetClocks,1000);
 
   window.addEventListener('resize',drawHero);
   window.addEventListener('beforeunload',saveState);

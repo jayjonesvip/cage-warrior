@@ -204,6 +204,8 @@ generated league.
   day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.
   Treatment costs `$40 + ($15 × fighter level)`, never exceeds the resource
   maximums, and does not consume a training session.
+- Live countdowns on the Training and Hustle pages show the time remaining
+  until their daily limits reset at the player's next local midnight.
 
 ### Persistence
 

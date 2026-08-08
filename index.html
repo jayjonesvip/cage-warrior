@@ -70,6 +70,7 @@
 
     <section class="screen" data-screen="train">
       <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. His per-session fee rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
+      <div class="daily-reset-clock"><span>DAILY LIMITS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily training limits reset">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">1 TREATMENT LEFT</span></div><div class="action-list" id="recoveryActions"></div></div>
       <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health. One paid recovery treatment is available each day.</div>
@@ -81,6 +82,7 @@
     </section>
 
     <section class="screen" data-screen="hustle">
+      <div class="daily-reset-clock"><span>DAILY LIMITS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily hustle limits reset">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Make Ends Meet <span class="limit-pill" id="hustleLimitText">3 SHIFTS LEFT</span></div><div class="action-list" id="hustleActions"></div></div>
       <div class="card"><div class="card-title">Underground Buzz <span class="limit-pill" id="riskLimitText">1 RISK LEFT</span></div><div class="action-list" id="riskActions"></div></div>
       <div class="card career-card"><div class="card-title">Career Spotlight <span class="limit-pill" id="publicityLimitText">2 GIGS LEFT</span></div><div class="action-list" id="publicityActions"></div></div>

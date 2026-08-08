@@ -157,3 +157,11 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',train:4,hustle:3,risk:1,publicity:2,recovery:1},today),{date:today,train:0,hustle:0,risk:0,publicity:0,recovery:0});
   assert.deepEqual(logic.dailyCountersFor({date:today,train:99,hustle:-4,risk:8,publicity:3,recovery:9},today),{date:today,train:4,hustle:0,risk:1,publicity:2,recovery:1});
 });
+
+test('daily reset countdown targets the next local midnight',()=>{
+  const now=new Date(2026,7,8,21,34,56,250),next=new Date(2026,7,9,0,0,0,0);
+  assert.equal(logic.millisecondsUntilNextLocalDay(now),next-now);
+  assert.equal(logic.formatCountdown(next-now),'02:25:04');
+  assert.equal(logic.formatCountdown(999),'00:00:01');
+  assert.equal(logic.millisecondsUntilNextLocalDay('not-a-date'),0);
+});

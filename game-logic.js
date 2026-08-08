@@ -16,6 +16,19 @@
     return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   }
 
+  function millisecondsUntilNextLocalDay(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(!Number.isFinite(date.getTime()))return 0;
+    const next=new Date(date.getFullYear(),date.getMonth(),date.getDate()+1);
+    return Math.max(0,next.getTime()-date.getTime());
+  }
+
+  function formatCountdown(milliseconds){
+    const totalSeconds=Math.max(0,Math.ceil(finite(milliseconds)/1000));
+    const hours=Math.floor(totalSeconds/3600),minutes=Math.floor(totalSeconds%3600/60),seconds=totalSeconds%60;
+    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  }
+
   function isBlankCareer(state){
     if(!state||typeof state!=='object')return true;
     return !state.fighterCity&&!state.fighterAvatar&&!state.fighterStyle&&
@@ -181,5 +194,5 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
 });
