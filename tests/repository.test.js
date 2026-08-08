@@ -436,6 +436,21 @@ test('equipping fight gear triggers the collectible-card burst before rerenderin
   assert.match(script, /setTimeout\(updateUI,680\)/);
 });
 
+test('a full fight-gear loadout opens an accessible styled dialog', () => {
+  assert.match(page, /id="loadoutFullModal" aria-hidden="true"/);
+  assert.match(page, /role="dialog" aria-modal="true" aria-labelledby="loadoutFullTitle" aria-describedby="loadoutFullDescription"/);
+  assert.match(page, /id="loadoutFullOk" type="button">OK<\/button>/);
+  assert.match(css, /\.loadout-dialog\{text-align:center/);
+  assert.match(css, /\.loadout-dialog \.modal-actions\.single-action\{grid-template-columns:1fr\}/);
+  assert.match(script, /if\(state\.equippedGear\.length>=4\)\{openLoadoutFullDialog\(trigger\);return\}/);
+  assert.doesNotMatch(script, /toast\('Loadout full\./);
+  assert.match(script, /function openLoadoutFullDialog\(trigger\)/);
+  assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#loadoutFullOk'\)\.focus\(\)\)/);
+  assert.match(script, /function closeLoadoutFullDialog\(\)/);
+  assert.match(script, /\$\('#loadoutFullOk'\)\.addEventListener\('click',closeLoadoutFullDialog\)/);
+  assert.match(script, /e\.key==='Escape'/);
+});
+
 test('cash pays the scaling coach fee while career earnings remain cumulative', () => {
   assert.doesNotMatch(html, /Coach's Board|id="coachTip"/);
   assert.doesNotMatch(script, /\$\('#coachTip'\)/);

@@ -170,8 +170,10 @@ generated league.
   item's perk.
 - Owned items appear as fixed 2:3 collectible cards, two across on mobile,
   with full-card Common, Rare, Epic, and Legendary treatments.
-- Fight Gear uses a four-slot active loadout. Bling, Lifestyle, Property, and
-  Rides provide passive career bonuses.
+- Fight Gear uses a four-slot active loadout. Attempting to equip a fifth item
+  opens a focused Loadout Full dialog explaining that an equipped item must be
+  removed first. Bling, Lifestyle, Property, and Rides provide passive career
+  bonuses.
 
 ### Economy and training
 
