@@ -76,7 +76,16 @@ generated league.
 - When condition falls to 25% or lower between rounds, the corner presents a
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it
-  results in an immediate knockout loss.
+  results in an immediate knockout loss. A haymaker costs 5 additional energy
+  beyond the energy reserved for any rounds still to come.
+- Three-round fight clearance requires 30 energy. The game charges 10 energy
+  only when each round actually begins, so a first-round finish costs 10, a
+  second-round finish costs 20, and a fight that reaches Round 3 costs 30.
+- If the player's corner has them behind on the unofficial scorecards with ten
+  seconds left in Round 3, the action pauses for one last decision: stay
+  disciplined or spend 5 additional energy on a haymaker. Landing can score a
+  dramatic knockdown, steal the decision, or produce a last-second knockout;
+  missing leaves the fighter open to an immediate counter knockout.
 - Watch fights normally or use 2× speed. There is no result skip: every
   surviving round requires its corner decision.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
@@ -128,9 +137,9 @@ generated league.
   immediately available.
 - Regular opponents never retire. Every defeated fighter persists in the
   **Past Rivals** collection. A free **Taunt for Rematch** guarantees that rival
-  accepts one more fight; the bout costs the normal 15 energy, pays half purse,
-  and retains full fight XP. Winning closes the offer until another taunt, while
-  losing keeps the rematch immediately available.
+  accepts one more fight; the bout uses the normal 10-energy-per-started-round
+  cost, pays half purse, and retains full fight XP. Winning closes the offer
+  until another taunt, while losing keeps the rematch immediately available.
 - The Career Opponents roster shows available current and past opponents, past
   rivals, former champions, and a locked preview of the next level. The
   current-level group starts open; all other groups start
@@ -145,10 +154,10 @@ generated league.
   a separate action and does not trigger the flip.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
-  spends no energy and emphasizes the purse with the 15-energy requirement
-  directly beneath it, above your fighter card and the opponent's card. It then
-  offers **Go Back** or **Fight!**; energy is charged only after Fight is
-  confirmed and the cage-opening choice begins.
+  spends no energy and explains the 30-energy clearance, 10-energy round cost,
+  and optional 5-energy haymaker reserve directly beneath the purse. It then
+  offers **Go Back** or **Fight!**; the first round's energy is charged only
+  after Fight is confirmed and the cage-opening choice begins.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.
@@ -191,6 +200,10 @@ generated league.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
   better perfect-session chance. His fee is `$35 + ($20 × fighter level)` per
   session; two-session sparring pays twice the fee.
+- The Training page also has a Recovery Room with one paid treatment per local
+  day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.
+  Treatment costs `$40 + ($15 × fighter level)`, never exceeds the resource
+  maximums, and does not consume a training session.
 
 ### Persistence
 

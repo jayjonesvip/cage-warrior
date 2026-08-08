@@ -61,19 +61,26 @@ test('resources and counters are clamped during save migration',()=>{
   assert.equal(state.fans,0);
   assert.deepEqual(state.stats,{power:1,speed:5,chin:8,cardio:9});
   assert.deepEqual(state.roster,[opponent]);
-  assert.equal(state.pendingFight.cost,15);
+  assert.equal(state.pendingFight.cost,35);
 });
 
-test('fight booking charges energy exactly once and failed charges do not mutate state',()=>{
+test('fight booking charges ten per started round and protects the scheduled reserve',()=>{
   const state={energy:40,maxEnergy:100,pendingFight:null};
-  assert.equal(logic.bookFight(state,'opponent-1',15,1000).ok,true);
-  assert.equal(state.energy,25);
-  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:15,startedAt:1000});
-  assert.equal(logic.bookFight(state,'opponent-1',15,1001).reason,'pending');
-  assert.equal(state.energy,25);
+  assert.equal(logic.bookFight(state,'opponent-1',10,1000,30).ok,true);
+  assert.equal(state.energy,30);
+  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:10,startedAt:1000});
+  assert.equal(logic.bookFight(state,'opponent-1',10,1001,30).reason,'pending');
+  assert.equal(logic.chargePendingFightEnergy(state,10),true);
+  assert.equal(logic.chargePendingFightEnergy(state,10),true);
+  assert.equal(state.energy,10);
+  assert.equal(state.pendingFight.cost,30);
+  assert.equal(logic.availableFightEnergy(state,0,10),10);
+  assert.equal(logic.chargePendingFightEnergy(state,5),true);
+  assert.equal(state.pendingFight.cost,35);
+  assert.equal(state.energy,5);
   state.pendingFight=null;
-  assert.equal(logic.bookFight(state,'opponent-2',30,1002).reason,'energy');
-  assert.equal(state.energy,25);
+  assert.equal(logic.bookFight(state,'opponent-2',10,1002,30).reason,'energy');
+  assert.equal(state.energy,5);
 });
 
 test('fight and rematch payouts preserve existing formulas',()=>{
@@ -106,6 +113,25 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingGain(2,true,true),6);
 });
 
+test('recovery treatments share one daily use and clamp restored resources',()=>{
+  const ice={energy:25,health:0},sauna={energy:15,health:12},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
+  assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');
+  assert.equal(logic.recoveryQuote({...state,cash:40},ice,55,false).reason,'cash');
+  assert.equal(logic.recoveryQuote({cash:100,energy:100,maxEnergy:100,health:100,maxHealth:100},sauna,55,false).reason,'full');
+  assert.equal(logic.recoveryQuote(state,sauna,55,false).ok,true);
+  assert.deepEqual(logic.applyRecovery(state,sauna),{energy:15,health:6});
+  assert.equal(state.energy,97);
+  assert.equal(state.health,100);
+});
+
+test('score helpers expose a trailing player for the final-ten-second decision',()=>{
+  const rounds=[{scoreP:9,scoreO:10},{scoreP:10,scoreO:9},{scoreP:9,scoreO:10}];
+  assert.deepEqual(logic.fightScore(rounds),{player:28,opponent:29});
+  assert.equal(logic.playerTrailing(rounds),true);
+  rounds[2]={scoreP:10,scoreO:8};
+  assert.equal(logic.playerTrailing(rounds),false);
+});
+
 test('gear pity guarantees the fourth win without an earlier drop',()=>{
   let count=0;
   for(let win=1;win<=3;win++){
@@ -128,6 +154,6 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',train:4,hustle:3,risk:1,publicity:2},today),{date:today,train:0,hustle:0,risk:0,publicity:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,train:99,hustle:-4,risk:8,publicity:3},today),{date:today,train:4,hustle:0,risk:1,publicity:2});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',train:4,hustle:3,risk:1,publicity:2,recovery:1},today),{date:today,train:0,hustle:0,risk:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,train:99,hustle:-4,risk:8,publicity:3,recovery:9},today),{date:today,train:4,hustle:0,risk:1,publicity:2,recovery:1});
 });

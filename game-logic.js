@@ -72,7 +72,7 @@
     const pending=state.pendingFight;
     state.pendingFight=pending&&typeof pending==='object'&&typeof pending.key==='string'&&pending.key?{
       key:pending.key,
-      cost:clamp(whole(pending.cost,15),1,15),
+      cost:clamp(whole(pending.cost,15),1,35),
       startedAt:Math.max(0,finite(pending.startedAt,0))
     }:null;
     state.lastSave=Math.max(0,finite(state.lastSave,Date.now()));
@@ -81,13 +81,14 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,train:0,hustle:0,risk:0,publicity:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,train:0,hustle:0,risk:0,publicity:0,recovery:0};
     return {
       date:today,
       train:clamp(nonNegativeWhole(counters.train),0,4),
       hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
       risk:clamp(nonNegativeWhole(counters.risk),0,1),
-      publicity:clamp(nonNegativeWhole(counters.publicity),0,2)
+      publicity:clamp(nonNegativeWhole(counters.publicity),0,2),
+      recovery:clamp(nonNegativeWhole(counters.recovery),0,1)
     };
   }
 
@@ -98,11 +99,24 @@
     return true;
   }
 
-  function bookFight(state,key,cost=15,startedAt=Date.now()){
+  function bookFight(state,key,cost=15,startedAt=Date.now(),requiredEnergy=cost){
     if(state.pendingFight)return {ok:false,reason:'pending'};
+    if(state.energy<Math.max(cost,finite(requiredEnergy,cost)))return {ok:false,reason:'energy'};
     if(!spendEnergy(state,cost))return {ok:false,reason:'energy'};
     state.pendingFight={key,cost:Math.max(0,finite(cost)),startedAt:Math.max(0,finite(startedAt))};
     return {ok:true,reason:''};
+  }
+
+  function chargePendingFightEnergy(state,cost){
+    if(!state.pendingFight)return false;
+    const amount=Math.max(0,finite(cost));
+    if(!spendEnergy(state,amount))return false;
+    state.pendingFight.cost=Math.max(0,finite(state.pendingFight.cost))+amount;
+    return true;
+  }
+
+  function availableFightEnergy(state,roundsRemaining,roundCost=10){
+    return Math.max(0,finite(state.energy)-nonNegativeWhole(roundsRemaining)*Math.max(0,finite(roundCost)));
   }
 
   function trainingQuote(state,action,coach,coachFee,sessionsLeft){
@@ -117,6 +131,22 @@
 
   function trainingGain(baseGain,coach,perfect){return (finite(baseGain)+(coach?1:0))*(perfect?2:1)}
 
+  function recoveryQuote(state,treatment,fee,used){
+    const cashCost=Math.max(0,whole(fee)),energyGain=Math.max(0,finite(treatment.energy)),healthGain=Math.max(0,finite(treatment.health));
+    if(used)return {ok:false,reason:'limit',cashCost,energyGain,healthGain};
+    if(state.cash<cashCost)return {ok:false,reason:'cash',cashCost,energyGain,healthGain};
+    const energyRoom=Math.max(0,finite(state.maxEnergy)-finite(state.energy)),healthRoom=Math.max(0,finite(state.maxHealth)-finite(state.health));
+    if(Math.min(energyRoom,energyGain)+Math.min(healthRoom,healthGain)<=0)return {ok:false,reason:'full',cashCost,energyGain,healthGain};
+    return {ok:true,reason:'',cashCost,energyGain,healthGain};
+  }
+
+  function applyRecovery(state,treatment){
+    const beforeEnergy=state.energy,beforeHealth=state.health;
+    state.energy=clamp(finite(state.energy)+Math.max(0,finite(treatment.energy)),0,state.maxEnergy);
+    state.health=clamp(finite(state.health)+Math.max(0,finite(treatment.health)),0,state.maxHealth);
+    return {energy:state.energy-beforeEnergy,health:state.health-beforeHealth};
+  }
+
   function payoutForOpponent(opponent,level){
     const reward=Math.max(0,finite(opponent&&opponent.reward));
     const tier=Math.max(1,whole(opponent&&opponent.tier,1));
@@ -130,6 +160,9 @@
   }
 
   function lossFightCash(basePurse){return Math.round(Math.max(0,finite(basePurse))*.08)}
+
+  function fightScore(rounds){return (Array.isArray(rounds)?rounds:[]).reduce((score,round)=>({player:score.player+finite(round.scoreP),opponent:score.opponent+finite(round.scoreO)}),{player:0,opponent:0})}
+  function playerTrailing(rounds){const score=fightScore(rounds);return score.player<score.opponent}
 
   function opponentState(opponent,{level,milestones=[],titleOrder=[],hasCity=false}){
     if(opponent.championship){
@@ -148,5 +181,5 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,trainingQuote,trainingGain,payoutForOpponent,winFightCash,lossFightCash,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
 });

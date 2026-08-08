@@ -34,7 +34,7 @@
 
   <main class="main">
     <section class="screen active" data-screen="home">
-      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: every fight burns 15 energy. No gas, no payday.</span></div></div>
+      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.</span></div></div>
 
       <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Avatar</small><b id="homeAvatarText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
@@ -71,11 +71,12 @@
     <section class="screen" data-screen="train">
       <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. His per-session fee rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
-      <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health.</div>
+      <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">1 TREATMENT LEFT</span></div><div class="action-list" id="recoveryActions"></div></div>
+      <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health. One paid recovery treatment is available each day.</div>
     </section>
 
     <section class="screen" data-screen="fight">
-      <div class="card"><div class="card-title">Career Opponents <small id="rosterSummary">15 energy per fight</small></div><div id="opponentList"></div></div>
+      <div class="card"><div class="card-title">Career Opponents <small id="rosterSummary">10 energy per round</small></div><div id="opponentList"></div></div>
       <div class="section-note">Preview an opponent's Tale of the Tape, confirm the fight, then choose Aggressive or Feel Them Out for Round 1. Between rounds, stay with your signature or meet them in their revealed style.</div>
     </section>
 
@@ -159,7 +160,7 @@
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
-          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy">15 ENERGY REQUIRED</span></div>
+          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy">30 ENERGY CLEARANCE · 10 PER ROUND</span><em class="tape-haymaker">KEEP 5 EXTRA FOR A HAYMAKER</em></div>
           <div class="tape-versus-cards">
             <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div><div class="tape-mini-stats"><span id="tapePPower">PWR 5</span><span id="tapePSpeed">SPD 5</span><span id="tapePChin">CHN 5</span><span id="tapePCardio">CAR 5</span></div></article>
             <div class="tape-vs-badge">VS</div>

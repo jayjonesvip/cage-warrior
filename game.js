@@ -27,7 +27,7 @@
     version:13,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0},
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0,recovery:0},
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,
     pendingFight:null,
@@ -226,6 +226,11 @@
   const riskDefs = [
     {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]}
   ];
+  const recoveryDefs = [
+    {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0},
+    {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12}
+  ];
+  const FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3,FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST*FIGHT_ROUNDS,HAYMAKER_ENERGY=5;
 
   const publicityDefs = [
     {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
@@ -281,7 +286,7 @@
     const now=Date.now(),last=Number(state.lastSave)||now,elapsed=clamp(now-last,0,8*60*60*1000),ticks=Math.floor(elapsed/15000);
     const oldEnergy=state.energy,oldHealth=state.health;
     if(ticks>0){state.energy=clamp(state.energy+ticks*(.5+ownedBonus('energyRegen')),0,state.maxEnergy);state.health=clamp(state.health+ticks*(.12+ownedBonus('healthRegen')),0,state.maxHealth)}
-    let refunded=0;if(state.pendingFight){refunded=clamp(Number(state.pendingFight.cost)||15,1,15);state.energy=clamp(state.energy+refunded,0,state.maxEnergy);state.pendingFight=null}
+    let refunded=0;if(state.pendingFight){refunded=clamp(Number(state.pendingFight.cost)||15,1,35);state.energy=clamp(state.energy+refunded,0,state.maxEnergy);state.pendingFight=null}
     const energy=Math.max(0,Math.floor(state.energy)-Math.floor(oldEnergy)),health=Math.max(0,Math.floor(state.health)-Math.floor(oldHealth));
     return energy||health||refunded?{energy,health,refunded}:null;
   }
@@ -347,6 +352,7 @@
   }
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 35+state.level*20}
+  function recoveryFee(){return 40+state.level*15}
 
   function initAudio(){
     if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)()}
@@ -515,10 +521,12 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',4),coach=state.trainerOn,fee=coachFee();
+    const left=sessionsLeft('train',4),coach=state.trainerOn,fee=coachFee(),recoveryLeft=sessionsLeft('recovery',1),treatmentFee=recoveryFee();
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
     const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
+    $('#recoveryLimitText').textContent=`${recoveryLeft} TREATMENT${recoveryLeft===1?'':'S'} LEFT`;
+    $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const quote=LOGIC.recoveryQuote(state,a,treatmentFee,recoveryLeft<1),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'USED TODAY':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
   function nextEndorsementOffer(){const id=LOGIC.nextEndorsementId(ENDORSEMENT_IDS,state.endorsementHistory);return endorsementDefs.find(d=>d.id===id)||null}
@@ -593,7 +601,7 @@
         </div>
       </article>`;
     };
-    const groups=[['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'],['current','AVAILABLE · YOUR LEVEL','FULL PURSE · 15 ENERGY'],['passed','AVAILABLE · PAST LEVELS','HALF PURSE · 15 ENERGY'],['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'],['former','FORMER CHAMPIONS','TITLE HISTORY'],['locked','LOCKED · UPCOMING','NEXT LEVEL PREVIEW']];
+    const groups=[['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'],['current','AVAILABLE · YOUR LEVEL','FULL PURSE · 10 ENERGY / ROUND'],['passed','AVAILABLE · PAST LEVELS','HALF PURSE · 10 ENERGY / ROUND'],['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'],['former','FORMER CHAMPIONS','TITLE HISTORY'],['locked','LOCKED · UPCOMING','NEXT LEVEL PREVIEW']];
     $('#opponentList').innerHTML=groups.map(([status,label,meta])=>{const cards=opponents.filter(o=>opponentGroup(o)===status),expanded=openRosterGroups.has(status);return cards.length?`<section class="roster-section" data-roster-section="${status}"><button class="roster-group" type="button" data-roster-toggle="${status}" aria-expanded="${expanded}"><span>${label}<b class="roster-count">${cards.length}</b></span><small>${meta}<i class="roster-chevron" aria-hidden="true">${expanded?'−':'+'}</i></small></button><div class="opponent-grid" ${expanded?'':'hidden'}>${cards.map(renderCard).join('')}</div></section>`:''}).join('');
   }
   function toggleRosterGroup(button){if(!button)return;const status=button.dataset.rosterToggle,section=button.closest('[data-roster-section]'),grid=section?.querySelector('.opponent-grid'),expanded=button.getAttribute('aria-expanded')==='true',next=!expanded;if(!grid)return;if(next)openRosterGroups.add(status);else openRosterGroups.delete(status);button.setAttribute('aria-expanded',String(next));grid.hidden=!next;const chevron=button.querySelector('.roster-chevron');if(chevron)chevron.textContent=next?'−':'+';sfx.tap()}
@@ -665,6 +673,13 @@
       state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
     }
     updateUI();
+  }
+  function handleRecovery(i){
+    ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(),quote=LOGIC.recoveryQuote(state,treatment,fee,sessionsLeft('recovery',1)<1);
+    if(quote.reason==='limit'){toast('Recovery room treatment already used today.','#ff766d');return}
+    if(quote.reason==='cash'){toast(`Recovery treatment costs $${fee}. Pick up a side job first.`,'#ffcc75');return}
+    if(quote.reason==='full'){toast('Your energy and health are already full.','#78dfff');return}
+    state.cash-=quote.cashCost;state.dailyCounters.recovery=1;const restored=LOGIC.applyRecovery(state,treatment);initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
   function handleHustle(i){
     ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
@@ -754,7 +769,7 @@
   function fighterLabel(side){return side==='player'?state.name:fight.o.name}
   function scheduleFight(fn,delay){const id=setTimeout(fn,Math.max(40,delay/fightSpeed));fightTimers.push(id);return id}
   function clearFightTimers(){fightTimers.forEach(clearTimeout);fightTimers=[]}
-  function fightClock(exchange,total){const seconds=Math.max(8,300-Math.round((exchange/Math.max(1,total))*292));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
+  function fightClock(exchange,total){const seconds=Math.max(12,300-Math.round((exchange/Math.max(1,total))*288));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
 
   function commentaryFor(type,attacker,defender,landed,big=false){
     const list=STRINGS.fightCommentary[landed?'hit':'miss'][type],template=list[rint(0,list.length-1)];return copyText(template,{A:attacker.name,D:defender.name});
@@ -763,7 +778,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false};
+    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false};
   }
 
   function planFamiliarity(styleId,planId){
@@ -841,16 +856,19 @@
       }
       const pMetric=rs.player.damage*1.35+rs.player.landed+rs.player.takedowns*5+rs.player.control/12+rs.player.kd*14,oMetric=rs.opp.damage*1.35+rs.opp.landed+rs.opp.takedowns*5+rs.opp.control/12+rs.opp.kd*14;
       if(pMetric>=oMetric){rs.scoreP=10;rs.scoreO=(pMetric-oMetric>20||rs.player.kd>rs.opp.kd)?8:9}else{rs.scoreO=10;rs.scoreP=(oMetric-pMetric>20||rs.opp.kd>rs.player.kd)?8:9}
-      addFightStats(sim.totals.player,rs.player);addFightStats(sim.totals.opp,rs.opp);sim.rounds.push(rs);if(!stopped)sim.timeline.push({type:'roundEnd',round,clock:'0:00',text:`Round ${round} ends. The corner teams rush in.`,className:'round-end',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
-    if(round===3&&!sim.winner){const pScore=sim.rounds.reduce((n,r)=>n+r.scoreP,0),oScore=sim.rounds.reduce((n,r)=>n+r.scoreO,0);sim.winner=pScore>=oScore?'player':'opp';const margin=Math.abs(pScore-oScore);sim.method=margin<=1&&Math.random()<.45?'SPLIT DECISION':'UNANIMOUS DECISION';sim.finishRound=3;sim.finishClock='0:00'}
+      addFightStats(sim.totals.player,rs.player);addFightStats(sim.totals.opp,rs.opp);sim.rounds.push(rs);
+      if(!stopped&&round===3&&!sim.crisisUsed&&LOGIC.playerTrailing(sim.rounds)){sim.finalDecisionPending=true;sim.timeline.push({type:'lastChance',round:3,clock:'0:10'})}
+      if(!stopped)sim.timeline.push({type:'roundEnd',round,clock:'0:00',text:`Round ${round} ends. The corner teams rush in.`,className:'round-end',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
+    if(round===3&&!sim.winner&&!sim.finalDecisionPending)settleFightDecision(sim)
   }
+  function settleFightDecision(sim){const score=LOGIC.fightScore(sim.rounds),margin=Math.abs(score.player-score.opponent);sim.winner=score.player>=score.opponent?'player':'opp';sim.method=margin<=1&&Math.random()<.45?'SPLIT DECISION':'UNANIMOUS DECISION';sim.finishRound=3;sim.finishClock='0:00';sim.finalDecisionPending=false}
 
   function fillTape(f){
-    const cleared=state.energy>=15&&state.health>=20;
+    const cleared=state.energy>=FIGHT_CLEARANCE_ENERGY&&state.health>=20;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);
     $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<15?'YOU NEED 15 ENERGY TO FIGHT':'';
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio);
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.`;
   }
@@ -870,7 +888,7 @@
     if(combatLocked||state.pendingFight)return;
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
-    const booking=LOGIC.bookFight(state,o.key,15,Date.now());if(!booking.ok){if(booking.reason==='energy')toast('Not enough energy. It refills over time.','#ff766d');return}
+    const booking=LOGIC.bookFight(state,o.key,FIGHT_ROUND_COST,Date.now(),FIGHT_CLEARANCE_ENERGY);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${FIGHT_CLEARANCE_ENERGY} energy for three-round clearance.`,'#ff766d');return}
     initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;
     $('#fightOverlay').classList.add('active');showFightStage('openingStage');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();
   }
@@ -879,6 +897,8 @@
     const signature=state.fighterStyle||'pressure',opponentStyle=fight?.o.tendency||signature,sameStyle=signature===opponentStyle,ids=sameStyle?[signature]:[signature,opponentStyle],choices=ids.map(id=>{const plan=planDefs.find(p=>p.id===id)||planDefs[0],isSignature=id===signature,matchup=matchupEdge(id,opponentStyle),familiarity=planFamiliarity(signature,id),badges=[];if(isSignature)badges.push('<span class="plan-badge signature">YOUR SIGNATURE</span>');else{badges.push('<span class="plan-badge unfamiliar">THEIR STYLE</span>');if(familiarity<=-.08)badges.push('<span class="plan-badge risky">OUTSIDE YOUR DISCIPLINE</span>')}if(fight?.deepRead&&matchup>=.08)badges.push('<span class="plan-badge good">TACTICAL EDGE</span>');else if(fight?.deepRead&&matchup<=-.08)badges.push('<span class="plan-badge risky">TACTICAL RISK</span>');return {plan,isSignature,badges,label:isSignature?'FIGHT YOUR WAY':`ADAPT TO ${plan.name}`}});const descriptions=choices.map(({plan,isSignature,badges})=>`<div class="corner-style-option"><div class="corner-style-head"><b>${isSignature?'YOUR STYLE':'THEIR STYLE'} · ${plan.name}</b>${badges.length?`<span class="plan-badges">${badges.join('')}</span>`:''}</div><p>${sameStyle?`You both use this archetype. Stay disciplined with the style you know.`:plan.text}</p></div>`).join(''),buttons=choices.map(({plan,isSignature,label})=>`<button class="plan-btn ${isSignature?'signature':'mirror'}" data-fight-plan="${plan.id}" data-plan-context="corner">${label}</button>`).join('');container.innerHTML=`<div class="corner-style-options">${descriptions}</div><div class="plan-grid">${buttons}</div>`
   }
   function haymakerChance(sim){return clamp(.34+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.20,.68)}
+  function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
+  function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,FIGHT_ROUND_COST)>=HAYMAKER_ENERGY}
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
   }
@@ -886,24 +906,37 @@
     if(!fight||fight.winner||fight.rounds.length>=3){finishFightSimulation();return}
     const next=fight.rounds.length+1,box=$('#cornerChoice'),crisisThreshold=25;
     if(fight.playerCondition<=crisisThreshold&&!fight.crisisUsed){
-      const chance=Math.round(haymakerChance(fight)*100);
-      box.innerHTML=`<div class="corner-panel crisis-panel"><h3>${gameIcon('corner-danger','🚨')} ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>${gameIcon('corner-towel','🏳️')} THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker"><b>${gameIcon('corner-haymaker','💥')} THROW A HAYMAKER</b><small>${chance}% chance to land. Miss and you are knocked out.</small></button></div></div>`;
+      const chance=Math.round(haymakerChance(fight)*100),roundsToReserve=FIGHT_ROUNDS-next+1,canHaymaker=haymakerEnergyAvailable(roundsToReserve);
+      box.innerHTML=`<div class="corner-panel crisis-panel"><h3>${gameIcon('corner-danger','🚨')} ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>${gameIcon('corner-towel','🏳️')} THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker" ${canHaymaker?'':'disabled'}><b>${gameIcon('corner-haymaker','💥')} THROW A HAYMAKER</b><small>${canHaymaker?`${chance}% chance · ${HAYMAKER_ENERGY} extra energy. Miss and you are knocked out.`:`Need ${HAYMAKER_ENERGY} energy beyond the remaining round reserve.`}</small></button></div></div>`;
       return;
     }
     const style=fighterStyles.find(s=>s.id===fight.o.tendency),read=fight.tendencyRevealed&&next===2?`<div class="tendency-read"><b>${gameIcon('tendency-revealed','👁️')} ${fight.deepRead?'DEEP READ':'TENDENCY REVEALED'} · ${style?.name||fight.o.tag}</b>${fight.deepRead?`${fight.o.scout} Your corner can now judge the risk of meeting them in their own style.`:'One round exposed their core approach.'}</div>`:'',cornerTitle=next===3?'FINAL ROUND: MAKE YOUR CALL':'ROUND 2: STYLE DECISION';box.innerHTML=`<div class="corner-panel"><h3>${cornerTitle}</h3>${read}<p>${state.fighterStyle===fight.o.tendency?'You share the same archetype. Stay disciplined and fight your way.':'Fight your way or adapt to their revealed style.'}</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
-  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
+  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(FIGHT_ROUND_COST)){toast('Not enough reserved energy to start the next round.','#ff766d');return}$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
     if(!fight||fight.winner||fight.crisisUsed||fight.playerCondition>25)return;
-    fight.crisisUsed=true;const next=fight.rounds.length+1,startIndex=fightTimelineIndex;$('#cornerChoice').innerHTML='';
+    const next=fight.rounds.length+1,startIndex=fightTimelineIndex,roundsToReserve=FIGHT_ROUNDS-next+1;if(choice==='haymaker'&&!haymakerEnergyAvailable(roundsToReserve))return;
+    fight.crisisUsed=true;$('#cornerChoice').innerHTML='';
     if(choice==='towel'){
       fight.cornerTowel=true;fight.winner='opp';fight.method='TKO';fight.finishRound=next;fight.finishClock='5:00';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'ko',round:next,clock:'5:00',text:`The towel is in. ${state.name}'s corner stops the fight and ${fight.o.name} wins by TKO.`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
-    const chance=haymakerChance(fight),landed=Math.random()<chance;
+    if(!chargeFightEnergy(FIGHT_ROUND_COST+HAYMAKER_ENERGY)){fight.crisisUsed=false;showCornerChoice();return}const chance=haymakerChance(fight),landed=Math.random()<chance;
     if(!landed){
       const damage=Math.max(12,Math.round(16+fight.opp.power*.65)),playerRound=emptyFightStats(),oppRound=emptyFightStats();playerRound.attempted=1;oppRound.attempted=1;oppRound.landed=1;oppRound.sig=1;oppRound.kd=1;oppRound.damage=damage;addFightStats(fight.totals.player,playerRound);addFightStats(fight.totals.opp,oppRound);fight.rounds.push({round:next,plan:'haymaker',player:playerRound,opp:oppRound,scoreP:8,scoreO:10});fight.haymakerMiss=true;fight.playerCondition=0;fight.winner='opp';fight.method='KO';fight.finishRound=next;fight.finishClock='4:55';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'action',round:next,clock:'4:57',text:`${state.name} loads up on the haymaker—but ${fight.o.name} sees it coming.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp'},{type:'ko',round:next,clock:'4:55',text:`COUNTER SHOT! ${state.name} is knocked out cold.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
     const damage=Math.max(16,Math.round((18+fight.player.power*.72)*rand(.88,1.16)));simulateRound(fight,next,'pressure',{damage});playFightTimeline(startIndex);
+  }
+  function showLastChanceDecision(){
+    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');
+    box.innerHTML=`<div class="corner-panel last-chance-panel"><h3>0:10 LEFT · YOUR CORNER HAS YOU BEHIND</h3><p>The scorecards are slipping away. Stay disciplined and live with the decision, or spend extra energy on one final knockout swing.</p><div class="last-chance-score"><b>UNOFFICIAL SCORE</b> · YOU ${score.player} · ${fight.o.name.toUpperCase()} ${score.opponent}</div><div class="last-chance-actions"><button class="last-chance-btn discipline" data-last-chance="discipline">STAY DISCIPLINED</button><button class="last-chance-btn haymaker" data-last-chance="haymaker" ${canHaymaker?'':'disabled'}>${canHaymaker?`THROW THE HAYMAKER · ${HAYMAKER_ENERGY} ENERGY · ${chance}%`:`HAYMAKER LOCKED · NEED ${HAYMAKER_ENERGY} ENERGY`}</button></div></div>`;
+  }
+  function resolveLastChance(choice){
+    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved||!['discipline','haymaker'].includes(choice))return;const startIndex=fightTimelineIndex;fight.lastChanceResolved=true;$('#cornerChoice').innerHTML='';
+    if(choice==='discipline'){settleFightDecision(fight);playFightTimeline(startIndex+1);return}
+    if(!haymakerEnergyAvailable()||!chargeFightEnergy(HAYMAKER_ENERGY)){fight.lastChanceResolved=false;showLastChanceDecision();return}
+    fight.crisisUsed=true;const landed=Math.random()<haymakerChance(fight),round=fight.rounds[fight.rounds.length-1];round.player.attempted++;fight.totals.player.attempted++;
+    if(!landed){const damage=Math.max(12,Math.round(16+fight.opp.power*.65));round.opp.attempted++;round.opp.landed++;round.opp.sig++;round.opp.kd++;round.opp.damage+=damage;fight.totals.opp.attempted++;fight.totals.opp.landed++;fight.totals.opp.sig++;fight.totals.opp.kd++;fight.totals.opp.damage+=damage;fight.playerCondition=0;fight.haymakerMiss=true;fight.winner='opp';fight.method='KO';fight.finishRound=3;fight.finishClock='0:04';fight.finalDecisionPending=false;fight.timeline.splice(startIndex+1,1,{type:'action',round:3,clock:'0:07',text:`${state.name} loads up—but ${fight.o.name} reads the final swing.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp'},{type:'ko',round:3,clock:'0:04',text:`COUNTER SHOT! ${state.name} is knocked out with seconds left.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition});playFightTimeline(startIndex+1);return}
+    const damage=Math.max(18,Math.round((20+fight.player.power*.78)*rand(.9,1.18)));round.player.landed++;round.player.sig++;round.player.kd++;round.player.damage+=damage;fight.totals.player.landed++;fight.totals.player.sig++;fight.totals.player.kd++;fight.totals.player.damage+=damage;fight.oppCondition=clamp(fight.oppCondition-damage,0,100);round.scoreP=10;round.scoreO=8;fight.lastChanceLanded=true;const finishChance=clamp(.22+(100-fight.oppCondition)*.004,.22,.68),knockout=fight.oppCondition<=0||Math.random()<finishChance;fight.timeline.splice(startIndex+1,0,{type:'action',round:3,clock:'0:06',text:`HAYMAKER LANDS! ${state.name} drops ${fight.o.name} with the fight slipping away!`,className:'big',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,big:true,landed:true,side:'player'});if(knockout){fight.winner='player';fight.method='KO';fight.finishRound=3;fight.finishClock='0:03';fight.finalDecisionPending=false;fight.timeline.splice(startIndex+2,1,{type:'ko',round:3,clock:'0:03',text:`IT'S OVER! ${state.name} steals it in the final seconds!`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition})}else settleFightDecision(fight);playFightTimeline(startIndex+1);
   }
   function toggleFightSpeed(){fightSpeed=fightSpeed===1?2:1;$('#speedBtn').classList.toggle('active',fightSpeed===2);$('#speedBtn').textContent=fightSpeed===2?'NORMAL ×1':'FAST ×2';sfx.tap()}
 
@@ -916,7 +949,7 @@
   function playFightTimeline(index){
     if(!fight)return;
     fightTimelineIndex=index;if(index>=fight.timeline.length){if(fight.winner||fight.rounds.length>=3)scheduleFight(()=>finishFightSimulation(),420);else showCornerChoice();return}
-    const item=fight.timeline[index];$('#liveRound').textContent=`ROUND ${item.round||1}`;$('#liveClock').textContent=item.clock||'5:00';
+    const item=fight.timeline[index];$('#liveRound').textContent=`ROUND ${item.round||1}`;$('#liveClock').textContent=item.clock||'5:00';if(item.type==='lastChance'){showLastChanceDecision();return}
     if(item.type==='roundStart')appendFightLine({clock:item.clock,text:`ROUND ${item.round} begins. Both fighters meet in the center.`,className:'round-end'});else appendFightLine(item);
     const delay=item.type==='roundStart'?430:item.type==='roundEnd'?560:item.type==='ko'?760:300;
     scheduleFight(()=>playFightTimeline(index+1),delay);
@@ -937,7 +970,7 @@
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
       titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
       if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);loot=[loot,`${gameIcon(title.iconName,title.icon)} NEW ${milestoneName(title)} CHAMPION`].filter(Boolean).join(' · ')}if(upset)loot=[loot,`${gameIcon('upset-bonus','⚡')} UPSET BONUS +25%`].filter(Boolean).join(' · ');if(rivalry)loot=[loot,`${gameIcon('rivalry-bonus','🔥')} RIVALRY FIGHT BONUS +15%`].filter(Boolean).join(' · ');if(state.winStreak>1)loot=[loot,`${gameIcon('win-streak','🔥')} ${state.winStreak}-FIGHT WIN STREAK`].filter(Boolean).join(' · ');if(!o.championship)ensureRoster()
-      $('#resultTitle').textContent=fight.method==='SUBMISSION'?'SUBMISSION WIN!':fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
+      $('#resultTitle').textContent=fight.lastChanceLanded?(fight.method.includes('KO')?'LAST-SECOND KNOCKOUT!':'COMEBACK WIN!'):fight.method==='SUBMISSION'?'SUBMISSION WIN!':fight.method.includes('KO')?'KNOCKOUT!':'DECISION WIN!';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
       $('#resultTitle').textContent=fight.cornerTowel?'CORNER STOPPAGE.':fight.haymakerMiss?'KNOCKED OUT.':fight.method==='SUBMISSION'?'SUBMITTED.':fight.method.includes('KO')?'STOPPED.':'DECISION LOSS.';$('#resultTitle').className='loss';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.';
@@ -975,6 +1008,7 @@
   document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-card-flip]')){e.preventDefault();toggleOpponentCard(e.target)}});
   document.addEventListener('click',e=>{
     const rosterToggle=e.target.closest('[data-roster-toggle]');if(rosterToggle){toggleRosterGroup(rosterToggle);return}
+    const lastChance=e.target.closest('[data-last-chance]');if(lastChance){resolveLastChance(lastChance.dataset.lastChance);return}
     const crisis=e.target.closest('[data-crisis]');if(crisis){resolveFightCrisis(crisis.dataset.crisis);return}
     const opening=e.target.closest('[data-opening-approach]');if(opening){beginFightApproach(opening.dataset.openingApproach);return}
     const fp=e.target.closest('[data-fight-plan]');if(fp){chooseCornerPlan(fp.dataset.fightPlan);return}
@@ -983,6 +1017,7 @@
     const go=e.target.closest('[data-go]');if(go){navTo(go.dataset.go);return}
     const tt=e.target.closest('#trainerToggle');if(tt){state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
     const tr=e.target.closest('[data-train]');if(tr){handleTrain(+tr.dataset.train);return}
+    const recovery=e.target.closest('[data-recovery]');if(recovery){handleRecovery(+recovery.dataset.recovery);return}
     const hu=e.target.closest('[data-hustle]');if(hu){handleHustle(+hu.dataset.hustle);return}
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}

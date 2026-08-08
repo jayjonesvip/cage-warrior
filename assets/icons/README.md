@@ -54,6 +54,8 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `body-conditioning.png` | 🧱 | Body Conditioning |
 | `roadwork-at-dawn.png` | 🫁 | Roadwork at Dawn |
 | `hard-sparring.png` | 🤼 | Hard Sparring |
+| `ice-bath.png` | 🧊 | Ice Bath recovery treatment |
+| `sauna.png` | ♨️ | Sauna recovery treatment |
 
 ## Hustle and risk icons
 

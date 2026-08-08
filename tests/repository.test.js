@@ -207,7 +207,8 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /id="tapePurse"/);
   assert.match(html, /class="tape-fighter-card player-card"/);
   assert.match(html, /class="tape-fighter-card opponent-card"/);
-  assert.match(html, /class="tape-energy">15 ENERGY REQUIRED/);
+  assert.match(html, /class="tape-energy">30 ENERGY CLEARANCE · 10 PER ROUND/);
+  assert.match(html, /KEEP 5 EXTRA FOR A HAYMAKER/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
   assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
@@ -338,7 +339,7 @@ test('home ticker teaches current mechanics in a shady promoter voice', () => {
   const heroPosition = html.indexOf('<div class="hero">', homeStart);
   assert.ok(tickerPosition > homeStart && tickerPosition < identityPosition && tickerPosition < heroPosition, 'ticker should lead the unlocked Home screen');
   assert.match(html.slice(homeStart, identityPosition), /class="card career-after-setup"/);
-  assert.ok(stringsData.ticker.some(line => /fight burns 15 energy/.test(line)));
+  assert.ok(stringsData.ticker.some(line => /30 energy ready.*10 every round/.test(line)));
   assert.ok(stringsData.ticker.some(line => /20 health before a bout/.test(line)));
   assert.match(script, /const tickerLines=STRINGS\.ticker/);
   const ticker = stringsData.ticker.join('\n');
@@ -481,6 +482,18 @@ test('active sponsor appears beneath Cage Rank in the Home hero', () => {
   assert.match(script, /state\.activeEndorsement\.fightsLeft\} FIGHTS LEFT/);
 });
 
+test('training includes one paid daily energy recovery treatment', () => {
+  assert.match(page, /Recovery Room/);
+  assert.match(page, /id="recoveryLimitText"/);
+  assert.match(page, /id="recoveryActions"/);
+  assert.match(script, /id:'ice-bath'.*energy:25,health:0/);
+  assert.match(script, /id:'sauna'.*energy:15,health:12/);
+  assert.match(script, /function recoveryFee\(\)\{return 40\+state\.level\*15\}/);
+  assert.match(script, /LOGIC\.recoveryQuote/);
+  assert.match(script, /LOGIC\.applyRecovery/);
+  assert.match(script, /state\.dailyCounters\.recovery=1/);
+});
+
 test('endorsements unlock as one crash-safe sequential offer', () => {
   for (const threshold of [2500, 10000, 30000, 80000, 200000]) assert.match(script, new RegExp(`minFans:${threshold}`));
   assert.match(script, /function nextEndorsementOffer\(\)/);
@@ -615,4 +628,17 @@ test('low-condition corner crisis offers towel or last-chance haymaker outcomes'
   assert.doesNotMatch(script, /skipBtn/);
   assert.match(html, /\.corner-panel\.crisis-panel\{/);
   assert.match(readme, /Throwing in the towel gives the opponent a TKO win/);
+});
+
+test('fights charge per started round and pause for a trailing final-ten-second choice', () => {
+  assert.match(script, /FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3/);
+  assert.match(script, /FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST\*FIGHT_ROUNDS,HAYMAKER_ENERGY=5/);
+  assert.match(script, /LOGIC\.bookFight\(state,o\.key,FIGHT_ROUND_COST,Date\.now\(\),FIGHT_CLEARANCE_ENERGY\)/);
+  assert.match(script, /LOGIC\.chargePendingFightEnergy/);
+  assert.match(script, /LOGIC\.availableFightEnergy/);
+  assert.match(script, /type:'lastChance',round:3,clock:'0:10'/);
+  assert.match(script, /data-last-chance="discipline"/);
+  assert.match(script, /data-last-chance="haymaker"/);
+  assert.match(script, /function resolveLastChance\(choice\)/);
+  assert.match(script, /LAST-SECOND KNOCKOUT!/);
 });
