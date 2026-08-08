@@ -304,6 +304,7 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
+  assert.match(html, /\.choice p\{[^}]*font-size:11\.5px;line-height:1\.35/);
 });
 
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
