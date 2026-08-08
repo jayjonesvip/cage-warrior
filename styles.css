@@ -208,7 +208,7 @@
   .flash{animation:flash .22s}@keyframes flash{50%{filter:brightness(2.1)}}
   @media (min-width:700px){#app{height:min(960px,100dvh);margin:auto;border-radius:14px;box-shadow:0 0 60px #000}.hero{height:260px}}
 
-  /* CAGE WARRIOR blue/black brand overrides */
+  /* CAGE GRIND blue/black brand overrides */
   .logo{width:112px;height:50px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;font-size:17px;line-height:.86;letter-spacing:1.6px;color:#fff}
   .logo span:last-child{color:#6ed7ff;font-size:18px}
   .card,.tape-card,.live-card,.result-card{border-color:#233d61;background:linear-gradient(160deg,#101b2b,#05080e 76%)}

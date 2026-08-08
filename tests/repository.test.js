@@ -25,10 +25,20 @@ test('external game assets are linked and the game script parses', () => {
   assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
 });
 
-test('generated Cage Warrior logo is used in the top-left header', () => {
-  assert.match(page, /<img class="logo" src="assets\/cage-warrior-logo\.png" alt="Cage Warrior">/);
+test('generated Cage Grind branding and navigation icons are wired into the interface', () => {
+  assert.match(page, /<title>Cage Grind — A Combat Career<\/title>/);
+  assert.match(page, /<img class="logo" src="assets\/cage-grind-logo\.png" alt="Cage Grind">/);
   assert.match(css, /\.logo\{[^}]*object-fit:contain/);
-  assert.ok(fs.statSync('assets/cage-warrior-logo.png').size > 0);
+  const brandedAssets = [
+    'assets/cage-grind-logo.png',
+    ...['home', 'train', 'fight', 'hustle', 'gear', 'feed'].map(name => `assets/icons/nav-${name}.png`),
+  ];
+  for (const asset of brandedAssets) {
+    const png = fs.readFileSync(asset);
+    assert.ok(png.length > 0, `missing ${asset}`);
+    assert.equal(png.subarray(1, 4).toString(), 'PNG', `${asset} must remain a PNG`);
+    assert.equal(png[25], 6, `${asset} must remain RGBA so its background stays transparent`);
+  }
 });
 
 test('DOM ids are unique', () => {

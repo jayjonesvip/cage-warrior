@@ -1,8 +1,8 @@
-# Cage Warrior
+# Cage Grind
 
 [![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
 
-Cage Warrior is a mobile-first, single-player fight-career game. Open
+Cage Grind is a mobile-first, single-player combat-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
 The page loads its presentation from `styles.css`, scalable copy pools from
 `strings.js`, testable gameplay rules from `game-logic.js`, and browser
@@ -249,7 +249,9 @@ opponent names, fight commentary, Cage Feed
 copy, generated social usernames, and promoter ticker lines so new variations
 can be added without editing simulation logic.
 The generated transparent header wordmark lives at
-`assets/cage-warrior-logo.png`. Fighter portraits, replaceable icons, and
+`assets/cage-grind-logo.png`. The six bottom-navigation icons live under
+`assets/icons/nav-*.png` and automatically use the same asset-override system.
+Fighter portraits, replaceable icons, and
 standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and

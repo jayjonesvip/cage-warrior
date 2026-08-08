@@ -1,6 +1,6 @@
 # Icon asset overrides
 
-Cage Warrior keeps its current symbols as automatic fallbacks. To replace any
+Cage Grind keeps its current symbols as automatic fallbacks. To replace any
 one of them, add a transparent PNG to this folder with the exact filename shown
 below. For example, `heavy-bag-rounds.png` replaces the boxing-glove symbol on
 the Heavy Bag Rounds action.
