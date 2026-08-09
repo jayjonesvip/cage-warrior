@@ -55,8 +55,8 @@ generated league.
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
 - Followers are the fighter's lasting social audience, while Hype represents
-  short-term attention. Cage Feed actions can build both, while a failed rival
-  callout can cost Hype.
+  short-term attention. Cage Feed interactions now focus on the shared fighter
+  community without directly changing either career resource.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
@@ -122,20 +122,17 @@ generated league.
   not unexpectedly change the handle.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
-- The timeline owns the Feed explanation and scrolls inside its own card. The
-  player-post controls sit in a detached action dock pinned to the bottom of
-  the Feed page and snapped flush to its side and bottom edges.
+- The timeline owns the Feed explanation and scrolls inside its own card.
+  Generic composer controls are removed; interaction begins by tapping a real
+  fighter's avatar and opening their public profile.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.
-- Each notable event starts a news cycle with one player post available. The
-  player may thank Followers, call out a real fighter from the shared roster,
-  or publish an Influencer Brand Post for Cash and Followers. Real-player
-  callouts are social posts only in this phase and do not fabricate an accepted
-  online fight. There is only one player post per news cycle, and publishing
-  scrolls the timeline to the new post at the top.
-- Rival Callout and Influencer Brand Post live in Cage Feed rather than the
-  Underground Buzz or Career Spotlight lists.
+- A fighter profile offers a stable daily selection of three to five canned
+  interactions drawn from larger string pools: callouts, props, welcomes,
+  respect, and putting another fighter on notice. Supabase enforces five direct
+  fighter interactions per UTC day; `CageReporter` career coverage does not use
+  that allowance. These social posts do not fabricate an accepted online fight.
 
 ### Career opponents
 

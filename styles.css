@@ -25,16 +25,13 @@
 .fighter-bio-dialog h2{font-family:system-ui,sans-serif!important;font-size:21px!important;font-weight:950!important;text-transform:uppercase}
 .fighter-bio-dialog p{max-width:330px;margin:8px auto 15px;font-size:11px;line-height:1.55}
 .fighter-bio-dialog .modal-actions.single-action{grid-template-columns:1fr}
-.rival-callout-dialog{border-color:#6e5db4;background:radial-gradient(circle at 50% 0,#7658ce35,transparent 45%),linear-gradient(155deg,#17152c,#080a12 78%)}
-.rival-callout-dialog h2 span{color:#aa96ff}
-.rival-callout-dialog .modal-actions.single-action{grid-template-columns:1fr}
-.real-rival-list{display:grid;gap:7px;max-height:min(48vh,360px);margin-top:11px;overflow-y:auto;scrollbar-width:thin}
-.real-rival-choice{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px;border:1px solid #4a4778;border-radius:9px;background:linear-gradient(145deg,#171b30,#090c16);color:#edf1ff;text-align:left}
-.real-rival-choice:active{transform:translateY(1px)}
-.real-rival-choice b{display:block;overflow:hidden;color:#b7a7ff;font-family:system-ui,sans-serif;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
-.real-rival-choice small{display:block;margin-top:3px;color:#8e98ad;font-family:system-ui,sans-serif;font-size:8.5px;line-height:1.25}
-.real-rival-choice>em{color:#7edcff;font-family:system-ui,sans-serif;font-size:9px;font-style:normal;font-weight:950;text-align:right;white-space:nowrap}
-.real-rival-choice>em small{max-width:150px;white-space:normal}
+.fighter-bio-interactions{display:grid;gap:7px;max-height:min(38vh,300px);margin:11px 0;overflow-y:auto;text-align:left;scrollbar-width:thin}
+.fighter-bio-interaction{width:100%;display:grid;gap:4px;padding:9px 10px;border:1px solid #3974a5;border-radius:9px;background:linear-gradient(145deg,#102844,#07111d);color:#eef8ff;text-align:left;box-shadow:0 2px 0 #02070d}
+.fighter-bio-interaction:active{transform:translateY(1px);box-shadow:0 1px 0 #02070d}
+.fighter-bio-interaction:disabled{opacity:.45;filter:grayscale(1)}
+.fighter-bio-interaction b{color:#72dbff;font-size:9px;font-weight:950;letter-spacing:.45px}
+.fighter-bio-interaction small{color:#b6c7d8;font-size:8.5px;line-height:1.35}
+.fighter-bio-limit{padding:8px;border:1px solid #325777;border-radius:8px;background:#06101a;color:#8fa7bb;font-size:8.5px;font-weight:900;text-align:center}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01040a;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
   body{display:flex;justify-content:center;overscroll-behavior:none}
@@ -308,7 +305,6 @@
 
   /* Bottom decision surfaces snap to their container edges instead of floating. */
   .screen[data-screen="feed"].active{padding-bottom:0}
-  .social-composer{margin:8px -10px 0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
   .corner-panel{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
   .plan-btn.signature{border-color:#63ceff;background:linear-gradient(#42b8f3,#1160b8);color:#fff;box-shadow:0 4px 0 #052f63,0 0 12px #39bfff22}
   .plan-btn.mirror{border-color:#6d7d8d;background:linear-gradient(#3b4856,#18212b);color:#e2eaf2;box-shadow:0 4px 0 #080d12,0 0 12px #8ca4ba1f}

@@ -16,6 +16,7 @@ const pwaScript = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
 const cageFeedMigration = fs.readFileSync('supabase/migrations/20260809130000_shared_cage_feed.sql', 'utf8');
 const cageAvatarMigration = fs.readFileSync('supabase/migrations/20260809150000_cage_profile_avatars.sql', 'utf8');
+const cageInteractionMigration = fs.readFileSync('supabase/migrations/20260809200000_fighter_interactions.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -148,7 +149,7 @@ test('shared Cage Feed uses a public Supabase client with RLS-protected schema',
   assert.match(cageFeedMigration, /when 'new-york' then 'NYC'/);
   assert.match(cageFeedMigration, /when 'brawler' then 'Brawler'/);
   assert.match(cageFeedMigration, /lpad\(v_suffix::text,2,'0'\)/);
-  assert.match(page, /id="rivalCalloutModal"/);
+  assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /SHARED_FEED\.loadFeed\(50\)/);
   assert.match(script, /SHARED_FEED\.loadProfiles\(100\)/);
   assert.match(script, /socialRemoteInitialized:false/);
@@ -166,7 +167,7 @@ test('real Cage Feed fighters expose validated avatars and public bios', () => {
   assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /data-feed-profile=/);
   assert.match(script, /function fighterBioSentence\(profile\)/);
-  assert.match(script, /sharedSocialProfiles\.filter\(profile=>profile\.id!==state\.socialProfileId\)/);
+  assert.match(script, /profile\.id===state\.socialProfileId/);
   assert.match(script, /REAL CAGE GRIND FIGHTER|fighterBioAvatar/);
   assert.match(css, /\.feed-avatar\.fighter-photo/);
 });
@@ -331,10 +332,11 @@ test('scalable copy pools are separated from gameplay logic', () => {
   assert.ok(stringsData.fightCommentary.miss.takedown.length >= 2);
   assert.ok(stringsData.social.account.length >= 3);
   assert.ok(stringsData.social.cycles.fightWin.length >= 3);
-  assert.ok(stringsData.social.actions.callout.success.length >= 2);
+  assert.ok(stringsData.social.interactions.callout.messages.length >= 5);
+  assert.ok(stringsData.social.interactions.props.messages.length >= 5);
   assert.match(script, /STRINGS\.fightCommentary\[landed\?'hit':'miss'\]\[type\]/);
   assert.match(script, /STRINGS\.social\.account\[0\]/);
-  assert.match(script, /const actions=STRINGS\.social\.actions/);
+  assert.match(script, /definitions=STRINGS\.social\.interactions/);
   assert.doesNotMatch(script, /snaps a jab through the guard|First follow\. Let’s see where this goes/);
 });
 
@@ -610,17 +612,14 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
 });
 
-test('Cage Feed turns career events into one strategic player post per news cycle', () => {
+test('Cage Feed combines career reports with avatar-driven fighter interactions', () => {
   assert.doesNotMatch(html, /Latest Buzz|homeFeedPreview|homeFeedStatus/);
   assert.match(html, /data-screen="feed"/);
   assert.match(html, /id="socialTimeline"/);
   assert.match(html, /data-nav="feed"[\s\S]*data-icon-name="nav-feed"[\s\S]*id="feedNavBadge"/);
   assert.match(html, /class="card feed-page-card"[\s\S]*class="feed-page-note"[\s\S]*id="socialTimeline"/);
-  assert.match(html, /class="social-composer"[\s\S]*id="feedCycleStatus"[\s\S]*id="socialActions"/);
-  assert.doesNotMatch(html, /Make Your Post|feed-compose-head/);
+  assert.doesNotMatch(page, /social-composer|socialActions|Make Your Post|feed-compose-head/);
   assert.match(html, /\.screen\[data-screen="feed"\]\.active\{display:flex/);
-  assert.match(html, /\.social-composer\{position:sticky/);
-  assert.match(css, /\.social-composer\{margin:8px -10px 0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
   assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:0\}/);
   assert.doesNotMatch(html, /class="feed-back"/);
   assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
@@ -638,24 +637,28 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(script, /openSocialCycle\('appearance'/);
   assert.match(script, /openSocialCycle\('autograph'/);
   assert.match(script, /openSocialCycle\('sponsor'/);
-  assert.match(script, /state\.socialPostedCycle>=state\.socialCycle/);
-  assert.match(script, /id:'thank'.*Thank the Followers/);
-  assert.match(script, /id:'callout'.*Call Out a Real Fighter/);
-  assert.match(script, /id:'brand'.*Influencer Brand Post/);
-  assert.match(script, /function openRivalCalloutModal\(\)/);
-  assert.match(script, /data-callout-profile/);
-  assert.match(script, /target\.handle/);
-  assert.match(script, /state\.socialPostedCycle=state\.socialCycle/);
+  assert.match(page, /Tap a real fighter's avatar/);
+  assert.match(page, /id="fighterBioInteractions"/);
+  assert.match(script, /function fighterInteractionChoices\(profile\)/);
+  assert.match(script, /count=3\+seed%3/);
+  assert.match(script, /data-fighter-interaction/);
+  assert.match(script, /function handleFighterInteraction\(kind,target\)/);
+  assert.match(script, /loadInteractionAllowance\(\)/);
+  assert.match(strings, /interactions:\s*\{/);
+  for (const kind of ['CALL THEM OUT','GIVE THEM PROPS','WELCOME THEM','SHOW RESPECT','PUT THEM ON NOTICE']) assert.match(strings, new RegExp(kind));
+  assert.match(cageInteractionMigration, /get_cage_interactions_remaining/);
+  assert.match(cageInteractionMigration, /return greatest\(0, 5 - v_used\)/);
+  assert.match(cageInteractionMigration, /post_kind in \('callout','props','welcome','respect','watching'\)/);
+  assert.match(cageInteractionMigration, /if public\.get_cage_interactions_remaining\(\) < 1/);
+  assert.doesNotMatch(page, /id="rivalCalloutModal"/);
   assert.match(strings, /WIN STREAK: \{name\} has now won \{winStreak\} straight fights/);
   for (const name of ['FightFan99', 'MMA4Life', 'ScorecardBandit', 'FlukeWinPolice']) assert.match(strings, new RegExp(name));
   const riskDefs = script.match(/const riskDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
   const publicityDefs = script.match(/const publicityDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
   assert.doesNotMatch(riskDefs, /call-out-rival|Post a Rival Callout/);
   assert.doesNotMatch(publicityDefs, /social-post|Influencer Brand Post/);
-  const socialHandler = script.match(/function handleSocialPost\(type,target=null\)[\s\S]*?\n\s*\}/)?.[0] || '';
-  assert.doesNotMatch(socialHandler, /profile:'fan'|profile:'hater'/);
   assert.doesNotMatch(html, />FANS<|>Fans</);
-  assert.match(readme, /one player post per news cycle/);
+  assert.match(readme, /five direct\s+fighter interactions per UTC day/i);
 });
 
 test('bottom navigation opens every destination at the top', () => {

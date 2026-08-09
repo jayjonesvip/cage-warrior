@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.3.2" />
+<meta name="app-version" content="2.3.3" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.3.2">
+<link rel="stylesheet" href="styles.css?v=2.3.3">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,7 +123,7 @@
     </section>
 
     <section class="screen" data-screen="feed">
-      <div class="card feed-page-card"><div class="card-title">Cage Feed <small>GLOBAL · LATEST FIRST</small></div><div class="feed-page-note">Real Cage Grind fighters share this timeline. CageReporter covers career events, while each fighter may publish one canned post per news cycle.</div><div class="feed-list" id="socialTimeline"></div></div><div class="social-composer"><div class="social-composer-status"><small id="feedCycleStatus">YOUR POST IS READY</small><div id="feedStatus"></div></div><div class="social-actions" id="socialActions"></div></div>
+      <div class="card feed-page-card"><div class="card-title">Cage Feed <small id="feedCycleStatus">GLOBAL · LATEST FIRST</small></div><div class="feed-page-note">Tap a real fighter's avatar to view their bio and interact. You get five fighter posts per day; CageReporter career coverage does not use them.</div><div class="feed-list" id="socialTimeline"></div></div>
     </section>
 
     <section class="screen" data-screen="train">
@@ -190,16 +190,6 @@
     </form>
   </div>
 
-  <div class="modal-overlay" id="rivalCalloutModal" aria-hidden="true">
-    <div class="gig-modal rival-callout-dialog" role="dialog" aria-modal="true" aria-labelledby="rivalCalloutTitle" aria-describedby="rivalCalloutDescription">
-      <span class="loadout-dialog-kicker">GLOBAL FIGHTER ROSTER</span>
-      <h2 id="rivalCalloutTitle">Choose Your <span>Callout</span></h2>
-      <p id="rivalCalloutDescription">These are real Cage Grind careers. Your post will tag them publicly; online fight contracts are not connected yet.</p>
-      <div class="real-rival-list" id="rivalCalloutList"></div>
-      <div class="modal-actions single-action"><button class="modal-cancel" id="rivalCalloutCancel" type="button">BACK</button></div>
-    </div>
-  </div>
-
   <div class="modal-overlay" id="fighterBioModal" aria-hidden="true">
     <div class="gig-modal fighter-bio-dialog" role="dialog" aria-modal="true" aria-labelledby="fighterBioTitle" aria-describedby="fighterBioText">
       <span class="loadout-dialog-kicker">REAL CAGE GRIND FIGHTER</span>
@@ -207,6 +197,7 @@
       <span class="fighter-bio-handle" id="fighterBioHandle"></span>
       <h2 id="fighterBioTitle">Fighter</h2>
       <p id="fighterBioText"></p>
+      <div class="fighter-bio-interactions" id="fighterBioInteractions"></div>
       <div class="modal-actions single-action"><button class="modal-run" id="fighterBioClose" type="button">BACK TO THE FEED</button></div>
     </div>
   </div>
@@ -327,11 +318,11 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.3.2"></script>
-<script src="strings.js?v=2.3.2"></script>
-<script src="analytics.js?v=2.3.2"></script>
-<script src="cage-social.js?v=2.3.2"></script>
-<script src="game.js?v=2.3.2"></script>
-<script src="pwa.js?v=2.3.2"></script>
+<script src="game-logic.js?v=2.3.3"></script>
+<script src="strings.js?v=2.3.3"></script>
+<script src="analytics.js?v=2.3.3"></script>
+<script src="cage-social.js?v=2.3.3"></script>
+<script src="game.js?v=2.3.3"></script>
+<script src="pwa.js?v=2.3.3"></script>
 </body>
 </html>

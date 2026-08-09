@@ -80,34 +80,55 @@ globalThis.CAGE_STRINGS = {
         {profile:'hater',text:'A sponsor check does not improve your takedown defense, {name}.'}
       ]
     },
-    actions: {
-      thank: {
-        player: 'Appreciate everybody following the climb. I hear the support. Back to work.',
-        reactions: [
-          {profile:'fan',text:'This is why we follow {name}. No speech, no excuses—just work.'},
-          {profile:'gym',text:'Message posted. Now put the phone down and finish the session.'}
-        ]
-      },
+    interactions: {
       callout: {
-        player: '{rival}, keep winning. I want your name across from mine when the matchmakers are ready.',
-        success: [
-          {profile:'rival',author:'{rival}',text:'You wanted my attention, {name}. You have it. Rematch accepted.'},
-          {profile:'fan',text:'That callout had some heat. Book {name} versus {rival} again.'}
-        ],
-        failure: [
-          {profile:'hater',text:'{rival} left {name} on read. Tough night for the mentions.'},
-          {profile:'promoter',text:'A callout without a response is just free advertising for the other fighter.'}
+        label:'CALL THEM OUT',
+        messages:[
+          '@{handle}, keep winning. I want your name across from mine when the matchmakers are ready.',
+          '@{handle}, the record looks good. Let us see what happens when the cage door closes.',
+          '@{handle}, no disrespect—but I see a fight the crowd would remember.',
+          'Matchmakers, put @{handle} across from me. I will handle the rest.',
+          '@{handle}, you have my attention. Now earn the contract with my name on it.'
         ]
       },
-      brand: {
-        player: 'Paid partnership. Training day powered by people who believe in the climb. #ad',
-        viral: [
-          {profile:'fan',text:'{name} somehow made an ad look like a fight trailer. This clip is everywhere.'},
-          {profile:'promoter',text:'Sponsors like reach. I like fighters who turn reach into ticket sales.'}
-        ],
-        standard: [
-          {profile:'hater',text:'The sponsored-post era arrived fast. Hope the product comes with better cardio.'},
-          {profile:'promoter',text:'Sponsors like reach. I like fighters who turn reach into ticket sales.'}
+      props: {
+        label:'GIVE THEM PROPS',
+        messages:[
+          'Real recognizes real. @{handle} has been putting in serious work.',
+          'Respect to @{handle}. That record was not built by taking easy nights.',
+          '@{handle} keeps showing up prepared. The sport needs more of that.',
+          'Credit where it is due: @{handle} is building a run worth watching.',
+          'Strong work from @{handle}. Nothing fake about that climb.'
+        ]
+      },
+      welcome: {
+        label:'WELCOME THEM',
+        messages:[
+          'Welcome to the Cage Grind feed, @{handle}. The whole roster is watching now.',
+          '@{handle} just joined the conversation. Welcome to the noise.',
+          'Good to see @{handle} on the feed. Now give everybody a fight to talk about.',
+          'Welcome, @{handle}. Keep the posts honest and the fights violent.',
+          'Another real fighter enters the timeline. Welcome, @{handle}.'
+        ]
+      },
+      respect: {
+        label:'SHOW RESPECT',
+        messages:[
+          '@{handle}, respect from one fighter to another. Keep climbing.',
+          'Different gyms, same hard road. Respect to @{handle}.',
+          'You can want the same belt and still respect the work. Salute, @{handle}.',
+          '@{handle} understands what this life costs. Nothing but respect.',
+          'No callout today—just respect for the work @{handle} is doing.'
+        ]
+      },
+      watching: {
+        label:'PUT THEM ON NOTICE',
+        messages:[
+          'I have been watching @{handle}. There are openings in that game.',
+          '@{handle} is climbing fast. Good—the division needs pressure.',
+          'Keep an eye on @{handle}. That name is going to matter soon.',
+          '@{handle}, I see the momentum. I am watching where it goes.',
+          'The roster is getting interesting. @{handle} might be part of the reason.'
         ]
       }
     }
