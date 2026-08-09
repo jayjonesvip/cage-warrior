@@ -10,6 +10,7 @@ const readme = fs.readFileSync('README.md', 'utf8');
 const strings = fs.readFileSync('strings.js', 'utf8');
 const logic = fs.readFileSync('game-logic.js', 'utf8');
 const analytics = fs.readFileSync('analytics.js', 'utf8');
+const supabaseClient = fs.readFileSync('supabase-client.js', 'utf8');
 const cageSocial = fs.readFileSync('cage-social.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
 const pwaScript = fs.readFileSync('pwa.js', 'utf8');
@@ -28,7 +29,7 @@ const stringsData = contentContext.CAGE_STRINGS;
 test('external game assets are linked and the game script parses', () => {
   const releaseVersionPattern = appVersion.replaceAll('.', '\\.');
   assert.match(page, new RegExp(`<link rel="stylesheet" href="styles\\.css\\?v=${releaseVersionPattern}">`));
-  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="analytics\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="cage-social\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
+  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="analytics\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="supabase-client\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="cage-social\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
   const pageWithoutAllowedInlineScripts = page
     .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '')
     .replace(/<script>\s*window\.dataLayer[\s\S]*?gtag\('config', 'G-LMT6RLVT5L'\);\s*<\/script>/, '');
@@ -36,6 +37,7 @@ test('external game assets are linked and the game script parses', () => {
   assert.doesNotThrow(() => new Function(strings));
   assert.doesNotThrow(() => new Function(logic));
   assert.doesNotThrow(() => new Function(analytics));
+  assert.doesNotThrow(() => new Function(supabaseClient));
   assert.doesNotThrow(() => new Function(cageSocial));
   assert.doesNotThrow(() => new Function(script));
   assert.doesNotThrow(() => new Function(pwaScript));
@@ -141,7 +143,13 @@ test('install manifest uses valid branded icons and a stable in-scope launch URL
 test('shared Cage Feed uses a public Supabase client with RLS-protected schema', () => {
   assert.match(cageSocial, /https:\/\/oucstmfyfuoxyqcgqsqm\.supabase\.co/);
   assert.match(cageSocial, /sb_publishable_/);
-  assert.doesNotMatch(cageSocial, /sb_secret_|service_role/);
+  assert.doesNotMatch(`${supabaseClient}\n${cageSocial}`, /sb_secret_|service_role/);
+  assert.match(supabaseClient, /async function authenticatedRequest\(path,options=\{\}\)/);
+  assert.match(supabaseClient, /async function rpc\(name,args\)/);
+  assert.match(supabaseClient, /\/rest\/v1\/cage_feed_posts\?select=/);
+  assert.match(supabaseClient, /registerCageProfile/);
+  assert.match(cageSocial, /DATABASE\.createClient\(options\)/);
+  assert.doesNotMatch(cageSocial, /\/auth\/v1\/|\/rest\/v1\/|Authorization:`Bearer|function rememberSession|database\.rpc|authenticatedRequest/);
   assert.match(cageFeedMigration, /alter table public\.cage_profiles enable row level security/i);
   assert.match(cageFeedMigration, /alter table public\.cage_feed_posts enable row level security/i);
   assert.match(cageFeedMigration, /security definer\s+set search_path = ''/i);
@@ -168,7 +176,7 @@ test('real Cage Feed fighters expose validated avatars and public bios', () => {
   assert.match(cageAvatarMigration, /register_cage_profile\([\s\S]*p_fighter_avatar text/i);
   assert.match(cageAvatarMigration, /revoke execute on function public\.register_cage_profile\(text,text,text,integer,integer,integer,text\) from public, anon/i);
   assert.match(cageSocial, /p_fighter_avatar:profile\.fighterAvatar/);
-  assert.match(cageSocial, /select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses/);
+  assert.match(supabaseClient, /select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses/);
   assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /data-feed-profile=/);
   assert.match(script, /function fighterBioSentence\(profile\)/);

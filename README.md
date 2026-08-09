@@ -311,7 +311,9 @@ and `service-worker.js` synchronized. Tests enforce that contract.
 
 ### Supabase Cage Feed setup
 
-The public browser client is in `cage-social.js`. Apply the SQL files in
+Low-level Supabase authentication, session recovery, REST, and RPC calls live in
+`supabase-client.js`; Cage Feed-specific queries live in `cage-social.js`.
+Both remain dependency-free browser scripts. Apply the SQL files in
 `supabase/migrations/` in filename order using the Supabase SQL Editor (or the
 Supabase CLI). The avatar migration adds each career portrait to its public
 profile; existing fighters populate it automatically on their next Feed visit.

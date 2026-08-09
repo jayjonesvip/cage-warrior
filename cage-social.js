@@ -1,6 +1,7 @@
 (function(root,factory){
   'use strict';
-  const api=factory();
+  const databaseApi=typeof module==='object'&&module.exports?require('./supabase-client.js'):root?.CAGE_SUPABASE;
+  const api=factory(databaseApi);
   if(typeof module==='object'&&module.exports)module.exports=api;
   if(root&&root.document){
     root.CAGE_SOCIAL=api.createClient({
@@ -8,101 +9,15 @@
       key:'sb_publishable_nnChWpOFM9giwSpW7Eoq7w_pGVmkIZE'
     });
   }
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(DATABASE){
   'use strict';
 
-  const SESSION_KEY='cage-grind-supabase-session-v1';
-
-  function safeRead(storage,key){
-    try{
-      const value=storage?.getItem?.(key);
-      if(!value)return null;
-      const parsed=JSON.parse(value);
-      return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:null;
-    }catch{return null}
-  }
-
-  function safeWrite(storage,key,value){
-    try{storage?.setItem?.(key,JSON.stringify(value));return true}catch{return false}
-  }
-
-  function safeRemove(storage,key){try{storage?.removeItem?.(key)}catch{/* optional cache */}}
-
-  function normalizeSession(value){
-    if(!value||typeof value!=='object')return null;
-    const accessToken=typeof value.access_token==='string'?value.access_token:'';
-    const refreshToken=typeof value.refresh_token==='string'?value.refresh_token:'';
-    const userId=typeof value.user?.id==='string'?value.user.id:typeof value.user_id==='string'?value.user_id:'';
-    const expiresAt=Math.max(0,Math.floor(Number(value.expires_at))||0);
-    if(!accessToken||!refreshToken||!userId)return null;
-    return {access_token:accessToken,refresh_token:refreshToken,expires_at:expiresAt,user:{id:userId}};
-  }
-
   function createClient(options={}){
-    const url=String(options.url||'').replace(/\/+$/,'');
-    const key=String(options.key||'');
-    const fetchImpl=options.fetchImpl||globalThis.fetch?.bind(globalThis);
-    const storage=options.storage===undefined?globalThis.localStorage:options.storage;
-    const now=options.now||(()=>Date.now());
-    let session=normalizeSession(safeRead(storage,SESSION_KEY));
-
-    function configured(){return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)&&/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)&&typeof fetchImpl==='function'}
-
-    async function request(path,{method='GET',body,token,headers={}}={}){
-      if(!configured())throw new Error('Shared Cage Feed is not configured.');
-      const response=await fetchImpl(`${url}${path}`,{
-        method,
-        headers:Object.assign({apikey:key,Authorization:`Bearer ${token||key}`,Accept:'application/json'},body===undefined?{}:{'Content-Type':'application/json'},headers),
-        body:body===undefined?undefined:JSON.stringify(body)
-      });
-      const text=await response.text();
-      let data=null;
-      if(text){try{data=JSON.parse(text)}catch{data=text}}
-      if(!response.ok){
-        const message=data?.msg||data?.message||data?.error_description||data?.error||`Shared feed request failed (${response.status}).`;
-        const error=new Error(String(message));error.status=response.status;throw error;
-      }
-      return data;
-    }
-
-    function rememberSession(value){
-      session=normalizeSession(value);
-      if(session)safeWrite(storage,SESSION_KEY,session);else safeRemove(storage,SESSION_KEY);
-      return session;
-    }
-
-    async function refreshSession(){
-      if(!session?.refresh_token)return null;
-      try{
-        const data=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
-        return rememberSession(data);
-      }catch{rememberSession(null);return null}
-    }
-
-    async function ensureSession(){
-      const currentTime=Math.floor(now()/1000);
-      if(session&&session.expires_at>currentTime+60)return session;
-      if(session&&await refreshSession())return session;
-      const data=await request('/auth/v1/signup',{method:'POST',body:{data:{game:'cage-grind'},gotrue_meta_security:{captcha_token:null}}});
-      const created=rememberSession(data);
-      if(!created)throw new Error('Supabase did not return an anonymous session.');
-      return created;
-    }
-
-    async function authenticatedRequest(path,options={}){
-      let active=await ensureSession();
-      try{return await request(path,Object.assign({},options,{token:active.access_token}))}
-      catch(error){
-        if(error.status!==401)throw error;
-        rememberSession(null);active=await ensureSession();
-        return request(path,Object.assign({},options,{token:active.access_token}));
-      }
-    }
-
-    async function rpc(name,args){return authenticatedRequest(`/rest/v1/rpc/${encodeURIComponent(name)}`,{method:'POST',body:args})}
+    if(!DATABASE?.createClient)throw new Error('supabase-client.js must load before cage-social.js');
+    const database=options.databaseClient||DATABASE.createClient(options);
 
     async function registerProfile(profile){
-      const data=await rpc('register_cage_profile',{
+      const data=await database.registerCageProfile({
         p_fighter_name:profile.fighterName,
         p_city:profile.city,
         p_archetype:profile.archetype,
@@ -116,34 +31,34 @@
 
     async function loadFeed(limit=50){
       const count=Math.max(1,Math.min(100,Math.floor(Number(limit))||50));
-      return authenticatedRequest(`/rest/v1/cage_feed_posts?select=id,author_id,author_handle,author_name,post_kind,body,target_profile_id,target_handle,target_name,created_at&order=created_at.desc&limit=${count}`);
+      return database.selectCageFeed(count);
     }
 
     async function loadProfiles(limit=100){
       const count=Math.max(1,Math.min(200,Math.floor(Number(limit))||100));
-      const rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses,updated_at&order=updated_at.desc&limit=${count}`);
-      const active=await ensureSession();
+      const rows=await database.selectCageProfiles(count);
+      const active=await database.ensureSession();
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
     }
 
     async function loadProfileCount(){
-      const data=await rpc('get_cage_profile_count',{});
+      const data=await database.countCageProfiles();
       const value=Array.isArray(data)?data[0]:data;
       return Math.max(0,Math.floor(Number(value))||0);
     }
 
     async function loadInteractionAllowance(){
-      const data=await rpc('get_cage_interactions_remaining',{});
+      const data=await database.getCageInteractionsRemaining();
       const value=Array.isArray(data)?data[0]:data;
       return Math.max(0,Math.min(5,Math.floor(Number(value))||0));
     }
 
     async function publishPost({kind,body,targetProfileId=null}){
-      return rpc('publish_cage_post',{p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
+      return database.insertCagePost({p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
 
-    return {configured,ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadInteractionAllowance,publishPost,sessionUserId:()=>session?.user?.id||''};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
   }
 
-  return {SESSION_KEY,createClient,normalizeSession};
+  return {createClient};
 });
