@@ -47,6 +47,13 @@
       return Math.max(0,Math.floor(Number(value))||0);
     }
 
+    async function loadOpponentCandidates(level,limit=12){
+      const tier=Math.max(1,Math.min(99,Math.floor(Number(level))||1));
+      const count=Math.max(1,Math.min(20,Math.floor(Number(limit))||12));
+      const rows=await database.selectCageOpponentCandidates(tier,count);
+      return Array.isArray(rows)?rows:[];
+    }
+
     async function loadInteractionAllowance(){
       const data=await database.getCageInteractionsRemaining();
       const value=Array.isArray(data)?data[0]:data;
@@ -57,7 +64,7 @@
       return database.insertCagePost({p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

@@ -93,6 +93,9 @@ test('profile registration, global feed reads, roster filtering, and callout pub
         { id: session.user.id, handle: 'NYCBrawler_01' },
         { id: otherId, handle: 'CHICounter_01', fighter_name: 'ALEX KING' },
       ]);
+      if (url.endsWith('/rest/v1/rpc/get_cage_opponent_candidates')) return jsonResponse([
+        { id: otherId, handle: 'CHICounter_01', fighter_name: 'ALEX KING', level: 4, fighter_avatar: 'fighter-08', archetype: 'counter' },
+      ]);
       if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
       if (url.endsWith('/rest/v1/rpc/publish_cage_post')) return jsonResponse({ id: 8 });
@@ -104,6 +107,7 @@ test('profile registration, global feed reads, roster filtering, and callout pub
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
   const profileCount = await client.loadProfileCount();
+  const opponents = await client.loadOpponentCandidates(4, 12);
   const remaining = await client.loadInteractionAllowance();
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
 
@@ -111,6 +115,7 @@ test('profile registration, global feed reads, roster filtering, and callout pub
   assert.equal(feed[0].id, 7);
   assert.deepEqual(roster.map(row => row.id), [otherId]);
   assert.equal(profileCount, 27);
+  assert.equal(opponents[0].handle, 'CHICounter_01');
   assert.equal(remaining, 3);
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));
@@ -119,4 +124,6 @@ test('profile registration, global feed reads, roster filtering, and callout pub
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');
+  const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
+  assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
 });

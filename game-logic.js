@@ -229,9 +229,17 @@
 
   function opponentGroup(opponent,context){return !opponent.championship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
   function opponentAvailable(opponent,context){const status=opponentGroup(opponent,context);return ['title','current','passed'].includes(status)||(status==='rival'&&opponent.rematchAccepted===true)}
+  function networkOpponentRatings(tier,avatarStats={},archetypeMods={},difficulty=0){
+    const base=4+(Math.max(1,whole(tier,1))-1)*1.9,variance=clamp(finite(difficulty),-.7,.7),ratings={};
+    for(const key of ['power','speed','chin','cardio']){
+      const allocation=clamp(finite(avatarStats[key],5),2,8),style=clamp(finite(archetypeMods[key],0),-2,2);
+      ratings[key]=Math.max(3,Math.round(base+variance+style+(allocation-5)*.35));
+    }
+    return ratings;
+  }
   function nextGearPityCount(value){return Math.min(4,nonNegativeWhole(value)+1)}
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,nextGearPityCount,isGearPity,nextEndorsementId};
 });

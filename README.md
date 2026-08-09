@@ -141,6 +141,14 @@ generated league.
 - Opponents are generated locally with persistent names drawn from a broad
   international pool, plus attributes, archetypes, professional records, and
   head-to-head history.
+- The **Cage Network** can add up to two recently active, exact-level real
+  fighter profiles beside the three locally generated contenders. These are
+  clearly labeled AI-controlled snapshots that use the fighter's public name,
+  handle, portrait, archetype, and record. Their combat ratings are derived
+  deterministically from level, avatar allocation, and archetype.
+- Cage Network snapshots persist in the local career and remain playable
+  offline. Fighting one never changes the real fighter's public record, never
+  creates a misleading shared CageReporter result, and can never award a title.
 - Pre-fight roster and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
 - The current level always replenishes to three fresh contenders, so the fight
@@ -317,7 +325,10 @@ Both remain dependency-free browser scripts. Apply the SQL files in
 `supabase/migrations/` in filename order using the Supabase SQL Editor (or the
 Supabase CLI). The avatar migration adds each career portrait to its public
 profile; existing fighters populate it automatically on their next Feed visit.
-The profile-count migration supplies the exact shared-roster Following count. In the Supabase
+The profile-count migration supplies the exact shared-roster Following count.
+The opponent-candidate migration supplies authenticated, exact-level profiles
+updated within the last 30 days for local AI snapshots; the game falls back to
+its generated roster if the RPC or network is unavailable. In the Supabase
 Dashboard, enable **Authentication → Providers → Anonymous Sign-Ins**. The
 migration enables Row Level Security, permits authenticated reads, and restricts
 profile and post creation to validated RPC functions. Never place a secret or

@@ -113,6 +113,16 @@ test('opponent availability covers current fights, locked titles, and accepted r
   assert.equal(logic.opponentAvailable({championship:true,titleId:'regional',tier:5,titleDefeated:false},context),false);
 });
 
+test('network opponent ratings combine level, avatar allocation, and archetype without changing balance bounds',()=>{
+  const avatar={power:8,speed:6,chin:2,cardio:4},style={power:2,speed:-1,chin:1,cardio:0};
+  const levelOne=logic.networkOpponentRatings(1,avatar,style,.7);
+  const levelFive=logic.networkOpponentRatings(5,avatar,style,.7);
+  assert.deepEqual(levelOne,{power:8,speed:4,chin:5,cardio:4});
+  assert.deepEqual(levelFive,{power:15,speed:12,chin:12,cardio:12});
+  assert.ok(levelFive.power>levelFive.speed);
+  assert.deepEqual(logic.networkOpponentRatings(5,avatar,style,.7),levelFive);
+});
+
 test('training quote enforces daily, cash, and energy costs before rewards',()=>{
   const action={cost:20,sessions:2,gain:2};
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');

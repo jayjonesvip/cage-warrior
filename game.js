@@ -65,6 +65,8 @@
   let sharedSocialRefreshTimer=null;
   let sharedSocialNoticeShown=false;
   let sharedSocialInteractionsRemaining=0;
+  const networkOpponentCheckedLevels=new Set();
+  let networkOpponentSyncPromise=null;
   let activeBioProfileId='';
   let fighterInteractionPending=false;
 
@@ -160,12 +162,33 @@
   function ensureRoster(){
     if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;const bootstrapPast=!state.leagueInitialized&&state.roster.length===0;
     state.roster.forEach(o=>{normalizeOpponentArchetype(o);if(!o.championship&&o.retired){o.retired=false;delete o.retiredAt}});
-    for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.championship&&(o.lossesToPlayer||0)===0).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
+    for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.championship&&!o.network&&(o.lossesToPlayer||0)===0).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
     if(bootstrapPast){for(let tier=1;tier<state.level;tier++)for(let i=0;i<2;i++)state.roster.push(generateOpponent(tier))}
     ensureTitleChampions();
     state.roster.forEach(o=>{normalizeOpponentArchetype(o);ensureProfessionalRecord(o)});
     state.leagueInitialized=true;
     refreshOpponents();
+  }
+  function networkOpponentFromProfile(profile,tier){
+    const id=String(profile?.id||''),handle=String(profile?.handle||''),name=normalizeFighterName(profile?.fighter_name),avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),arch=opponentArchetypes.find(item=>item.id===profile?.archetype);
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)||!/^[A-Za-z][A-Za-z0-9]{2,31}_[0-9]{2,3}$/.test(handle)||!name||!avatar||!arch||Number(profile?.level)!==tier)return null;
+    const seed=hashSeed(`cage-network-v1|${id}|${tier}`),difficulty=((seed%3)-1)*.7,ratings=LOGIC.networkOpponentRatings(tier,avatar.stats,arch.mods,difficulty);
+    return {key:`network-${id}`,network:true,sourceProfileId:id,networkHandle:handle,networkCity:String(profile.city||''),networkPortrait:avatar.asset,fighterAvatar:avatar.id,name,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,...ratings,reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(0,Math.floor(Number(profile.wins))||0),losses:Math.max(0,Math.floor(Number(profile.losses))||0),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
+  }
+  async function syncNetworkOpponents(){
+    const tier=state.level;
+    if(!SHARED_FEED?.configured?.()||typeof SHARED_FEED.loadOpponentCandidates!=='function'||networkOpponentCheckedLevels.has(tier))return false;
+    if(networkOpponentSyncPromise)return networkOpponentSyncPromise;
+    const existing=state.roster.filter(o=>o.network&&o.tier===tier);
+    if(existing.length>=2){networkOpponentCheckedLevels.add(tier);return true}
+    networkOpponentCheckedLevels.add(tier);
+    networkOpponentSyncPromise=(async()=>{
+      const profiles=await SHARED_FEED.loadOpponentCandidates(tier,12),known=new Set(state.roster.map(o=>o.sourceProfileId).filter(Boolean)),additions=[];
+      for(const profile of profiles){const opponent=networkOpponentFromProfile(profile,tier);if(!opponent||known.has(opponent.sourceProfileId))continue;known.add(opponent.sourceProfileId);additions.push(opponent);if(additions.length>=2-existing.length)break}
+      if(!additions.length)return true;
+      state.roster.push(...additions);refreshOpponents();saveState();renderOpponents();toast(`${additions.length} CAGE NETWORK FIGHTER${additions.length===1?'':'S'} JOINED YOUR LEVEL`,'#76dcff');return true;
+    })().catch(()=>{networkOpponentCheckedLevels.delete(tier);return false}).finally(()=>{networkOpponentSyncPromise=null});
+    return networkOpponentSyncPromise;
   }
   function refreshOpponents(){
     const nextTitle=milestoneDefs.find(m=>!state.milestones.includes(m.id)),title=state.roster.filter(o=>opponentGroup(o)==='title'),current=state.roster.filter(o=>opponentGroup(o)==='current'),past=state.roster.filter(o=>opponentGroup(o)==='passed').sort((a,b)=>b.tier-a.tier),rivals=state.roster.filter(o=>opponentGroup(o)==='rival').sort((a,b)=>(b.meetings||0)-(a.meetings||0)||(b.createdAt||0)-(a.createdAt||0)),former=state.roster.filter(o=>opponentGroup(o)==='former'),locked=state.roster.filter(o=>opponentGroup(o)==='locked'&&(!o.championship?o.tier===state.level+1:o.titleId===nextTitle?.id&&o.tier<=state.level+1));opponents=[...title,...current,...past,...rivals,...former,...locked];
@@ -177,7 +200,7 @@
     for(const ch of o.name) h=(h*31+ch.charCodeAt(0))>>>0;
     return h%fighterSilhouettes.length;
   }
-  function silhouetteForOpponent(o){return fighterSilhouettes[spriteIndexForOpponent(o)]}
+  function silhouetteForOpponent(o){return o?.networkPortrait||fighterSilhouettes[spriteIndexForOpponent(o)]}
   function opponentContext(){return {level:state.level,milestones:state.milestones,titleOrder:milestoneDefs.map(m=>m.id),hasCity:!!currentCity()}}
   function opponentState(o){return LOGIC.opponentState(o,opponentContext())}
   function opponentGroup(o){return LOGIC.opponentGroup(o,opponentContext())}
@@ -577,7 +600,7 @@
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
     const changed=currentScreen!==screen;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
     if(screen==='feed')connectSharedSocial(true);else{clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null}
-    sfx.tap();updateUI();const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
+    sfx.tap();updateUI();if(screen==='fight')queueMicrotask(syncNetworkOpponents);const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
 
   function renderTrain(){
@@ -638,26 +661,27 @@
       const available=opponentAvailable(o);
       const stars=clamp(Math.ceil((o.power+o.speed+o.chin+o.cardio)/18),1,5);
       const silhouette=silhouetteForOpponent(o);
-      const badge=o.championship?(status==='title'?'TITLE FIGHT':status==='former'?'FORMER CHAMP':'TITLE LOCKED'):status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='rival'?`PAST RIVAL · LVL ${o.tier}`:'YOUR LEVEL';
-      const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rematch=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=o.championship?(status==='title'?`Beat the reigning champion for the ${o.titleName}`:status==='former'?`You defeated ${o.name} for the ${o.titleName}`:`Reigning ${o.titleName} champion · not yet unlocked`):status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='rival'?(available?`Rematch accepted · half purse $${fmt(purse)}`:`You beat ${o.name} · taunt them into another fight`):status==='passed'?(hasHistory?`Past level ${o.tier} · rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
+      const badge=o.network&&status==='current'?'CAGE NETWORK':o.championship?(status==='title'?'TITLE FIGHT':status==='former'?'FORMER CHAMP':'TITLE LOCKED'):status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='rival'?`PAST RIVAL · LVL ${o.tier}`:'YOUR LEVEL';
+      const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rematch=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),note=o.network?`AI-controlled snapshot of @${o.networkHandle} · their public record is never changed`:o.championship?(status==='title'?`Beat the reigning champion for the ${o.titleName}`:status==='former'?`You defeated ${o.name} for the ${o.titleName}`:`Reigning ${o.titleName} champion · not yet unlocked`):status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='rival'?(available?`Rematch accepted · half purse $${fmt(purse)}`:`You beat ${o.name} · taunt them into another fight`):status==='passed'?(hasHistory?`Past level ${o.tier} · rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`);
       const btn=status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='former'?`DEFEATED<br><small>FORMER CHAMP</small>`:'SEE MATCHUP';
       const action=tauntable?`<button class="fight-btn taunt" data-taunt-key="${o.key}">TAUNT<br><small>FOR REMATCH</small></button>`:`<button class="fight-btn ${status}" data-fight-key="${o.key}" ${!available?'disabled':''}>${btn}</button>`;
-      return `<article class="opponent ${status} ${o.championship?'champion':''} ${rematch?'rematch':''}" data-card-flip="true" data-card-name="${o.name}" tabindex="0" aria-label="${o.name} fighter card${rematch?', rematch available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
+      const safeName=escapeHtml(o.name),networkHandle=o.network?escapeHtml(o.networkHandle):'';
+      return `<article class="opponent ${status} ${o.championship?'champion':''} ${o.network?'network':''} ${rematch?'rematch':''}" data-card-flip="true" data-card-name="${safeName}" tabindex="0" aria-label="${safeName} fighter card${rematch?', rematch available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
         <div class="opponent-flip">
           <div class="opponent-side opponent-front" aria-hidden="false">
             <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
             <div class="opp-face">
-              <img class="opp-sprite" src="${silhouette}" alt="${o.name} silhouette" loading="lazy">
+              <img class="opp-sprite" src="${silhouette}" alt="${safeName} ${o.network?'portrait':'silhouette'}" loading="lazy">
               ${o.championship?`<span class="sil-label">${o.titleName}</span>`:status==='locked'?'<span class="sil-label">UPCOMING</span>':status==='passed'?`<span class="sil-label">${hasHistory?'PAST OPPONENT':'AVAILABLE'}</span>`:status==='rival'?'<span class="sil-label">PAST RIVAL</span>':''}
               ${rematch?`<span class="rematch-banner">${gameIcon('rematch','⚡')} REMATCH</span>`:''}
             </div>
-            <div class="opp-title"><h3>${o.name}</h3></div>
+            <div class="opp-title"><h3>${safeName}</h3>${o.network?`<small class="network-handle">@${networkHandle} · REAL FIGHTER</small>`:''}</div>
             <div class="flip-hint">↻ TAP CARD FOR DETAILS</div>
             ${action}
           </div>
           <div class="opponent-side opponent-back" aria-hidden="true">
             <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="flip-hint">DETAILS</span></div>
-            <div class="opp-back-title"><h3>${o.name}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
+            <div class="opp-back-title"><h3>${safeName}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
             <div class="opp-back-stats"><div class="opp-back-stat"><small>PWR</small><b>${o.power}</b></div><div class="opp-back-stat"><small>SPD</small><b>${o.speed}</b></div><div class="opp-back-stat"><small>CHN</small><b>${o.chin}</b></div><div class="opp-back-stat"><small>CAR</small><b>${o.cardio}</b></div></div>
             <div class="opp-back-info"><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div><div class="opp-note">${note}</div>${rivalry?`<span class="tendency rival-pill">${gameIcon('rival','🔥')} RIVAL</span>`:''}${hasHistory?`<div class="opp-history">H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}</div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY</div>'}</div>
             <div class="flip-hint">↻ TAP CARD TO RETURN</div>
@@ -983,11 +1007,11 @@
   function fillTape(f){
     const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),cleared=fightsLeft>0&&state.energy>=FIGHT_CLEARANCE_ENERGY&&state.health>=20;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
-    $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);
+    $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);$('#tapeOppSprite').classList.toggle('network-portrait',!!f.o.network);
     $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:f.o.network?'CAGE NETWORK · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio);
-    const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.`;
+    const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.',networkNote=f.o.network?" This is an AI-controlled snapshot; the real fighter's public record is unaffected.":'';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.${networkNote}`;
   }
 
   function showFightStage(stage){['tapeStage','openingStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
@@ -1103,7 +1127,7 @@
         if(contractDone)state.activeEndorsement=null;
       }
     }
-    openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
+    if(!o.network)openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
     trackEvent('fight_completed',{result:win?'win':'loss',method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 

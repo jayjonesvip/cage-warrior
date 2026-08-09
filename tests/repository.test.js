@@ -19,6 +19,7 @@ const cageFeedMigration = fs.readFileSync('supabase/migrations/20260809130000_sh
 const cageAvatarMigration = fs.readFileSync('supabase/migrations/20260809150000_cage_profile_avatars.sql', 'utf8');
 const cageInteractionMigration = fs.readFileSync('supabase/migrations/20260809200000_fighter_interactions.sql', 'utf8');
 const cageProfileCountMigration = fs.readFileSync('supabase/migrations/20260809210000_cage_profile_count.sql', 'utf8');
+const cageOpponentMigration = fs.readFileSync('supabase/migrations/20260809220000_cage_opponent_candidates.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -413,7 +414,7 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.doesNotMatch(script, /background-image:url\(\$\{silhouetteSheet\}\)/);
   assert.match(html, /Career Opponents/);
   assert.doesNotMatch(html, /The Living Roster/);
-  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\} \$\{rematch\?'rematch':''\}" data-card-flip="true"/);
+  assert.match(script, /<article class="opponent \$\{status\} \$\{o\.championship\?'champion':''\} \$\{o\.network\?'network':''\} \$\{rematch\?'rematch':''\}" data-card-flip="true"/);
   assert.match(html, /\.opponent-flip\{[^}]*transform-style:preserve-3d/);
   assert.match(html, /\.opponent\.flipped \.opponent-flip\{transform:rotateY\(180deg\)\}/);
   assert.match(script, /class="opponent-side opponent-front"/);
@@ -429,7 +430,7 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(script, /:'SEE MATCHUP'/);
   assert.match(script, /rivals=state\.roster\.filter\(o=>opponentGroup\(o\)==='rival'\)/);
   assert.match(script, /\['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'\]/);
-  assert.match(script, /active=state\.roster\.filter\(o=>o\.tier===tier&&!o\.championship&&\(o\.lossesToPlayer\|\|0\)===0\)/);
+  assert.match(script, /active=state\.roster\.filter\(o=>o\.tier===tier&&!o\.championship&&!o\.network&&\(o\.lossesToPlayer\|\|0\)===0\)/);
   assert.match(script, /if\(!o\.championship\)ensureRoster\(\)/);
   assert.match(script, /const openRosterGroups = new Set\(\['current'\]\)/);
   assert.match(script, /data-roster-toggle="\$\{status\}" aria-expanded="\$\{expanded\}"/);
@@ -678,6 +679,27 @@ test('bottom navigation opens every destination at the top', () => {
   const navTo = script.match(/function navTo\(screen\)\{([\s\S]*?)\r?\n\s*\}/)?.[1] || '';
   assert.match(navTo, /page\.scrollTop=0/);
   assert.match(navTo, /screen==='feed'.*socialTimeline.*scrollTop=0/);
+});
+
+test('Cage Network profiles become safe local AI opponent snapshots', () => {
+  assert.match(cageOpponentMigration, /get_cage_opponent_candidates/);
+  assert.match(cageOpponentMigration, /profile\.id <> v_user_id/);
+  assert.match(cageOpponentMigration, /profile\.level = v_level/);
+  assert.match(cageOpponentMigration, /interval '30 days'/);
+  assert.match(cageOpponentMigration, /grant execute .* to authenticated/);
+  assert.match(supabaseClient, /selectCageOpponentCandidates/);
+  assert.match(cageSocial, /loadOpponentCandidates/);
+  assert.match(script, /function networkOpponentFromProfile\(profile,tier\)/);
+  assert.match(script, /network:true,sourceProfileId:id/);
+  assert.match(script, /LOGIC\.networkOpponentRatings/);
+  assert.match(script, /if\(screen==='fight'\)queueMicrotask\(syncNetworkOpponents\)/);
+  assert.match(script, /existing\.length>=2/);
+  assert.match(script, /!o\.championship&&!o\.network/);
+  assert.match(script, /o\?\.networkPortrait\|\|fighterSilhouettes/);
+  assert.match(script, /AI-controlled snapshot/);
+  assert.match(script, /if\(!o\.network\)openSocialCycle\('fight'/);
+  assert.doesNotMatch(script, /update_cage_opponent|registerOpponent|sourceProfileId.*publish/);
+  assert.match(readme, /Cage Network/i);
 });
 
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
