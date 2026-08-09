@@ -10,9 +10,11 @@ const readme = fs.readFileSync('README.md', 'utf8');
 const strings = fs.readFileSync('strings.js', 'utf8');
 const logic = fs.readFileSync('game-logic.js', 'utf8');
 const analytics = fs.readFileSync('analytics.js', 'utf8');
+const cageSocial = fs.readFileSync('cage-social.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
 const pwaScript = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
+const cageFeedMigration = fs.readFileSync('supabase/migrations/20260809130000_shared_cage_feed.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -23,7 +25,7 @@ const stringsData = contentContext.CAGE_STRINGS;
 test('external game assets are linked and the game script parses', () => {
   const releaseVersionPattern = appVersion.replaceAll('.', '\\.');
   assert.match(page, new RegExp(`<link rel="stylesheet" href="styles\\.css\\?v=${releaseVersionPattern}">`));
-  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="analytics\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
+  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="analytics\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="cage-social\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
   const pageWithoutAllowedInlineScripts = page
     .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '')
     .replace(/<script>\s*window\.dataLayer[\s\S]*?gtag\('config', 'G-LMT6RLVT5L'\);\s*<\/script>/, '');
@@ -31,11 +33,14 @@ test('external game assets are linked and the game script parses', () => {
   assert.doesNotThrow(() => new Function(strings));
   assert.doesNotThrow(() => new Function(logic));
   assert.doesNotThrow(() => new Function(analytics));
+  assert.doesNotThrow(() => new Function(cageSocial));
   assert.doesNotThrow(() => new Function(script));
   assert.doesNotThrow(() => new Function(pwaScript));
   assert.doesNotThrow(() => new Function(serviceWorker));
   assert.match(script, /const LOGIC=globalThis\.CAGE_LOGIC/);
   assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
+  assert.match(script, /const SHARED_FEED=globalThis\.CAGE_SOCIAL/);
+  assert.match(serviceWorker, /'\.\/cage-social\.js\?v=/);
 });
 
 test('Google Analytics is configured and gameplay tracking is validated and non-fatal', () => {
@@ -128,6 +133,26 @@ test('install manifest uses valid branded icons and a stable in-scope launch URL
   }
   assert.equal(fs.readFileSync('assets/app-icon-192.png')[25], 6, 'standard install icon should preserve transparency');
   assert.equal(fs.readFileSync('assets/app-icon-512.png')[25], 6, 'large install icon should preserve transparency');
+});
+
+test('shared Cage Feed uses a public Supabase client with RLS-protected schema', () => {
+  assert.match(cageSocial, /https:\/\/oucstmfyfuoxyqcgqsqm\.supabase\.co/);
+  assert.match(cageSocial, /sb_publishable_/);
+  assert.doesNotMatch(cageSocial, /sb_secret_|service_role/);
+  assert.match(cageFeedMigration, /alter table public\.cage_profiles enable row level security/i);
+  assert.match(cageFeedMigration, /alter table public\.cage_feed_posts enable row level security/i);
+  assert.match(cageFeedMigration, /security definer\s+set search_path = ''/i);
+  assert.match(cageFeedMigration, /revoke execute on function public\.register_cage_profile[\s\S]*from public, anon/i);
+  assert.match(cageFeedMigration, /grant execute on function public\.publish_cage_post[\s\S]*to authenticated/i);
+  assert.match(cageFeedMigration, /when 'new-york' then 'NYC'/);
+  assert.match(cageFeedMigration, /when 'brawler' then 'Brawler'/);
+  assert.match(cageFeedMigration, /lpad\(v_suffix::text,2,'0'\)/);
+  assert.match(page, /id="rivalCalloutModal"/);
+  assert.match(script, /SHARED_FEED\.loadFeed\(50\)/);
+  assert.match(script, /SHARED_FEED\.loadProfiles\(100\)/);
+  assert.match(script, /socialRemoteInitialized:false/);
+  assert.match(script, /const hasOwnRemotePost=/);
+  assert.match(script, /publishPost\(\{kind:'player',body:'Hello, fight fans!/);
 });
 
 test('completed careers receive a native install offer and one verified collectible reward', async () => {
@@ -292,7 +317,7 @@ test('scalable copy pools are separated from gameplay logic', () => {
   assert.ok(stringsData.social.cycles.fightWin.length >= 3);
   assert.ok(stringsData.social.actions.callout.success.length >= 2);
   assert.match(script, /STRINGS\.fightCommentary\[landed\?'hit':'miss'\]\[type\]/);
-  assert.match(script, /copyPosts\(STRINGS\.social\.account/);
+  assert.match(script, /STRINGS\.social\.account\[0\]/);
   assert.match(script, /const actions=STRINGS\.social\.actions/);
   assert.doesNotMatch(script, /snaps a jab through the guard|First follow\. Let’s see where this goes/);
 });
@@ -584,7 +609,7 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.doesNotMatch(html, /class="feed-back"/);
   assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
   assert.match(script, /function socialUnreadCount\(\)/);
-  assert.match(script, /currentScreen==='feed'\)state\.socialLastReadSerial=state\.socialSerial/);
+  assert.match(script, /currentScreen==='feed'\)\{state\.socialLastReadSerial=state\.socialSerial/);
   assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
   assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#socialTimeline'\)\.scrollTo\(\{top:0,behavior:'smooth'\}\)\)/);
   assert.match(script, /function createSocialAccount\(\)/);
@@ -599,9 +624,11 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(script, /openSocialCycle\('sponsor'/);
   assert.match(script, /state\.socialPostedCycle>=state\.socialCycle/);
   assert.match(script, /id:'thank'.*Thank the Followers/);
-  assert.match(script, /id:'callout'.*Post a Rival Callout/);
+  assert.match(script, /id:'callout'.*Call Out a Real Fighter/);
   assert.match(script, /id:'brand'.*Influencer Brand Post/);
-  assert.match(script, /rival\.rematchAccepted=true/);
+  assert.match(script, /function openRivalCalloutModal\(\)/);
+  assert.match(script, /data-callout-profile/);
+  assert.match(script, /target\.handle/);
   assert.match(script, /state\.socialPostedCycle=state\.socialCycle/);
   assert.match(strings, /WIN STREAK: \{name\} has now won \{winStreak\} straight fights/);
   for (const name of ['FightFan99', 'MMA4Life', 'ScorecardBandit', 'FlukeWinPolice']) assert.match(strings, new RegExp(name));
@@ -609,7 +636,8 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   const publicityDefs = script.match(/const publicityDefs = (\[[\s\S]*?\n\s*\]);/)?.[1] || '';
   assert.doesNotMatch(riskDefs, /call-out-rival|Post a Rival Callout/);
   assert.doesNotMatch(publicityDefs, /social-post|Influencer Brand Post/);
-  assert.match(script, /THE COMMENTS COOKED YOU/);
+  const socialHandler = script.match(/function handleSocialPost\(type,target=null\)[\s\S]*?\n\s*\}/)?.[0] || '';
+  assert.doesNotMatch(socialHandler, /profile:'fan'|profile:'hater'/);
   assert.doesNotMatch(html, />FANS<|>Fans</);
   assert.match(readme, /one player post per news cycle/);
 });

@@ -23,7 +23,7 @@ globalThis.CAGE_STRINGS = {
 
   social: {
     profiles: {
-      media: {author:'Cage Report',handle:'@CageReport',tone:'media'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -89,7 +89,7 @@ globalThis.CAGE_STRINGS = {
         ]
       },
       callout: {
-        player: '{rival}, the first fight answered nothing. Sign the rematch and meet me in the cage.',
+        player: '{rival}, keep winning. I want your name across from mine when the matchmakers are ready.',
         success: [
           {profile:'rival',author:'{rival}',text:'You wanted my attention, {name}. You have it. Rematch accepted.'},
           {profile:'fan',text:'That callout had some heat. Book {name} versus {rival} again.'}

@@ -110,22 +110,29 @@ generated league.
 
 - A fighter has no social account and earns no Followers until Cage Feed is
   opened for the first time. That first visit creates the account, publishes a
-  "Hello, fight fans" introduction, and draws the first reactions and Followers.
+  "Hello, fight fans" introduction, and grants the first Followers.
   Existing saved careers that already have Followers are treated as connected
   accounts and keep their audience.
+- Cage Feed uses Supabase for a shared global timeline while the career itself
+  remains in `localStorage`. If Supabase is offline or has not been configured,
+  the existing local feed remains available and gameplay is never blocked.
+- The first successful connection receives an atomic, database-enforced handle
+  derived from the permanent identity, such as `NYCBrawler_01`. The numeric
+  suffix advances until a unique handle is found; later fighter-name edits do
+  not unexpectedly change the handle.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The timeline owns the Feed explanation and scrolls inside its own card. The
   player-post controls sit in a detached action dock pinned to the bottom of
   the Feed page and snapped flush to its side and bottom edges.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
-  deals generate contextual posts from reporters, promoters, gyms, rivals,
-  fans, and haters. Ordinary accounts use generated-style names such as
-  `FightFan99`, `MMA4Life`, and `ScorecardBandit`.
+  deals generate contextual `CageReporter` coverage. The global feed emphasizes
+  real fighters' canned posts instead of filling the timeline with fake fans.
 - Each notable event starts a news cycle with one player post available. The
-  player may thank Followers for safe growth, post a volatile rival callout
-  that can unlock a rematch, or publish an Influencer Brand Post for Cash and
-  Followers. There is only one player post per news cycle, and publishing
+  player may thank Followers, call out a real fighter from the shared roster,
+  or publish an Influencer Brand Post for Cash and Followers. Real-player
+  callouts are social posts only in this phase and do not fabricate an accepted
+  online fight. There is only one player post per news cycle, and publishing
   scrolls the timeline to the new post at the top.
 - Rival Callout and Influencer Brand Post live in Cage Feed rather than the
   Underground Buzz or Career Spotlight lists.
@@ -302,6 +309,17 @@ If a newer semantic version is deployed, the game opens a styled update dialog;
 updating reloads code without modifying the career save. For each release, keep
 the versions in `package.json`, the `app-version` meta tag, `app-version.json`,
 and `service-worker.js` synchronized. Tests enforce that contract.
+
+### Supabase Cage Feed setup
+
+The public browser client is in `cage-social.js`. The database migration is
+`supabase/migrations/20260809130000_shared_cage_feed.sql`; run that file once in
+the Supabase SQL Editor (or apply it with the Supabase CLI). In the Supabase
+Dashboard, enable **Authentication → Providers → Anonymous Sign-Ins**. The
+migration enables Row Level Security, permits authenticated reads, and restricts
+profile and post creation to validated RPC functions. Never place a secret or
+`service_role` key in this repository—the checked-in `sb_publishable_` key is
+the intentionally public browser key.
 
 ## Analytics
 
