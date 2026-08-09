@@ -16,6 +16,15 @@
 }
 
 .feed-post.fighter .feed-avatar{border-color:#8b72d8;background:linear-gradient(145deg,#533a9c,#18102f)}
+.feed-avatar.fighter-photo{padding:0;overflow:hidden;cursor:pointer;box-shadow:0 0 0 2px #07101a,0 0 10px #6ed7ff4a}
+.feed-avatar.fighter-photo img{width:100%;height:100%;display:block;object-fit:cover}
+.fighter-bio-dialog{text-align:center;border-color:#4f9ed2;background:radial-gradient(circle at 50% 0,#39bfff2b,transparent 44%),linear-gradient(155deg,#12233a,#070c14 78%)}
+.fighter-bio-avatar{width:112px;height:112px;margin:4px auto 9px;display:grid;place-items:center;overflow:hidden;border:2px solid #6ed7ff;border-radius:50%;background:#07111d;box-shadow:0 0 0 4px #0b1c2d,0 0 28px #1b9fff66;color:#6ed7ff;font-size:28px;font-weight:950}
+.fighter-bio-avatar img{width:100%;height:100%;display:block;object-fit:cover}
+.fighter-bio-handle{display:block;margin-bottom:4px;color:#74dcff;font-family:system-ui,sans-serif;font-size:9px;font-weight:950;letter-spacing:.5px}
+.fighter-bio-dialog h2{font-family:system-ui,sans-serif!important;font-size:21px!important;font-weight:950!important;text-transform:uppercase}
+.fighter-bio-dialog p{max-width:330px;margin:8px auto 15px;font-size:11px;line-height:1.55}
+.fighter-bio-dialog .modal-actions.single-action{grid-template-columns:1fr}
 .rival-callout-dialog{border-color:#6e5db4;background:radial-gradient(circle at 50% 0,#7658ce35,transparent 45%),linear-gradient(155deg,#17152c,#080a12 78%)}
 .rival-callout-dialog h2 span{color:#aa96ff}
 .rival-callout-dialog .modal-actions.single-action{grid-template-columns:1fr}

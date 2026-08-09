@@ -15,6 +15,7 @@ const script = fs.readFileSync('game.js', 'utf8');
 const pwaScript = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
 const cageFeedMigration = fs.readFileSync('supabase/migrations/20260809130000_shared_cage_feed.sql', 'utf8');
+const cageAvatarMigration = fs.readFileSync('supabase/migrations/20260809150000_cage_profile_avatars.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -153,6 +154,21 @@ test('shared Cage Feed uses a public Supabase client with RLS-protected schema',
   assert.match(script, /socialRemoteInitialized:false/);
   assert.match(script, /const hasOwnRemotePost=/);
   assert.match(script, /publishPost\(\{kind:'player',body:'Hello, fight fans!/);
+});
+
+test('real Cage Feed fighters expose validated avatars and public bios', () => {
+  assert.match(cageAvatarMigration, /add column if not exists fighter_avatar text/i);
+  assert.match(cageAvatarMigration, /fighter-\(0\[1-9\]\|1\[0-9\]\|20\)/);
+  assert.match(cageAvatarMigration, /register_cage_profile\([\s\S]*p_fighter_avatar text/i);
+  assert.match(cageAvatarMigration, /revoke execute on function public\.register_cage_profile\(text,text,text,integer,integer,integer,text\) from public, anon/i);
+  assert.match(cageSocial, /p_fighter_avatar:profile\.fighterAvatar/);
+  assert.match(cageSocial, /select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses/);
+  assert.match(page, /id="fighterBioModal"/);
+  assert.match(script, /data-feed-profile=/);
+  assert.match(script, /function fighterBioSentence\(profile\)/);
+  assert.match(script, /sharedSocialProfiles\.filter\(profile=>profile\.id!==state\.socialProfileId\)/);
+  assert.match(script, /REAL CAGE GRIND FIGHTER|fighterBioAvatar/);
+  assert.match(css, /\.feed-avatar\.fighter-photo/);
 });
 
 test('completed careers receive a native install offer and one verified collectible reward', async () => {

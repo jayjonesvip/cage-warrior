@@ -108,7 +108,8 @@
         p_archetype:profile.archetype,
         p_level:profile.level,
         p_wins:profile.wins,
-        p_losses:profile.losses
+        p_losses:profile.losses,
+        p_fighter_avatar:profile.fighterAvatar
       });
       return Array.isArray(data)?data[0]||null:data;
     }
@@ -120,7 +121,7 @@
 
     async function loadProfiles(limit=100){
       const count=Math.max(1,Math.min(200,Math.floor(Number(limit))||100));
-      const rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,fighter_name,city,archetype,level,wins,losses,updated_at&order=updated_at.desc&limit=${count}`);
+      const rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses,updated_at&order=updated_at.desc&limit=${count}`);
       const active=await ensureSession();
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
     }

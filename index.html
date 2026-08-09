@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.3.1" />
+<meta name="app-version" content="2.3.2" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.3.1">
+<link rel="stylesheet" href="styles.css?v=2.3.2">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -200,6 +200,17 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="fighterBioModal" aria-hidden="true">
+    <div class="gig-modal fighter-bio-dialog" role="dialog" aria-modal="true" aria-labelledby="fighterBioTitle" aria-describedby="fighterBioText">
+      <span class="loadout-dialog-kicker">REAL CAGE GRIND FIGHTER</span>
+      <div class="fighter-bio-avatar" id="fighterBioAvatar"></div>
+      <span class="fighter-bio-handle" id="fighterBioHandle"></span>
+      <h2 id="fighterBioTitle">Fighter</h2>
+      <p id="fighterBioText"></p>
+      <div class="modal-actions single-action"><button class="modal-run" id="fighterBioClose" type="button">BACK TO THE FEED</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="blackjackModal" aria-hidden="true">
     <div class="gig-modal blackjack-dialog" role="dialog" aria-modal="true" aria-labelledby="blackjackTitle" aria-describedby="blackjackRules">
       <span class="blackjack-kicker">UNDERGROUND BUZZ · ONE HAND DAILY</span>
@@ -316,11 +327,11 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.3.1"></script>
-<script src="strings.js?v=2.3.1"></script>
-<script src="analytics.js?v=2.3.1"></script>
-<script src="cage-social.js?v=2.3.1"></script>
-<script src="game.js?v=2.3.1"></script>
-<script src="pwa.js?v=2.3.1"></script>
+<script src="game-logic.js?v=2.3.2"></script>
+<script src="strings.js?v=2.3.2"></script>
+<script src="analytics.js?v=2.3.2"></script>
+<script src="cage-social.js?v=2.3.2"></script>
+<script src="game.js?v=2.3.2"></script>
+<script src="pwa.js?v=2.3.2"></script>
 </body>
 </html>

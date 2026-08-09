@@ -495,8 +495,8 @@
   function ensureSocialFeed(){return !!(state.socialAccountCreated&&state.socialFeed.length)}
   function socialUnreadCount(){return ensureSocialFeed()?state.socialFeed.filter(post=>(Number(post.id)||0)>state.socialLastReadSerial).length:0}
   function sharedSocialUnreadCount(){return sharedSocialStatus==='ready'?sharedSocialPosts.filter(post=>(Number(String(post.id).replace('shared-',''))||0)>state.socialLastRemotePostId).length:0}
-  function sharedProfilePayload(){return {fighterName:state.name,city:state.fighterCity,archetype:state.fighterStyle,level:state.level,wins:state.wins,losses:state.losses}}
-  function mapSharedPost(post){const reporter=post.post_kind==='reporter',mine=post.author_id===state.socialProfileId;return {id:`shared-${post.id}`,author:reporter?'CageReporter':post.author_name,handle:`@${reporter?'CageReporter':post.author_handle}`,tone:reporter?'media':mine?'player player-post':'fighter',text:String(post.body||''),createdAt:post.created_at,shared:true}}
+  function sharedProfilePayload(){return {fighterName:state.name,city:state.fighterCity,archetype:state.fighterStyle,fighterAvatar:state.fighterAvatar,level:state.level,wins:state.wins,losses:state.losses}}
+  function mapSharedPost(post){const reporter=post.post_kind==='reporter',mine=post.author_id===state.socialProfileId,profile=reporter?null:sharedSocialProfiles.find(item=>item.id===post.author_id)||null,avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar);return {id:`shared-${post.id}`,author:reporter?'CageReporter':post.author_name,handle:`@${reporter?'CageReporter':post.author_handle}`,tone:reporter?'media':mine?'player player-post':'fighter',text:String(post.body||''),createdAt:post.created_at,shared:true,profileId:profile?.id||'',avatarAsset:avatar?.asset||''}}
   function scheduleSharedSocialRefresh(){clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null;if(currentScreen==='feed'&&sharedSocialStatus==='ready')sharedSocialRefreshTimer=setTimeout(()=>connectSharedSocial(true),30000)}
   async function connectSharedSocial(force=false){
     if(!state.socialAccountCreated||!SHARED_FEED?.configured?.())return false;
@@ -510,7 +510,7 @@
       let [posts,profiles]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(100)]);const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
       if(!hasOwnRemotePost&&!state.socialRemoteInitialized){await SHARED_FEED.publishPost({kind:'player',body:'Hello, fight fans! Stay tuned—the climb starts now.'});posts=await SHARED_FEED.loadFeed(50)}
       state.socialRemoteInitialized=hasOwnRemotePost||Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
-      sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];sharedSocialProfiles=Array.isArray(profiles)?profiles:[];const latestRemoteId=Math.max(0,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0));if(currentScreen==='feed')state.socialLastRemotePostId=latestRemoteId;
+      sharedSocialProfiles=[profile,...(Array.isArray(profiles)?profiles.filter(item=>item.id!==profile.id):[])];sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];const latestRemoteId=Math.max(0,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0));if(currentScreen==='feed')state.socialLastRemotePostId=latestRemoteId;
       sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();scheduleSharedSocialRefresh();return true;
     })().catch(error=>{
       sharedSocialStatus='error';sharedSocialError=String(error?.message||'Shared feed unavailable.');sharedSocialPosts=[];sharedSocialProfiles=[];renderSocial();
@@ -549,9 +549,12 @@
     }
     const reporterPosts=posts.filter(post=>post.profile==='media');if(reporterPosts.length){addSocialPosts(reporterPosts);queueSharedPosts(reporterPosts.map(post=>({kind:'reporter',body:post.text})))}
   }
-  function calloutRivals(){return sharedSocialProfiles.slice().sort((a,b)=>(b.level||0)-(a.level||0)||(b.wins||0)-(a.wins||0)||String(a.handle).localeCompare(String(b.handle)))}
+  function calloutRivals(){return sharedSocialProfiles.filter(profile=>profile.id!==state.socialProfileId).sort((a,b)=>(b.level||0)-(a.level||0)||(b.wins||0)-(a.wins||0)||String(a.handle).localeCompare(String(b.handle)))}
   function feedAge(post){if(post.createdAt){const seconds=Math.max(0,Math.floor((Date.now()-new Date(post.createdAt).getTime())/1000));if(seconds<60)return 'NOW';if(seconds<3600)return `${Math.floor(seconds/60)}M`;if(seconds<86400)return `${Math.floor(seconds/3600)}H`;return `${Math.floor(seconds/86400)}D`}const age=Math.max(0,state.socialCycle-(Number(post.cycle)||0));return age===0?'NOW':age===1?'1 EVENT AGO':`${age} EVENTS AGO`}
-  function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase(),reactions=post.shared?'':`<div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div>`;return `<article class="feed-post ${escapeHtml(post.tone||'media')}"><div class="feed-avatar">${escapeHtml(initials)}</div><div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b><span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p>${reactions}</div></article>`}
+  function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase(),reactions=post.shared?'':`<div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div>`,avatar=post.avatarAsset&&post.profileId?`<button class="feed-avatar fighter-photo" type="button" data-feed-profile="${escapeHtml(post.profileId)}" aria-label="View ${escapeHtml(post.author)} fighter bio"><img src="${escapeHtml(post.avatarAsset)}" alt=""></button>`:`<div class="feed-avatar">${escapeHtml(initials)}</div>`;return `<article class="feed-post ${escapeHtml(post.tone||'media')}">${avatar}<div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b><span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p>${reactions}</div></article>`}
+  function fighterBioSentence(profile){const city=fighterCities.find(item=>item.id===profile.city)?.name||String(profile.city||'UNKNOWN').toUpperCase(),style=fighterStyles.find(item=>item.id===profile.archetype)?.name||'FIGHTER',wins=Math.max(0,Number(profile.wins)||0),losses=Math.max(0,Number(profile.losses)||0);return `${profile.fighter_name} is a Level ${Math.max(1,Number(profile.level)||1)} ${style.toLowerCase()} fighting out of ${city}, with a professional record of ${wins} win${wins===1?'':'s'} and ${losses} loss${losses===1?'':'es'}.`}
+  function openFighterBio(profile){if(!profile)return;const avatar=fighterAvatars.find(item=>item.id===profile.fighter_avatar);$('#fighterBioAvatar').innerHTML=avatar?`<img src="${escapeHtml(avatar.asset)}" alt="${escapeHtml(profile.fighter_name)}">`:'<span>CG</span>';$('#fighterBioHandle').textContent=`@${profile.handle}`;$('#fighterBioTitle').textContent=profile.fighter_name;$('#fighterBioText').textContent=fighterBioSentence(profile);$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
+  function closeFighterBio(){$('#fighterBioModal').classList.remove('open');$('#fighterBioModal').setAttribute('aria-hidden','true')}
   function renderSocial(){
     const accountReady=ensureSocialFeed(),sharedReady=sharedSocialStatus==='ready';if(accountReady&&currentScreen==='feed'){state.socialLastReadSerial=state.socialSerial;state.socialLastRemotePostId=Math.max(state.socialLastRemotePostId,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0))}const unread=socialUnreadCount()+sharedSocialUnreadCount(),used=!accountReady||state.socialPostedCycle>=state.socialCycle,rivals=calloutRivals(),brandLocked=state.level<2||state.fans<100,posts=sharedReady?sharedSocialPosts:state.socialFeed||[],navBadge=$('#feedNavBadge');navBadge.hidden=unread<1;navBadge.textContent=unread>99?'99+':String(unread);navBadge.setAttribute('aria-label',`${unread} unread Cage Feed posts`);
     $('#feedCycleStatus').textContent=!accountReady?'ACCOUNT NOT CREATED':sharedReady?`@${state.socialHandle} · GLOBAL FEED`:sharedSocialStatus==='loading'?'CONNECTING TO GLOBAL FEED':'LOCAL FEED · CONNECTING SOON';
@@ -1154,6 +1157,7 @@
     const blackjack=e.target.closest('[data-blackjack-open]');if(blackjack){openBlackjack();return}
     const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
     const sharedRival=e.target.closest('[data-callout-profile]');if(sharedRival){const profile=sharedSocialProfiles.find(item=>item.id===sharedRival.dataset.calloutProfile);if(profile)handleSocialPost('callout',profile);return}
+    const feedProfile=e.target.closest('[data-feed-profile]');if(feedProfile){openFighterBio(sharedSocialProfiles.find(item=>item.id===feedProfile.dataset.feedProfile));return}
     const social=e.target.closest('[data-social-post]');if(social){handleSocialPost(social.dataset.socialPost);return}
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
     const st=e.target.closest('[data-style]');if(st){chooseStyle(st.dataset.style);return}
@@ -1182,6 +1186,9 @@
   $('#rivalCalloutCancel').addEventListener('click',closeRivalCalloutModal);
   $('#rivalCalloutModal').addEventListener('click',e=>{if(e.target===$('#rivalCalloutModal'))closeRivalCalloutModal()});
   $('#rivalCalloutModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeRivalCalloutModal()});
+  $('#fighterBioClose').addEventListener('click',closeFighterBio);
+  $('#fighterBioModal').addEventListener('click',e=>{if(e.target===$('#fighterBioModal'))closeFighterBio()});
+  $('#fighterBioModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeFighterBio()});
   $('#loadoutFullOk').addEventListener('click',closeLoadoutFullDialog);
   $('#loadoutFullModal').addEventListener('click',e=>{if(e.target===$('#loadoutFullModal'))closeLoadoutFullDialog()});
   $('#loadoutFullModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeLoadoutFullDialog()});

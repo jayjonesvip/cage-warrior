@@ -97,7 +97,7 @@ test('profile registration, global feed reads, roster filtering, and callout pub
     },
   });
 
-  const profile = await client.registerProfile({ fighterName: 'JAY JONES', city: 'new-york', archetype: 'brawler', level: 4, wins: 7, losses: 2 });
+  const profile = await client.registerProfile({ fighterName: 'JAY JONES', city: 'new-york', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
@@ -108,7 +108,7 @@ test('profile registration, global feed reads, roster filtering, and callout pub
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));
   const registerBody = JSON.parse(authenticated.find(request => request.url.endsWith('register_cage_profile')).options.body);
-  assert.deepEqual(registerBody, { p_fighter_name: 'JAY JONES', p_city: 'new-york', p_archetype: 'brawler', p_level: 4, p_wins: 7, p_losses: 2 });
+  assert.deepEqual(registerBody, { p_fighter_name: 'JAY JONES', p_city: 'new-york', p_archetype: 'brawler', p_level: 4, p_wins: 7, p_losses: 2, p_fighter_avatar: 'fighter-07' });
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');
