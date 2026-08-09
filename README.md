@@ -258,8 +258,8 @@ Run the repository checks with:
 npm test
 ```
 
-The game uses `index.html`, `styles.css`, `game-logic.js`, `strings.js`, and
-`game.js` without a build step. `game-logic.js` contains the small shared rule
+The game uses `index.html`, `styles.css`, `game-logic.js`, `strings.js`,
+`analytics.js`, and `game.js` without a build step. `game-logic.js` contains the small shared rule
 helpers used by both the browser and behavioral tests. `strings.js` groups
 opponent names, fight commentary, Cage Feed
 copy, generated social usernames, and promoter ticker lines so new variations
@@ -297,3 +297,16 @@ If a newer semantic version is deployed, the game opens a styled update dialog;
 updating reloads code without modifying the career save. For each release, keep
 the versions in `package.json`, the `app-version` meta tag, `app-version.json`,
 and `service-worker.js` synchronized. Tests enforce that contract.
+
+## Analytics
+
+Google Analytics 4 measurement ID `G-LMT6RLVT5L` is loaded from the page head.
+`analytics.js` validates event and parameter names, strips unsupported values,
+limits string lengths, and treats analytics failures as non-fatal so tracking
+can never interrupt gameplay. The initial event set covers career setup and
+starts, screen navigation, training and recovery, hustles and publicity,
+endorsements, Cage Feed activity, daily rewards, blackjack, underground
+sparring, matchup and fight decisions, fight results, titles, level-ups, gear
+drops, and equipment changes. Events include gameplay categories and numeric
+outcomes but never fighter names, opponent names, social post copy, or saved
+career data.

@@ -9,6 +9,7 @@ const html = `${page}\n<style>${css}</style>`;
 const readme = fs.readFileSync('README.md', 'utf8');
 const strings = fs.readFileSync('strings.js', 'utf8');
 const logic = fs.readFileSync('game-logic.js', 'utf8');
+const analytics = fs.readFileSync('analytics.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
 const pwaScript = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
@@ -22,16 +23,62 @@ const stringsData = contentContext.CAGE_STRINGS;
 test('external game assets are linked and the game script parses', () => {
   const releaseVersionPattern = appVersion.replaceAll('.', '\\.');
   assert.match(page, new RegExp(`<link rel="stylesheet" href="styles\\.css\\?v=${releaseVersionPattern}">`));
-  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
-  const pageWithoutStructuredData = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '');
-  assert.doesNotMatch(pageWithoutStructuredData, /<style>|<script>(?!<\/script>)/);
+  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="analytics\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
+  const pageWithoutAllowedInlineScripts = page
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '')
+    .replace(/<script>\s*window\.dataLayer[\s\S]*?gtag\('config', 'G-LMT6RLVT5L'\);\s*<\/script>/, '');
+  assert.doesNotMatch(pageWithoutAllowedInlineScripts, /<style>|<script>(?!<\/script>)/);
   assert.doesNotThrow(() => new Function(strings));
   assert.doesNotThrow(() => new Function(logic));
+  assert.doesNotThrow(() => new Function(analytics));
   assert.doesNotThrow(() => new Function(script));
   assert.doesNotThrow(() => new Function(pwaScript));
   assert.doesNotThrow(() => new Function(serviceWorker));
   assert.match(script, /const LOGIC=globalThis\.CAGE_LOGIC/);
   assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
+});
+
+test('Google Analytics is configured and gameplay tracking is validated and non-fatal', () => {
+  assert.match(page, /googletagmanager\.com\/gtag\/js\?id=G-LMT6RLVT5L/);
+  assert.match(page, /gtag\('config', 'G-LMT6RLVT5L'\)/);
+  assert.match(serviceWorker, /'\.\/analytics\.js\?v=/);
+
+  const calls = [];
+  const context = { gtag: (...args) => calls.push(args) };
+  vm.runInNewContext(analytics, context);
+  const accepted = context.CAGE_ANALYTICS.track('training_completed', {
+    training_id: 'heavy-bag-rounds',
+    stat_gain: 2,
+    coach_used: true,
+    ignored: { save: 'data' },
+    'Bad Key': 'nope',
+    long_value: 'x'.repeat(150),
+  });
+  assert.equal(accepted, true);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][0], 'event');
+  assert.equal(calls[0][1], 'training_completed');
+  const sent = JSON.parse(JSON.stringify(calls[0][2]));
+  assert.deepEqual(sent, {
+    training_id: 'heavy-bag-rounds',
+    stat_gain: 2,
+    coach_used: true,
+    long_value: 'x'.repeat(100),
+  });
+  assert.equal(context.CAGE_ANALYTICS.track('Invalid Event', {}), false);
+  assert.equal(calls.length, 1);
+
+  const failingContext = { gtag: () => { throw new Error('blocked'); } };
+  vm.runInNewContext(analytics, failingContext);
+  assert.equal(failingContext.CAGE_ANALYTICS.track('game_open'), false);
+
+  for (const eventName of [
+    'career_started', 'game_screen_view', 'training_completed', 'recovery_completed',
+    'hustle_completed', 'publicity_completed', 'blackjack_completed',
+    'daily_reward_claimed', 'fight_started', 'fight_completed',
+    'gear_drop_revealed', 'social_post', 'endorsement_signed', 'level_up',
+  ]) assert.match(script, new RegExp(`trackEvent\\('${eventName}'`), `missing ${eventName} tracking`);
+  assert.doesNotMatch(script, /\b(?:fighter_name|opponent_name|post_text)\s*:/);
 });
 
 test('generated Cage Grind branding and navigation icons are wired into the interface', () => {
@@ -231,7 +278,7 @@ test('career identity shows followers and fighter renaming unlocks from the top 
   assert.match(script, /s\.name=normalizeFighterName\(s\.name\)\|\|defaultState\.name/);
   assert.match(script, /function openFighterNameModal\(\)\{if\(state\.level<2\)/);
   assert.match(script, /NAME EDITING UNLOCKS AT LVL 2/);
-  assert.match(script, /state\.name=name;closeFighterNameModal\(\)/);
+  assert.match(script, /state\.name=name;trackEvent\('fighter_name_changed'\);closeFighterNameModal\(\)/);
   assert.match(script, /nameButton\.classList\.toggle\('locked',!nameUnlocked\)/);
   assert.match(script, /\$\('#careerFollowersText'\)\.textContent=fmt\(state\.fans\)/);
   assert.match(readme, /naming modal\s+unlocks at level 2/);
@@ -298,7 +345,8 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.doesNotMatch(html, /id="tapeOppTag"/);
   assert.doesNotMatch(script, /\$\{rivalry\?'🔥 RIVAL · ':''\}\$\{o\.tag\}/);
   assert.doesNotMatch(script, /\$\{o\.tag\} · PRO \$\{o\.wins\}-\$\{o\.losses\}/);
-  assert.match(script, /const signature=state\.fighterStyle\|\|'pressure';fight\.openingApproach=approach;fight\.deepRead=approach==='feel';simulateRound\(fight,1,signature,\{mode:approach\}\);fight\.tendencyRevealed=true/);
+  assert.match(script, /const signature=state\.fighterStyle\|\|'pressure';fight\.openingApproach=approach;fight\.deepRead=approach==='feel';trackEvent\('fight_opening_selected'/);
+  assert.match(script, /simulateRound\(fight,1,signature,\{mode:approach\}\);fight\.tendencyRevealed=true/);
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
   assert.match(script, /function renderCornerPlans\(container,nextRound\)/);
   assert.match(script, /sameStyle\?\[signature\]:\[signature,opponentStyle\]/);
@@ -622,7 +670,8 @@ test('endorsements unlock as one crash-safe sequential offer', () => {
   assert.match(script, /s\.activeEndorsement=savedActiveId\?\{id:savedActiveId,fightsLeft:clamp/);
   assert.ok(script.indexOf('const ENDORSEMENT_IDS') < script.indexOf('state = loadState()'), 'endorsement migration data must exist before saved state loads');
   assert.match(script, /state\.endorsementHistory=\[\.\.\.new Set\(\[\.\.\.history,d\.id\]\)\]/);
-  assert.match(script, /changeFollowers\(Math\.round\(d\.fansPerFight\*\.5\)\);saveState\(\);openSocialCycle\('sponsor'/);
+  assert.match(script, /changeFollowers\(Math\.round\(d\.fansPerFight\*\.5\)\);trackEvent\('endorsement_signed'/);
+  assert.match(script, /saveState\(\);openSocialCycle\('sponsor'/);
 });
 
 test('level ups receive a dedicated promotion celebration', () => {

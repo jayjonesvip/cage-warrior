@@ -35,6 +35,11 @@
   };
 
   let state;
+  const ANALYTICS=globalThis.CAGE_ANALYTICS;
+  function trackEvent(eventName,parameters={}){
+    if(!ANALYTICS)return false;
+    return ANALYTICS.track(eventName,Object.assign({fighter_level:state?.level||1},parameters));
+  }
   let recoveryReport = null;
   let audioCtx = null;
   let currentScreen = 'home';
@@ -325,7 +330,7 @@
   function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
   function validFighterAllocation(stats){const keys=['power','speed','chin','cardio'];return !!stats&&keys.every(k=>Number.isInteger(stats[k])&&stats[k]>=2&&stats[k]<=8)&&keys.reduce((sum,k)=>sum+stats[k],0)===20}
   function milestoneName(m){const city=currentCity();if(m.scope==='city')return city?`${city.name} TITLE`:'CITY TITLE';if(m.scope==='region')return city?`${city.region} TITLE`:'REGIONAL TITLE';if(m.scope==='us')return 'U.S. TITLE';return m.name}
-  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);changeFollowers(m.level*75);toast(`${milestoneName(m)} WON!`,'#ffd36e',m.iconName,m.icon);confettiBurst();return true}
+  function awardTitle(o){const m=o&&o.championship?milestoneDefs.find(x=>x.id===o.titleId):null;if(!m||state.milestones.includes(m.id))return false;state.milestones.push(m.id);o.titleDefeated=true;receiveMoney(m.level*500,true);changeFollowers(m.level*75);trackEvent('title_won',{title_id:m.id});toast(`${milestoneName(m)} WON!`,'#ffd36e',m.iconName,m.icon);confettiBurst();return true}
   function gearCount(id){return Math.max(0,Math.floor(Number(state.gearCounts&&state.gearCounts[id]))||0)}
   function ownedBonus(prop){return state.gear.reduce((sum,id)=>{const g=gearItems.find(x=>x.id===id);return sum+(g&&g[prop]?g[prop]:0)},0)}
   function receiveMoney(amount,career=false){const value=Math.max(0,Math.round(Number(amount)||0));state.cash+=value;if(career)state.careerEarnings+=value;return value}
@@ -431,7 +436,7 @@
     while(state.xp>=xpNeed()){
       state.xp-=xpNeed();state.level++;const fullRestore=milestoneDefs.some(m=>m.level===state.level);LOGIC.applyLevelUpResources(state,fullRestore);titleRestore=titleRestore||fullRestore;const bonus=100*state.level;receiveMoney(bonus,true);earningsBonus+=bonus;leveled=true;
     }
-    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus,titleRestore:!!previous?.titleRestore||titleRestore};ensureRoster();showLevelUp(levelUpSummary)}
+    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus,titleRestore:!!previous?.titleRestore||titleRestore};trackEvent('level_up',{from_level:startingLevel,to_level:state.level,levels_gained:state.level-startingLevel});ensureRoster();showLevelUp(levelUpSummary)}
   }
   function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id)),recovery=summary.titleRestore?'Title milestone reached — energy and health fully restored.':'Your corner restored up to 30 energy and 25 health per level.';$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`${recovery} ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
   function closeLevelUp(){const modal=$('#levelUpModal');modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
@@ -462,12 +467,12 @@
     $('#fighterChoices').innerHTML=avatar?'':fighterAvatars.map((a,i)=>`<button class="avatar-card" data-avatar="${a.id}" aria-label="Select Fighter ${i+1}, Power ${a.stats.power}, Speed ${a.stats.speed}, Chin ${a.stats.chin}, Cardio ${a.stats.cardio}"><img src="${a.asset}" alt="Fighter ${i+1}" loading="lazy"><h3>FIGHTER ${String(i+1).padStart(2,'0')}</h3><div class="avatar-stats"><span>PWR ${a.stats.power}</span><span>SPD ${a.stats.speed}</span><span>CHN ${a.stats.chin}</span><span>CAR ${a.stats.cardio}</span></div><span class="avatar-total">SELECT</span></button>`).join('');
     if(avatar)$('#heroFighterArt').src=avatar.asset;
   }
-  function chooseStyle(id){if(state.fighterStyle||!state.fighterCity||!state.fighterAvatar)return;const style=fighterStyles.find(s=>s.id===id);if(!style)return;state.fighterStyle=id;sfx.win();confettiBurst();toast(`${style.name} IDENTITY LOCKED IN`,'#76dcff');updateUI()}
-  function chooseCity(id){if(state.fighterCity)return;const city=fighterCities.find(c=>c.id===id);if(!city)return;state.fighterCity=id;ensureTitleChampions();sfx.win();confettiBurst();toast(`FIGHTING OUT OF ${city.name}`,'#76dcff');updateUI()}
-  function chooseAvatar(id){if(state.fighterAvatar||!state.fighterCity)return;const avatar=fighterAvatars.find(a=>a.id===id);if(!avatar||!validFighterAllocation(avatar.stats)){toast('Fighter build must use exactly 20 points with every attribute from 2 through 8.','#ff766d');return}const keys=['power','speed','chin','cardio'],earned=Object.fromEntries(keys.map(k=>[k,Math.max(0,(Number(state.stats[k])||5)-5)]));state.fighterAvatar=id;state.fighterBaseStats=Object.assign({},avatar.stats);state.stats=Object.fromEntries(keys.map(k=>[k,avatar.stats[k]+earned[k]]));sfx.win();confettiBurst();toast(`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')} LOCKED IN · 20 POINT BUILD`,'#76dcff');updateUI()}
+  function chooseStyle(id){if(state.fighterStyle||!state.fighterCity||!state.fighterAvatar)return;const style=fighterStyles.find(s=>s.id===id);if(!style)return;state.fighterStyle=id;trackEvent('career_setup_step',{step:'archetype',selection:id});trackEvent('career_started',{archetype:id,city:state.fighterCity,avatar:state.fighterAvatar});sfx.win();confettiBurst();toast(`${style.name} IDENTITY LOCKED IN`,'#76dcff');updateUI()}
+  function chooseCity(id){if(state.fighterCity)return;const city=fighterCities.find(c=>c.id===id);if(!city)return;state.fighterCity=id;trackEvent('career_setup_step',{step:'city',selection:id});ensureTitleChampions();sfx.win();confettiBurst();toast(`FIGHTING OUT OF ${city.name}`,'#76dcff');updateUI()}
+  function chooseAvatar(id){if(state.fighterAvatar||!state.fighterCity)return;const avatar=fighterAvatars.find(a=>a.id===id);if(!avatar||!validFighterAllocation(avatar.stats)){toast('Fighter build must use exactly 20 points with every attribute from 2 through 8.','#ff766d');return}const keys=['power','speed','chin','cardio'],earned=Object.fromEntries(keys.map(k=>[k,Math.max(0,(Number(state.stats[k])||5)-5)]));state.fighterAvatar=id;state.fighterBaseStats=Object.assign({},avatar.stats);state.stats=Object.fromEntries(keys.map(k=>[k,avatar.stats[k]+earned[k]]));trackEvent('career_setup_step',{step:'avatar',selection:id});sfx.win();confettiBurst();toast(`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')} LOCKED IN · 20 POINT BUILD`,'#76dcff');updateUI()}
   function openFighterNameModal(){if(state.level<2){toast('NAME EDITING UNLOCKS AT LVL 2 · EARN CLUB FIGHTER STATUS','#ffcf78');sfx.lose();return}const input=$('#fighterNameInput');input.value=state.name;$('#fighterNameModal').classList.add('open');$('#fighterNameModal').setAttribute('aria-hidden','false');sfx.tap();requestAnimationFrame(()=>{input.focus();input.select()})}
   function closeFighterNameModal(){$('#fighterNameModal').classList.remove('open');$('#fighterNameModal').setAttribute('aria-hidden','true')}
-  function saveFighterName(e){e.preventDefault();const name=normalizeFighterName($('#fighterNameInput').value);if(!name){toast("Use 2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.",'#ff766d');return}state.name=name;closeFighterNameModal();sfx.tap();toast('FIGHTER NAME UPDATED','#76dcff');updateUI()}
+  function saveFighterName(e){e.preventDefault();const name=normalizeFighterName($('#fighterNameInput').value);if(!name){toast("Use 2–24 letters, numbers, spaces, periods, apostrophes, or hyphens.",'#ff766d');return}state.name=name;trackEvent('fighter_name_changed');closeFighterNameModal();sfx.tap();toast('FIGHTER NAME UPDATED','#76dcff');updateUI()}
 
   function socialProfile(key){
     const profiles=STRINGS.social.profiles;
@@ -484,7 +489,7 @@
     if(ensureSocialFeed())return;
     const firstAccount=!state.socialAccountCreated;state.socialAccountCreated=true;state.socialCycle=Math.max(1,state.socialCycle);state.socialPostedCycle=state.socialCycle;
     addSocialPosts(copyPosts(STRINGS.social.account,{name:state.name}));
-    const firstFollowers=firstAccount?changeFollowers(5):0;toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
+    const firstFollowers=firstAccount?changeFollowers(5):0;if(firstAccount)trackEvent('social_account_created',{followers_awarded:firstFollowers});toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
   }
   function openSocialCycle(type,data={}){
     if(!ensureSocialFeed())return;state.socialCycle=Math.max(1,state.socialCycle+1);
@@ -518,23 +523,23 @@
     $('#socialTimeline').innerHTML=posts.length?posts.map(renderFeedPost).join(''):'<div class="feed-preview-empty">No posts yet.</div>';
   }
   function handleSocialPost(type){
-    if(!ensureSocialFeed()){createSocialAccount();updateUI();return}if(state.socialPostedCycle>=state.socialCycle){toast('ONE POST PER NEWS CYCLE','#ffcf78');return}initAudio();const actions=STRINGS.social.actions;let playerText='',reactions=[];
+    if(!ensureSocialFeed()){createSocialAccount();updateUI();return}if(state.socialPostedCycle>=state.socialCycle){toast('ONE POST PER NEWS CYCLE','#ffcf78');return}initAudio();const actions=STRINGS.social.actions;let playerText='',reactions=[],analytics={post_type:type};
     if(type==='thank'){
-      const followers=changeFollowers(12+state.level*6+rint(0,8));state.hype=clamp(state.hype+2,0,100);playerText=copyText(actions.thank.player,{name:state.name});reactions=copyPosts(actions.thank.reactions,{name:state.name});toast(`+${followers} FOLLOWERS · +2% HYPE`,'#77d13e');sfx.win();
+      const followers=changeFollowers(12+state.level*6+rint(0,8));analytics={...analytics,outcome:'success',followers_gained:followers};state.hype=clamp(state.hype+2,0,100);playerText=copyText(actions.thank.player,{name:state.name});reactions=copyPosts(actions.thank.reactions,{name:state.name});toast(`+${followers} FOLLOWERS · +2% HYPE`,'#77d13e');sfx.win();
     }else if(type==='callout'){
       const rival=calloutRival();if(!rival){toast('BEAT A FIGHTER BEFORE CALLING FOR A REMATCH','#ffcf78');return}const success=Math.random()<.75,values={name:state.name,rival:rival.name};playerText=copyText(actions.callout.player,values);
-      if(success){const hype=rint(8,18),followers=changeFollowers(rint(20,60));state.hype=clamp(state.hype+hype,0,100);rival.rematchAccepted=true;reactions=copyPosts(actions.callout.success,values);toast(`CALLOUT CAUGHT FIRE · +${hype}% HYPE · +${followers} FOLLOWERS`,'#ad72ff');sfx.win();confettiBurst()}
-      else{state.hype=clamp(state.hype-5,0,100);reactions=copyPosts(actions.callout.failure,values);toast('POST FLOPPED · THE COMMENTS COOKED YOU · -5% HYPE','#ff6157');sfx.lose()}
+      if(success){const hype=rint(8,18),followers=changeFollowers(rint(20,60));analytics={...analytics,outcome:'success',followers_gained:followers,hype_change:hype};state.hype=clamp(state.hype+hype,0,100);rival.rematchAccepted=true;reactions=copyPosts(actions.callout.success,values);toast(`CALLOUT CAUGHT FIRE · +${hype}% HYPE · +${followers} FOLLOWERS`,'#ad72ff');sfx.win();confettiBurst()}
+      else{analytics={...analytics,outcome:'failure',hype_change:-5};state.hype=clamp(state.hype-5,0,100);reactions=copyPosts(actions.callout.failure,values);toast('POST FLOPPED · THE COMMENTS COOKED YOU · -5% HYPE','#ff6157');sfx.lose()}
     }else if(type==='brand'){
-      if(state.level<2||state.fans<100){toast('BRAND POSTS NEED LVL 2 AND 100 FOLLOWERS','#ffcf78');return}if(!spendEnergy(4))return;let cash=rint(45,125),followers=rint(15,45),viral=Math.random()<.18;if(viral){cash=Math.round(cash*1.65);followers=Math.round(followers*2.2)}receiveMoney(cash,true);followers=changeFollowers(followers);gainXp(7);playerText=copyText(actions.brand.player,{name:state.name});reactions=copyPosts(viral?actions.brand.viral:actions.brand.standard,{name:state.name});toast(`${viral?'BRAND POST WENT VIRAL':'BRAND POSTED'} · +$${fmt(cash)} · +${fmt(followers)} FOLLOWERS`,viral?'#6ed7ff':'#77d13e');sfx.coin();if(viral)confettiBurst();
+      if(state.level<2||state.fans<100){toast('BRAND POSTS NEED LVL 2 AND 100 FOLLOWERS','#ffcf78');return}if(!spendEnergy(4))return;let cash=rint(45,125),followers=rint(15,45),viral=Math.random()<.18;if(viral){cash=Math.round(cash*1.65);followers=Math.round(followers*2.2)}receiveMoney(cash,true);followers=changeFollowers(followers);analytics={...analytics,outcome:viral?'viral':'success',cash_earned:cash,followers_gained:followers};gainXp(7);playerText=copyText(actions.brand.player,{name:state.name});reactions=copyPosts(viral?actions.brand.viral:actions.brand.standard,{name:state.name});toast(`${viral?'BRAND POST WENT VIRAL':'BRAND POSTED'} · +$${fmt(cash)} · +${fmt(followers)} FOLLOWERS`,viral?'#6ed7ff':'#77d13e');sfx.coin();if(viral)confettiBurst();
     }else return;
-    state.socialPostedCycle=state.socialCycle;addSocialPosts([{profile:'player',text:playerText},...reactions]);updateUI();requestAnimationFrame(()=>$('#socialTimeline').scrollTo({top:0,behavior:'smooth'}));
+    state.socialPostedCycle=state.socialCycle;addSocialPosts([{profile:'player',text:playerText},...reactions]);trackEvent('social_post',analytics);updateUI();requestAnimationFrame(()=>$('#socialTimeline').scrollTo({top:0,behavior:'smooth'}));
   }
 
   function navTo(screen){
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
-    currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));
+    const changed=currentScreen!==screen;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
     sfx.tap();updateUI();const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
 
@@ -588,7 +593,7 @@
   }
   function openLoadoutFullDialog(trigger){const modal=$('#loadoutFullModal');loadoutDialogReturnFocus=trigger&&typeof trigger.focus==='function'?trigger:null;modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.lose();requestAnimationFrame(()=>$('#loadoutFullOk').focus())}
   function closeLoadoutFullDialog(){const modal=$('#loadoutFullModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();const returnFocus=loadoutDialogReturnFocus;loadoutDialogReturnFocus=null;if(returnFocus&&returnFocus.isConnected)requestAnimationFrame(()=>returnFocus.focus())}
-  function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);sfx.tap();updateUI();return}if(state.equippedGear.length>=4){openLoadoutFullDialog(trigger);return}state.equippedGear.push(id);initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
+  function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);trackEvent('gear_unequipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});sfx.tap();updateUI();return}if(state.equippedGear.length>=4){openLoadoutFullDialog(trigger);return}state.equippedGear.push(id);trackEvent('gear_equipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
     refreshOpponents();const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),activeCount=opponents.filter(opponentAvailable).length,rivalCount=state.roster.filter(o=>opponentGroup(o)==='rival').length;$('#fightLimitText').textContent=`${fightsLeft} ${fightsLeft===1?'FIGHT':'FIGHTS'} LEFT`;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${rivalCount} RIVALS`;
     const renderCard=o=>{
@@ -694,17 +699,17 @@
     }else{
       state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
     }
-    updateUI();
+    trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
     ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(),quote=LOGIC.recoveryQuote(state,treatment,fee,sessionsLeft('recovery',1)<1);
     if(quote.reason==='limit'){toast('Recovery room treatment already used today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Recovery treatment costs $${fee}. Pick up a side job first.`,'#ffcc75');return}
     if(quote.reason==='full'){toast('Your energy and health are already full.','#78dfff');return}
-    state.cash-=quote.cashCost;state.dailyCounters.recovery=1;const restored=LOGIC.applyRecovery(state,treatment);initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
+    state.cash-=quote.cashCost;state.dailyCounters.recovery=1;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
   function handleHustle(i){
-    ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
+    ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
   }
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
@@ -718,7 +723,7 @@
     receiveMoney(cash,true);fans=changeFollowers(fans);gainXp(a.xp);sfx.coin();
     if(viral){confettiBurst();sfx.win();toast(`THE CLIP WENT VIRAL! +$${fmt(cash)} · +${fmt(fans)} followers`,'#6ed7ff')}
     else toast(`+$${fmt(cash)} · +${fmt(fans)} followers`,'#77d13e');
-    openSocialCycle('appearance',{title:a.title,viral,followers:fans});
+    openSocialCycle('appearance',{title:a.title,viral,followers:fans});trackEvent('publicity_completed',{publicity_id:a.id,outcome:viral?'viral':'success',cash_earned:cash,followers_gained:fans,energy_spent:a.cost});
     updateUI();
   }
   function openAutographModal(){
@@ -762,7 +767,7 @@
     $('#autographResult').innerHTML=`<b>${fmt(signatures)} AUTOGRAPHS SIGNED</b><span>+$${fmt(cash)} income · ${fanText}<br>${price===0?'The free signing created a packed line and strong goodwill.':price>35?'The price caused backlash despite the payday.':'Your price shaped the turnout and final payment.'}</span>`;
     $('#autographResult').classList.add('show');$('#autographRun').style.display='none';$('#autographCancel').textContent='COLLECT & CLOSE';
     if(fanChange>=0){sfx.coin();if(price===0)confettiBurst()}else{sfx.lose();shake()}
-    openSocialCycle('autograph',{price,signatures,followers:fanChange});
+    openSocialCycle('autograph',{price,signatures,followers:fanChange});trackEvent('publicity_completed',{publicity_id:a.id,autograph_price:price,signatures,cash_earned:cash,followers_gained:fanChange,energy_spent:a.cost});
     saveState();updateUI();
   }
   function handleEndorsement(i){
@@ -770,7 +775,7 @@
     if(state.activeEndorsement){toast('Finish your current endorsement first.','#ffcf78');return}
     const nextOffer=nextEndorsementOffer();if(!nextOffer){toast('Every endorsement tier is complete.','#6ed7ff');return}if(d.id!==nextOffer.id){toast(`${nextOffer.brand} is the only offer on the table. Land that deal first.`,'#ffcf78');return}
     if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} followers`,'#75cfff');return}
-    initAudio();const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory=[...new Set([...history,d.id])];receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));saveState();openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
+    initAudio();const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory=[...new Set([...history,d.id])];receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));trackEvent('endorsement_signed',{endorsement_id:d.id,signing_bonus:d.signing,contract_fights:d.fights});saveState();openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
   }
   function shuffledBlackjackDeck(){
     const deck=[];for(const suit of ['S','H','D','C'])for(const rank of ['A','2','3','4','5','6','7','8','9','T','J','Q','K'])deck.push(rank+suit);
@@ -799,7 +804,7 @@
   }
   function closeBlackjack(){const modal=$('#blackjackModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
   function settleBlackjack(){
-    const hand=state.blackjackHand;if(!hand||hand.status!=='playing')return;const outcome=LOGIC.blackjackOutcome(hand.player,hand.dealer,hand.bet);hand.status='settled';hand.result=outcome.result;hand.payout=outcome.payout;state.cash+=outcome.payout;saveState();
+    const hand=state.blackjackHand;if(!hand||hand.status!=='playing')return;const outcome=LOGIC.blackjackOutcome(hand.player,hand.dealer,hand.bet);hand.status='settled';hand.result=outcome.result;hand.payout=outcome.payout;state.cash+=outcome.payout;trackEvent('blackjack_completed',{outcome:outcome.result,bet:hand.bet,payout:outcome.payout,profit:outcome.payout-hand.bet,player_cards:hand.player.length});saveState();
     if(outcome.result==='blackjack'||outcome.result==='win'){sfx.coin();confettiBurst()}else if(outcome.result==='loss'){sfx.lose();shake()}else sfx.tap();updateUI();renderBlackjackDialog();
   }
   function playBlackjackDealer(){
@@ -807,7 +812,7 @@
   }
   function dealBlackjack(){
     ensureDailyCounters();if(state.blackjackHand||sessionsLeft('blackjack',1)<1)return;const maxBet=LOGIC.blackjackBetLimit(state.cash),bet=Math.floor(Number($('#blackjackBet').value));if(!Number.isFinite(bet)||bet<1||bet>maxBet){toast(`Choose a whole-dollar bet from $1 to $${fmt(maxBet)}.`,'#ff766d');return}
-    initAudio();const deck=shuffledBlackjackDeck(),player=[deck.pop()],dealer=[deck.pop()];player.push(deck.pop());dealer.push(deck.pop());state.cash-=bet;state.dailyCounters.blackjack=1;state.blackjackHand={date:todayKey(),bet,deck,player,dealer,status:'playing',result:'',payout:0};saveState();sfx.tap();
+    initAudio();const deck=shuffledBlackjackDeck(),player=[deck.pop()],dealer=[deck.pop()];player.push(deck.pop());dealer.push(deck.pop());state.cash-=bet;state.dailyCounters.blackjack=1;state.blackjackHand={date:todayKey(),bet,deck,player,dealer,status:'playing',result:'',payout:0};trackEvent('blackjack_started',{bet,max_bet:maxBet});saveState();sfx.tap();
     const playerValue=LOGIC.blackjackHandValue(player),dealerValue=LOGIC.blackjackHandValue(dealer);if(playerValue.blackjack||dealerValue.blackjack)settleBlackjack();else{updateUI();renderBlackjackDialog()}
   }
   function hitBlackjack(){
@@ -818,13 +823,13 @@
     if(sessionsLeft('risk',1)<1){toast('You already used today’s underground risk.','#ff766d');return}
     if(!spendEnergy(a.cost))return;state.dailyCounters.risk++;
     if(Math.random()<a.success){
-      if(a.cash){const c=rint(...a.cash);receiveMoney(c);sfx.coin();toast(`YOU WON $${c}`,'#f4c34a');confettiBurst()}
+      if(a.cash){const c=rint(...a.cash);receiveMoney(c);trackEvent('underground_spar_completed',{outcome:'win',cash_earned:c,energy_spent:a.cost,health_lost:0});sfx.coin();toast(`YOU WON $${c}`,'#f4c34a');confettiBurst()}
     }else{
-      if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
+      if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);trackEvent('underground_spar_completed',{outcome:'loss',cash_earned:0,energy_spent:a.cost,health_lost:d});sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
     }updateUI();
   }
   function claimDaily(){
-    const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20,gearDrop=awardDailyCollectible(today);receiveMoney(cash);state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;updateUI();if(!gearDrop){toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');return}pendingResultDrop=Object.assign({extras:`+$${cash} CASH · +${energy} ENERGY`},gearDrop);resultDropRevealed=false;$('#resultTitle').textContent='DAILY DROP!';$('#resultTitle').className='win';$('#resultMethod').textContent='GUARANTEED COLLECTIBLE';$('#resultLine').textContent='Your daily package has a rarity card inside.';$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Cash';$('#rewardFans').textContent='+'+energy;$('#rewardFansLabel').textContent='Energy';$('#rewardXp').textContent='1';$('#rewardXpLabel').textContent='Collectible';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('daily-collectible','🎁')} COLLECTIBLE CARD READY<small>Reveal today’s guaranteed item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
+    const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20,gearDrop=awardDailyCollectible(today);receiveMoney(cash);state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;trackEvent('daily_reward_claimed',{cash_earned:cash,energy_restored:energy,gear_id:gearDrop?.item?.id||'none',gear_rarity:gearDrop?.rarity?.toLowerCase()||'none',new_item:!!gearDrop?.isNew});updateUI();if(!gearDrop){toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');return}pendingResultDrop=Object.assign({extras:`+$${cash} CASH · +${energy} ENERGY`},gearDrop);resultDropRevealed=false;$('#resultTitle').textContent='DAILY DROP!';$('#resultTitle').className='win';$('#resultMethod').textContent='GUARANTEED COLLECTIBLE';$('#resultLine').textContent='Your daily package has a rarity card inside.';$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Cash';$('#rewardFans').textContent='+'+energy;$('#rewardFansLabel').textContent='Energy';$('#rewardXp').textContent='1';$('#rewardXpLabel').textContent='Collectible';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('daily-collectible','🎁')} COLLECTIBLE CARD READY<small>Reveal today’s guaranteed item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
   }
 
   function emptyFightStats(){return {attempted:0,landed:0,sig:0,takedowns:0,control:0,damage:0,kd:0}}
@@ -939,11 +944,11 @@
   function showFightStage(stage){['tapeStage','openingStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
   function tauntOpponent(key){
     const o=state.roster.find(f=>f.key===key);if(!o||o.championship||(o.lossesToPlayer||0)<1||o.rematchAccepted)return;
-    o.rematchAccepted=true;state.hype=clamp(state.hype+3,0,100);initAudio();sfx.rage();shake(true);updateUI();toast(`${o.name} TOOK THE BAIT · REMATCH ACCEPTED!`,'#ffb157');
+    o.rematchAccepted=true;state.hype=clamp(state.hype+3,0,100);trackEvent('rival_taunted',{prior_meetings:o.meetings||0});initAudio();sfx.rage();shake(true);updateUI();toast(`${o.name} TOOK THE BAIT · REMATCH ACCEPTED!`,'#ffb157');
   }
   function openTaleOfTape(o){
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
-    clearFightTimers();fight=createFight(o);combatLocked=false;fightSpeed=1;fightTimelineIndex=0;$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#fightControls').classList.add('hidden');fillTape(fight);sfx.tap();
+    clearFightTimers();fight=createFight(o);combatLocked=false;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_matchup_viewed',{opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship});$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#fightControls').classList.add('hidden');fillTape(fight);sfx.tap();
   }
   function closeFightPreview(){if(combatLocked)return;clearFightTimers();$('#fightOverlay').classList.remove('active');fight=null;sfx.tap()}
   function commitFight(o=fight?.o){
@@ -953,7 +958,7 @@
     if(sessionsLeft('fight',DAILY_FIGHT_LIMIT)<1){toast('Daily fight limit reached. New fights unlock at local midnight.','#ff766d');fillTape(fight);return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
     const booking=LOGIC.bookFight(state,o.key,FIGHT_ROUND_COST,Date.now(),FIGHT_CLEARANCE_ENERGY);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${FIGHT_CLEARANCE_ENERGY} energy for three-round clearance.`,'#ff766d');return}
-    initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;
+    initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_started',{player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship,energy_reserved:FIGHT_CLEARANCE_ENERGY});
     $('#fightOverlay').classList.add('active');showFightStage('openingStage');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();
   }
 
@@ -964,7 +969,7 @@
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,FIGHT_ROUND_COST)>=HAYMAKER_ENERGY}
   function beginFightApproach(approach){
-    if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
+    if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
   }
   function showCornerChoice(){
     if(!fight||fight.winner||fight.rounds.length>=3){finishFightSimulation();return}
@@ -976,15 +981,15 @@
     }
     const style=fighterStyles.find(s=>s.id===fight.o.tendency),read=fight.tendencyRevealed&&next===2?`<div class="tendency-read"><b>${gameIcon('tendency-revealed','👁️')} ${fight.deepRead?'DEEP READ':'TENDENCY REVEALED'} · ${style?.name||fight.o.tag}</b>${fight.deepRead?`${fight.o.scout} Your corner can now judge the risk of meeting them in their own style.`:'One round exposed their core approach.'}</div>`:'',cornerTitle=next===3?'FINAL ROUND: MAKE YOUR CALL':'ROUND 2: STYLE DECISION';box.innerHTML=`<div class="corner-panel"><h3>${cornerTitle}</h3>${read}<p>${state.fighterStyle===fight.o.tendency?'You share the same archetype. Stay disciplined and fight your way.':'Fight your way or adapt to their revealed style.'}</p><div class="plan-grid" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
-  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(FIGHT_ROUND_COST)){toast('Not enough reserved energy to start the next round.','#ff766d');return}$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
+  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(FIGHT_ROUND_COST)){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
     if(!fight||fight.winner||fight.crisisUsed||fight.playerCondition>25)return;
     const next=fight.rounds.length+1,startIndex=fightTimelineIndex,roundsToReserve=FIGHT_ROUNDS-next+1;if(choice==='haymaker'&&!haymakerEnergyAvailable(roundsToReserve))return;
     fight.crisisUsed=true;$('#cornerChoice').innerHTML='';
     if(choice==='towel'){
-      fight.cornerTowel=true;fight.winner='opp';fight.method='TKO';fight.finishRound=next;fight.finishClock='5:00';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'ko',round:next,clock:'5:00',text:`The towel is in. ${state.name}'s corner stops the fight and ${fight.o.name} wins by TKO.`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
+      trackEvent('fight_crisis_choice',{round_number:next,choice:'towel',outcome:'tko_loss'});fight.cornerTowel=true;fight.winner='opp';fight.method='TKO';fight.finishRound=next;fight.finishClock='5:00';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'ko',round:next,clock:'5:00',text:`The towel is in. ${state.name}'s corner stops the fight and ${fight.o.name} wins by TKO.`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
-    if(!chargeFightEnergy(FIGHT_ROUND_COST+HAYMAKER_ENERGY)){fight.crisisUsed=false;showCornerChoice();return}const chance=haymakerChance(fight),landed=Math.random()<chance;
+    if(!chargeFightEnergy(FIGHT_ROUND_COST+HAYMAKER_ENERGY)){fight.crisisUsed=false;showCornerChoice();return}const chance=haymakerChance(fight),landed=Math.random()<chance;trackEvent('fight_crisis_choice',{round_number:next,choice:'haymaker',outcome:landed?'landed':'missed'});
     if(!landed){
       const damage=Math.max(12,Math.round(16+fight.opp.power*.65)),playerRound=emptyFightStats(),oppRound=emptyFightStats();playerRound.attempted=1;oppRound.attempted=1;oppRound.landed=1;oppRound.sig=1;oppRound.kd=1;oppRound.damage=damage;addFightStats(fight.totals.player,playerRound);addFightStats(fight.totals.opp,oppRound);fight.rounds.push({round:next,plan:'haymaker',player:playerRound,opp:oppRound,scoreP:8,scoreO:10});fight.haymakerMiss=true;fight.playerCondition=0;fight.winner='opp';fight.method='KO';fight.finishRound=next;fight.finishClock='4:55';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'action',round:next,clock:'4:57',text:`${state.name} loads up on the haymaker—but ${fight.o.name} sees it coming.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp'},{type:'ko',round:next,clock:'4:55',text:`COUNTER SHOT! ${state.name} is knocked out cold.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
@@ -996,9 +1001,9 @@
   }
   function resolveLastChance(choice){
     if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved||!['discipline','haymaker'].includes(choice))return;const startIndex=fightTimelineIndex;fight.lastChanceResolved=true;$('#cornerChoice').innerHTML='';
-    if(choice==='discipline'){settleFightDecision(fight);playFightTimeline(startIndex+1);return}
+    if(choice==='discipline'){trackEvent('fight_last_chance_choice',{choice:'discipline',outcome:'decision'});settleFightDecision(fight);playFightTimeline(startIndex+1);return}
     if(!haymakerEnergyAvailable()||!chargeFightEnergy(HAYMAKER_ENERGY)){fight.lastChanceResolved=false;showLastChanceDecision();return}
-    fight.crisisUsed=true;const landed=Math.random()<haymakerChance(fight),round=fight.rounds[fight.rounds.length-1];round.player.attempted++;fight.totals.player.attempted++;
+    fight.crisisUsed=true;const landed=Math.random()<haymakerChance(fight),round=fight.rounds[fight.rounds.length-1];trackEvent('fight_last_chance_choice',{choice:'haymaker',outcome:landed?'landed':'missed'});round.player.attempted++;fight.totals.player.attempted++;
     if(!landed){const damage=Math.max(12,Math.round(16+fight.opp.power*.65));round.opp.attempted++;round.opp.landed++;round.opp.sig++;round.opp.kd++;round.opp.damage+=damage;fight.totals.opp.attempted++;fight.totals.opp.landed++;fight.totals.opp.sig++;fight.totals.opp.kd++;fight.totals.opp.damage+=damage;fight.playerCondition=0;fight.haymakerMiss=true;fight.winner='opp';fight.method='KO';fight.finishRound=3;fight.finishClock='0:04';fight.finalDecisionPending=false;fight.timeline.splice(startIndex+1,1,{type:'action',round:3,clock:'0:07',text:`${state.name} loads up—but ${fight.o.name} reads the final swing.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp'},{type:'ko',round:3,clock:'0:04',text:`COUNTER SHOT! ${state.name} is knocked out with seconds left.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition});playFightTimeline(startIndex+1);return}
     const damage=Math.max(18,Math.round((20+fight.player.power*.78)*rand(.9,1.18)));round.player.landed++;round.player.sig++;round.player.kd++;round.player.damage+=damage;fight.totals.player.landed++;fight.totals.player.sig++;fight.totals.player.kd++;fight.totals.player.damage+=damage;fight.oppCondition=clamp(fight.oppCondition-damage,0,100);round.scoreP=10;round.scoreO=8;fight.lastChanceLanded=true;const finishChance=clamp(.22+(100-fight.oppCondition)*.004,.22,.68),knockout=fight.oppCondition<=0||Math.random()<finishChance;fight.timeline.splice(startIndex+1,0,{type:'action',round:3,clock:'0:06',text:`HAYMAKER LANDS! ${state.name} drops ${fight.o.name} with the fight slipping away!`,className:'big',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,big:true,landed:true,side:'player'});if(knockout){fight.winner='player';fight.method='KO';fight.finishRound=3;fight.finishClock='0:03';fight.finalDecisionPending=false;fight.timeline.splice(startIndex+2,1,{type:'ko',round:3,clock:'0:03',text:`IT'S OVER! ${state.name} steals it in the final seconds!`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition})}else settleFightDecision(fight);playFightTimeline(startIndex+1);
   }
@@ -1029,7 +1034,7 @@
 
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
-    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null,titleWon=false;o.meetings=(o.meetings||0)+1;
+    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null,titleWon=false;o.meetings=(o.meetings||0)+1;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();
       titleWon=awardTitle(o);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});
@@ -1050,11 +1055,11 @@
       }
     }
     openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
-    state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    trackEvent('fight_completed',{result:win?'win':'loss',method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:loot},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';$('#continueBtn').textContent=win?'CLAIM REWARDS':'CONTINUE';const lootBox=$('#lootBox');lootBox.style.display=gearDrop||loot?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=loot;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function revealGearDrop(){
-    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${gameIcon(item.iconName||item.id,item.icon)}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
+    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;trackEvent('gear_drop_revealed',{gear_id:item.id,gear_rarity:drop.rarity.toLowerCase(),is_new:drop.isNew,drop_reason:String(drop.reason).toLowerCase().replace(/\s+/g,'_')});const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${gameIcon(item.iconName||item.id,item.icon)}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
   }
 
   function handleResultAction(){if(revealGearDrop())return;closeResult()}
@@ -1126,5 +1131,6 @@
   hydrateStaticIcons();ensureLoadout();ensureRoster();
   recoveryReport=applyOfflineRecovery();
   updateUI();
+  trackEvent('game_open',{returning_career:(state.wins+state.losses)>0,setup_complete:!!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar)});trackEvent('game_screen_view',{screen_name:'home'});
   if(recoveryReport)setTimeout(()=>{const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push(`fight booking refunded`);toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff')},350);
 })();
