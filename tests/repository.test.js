@@ -10,23 +10,31 @@ const readme = fs.readFileSync('README.md', 'utf8');
 const strings = fs.readFileSync('strings.js', 'utf8');
 const logic = fs.readFileSync('game-logic.js', 'utf8');
 const script = fs.readFileSync('game.js', 'utf8');
+const pwaScript = fs.readFileSync('pwa.js', 'utf8');
+const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
+const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
+const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
+const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
 const contentContext = {};
 vm.runInNewContext(strings, contentContext);
 const stringsData = contentContext.CAGE_STRINGS;
 
 test('external game assets are linked and the game script parses', () => {
   assert.match(page, /<link rel="stylesheet" href="styles\.css">/);
-  assert.match(page, /<script src="game-logic\.js"><\/script>\s*<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>/);
-  assert.doesNotMatch(page, /<style>|<script>(?!<\/script>)/);
+  assert.match(page, /<script src="game-logic\.js"><\/script>\s*<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>\s*<script src="pwa\.js"><\/script>/);
+  const pageWithoutStructuredData = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '');
+  assert.doesNotMatch(pageWithoutStructuredData, /<style>|<script>(?!<\/script>)/);
   assert.doesNotThrow(() => new Function(strings));
   assert.doesNotThrow(() => new Function(logic));
   assert.doesNotThrow(() => new Function(script));
+  assert.doesNotThrow(() => new Function(pwaScript));
+  assert.doesNotThrow(() => new Function(serviceWorker));
   assert.match(script, /const LOGIC=globalThis\.CAGE_LOGIC/);
   assert.match(script, /const STRINGS=globalThis\.CAGE_STRINGS/);
 });
 
 test('generated Cage Grind branding and navigation icons are wired into the interface', () => {
-  assert.match(page, /<title>Cage Grind — A Combat Career<\/title>/);
+  assert.match(page, /<title>Cage Grind — Free MMA Career Browser Game<\/title>/);
   assert.match(page, /<img class="logo" src="assets\/cage-grind-logo\.png" alt="Cage Grind">/);
   assert.match(css, /\.logo\{[^}]*object-fit:contain/);
   const brandedAssets = [
@@ -39,6 +47,56 @@ test('generated Cage Grind branding and navigation icons are wired into the inte
     assert.equal(png.subarray(1, 4).toString(), 'PNG', `${asset} must remain a PNG`);
     assert.equal(png[25], 6, `${asset} must remain RGBA so its background stays transparent`);
   }
+});
+
+test('canonical SEO metadata consistently points crawlers and social previews to cagegrind.com', () => {
+  assert.match(page, /<link rel="canonical" href="https:\/\/cagegrind\.com\/" \/>/);
+  assert.match(page, /<meta name="description" content="[^"]*MMA fighter[^"]*" \/>/);
+  assert.match(page, /<meta property="og:url" content="https:\/\/cagegrind\.com\/" \/>/);
+  assert.match(page, /<meta property="og:image" content="https:\/\/cagegrind\.com\/assets\/cage-grind-social-card\.png" \/>/);
+  assert.match(page, /<meta name="twitter:card" content="summary_large_image" \/>/);
+  const structuredData = JSON.parse(page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] || '{}');
+  assert.equal(structuredData['@type'], 'VideoGame');
+  assert.equal(structuredData.url, 'https://cagegrind.com/');
+  assert.equal(structuredData.offers.price, '0');
+  assert.equal(fs.readFileSync('CNAME', 'utf8').trim(), 'cagegrind.com');
+  assert.match(fs.readFileSync('robots.txt', 'utf8'), /Sitemap: https:\/\/cagegrind\.com\/sitemap\.xml/);
+  assert.match(fs.readFileSync('sitemap.xml', 'utf8'), /<loc>https:\/\/cagegrind\.com\/<\/loc>/);
+});
+
+test('install manifest uses valid branded icons and a stable in-scope launch URL', () => {
+  assert.match(page, /<link rel="manifest" href="manifest\.webmanifest" \/>/);
+  assert.equal(manifest.id, './');
+  assert.equal(manifest.start_url, './');
+  assert.equal(manifest.scope, './');
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.orientation, 'portrait');
+  assert.deepEqual(manifest.categories, ['games', 'sports']);
+  for (const icon of manifest.icons) {
+    const png = fs.readFileSync(icon.src);
+    const [expectedWidth, expectedHeight] = icon.sizes.split('x').map(Number);
+    assert.equal(png.readUInt32BE(16), expectedWidth, `${icon.src} width must match its manifest declaration`);
+    assert.equal(png.readUInt32BE(20), expectedHeight, `${icon.src} height must match its manifest declaration`);
+  }
+  assert.equal(fs.readFileSync('assets/app-icon-192.png')[25], 6, 'standard install icon should preserve transparency');
+  assert.equal(fs.readFileSync('assets/app-icon-512.png')[25], 6, 'large install icon should preserve transparency');
+});
+
+test('PWA version checks compare releases without touching career save storage', () => {
+  const context = {};
+  vm.runInNewContext(pwaScript, context);
+  assert.equal(context.CAGE_PWA.compareVersions('2.1.0', '2.0.9'), 1);
+  assert.equal(context.CAGE_PWA.compareVersions('2.1.0', '2.1.0'), 0);
+  assert.equal(context.CAGE_PWA.compareVersions('2.0.9', '2.1.0'), -1);
+  assert.equal(context.CAGE_PWA.validVersion('2.1.0'), true);
+  assert.equal(context.CAGE_PWA.validVersion('latest'), false);
+  assert.equal(appVersion, packageVersion);
+  assert.match(page, new RegExp(`<meta name="app-version" content="${appVersion.replaceAll('.', '\\.')}" \\/>`));
+  assert.match(serviceWorker, new RegExp(`const APP_VERSION='${appVersion.replaceAll('.', '\\.')}';`));
+  assert.match(pwaScript, /fetch\(versionUrl,\{cache:'no-store'/);
+  assert.match(pwaScript, /navigator\.serviceWorker\.register\('service-worker\.js'/);
+  assert.match(serviceWorker, /event\.data\?\.type==='SKIP_WAITING'/);
+  assert.doesNotMatch(pwaScript, /localStorage|cage-warrior-save/);
 });
 
 test('DOM ids are unique', () => {
@@ -445,6 +503,12 @@ test('Cage Feed turns career events into one strategic player post per news cycl
   assert.match(readme, /one player post per news cycle/);
 });
 
+test('bottom navigation opens every destination at the top', () => {
+  const navTo = script.match(/function navTo\(screen\)\{([\s\S]*?)\r?\n\s*\}/)?.[1] || '';
+  assert.match(navTo, /page\.scrollTop=0/);
+  assert.match(navTo, /screen==='feed'.*socialTimeline.*scrollTop=0/);
+});
+
 test('equipping fight gear triggers the collectible-card burst before rerendering', () => {
   assert.match(html, /\.gear\.equip-bursting\{animation:equipCardBurst/);
   assert.match(html, /@keyframes equipRays/);
@@ -506,14 +570,22 @@ test('training includes one paid daily energy recovery treatment', () => {
   assert.match(script, /state\.dailyCounters\.recovery=1/);
 });
 
-test('training and hustle share one live local-midnight reset timer', () => {
-  assert.equal((page.match(/data-daily-reset-clock/g)||[]).length,2);
+test('fight, training, and hustle share one live local-midnight reset timer', () => {
+  assert.equal((page.match(/data-daily-reset-clock/g)||[]).length,3);
   assert.match(page, /DAILY LIMITS RESET IN/);
   assert.match(page, /YOUR LOCAL MIDNIGHT/);
   assert.match(script, /function updateDailyResetClocks\(\)/);
   assert.equal((script.match(/setInterval\(updateDailyResetClocks,1000\)/g)||[]).length,1);
   assert.match(script, /date!==dailyResetDate/);
   assert.match(css, /\.daily-reset-clock\{/);
+});
+
+test('career fights have a ten-fight daily cap', () => {
+  assert.match(page, /DAILY FIGHTS RESET IN/);
+  assert.match(page, /id="fightLimitText">10 FIGHTS LEFT/);
+  assert.match(script, /DAILY_FIGHT_LIMIT=10/);
+  assert.match(script, /sessionsLeft\('fight',DAILY_FIGHT_LIMIT\)/);
+  assert.match(script, /state\.dailyCounters\.fight\+\+/);
 });
 
 test('endorsements unlock as one crash-safe sequential offer', () => {
@@ -540,6 +612,10 @@ test('level ups receive a dedicated promotion celebration', () => {
   assert.match(script, /function showLevelUp\(summary\)/);
   assert.match(script, /levelUpSummary=\{fromLevel:previous\?\.fromLevel\|\|startingLevel,toLevel:state\.level,earningsBonus:/);
   assert.match(script, /newTitles=milestoneDefs\.filter/);
+  assert.match(script, /fullRestore=milestoneDefs\.some\(m=>m\.level===state\.level\)/);
+  assert.match(script, /LOGIC\.applyLevelUpResources\(state,fullRestore\)/);
+  assert.match(script, /up to 30 energy and 25 health per level/);
+  assert.doesNotMatch(script, /state\.energy=state\.maxEnergy;state\.maxHealth\+=5;state\.health=state\.maxHealth/);
   assert.match(script, /modal\._burstTimer=setTimeout\(confettiBurst,620\)/);
   assert.match(script, /function closeLevelUp\(\)/);
   assert.match(script, /\$\('#levelUpContinue'\)\.addEventListener\('click',closeLevelUp\)/);

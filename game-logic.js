@@ -94,9 +94,10 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,train:0,hustle:0,risk:0,publicity:0,recovery:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0};
     return {
       date:today,
+      fight:clamp(nonNegativeWhole(counters.fight),0,10),
       train:clamp(nonNegativeWhole(counters.train),0,4),
       hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
       risk:clamp(nonNegativeWhole(counters.risk),0,1),
@@ -110,6 +111,14 @@
     if(state.energy<amount)return false;
     state.energy=clamp(state.energy-amount,0,state.maxEnergy);
     return true;
+  }
+
+  function applyLevelUpResources(state,fullRestore=false){
+    state.maxEnergy=Math.max(1,finite(state.maxEnergy)+3);
+    state.maxHealth=Math.max(1,finite(state.maxHealth)+5);
+    state.energy=fullRestore?state.maxEnergy:clamp(finite(state.energy)+30,0,state.maxEnergy);
+    state.health=fullRestore?state.maxHealth:clamp(finite(state.health)+25,0,state.maxHealth);
+    return state;
   }
 
   function bookFight(state,key,cost=15,startedAt=Date.now(),requiredEnergy=cost){
@@ -194,5 +203,5 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
 });

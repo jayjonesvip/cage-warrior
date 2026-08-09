@@ -2,6 +2,8 @@
 
 [![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
 
+[Play Cage Grind](https://cagegrind.com/)
+
 Cage Grind is a mobile-first, single-player combat-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
 The page loads its presentation from `styles.css`, scalable copy pools from
@@ -81,6 +83,9 @@ generated league.
 - Three-round fight clearance requires 30 energy. The game charges 10 energy
   only when each round actually begins, so a first-round finish costs 10, a
   second-round finish costs 20, and a fight that reaches Round 3 costs 30.
+- Fighters can complete up to 10 fights per local calendar day. The Fight page
+  shows the remaining bouts and a live countdown to the local-midnight reset;
+  energy and medical clearance remain the primary pacing limits.
 - If the player's corner has them behind on the unofficial scorecards with ten
   seconds left in Round 3, the action pauses for one last decision: stay
   disciplined or spend 5 additional energy on a haymaker. Landing can score a
@@ -95,8 +100,10 @@ generated league.
   champion; the belt is awarded only after that fighter is defeated.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
-  and rank, cumulative max-energy and max-health gains, full restoration,
-  career bonus, and any newly unlocked title challenge.
+  and rank, cumulative max-energy and max-health gains, partial recovery,
+  career bonus, and any newly unlocked title challenge. Ordinary levels restore
+  up to 30 energy and 25 health; title-challenge levels 5, 9, 12, and 15 fully
+  restore both resources.
 
 ### Cage Feed
 
@@ -259,3 +266,24 @@ cover script parsing plus behavioral save recovery and migration, resource
 clamping, fight booking and payouts, rematches, opponent availability, training,
 gear pity, endorsements, daily resets, roster rules, readable text sizing,
 equipment drops, reward reveals, and the Cash/Career Earnings economy.
+
+## Deployment, search, and installation
+
+`cagegrind.com` is the canonical public URL. The repository includes the Pages
+`CNAME`, canonical and social-sharing metadata, structured game data,
+`robots.txt`, `sitemap.xml`, and a 1200×630 social card. DNS still has to point
+the apex domain to GitHub Pages at the registrar; `onlinecagefighting.com`
+should redirect to the canonical URL rather than serve a second copy.
+
+`manifest.webmanifest` and the branded 192px/512px icons make the game
+installable on supporting browsers. Transparent icons are used for the normal
+install artwork, while the separate maskable icon intentionally has an opaque
+safe-zone background for launchers that crop icons into platform shapes.
+
+`service-worker.js` caches the core shell and previously visited same-origin
+assets for offline fallback. `pwa.js` checks uncached `app-version.json` on
+startup, when the app returns to the foreground, and when connectivity returns.
+If a newer semantic version is deployed, the game opens a styled update dialog;
+updating reloads code without modifying the career save. For each release, keep
+the versions in `package.json`, the `app-version` meta tag, `app-version.json`,
+and `service-worker.js` synchronized. Tests enforce that contract.

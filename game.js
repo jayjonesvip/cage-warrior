@@ -27,7 +27,7 @@
     version:13,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',train:0,hustle:0,risk:0,publicity:0,recovery:0},
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0},
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,
     pendingFight:null,
@@ -231,7 +231,7 @@
     {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0},
     {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12}
   ];
-  const FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3,FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST*FIGHT_ROUNDS,HAYMAKER_ENERGY=5;
+  const FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3,FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST*FIGHT_ROUNDS,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
 
   const publicityDefs = [
     {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
@@ -415,13 +415,13 @@
 
   function gainXp(amount){
     state.xp+=amount;const startingLevel=state.level;
-    let leveled=false,earningsBonus=0;
+    let leveled=false,earningsBonus=0,titleRestore=false;
     while(state.xp>=xpNeed()){
-      state.xp-=xpNeed();state.level++;state.maxEnergy+=3;state.energy=state.maxEnergy;state.maxHealth+=5;state.health=state.maxHealth;const bonus=100*state.level;receiveMoney(bonus,true);earningsBonus+=bonus;leveled=true;
+      state.xp-=xpNeed();state.level++;const fullRestore=milestoneDefs.some(m=>m.level===state.level);LOGIC.applyLevelUpResources(state,fullRestore);titleRestore=titleRestore||fullRestore;const bonus=100*state.level;receiveMoney(bonus,true);earningsBonus+=bonus;leveled=true;
     }
-    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus};ensureRoster();showLevelUp(levelUpSummary)}
+    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus,titleRestore:!!previous?.titleRestore||titleRestore};ensureRoster();showLevelUp(levelUpSummary)}
   }
-  function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id));$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`Energy and health fully restored. ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
+  function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id)),recovery=summary.titleRestore?'Title milestone reached — energy and health fully restored.':'Your corner restored up to 30 energy and 25 health per level.';$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`${recovery} ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
   function closeLevelUp(){const modal=$('#levelUpModal');modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
   function spendEnergy(n){if(!LOGIC.spendEnergy(state,n)){toast('Not enough energy. It refills over time.','#ff766d');return false}return true}
 
@@ -523,7 +523,7 @@
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
     currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));
-    sfx.tap();updateUI();
+    sfx.tap();updateUI();const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
 
   function renderTrain(){
@@ -576,7 +576,7 @@
   function closeLoadoutFullDialog(){const modal=$('#loadoutFullModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();const returnFocus=loadoutDialogReturnFocus;loadoutDialogReturnFocus=null;if(returnFocus&&returnFocus.isConnected)requestAnimationFrame(()=>returnFocus.focus())}
   function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);sfx.tap();updateUI();return}if(state.equippedGear.length>=4){openLoadoutFullDialog(trigger);return}state.equippedGear.push(id);initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
-    refreshOpponents();const activeCount=opponents.filter(opponentAvailable).length,rivalCount=state.roster.filter(o=>opponentGroup(o)==='rival').length;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${rivalCount} RIVALS`;
+    refreshOpponents();const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),activeCount=opponents.filter(opponentAvailable).length,rivalCount=state.roster.filter(o=>opponentGroup(o)==='rival').length;$('#fightLimitText').textContent=`${fightsLeft} ${fightsLeft===1?'FIGHT':'FIGHTS'} LEFT`;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${rivalCount} RIVALS`;
     const renderCard=o=>{
       const status=opponentGroup(o);
       const available=opponentAvailable(o);
@@ -872,11 +872,11 @@
   function settleFightDecision(sim){const score=LOGIC.fightScore(sim.rounds),margin=Math.abs(score.player-score.opponent);sim.winner=score.player>=score.opponent?'player':'opp';sim.method=margin<=1&&Math.random()<.45?'SPLIT DECISION':'UNANIMOUS DECISION';sim.finishRound=3;sim.finishClock='0:00';sim.finalDecisionPending=false}
 
   function fillTape(f){
-    const cleared=state.energy>=FIGHT_CLEARANCE_ENERGY&&state.health>=20;
+    const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),cleared=fightsLeft>0&&state.energy>=FIGHT_CLEARANCE_ENERGY&&state.health>=20;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);
     $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio);
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.`;
   }
@@ -895,6 +895,7 @@
     if(!o)return;
     if(combatLocked||state.pendingFight)return;
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
+    if(sessionsLeft('fight',DAILY_FIGHT_LIMIT)<1){toast('Daily fight limit reached. New fights unlock at local midnight.','#ff766d');fillTape(fight);return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
     const booking=LOGIC.bookFight(state,o.key,FIGHT_ROUND_COST,Date.now(),FIGHT_CLEARANCE_ENERGY);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${FIGHT_CLEARANCE_ENERGY} energy for three-round clearance.`,'#ff766d');return}
     initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;
@@ -972,7 +973,7 @@
   }
 
   function finishFightSimulation(){
-    if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;
+    if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
     const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,loot='',gearDrop=null,titleWon=false;o.meetings=(o.meetings||0)+1;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();

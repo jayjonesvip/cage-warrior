@@ -83,6 +83,16 @@ test('fight booking charges ten per started round and protects the scheduled res
   assert.equal(state.energy,5);
 });
 
+test('ordinary level ups grant partial recovery while title milestones restore fully',()=>{
+  const ordinary={energy:10,maxEnergy:100,health:20,maxHealth:100};
+  logic.applyLevelUpResources(ordinary,false);
+  assert.deepEqual(ordinary,{energy:40,maxEnergy:103,health:45,maxHealth:105});
+
+  const milestone={energy:10,maxEnergy:100,health:20,maxHealth:100};
+  logic.applyLevelUpResources(milestone,true);
+  assert.deepEqual(milestone,{energy:103,maxEnergy:103,health:105,maxHealth:105});
+});
+
 test('fight and rematch payouts preserve existing formulas',()=>{
   const newOpponent={reward:200,tier:3,lossesToPlayer:0};
   const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};
@@ -154,8 +164,8 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',train:4,hustle:3,risk:1,publicity:2,recovery:1},today),{date:today,train:0,hustle:0,risk:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,train:99,hustle:-4,risk:8,publicity:3,recovery:9},today),{date:today,train:4,hustle:0,risk:1,publicity:2,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,hustle:3,risk:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,publicity:2,recovery:1});
 });
 
 test('daily reset countdown targets the next local midnight',()=>{

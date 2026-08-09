@@ -4,9 +4,52 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#030914" />
-<title>Cage Grind — A Combat Career</title>
-<link rel="icon" type="image/png" href="assets/icons/nav-fight.png">
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="Build an MMA fighter from unknown rookie to world champion in Cage Grind, a free tactical combat-career browser game with training, rivals, gear, sponsors, and persistent saves." />
+<meta name="robots" content="index,follow,max-image-preview:large" />
+<meta name="application-name" content="Cage Grind" />
+<meta name="apple-mobile-web-app-title" content="Cage Grind" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="app-version" content="2.1.0" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Cage Grind" />
+<meta property="og:title" content="Cage Grind — Free MMA Career Browser Game" />
+<meta property="og:description" content="Build your fighter, call every round, chase titles, collect gear, and turn a nobody into a main-event star." />
+<meta property="og:url" content="https://cagegrind.com/" />
+<meta property="og:image" content="https://cagegrind.com/assets/cage-grind-social-card.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Cage Grind — Build the fighter. Live the career." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cage Grind — Free MMA Career Browser Game" />
+<meta name="twitter:description" content="Build your fighter, call every round, chase titles, and turn a nobody into a main-event star." />
+<meta name="twitter:image" content="https://cagegrind.com/assets/cage-grind-social-card.png" />
+<title>Cage Grind — Free MMA Career Browser Game</title>
+<link rel="canonical" href="https://cagegrind.com/" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
 <link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Cage Grind",
+  "url": "https://cagegrind.com/",
+  "image": "https://cagegrind.com/assets/cage-grind-social-card.png",
+  "description": "A free tactical MMA career browser game about building a fighter from unknown rookie to world champion.",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any modern web browser",
+  "genre": ["Sports", "Simulation", "Strategy"],
+  "playMode": "SinglePlayer",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
 </head>
 <body>
 <div id="app" class="career-setup">
@@ -78,7 +121,8 @@
     </section>
 
     <section class="screen" data-screen="fight">
-      <div class="card"><div class="card-title">Career Opponents <small id="rosterSummary">10 energy per round</small></div><div id="opponentList"></div></div>
+      <div class="daily-reset-clock"><span>DAILY FIGHTS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily fight limit resets">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
+      <div class="card"><div class="card-title">Career Opponents <span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span><small id="rosterSummary">10 energy per round</small></div><div id="opponentList"></div></div>
       <div class="section-note">Preview an opponent's Tale of the Tape, confirm the fight, then choose Aggressive or Feel Them Out for Round 1. Between rounds, stay with your signature or meet them in their revealed style.</div>
     </section>
 
@@ -141,6 +185,16 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="appUpdateModal" aria-hidden="true">
+    <div class="gig-modal app-update-dialog" role="dialog" aria-modal="true" aria-labelledby="appUpdateTitle" aria-describedby="appUpdateDescription">
+      <span class="loadout-dialog-kicker">NEW VERSION READY</span>
+      <h2 id="appUpdateTitle">Update <span>Cage Grind</span></h2>
+      <p id="appUpdateDescription">A newer release is ready. Update now to load the latest fixes and features without changing your saved career.</p>
+      <div class="app-update-version"><span>INSTALLED <b id="installedAppVersion">2.1.0</b></span><span>AVAILABLE <b id="availableAppVersion">2.1.0</b></span></div>
+      <div class="modal-actions"><button class="modal-cancel" id="appUpdateLater" type="button">LATER</button><button class="modal-run" id="appUpdateNow" type="button">UPDATE NOW</button></div>
+    </div>
+  </div>
+
   <div id="toast"></div>
   <canvas id="confetti"></canvas>
 
@@ -151,7 +205,7 @@
       <h2 id="levelUpTitle">CLUB FIGHTER</h2>
       <div class="level-up-from" id="levelUpFrom">LEVEL 1 → LEVEL 2</div>
       <div class="level-up-rewards"><div class="level-up-reward"><b id="levelUpEnergy">+3</b><small>MAX ENERGY</small></div><div class="level-up-reward"><b id="levelUpHealth">+5</b><small>MAX HEALTH</small></div><div class="level-up-reward"><b id="levelUpCash">+$200</b><small>CAREER BONUS</small></div></div>
-      <p class="level-up-note" id="levelUpNote">Energy and health fully restored. New competition is now available.</p>
+      <p class="level-up-note" id="levelUpNote">Your corner restored up to 30 energy and 25 health. New competition is now available.</p>
       <button class="level-up-continue" id="levelUpContinue" type="button">CONTINUE CAREER</button>
     </div>
   </div>
@@ -216,5 +270,6 @@
 <script src="game-logic.js"></script>
 <script src="strings.js"></script>
 <script src="game.js"></script>
+<script src="pwa.js"></script>
 </body>
 </html>

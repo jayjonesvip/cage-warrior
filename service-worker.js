@@ -1,0 +1,76 @@
+'use strict';
+
+const APP_VERSION='2.1.0';
+const CACHE_PREFIX='cage-grind-app-';
+const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
+const ROOT_URL=new URL('./',self.location.href);
+const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
+const CORE_ASSETS=[
+  './',
+  './index.html',
+  './styles.css',
+  './game-logic.js',
+  './strings.js',
+  './game.js',
+  './pwa.js',
+  './manifest.webmanifest',
+  './app-version.json',
+  './assets/cage-grind-logo.png',
+  './assets/cage-overlay.png',
+  './assets/home-fight.png',
+  './assets/home-training.png',
+  './assets/home-hustle.png',
+  './assets/home-gear.png',
+  './assets/app-icon-192.png',
+  './assets/app-icon-512.png',
+  './assets/icons/nav-home.png',
+  './assets/icons/nav-train.png',
+  './assets/icons/nav-fight.png',
+  './assets/icons/nav-hustle.png',
+  './assets/icons/nav-gear.png',
+  './assets/icons/nav-feed.png'
+].map(path=>new URL(path,self.location.href).href);
+
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(CORE_ASSETS)));
+});
+
+self.addEventListener('activate',event=>{
+  event.waitUntil(
+    caches.keys()
+      .then(keys=>Promise.all(keys.filter(key=>key.startsWith(CACHE_PREFIX)&&key!==CACHE_NAME).map(key=>caches.delete(key))))
+      .then(()=>self.clients.claim())
+  );
+});
+
+self.addEventListener('message',event=>{
+  if(event.data?.type==='SKIP_WAITING')self.skipWaiting();
+});
+
+async function networkFirst(request){
+  const cache=await caches.open(CACHE_NAME);
+  try{
+    const response=await fetch(request);
+    if(response.ok)await cache.put(request,response.clone());
+    return response;
+  }catch{
+    return (await cache.match(request))||(request.mode==='navigate'?cache.match(OFFLINE_URL):undefined);
+  }
+}
+
+async function cacheFirst(request){
+  const cached=await caches.match(request);if(cached)return cached;
+  const response=await fetch(request);
+  if(response.ok){const cache=await caches.open(CACHE_NAME);await cache.put(request,response.clone())}
+  return response;
+}
+
+self.addEventListener('fetch',event=>{
+  const request=event.request;if(request.method!=='GET')return;
+  const url=new URL(request.url);if(url.origin!==self.location.origin)return;
+  if(url.pathname.endsWith('/app-version.json')){
+    event.respondWith(fetch(request,{cache:'no-store'}).catch(()=>caches.match(request)));
+    return;
+  }
+  event.respondWith(request.mode==='navigate'?networkFirst(request):cacheFirst(request));
+});
