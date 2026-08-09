@@ -17,6 +17,7 @@ const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
 const cageFeedMigration = fs.readFileSync('supabase/migrations/20260809130000_shared_cage_feed.sql', 'utf8');
 const cageAvatarMigration = fs.readFileSync('supabase/migrations/20260809150000_cage_profile_avatars.sql', 'utf8');
 const cageInteractionMigration = fs.readFileSync('supabase/migrations/20260809200000_fighter_interactions.sql', 'utf8');
+const cageProfileCountMigration = fs.readFileSync('supabase/migrations/20260809210000_cage_profile_count.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -152,6 +153,10 @@ test('shared Cage Feed uses a public Supabase client with RLS-protected schema',
   assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /SHARED_FEED\.loadFeed\(50\)/);
   assert.match(script, /SHARED_FEED\.loadProfiles\(100\)/);
+  assert.match(cageProfileCountMigration, /select count\(\*\)::integer\s+from public\.cage_profiles/i);
+  assert.match(cageProfileCountMigration, /grant execute on function public\.get_cage_profile_count\(\) to authenticated/i);
+  assert.match(cageSocial, /async function loadProfileCount\(\)/);
+  assert.match(script, /state\.socialFollowingCount=await SHARED_FEED\.loadProfileCount\(\)/);
   assert.match(script, /socialRemoteInitialized:false/);
   assert.match(script, /const hasOwnRemotePost=/);
   assert.match(script, /publishPost\(\{kind:'player',body:'Hello, fight fans!/);
@@ -367,7 +372,7 @@ test('career identity includes a permanent hometown and a fight-earned title lad
 test('career identity shows followers and fighter renaming unlocks from the top bar', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
   assert.doesNotMatch(html, /homeAvatarText|<small>Fighter Avatar<\/small>/);
-  assert.match(html, /<b id="cashText">\$0<\/b><small><span id="fansText">0<\/span> FOLLOWERS<\/small>/);
+  assert.match(html, /<b id="cashText">\$0<\/b><small class="audience-counts"><span id="fansText">0<\/span> FOLLOWERS[\s\S]*<span id="followingText">0<\/span> FOLLOWING<\/small>/);
   assert.doesNotMatch(html, /<small>CASH ·/);
   assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
   assert.match(html, /class="identity-name-row"[\s\S]*id="editFighterNameBtn"[^>]*aria-disabled="true"/);
@@ -607,7 +612,7 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
     assert.ok(position > headerStart && position < headerEnd, `${id} should live in the top bar`);
   }
   assert.match(html, /id="rankText"[^>]*>UNRANKED<\/span><\/div><div class="top-progress"><span>XP<\/span><b id="xpText"/);
-  assert.match(html, /id="fansText"[^>]*>0<\/span> FOLLOWERS<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
+  assert.match(html, /id="fansText"[^>]*>0<\/span> FOLLOWERS[\s\S]*id="followingText"[^>]*>0<\/span> FOLLOWING<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
   assert.doesNotMatch(html, /card bars|id="energyBar"|id="healthBar"|id="xpBar"|id="hypeBar"/);
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
 });
@@ -620,7 +625,7 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(html, /class="card feed-page-card"[\s\S]*class="feed-page-note"[\s\S]*id="socialTimeline"/);
   assert.doesNotMatch(page, /social-composer|socialActions|Make Your Post|feed-compose-head/);
   assert.match(html, /\.screen\[data-screen="feed"\]\.active\{display:flex/);
-  assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:0\}/);
+  assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:8px\}/);
   assert.doesNotMatch(html, /class="feed-back"/);
   assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
   assert.match(script, /function socialUnreadCount\(\)/);

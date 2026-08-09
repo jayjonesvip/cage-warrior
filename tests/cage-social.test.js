@@ -92,6 +92,7 @@ test('profile registration, global feed reads, roster filtering, and callout pub
         { id: session.user.id, handle: 'NYCBrawler_01' },
         { id: otherId, handle: 'CHICounter_01', fighter_name: 'ALEX KING' },
       ]);
+      if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
       if (url.endsWith('/rest/v1/rpc/publish_cage_post')) return jsonResponse({ id: 8 });
       return jsonResponse({ message: 'unexpected request' }, 500);
@@ -101,12 +102,14 @@ test('profile registration, global feed reads, roster filtering, and callout pub
   const profile = await client.registerProfile({ fighterName: 'JAY JONES', city: 'new-york', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
+  const profileCount = await client.loadProfileCount();
   const remaining = await client.loadInteractionAllowance();
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
 
   assert.equal(profile.handle, 'NYCBrawler_01');
   assert.equal(feed[0].id, 7);
   assert.deepEqual(roster.map(row => row.id), [otherId]);
+  assert.equal(profileCount, 27);
   assert.equal(remaining, 3);
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));

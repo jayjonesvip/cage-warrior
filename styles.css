@@ -59,6 +59,7 @@
   .money{text-align:right;line-height:1}
   .money> b{display:block;color:var(--green);font-size:17px}
   .money small{display:block;font-family:system-ui,sans-serif;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+  .money .audience-counts{letter-spacing:.45px}.money .audience-counts i{padding:0 1px;color:#52657a;font-style:normal}
   .top-progress{display:flex;align-items:center;gap:5px;margin-top:4px;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;line-height:1;color:#7890aa;letter-spacing:.55px;text-transform:uppercase;white-space:nowrap}
   .top-progress b{color:#7ddcff;font-size:9px}.money .top-progress{justify-content:flex-end}.money .top-progress b{color:#92a9ff}
   .resource-hud{
@@ -304,7 +305,7 @@
   @keyframes gearFlairSpin{to{transform:rotate(360deg)}}@keyframes equipCardBurst{0%{transform:scale(1)}35%{transform:scale(1.035);filter:brightness(1.55)}100%{transform:scale(1)}}@keyframes equipIconBurst{0%{transform:scale(.75) rotate(-10deg)}42%{transform:scale(1.3) rotate(5deg)}100%{transform:none}}@keyframes equipFlairBurst{0%{transform:scale(.35) rotate(0);opacity:0}42%{opacity:.9}100%{transform:scale(1.45) rotate(75deg);opacity:0}}@keyframes equipBurstShow{0%,100%{opacity:0}12%,68%{opacity:1}}@keyframes equipRays{from{transform:scale(.15) rotate(0)}to{transform:scale(1.35) rotate(70deg);opacity:0}}@keyframes equipRing{from{transform:scale(.2);opacity:1}to{transform:scale(2.4);opacity:0}}@keyframes equipButtonFlash{0%,100%{filter:none}35%{filter:brightness(2);box-shadow:0 0 26px #fff}}
 
   /* Bottom decision surfaces snap to their container edges instead of floating. */
-  .screen[data-screen="feed"].active{padding-bottom:0}
+  .screen[data-screen="feed"].active{padding-bottom:8px}
   .corner-panel{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
   .plan-btn.signature{border-color:#63ceff;background:linear-gradient(#42b8f3,#1160b8);color:#fff;box-shadow:0 4px 0 #052f63,0 0 12px #39bfff22}
   .plan-btn.mirror{border-color:#6d7d8d;background:linear-gradient(#3b4856,#18212b);color:#e2eaf2;box-shadow:0 4px 0 #080d12,0 0 12px #8ca4ba1f}

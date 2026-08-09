@@ -122,6 +122,8 @@ generated league.
   not unexpectedly change the handle.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
+- The top-bar audience line shows both Followers and Following. Following is the
+  live count of real fighter profiles in the shared Cage Feed roster.
 - The timeline owns the Feed explanation and scrolls inside its own card.
   Generic composer controls are removed; interaction begins by tapping a real
   fighter's avatar and opening their public profile.
@@ -312,7 +314,8 @@ and `service-worker.js` synchronized. Tests enforce that contract.
 The public browser client is in `cage-social.js`. Apply the SQL files in
 `supabase/migrations/` in filename order using the Supabase SQL Editor (or the
 Supabase CLI). The avatar migration adds each career portrait to its public
-profile; existing fighters populate it automatically on their next Feed visit. In the Supabase
+profile; existing fighters populate it automatically on their next Feed visit.
+The profile-count migration supplies the exact shared-roster Following count. In the Supabase
 Dashboard, enable **Authentication → Providers → Anonymous Sign-Ins**. The
 migration enables Row Level Security, permits authenticated reads, and restricts
 profile and post creation to validated RPC functions. Never place a secret or

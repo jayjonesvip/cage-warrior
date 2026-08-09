@@ -126,6 +126,12 @@
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
     }
 
+    async function loadProfileCount(){
+      const data=await rpc('get_cage_profile_count',{});
+      const value=Array.isArray(data)?data[0]:data;
+      return Math.max(0,Math.floor(Number(value))||0);
+    }
+
     async function loadInteractionAllowance(){
       const data=await rpc('get_cage_interactions_remaining',{});
       const value=Array.isArray(data)?data[0]:data;
@@ -136,7 +142,7 @@
       return rpc('publish_cage_post',{p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
 
-    return {configured,ensureSession,registerProfile,loadFeed,loadProfiles,loadInteractionAllowance,publishPost,sessionUserId:()=>session?.user?.id||''};
+    return {configured,ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadInteractionAllowance,publishPost,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};
