@@ -130,6 +130,65 @@ test('install manifest uses valid branded icons and a stable in-scope launch URL
   assert.equal(fs.readFileSync('assets/app-icon-512.png')[25], 6, 'large install icon should preserve transparency');
 });
 
+test('completed careers receive a native install offer and one verified collectible reward', async () => {
+  assert.match(page, /id="installOffer" hidden/);
+  assert.match(page, /TAKE CAGE GRIND WITH YOU/);
+  assert.match(page, /id="installGameBtn"[^>]*>INSTALL GAME · FREE DROP<\/button>/);
+  assert.match(css, /\.install-offer\[hidden\]\{display:none\}/);
+  assert.match(script, /installDetected:false,installRewardClaimed:false/);
+  assert.match(script, /installOffer\.hidden=!ready\|\|state\.installDetected\|\|state\.installRewardClaimed/);
+  assert.match(script, /function awardInstallCollectible\(\)/);
+  assert.match(script, /drop\.reason='INSTALL DROP'/);
+  assert.match(script, /state\.installRewardClaimed=true/);
+  assert.match(script, /document\.addEventListener\('cagegrind:installed'/);
+  assert.match(script, /trackEvent\('install_reward_claimed'/);
+
+  const windowListeners = {};
+  const documentEvents = [];
+  const fakeNavigator = {
+    standalone: false,
+    serviceWorker: { addEventListener() {}, register: async () => ({ addEventListener() {}, update: async () => {} }) },
+  };
+  const fakeWindow = {
+    location: { protocol: 'https:' },
+    navigator: fakeNavigator,
+    matchMedia: () => ({ matches: false }),
+    addEventListener: (name, handler) => { windowListeners[name] = handler; },
+  };
+  const context = {
+    window: fakeWindow,
+    navigator: fakeNavigator,
+    document: {
+      baseURI: 'https://cagegrind.com/',
+      visibilityState: 'visible',
+      activeElement: null,
+      querySelector: () => ({ content: '2.2.3' }),
+      getElementById: () => null,
+      addEventListener() {},
+      dispatchEvent: event => documentEvents.push(event),
+    },
+    CustomEvent: class CustomEvent { constructor(type, options = {}) { this.type = type; this.detail = options.detail; } },
+    URL,
+    queueMicrotask: callback => callback(),
+    sessionStorage: { getItem: () => '', setItem() {} },
+  };
+  vm.runInNewContext(pwaScript, context);
+  let prevented = false;
+  let prompted = false;
+  windowListeners.beforeinstallprompt({
+    preventDefault: () => { prevented = true; },
+    prompt: async () => { prompted = true; },
+    userChoice: Promise.resolve({ outcome: 'accepted' }),
+  });
+  assert.equal(prevented, true);
+  assert.equal(context.CAGE_PWA.installAvailable(), true);
+  assert.deepEqual(JSON.parse(JSON.stringify(await context.CAGE_PWA.requestInstall())), { status: 'accepted' });
+  assert.equal(prompted, true);
+  assert.equal(context.CAGE_PWA.installAvailable(), false);
+  windowListeners.appinstalled();
+  assert.ok(documentEvents.some(event => event.type === 'cagegrind:installed'));
+});
+
 test('PWA version checks compare releases without touching career save storage', () => {
   const context = {};
   vm.runInNewContext(pwaScript, context);

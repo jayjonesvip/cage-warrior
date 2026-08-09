@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.2.2" />
+<meta name="app-version" content="2.2.3" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.2.2">
+<link rel="stylesheet" href="styles.css?v=2.2.3">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -87,6 +87,12 @@
   <main class="main">
     <section class="screen active" data-screen="home">
       <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.</span></div></div>
+
+      <section class="card install-offer career-after-setup" id="installOffer" hidden aria-live="polite">
+        <span class="install-offer-icon" data-icon-name="install-app" data-icon-fallback="↓">↓</span>
+        <div class="install-offer-copy"><h2>TAKE CAGE GRIND WITH YOU</h2><p>Install the game for faster access, offline play, and a free collectible drop.</p><small id="installOfferStatus">INSTALL TO CLAIM YOUR DROP</small></div>
+        <button id="installGameBtn" type="button">INSTALL GAME · FREE DROP</button>
+      </section>
 
       <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
@@ -223,7 +229,7 @@
       <span class="loadout-dialog-kicker">NEW VERSION READY</span>
       <h2 id="appUpdateTitle">Update <span>Cage Grind</span></h2>
       <p id="appUpdateDescription">A newer release is ready. Update now to load the latest fixes and features without changing your saved career.</p>
-      <div class="app-update-version"><span>INSTALLED <b id="installedAppVersion">2.2.2</b></span><span>AVAILABLE <b id="availableAppVersion">2.2.2</b></span></div>
+      <div class="app-update-version"><span>INSTALLED <b id="installedAppVersion">2.2.3</b></span><span>AVAILABLE <b id="availableAppVersion">2.2.3</b></span></div>
       <div class="modal-actions"><button class="modal-cancel" id="appUpdateLater" type="button">LATER</button><button class="modal-run" id="appUpdateNow" type="button">UPDATE NOW</button></div>
     </div>
   </div>
@@ -300,10 +306,10 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.2.2"></script>
-<script src="strings.js?v=2.2.2"></script>
-<script src="analytics.js?v=2.2.2"></script>
-<script src="game.js?v=2.2.2"></script>
-<script src="pwa.js?v=2.2.2"></script>
+<script src="game-logic.js?v=2.2.3"></script>
+<script src="strings.js?v=2.2.3"></script>
+<script src="analytics.js?v=2.2.3"></script>
+<script src="game.js?v=2.2.3"></script>
+<script src="pwa.js?v=2.2.3"></script>
 </body>
 </html>

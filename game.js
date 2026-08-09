@@ -24,11 +24,11 @@
   let saveWarningShown = false;
 
   const defaultState = {
-    version:14,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:15,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
-    activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
+    activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,
     pendingFight:null,
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,milestones:[],equippedGear:[],leagueInitialized:false
@@ -280,11 +280,11 @@
       s.trainerOn = !!s.trainerOn;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
-      s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);
+      s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
       s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);if(!s.socialAccountCreated)s.fans=0;
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
-      s.version=14;
+      s.version=15;
       return s;
   }
   function loadState(){
@@ -368,6 +368,7 @@
   function ensureDailyCounters(){
     const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;
   }
+  function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 35+state.level*20}
   function recoveryFee(){return 40+state.level*15}
@@ -456,11 +457,11 @@
     $('#hypeText').textContent=Math.floor(state.hype)+'%';
     ['power','speed','chin','cardio'].forEach(k=>{$('#'+k+'Stat').textContent=effectiveStat(k);$('#'+k+'Mini').style.width=clamp(effectiveStat(k)*4,5,100)+'%'});
     const today=todayKey();$('#dailyBtn').disabled=state.lastDaily===today;$('#dailyBtn').textContent=state.lastDaily===today?'DROP CLAIMED':'DAILY DROP';
-    renderCareer();renderSocial();renderTrain();renderHustle();renderGear();renderOpponents();drawHero();saveState();
+    renderCareer();renderSocial();renderTrain();renderHustle();renderGear();renderOpponents();drawHero();saveState();if(state.installDetected&&!state.installRewardClaimed)queueMicrotask(maybeGrantInstallReward);
   }
 
   function renderCareer(){
-    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
+    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id)),pwa=globalThis.CAGE_PWA;if(pwa?.isInstalled?.())state.installDetected=true;const installOffer=$('#installOffer'),nativeInstall=!!pwa?.installAvailable?.();installOffer.hidden=!ready||state.installDetected||state.installRewardClaimed;$('#installGameBtn').disabled=false;$('#installOfferStatus').textContent=nativeInstall?'READY TO INSTALL · DROP UNLOCKS AFTER SUCCESS':'USE YOUR BROWSER INSTALL OR ADD-TO-HOME-SCREEN OPTION';$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
     const sponsor=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,sponsorBadge=$('#heroSponsor');sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${sponsor.brand}</b><em>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</em></span>`:'';
     $('#buildChoices').innerHTML=style?'':fighterStyles.map(s=>`<button class="build-choice" data-style="${s.id}"><b>${s.name}</b><small>${s.text}</small></button>`).join('');
     $('#cityChoices').innerHTML=city?'':fighterCities.map(c=>`<button class="city-choice" data-city="${c.id}">${c.name}</button>`).join('');
@@ -828,6 +829,18 @@
       if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);trackEvent('underground_spar_completed',{outcome:'loss',cash_earned:0,energy_spent:a.cost,health_lost:d});sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
     }updateUI();
   }
+  async function requestGameInstall(){
+    const pwa=globalThis.CAGE_PWA;if(!pwa){toast('USE YOUR BROWSER MENU TO INSTALL CAGE GRIND','#78dfff');return}
+    const result=await pwa.requestInstall();trackEvent('install_prompt_result',{outcome:result.status});
+    if(result.status==='accepted'){toast('INSTALLING · YOUR FREE DROP UNLOCKS WHEN COMPLETE','#77d13e');return}
+    if(result.status==='dismissed'){toast('INSTALL CANCELLED · YOUR FREE DROP IS STILL WAITING','#ffcf78');return}
+    if(result.status==='installed'){state.installDetected=true;updateUI();return}
+    const ios=/iPad|iPhone|iPod/i.test(navigator.userAgent);toast(ios?'ON IOS: SHARE → ADD TO HOME SCREEN':'USE THE BROWSER MENU → INSTALL CAGE GRIND','#78dfff');
+  }
+  function maybeGrantInstallReward(){
+    const ready=!!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats));if(!ready||!state.installDetected||state.installRewardClaimed||fight||combatLocked||$('#resultModal').style.display==='flex'||$('#levelUpModal').classList.contains('active'))return;
+    const gearDrop=awardInstallCollectible();if(!gearDrop)return;state.installRewardClaimed=true;pendingResultDrop=Object.assign({extras:'CAGE GRIND INSTALL BONUS'},gearDrop);resultDropRevealed=false;trackEvent('install_reward_claimed',{gear_id:gearDrop.item.id,gear_rarity:gearDrop.rarity.toLowerCase(),new_item:gearDrop.isNew});$('#installOffer').hidden=true;$('#resultTitle').textContent='INSTALLED!';$('#resultTitle').className='win';$('#resultMethod').textContent='CAGE GRIND IS READY TO PLAY';$('#resultLine').textContent='You took the fight with you. Your free collectible is waiting.';$('#rewardCash').textContent='FREE';$('#rewardCashLabel').textContent='Install Bonus';$('#rewardFans').textContent='1';$('#rewardFansLabel').textContent='Collectible';$('#rewardXp').textContent='READY';$('#rewardXpLabel').textContent='Drop';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('install-app','↓')} INSTALL REWARD READY<small>Reveal your free collectible</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
+  }
   function claimDaily(){
     const today=todayKey();if(state.lastDaily===today)return;initAudio();const cash=100+state.level*35,energy=20,gearDrop=awardDailyCollectible(today);receiveMoney(cash);state.energy=clamp(state.energy+energy,0,state.maxEnergy);state.lastDaily=today;trackEvent('daily_reward_claimed',{cash_earned:cash,energy_restored:energy,gear_id:gearDrop?.item?.id||'none',gear_rarity:gearDrop?.rarity?.toLowerCase()||'none',new_item:!!gearDrop?.isNew});updateUI();if(!gearDrop){toast(`DAILY DROP: $${cash} + ${energy} energy`,'#f4c34a');return}pendingResultDrop=Object.assign({extras:`+$${cash} CASH · +${energy} ENERGY`},gearDrop);resultDropRevealed=false;$('#resultTitle').textContent='DAILY DROP!';$('#resultTitle').className='win';$('#resultMethod').textContent='GUARANTEED COLLECTIBLE';$('#resultLine').textContent='Your daily package has a rarity card inside.';$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Cash';$('#rewardFans').textContent='+'+energy;$('#rewardFansLabel').textContent='Energy';$('#rewardXp').textContent='1';$('#rewardXpLabel').textContent='Collectible';$('#continueBtn').textContent='REVEAL DROP';const lootBox=$('#lootBox');lootBox.style.display='block';lootBox.className='loot drop-pending';lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('daily-collectible','🎁')} COLLECTIBLE CARD READY<small>Reveal today’s guaranteed item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='none';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();$('#resultModal').style.display='flex';sfx.win();confettiBurst();
   }
@@ -1100,6 +1113,9 @@
     const taunt=e.target.closest('[data-taunt-key]');if(taunt){tauntOpponent(taunt.dataset.tauntKey);return}
     const fi=e.target.closest('[data-fight-key]');if(fi){const opponent=state.roster.find(o=>o.key===fi.dataset.fightKey);if(opponent)openTaleOfTape(opponent);return}
   });
+  document.addEventListener('cagegrind:installchange',()=>updateUI());
+  document.addEventListener('cagegrind:installed',()=>{const firstDetection=!state.installDetected;state.installDetected=true;if(firstDetection)trackEvent('game_installed');saveState();updateUI()});
+  $('#installGameBtn').addEventListener('click',requestGameInstall);
   $('#dailyBtn').addEventListener('click',claimDaily);$('#continueBtn').addEventListener('click',handleResultAction);$('#levelUpContinue').addEventListener('click',closeLevelUp);
   $('#tapeBackBtn').addEventListener('click',closeFightPreview);$('#tapeFightBtn').addEventListener('click',()=>commitFight());
   $('#speedBtn').addEventListener('click',toggleFightSpeed);$('#detailsToggle').addEventListener('click',()=>{const details=$('#resultDetails'),open=!details.classList.contains('open');details.classList.toggle('open',open);$('#detailsToggle').textContent=open?'HIDE STATS':'SCORECARD'});

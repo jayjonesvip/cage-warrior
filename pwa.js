@@ -9,7 +9,20 @@
     return 0;
   }
 
-  root.CAGE_PWA=Object.freeze({compareVersions,validVersion:version=>VERSION_PATTERN.test(String(version||''))});
+  let deferredInstallPrompt=null;
+  function isInstalled(){return typeof window!=='undefined'&&((window.matchMedia?.('(display-mode: standalone)').matches)||window.navigator?.standalone===true)}
+  function installAvailable(){return !!deferredInstallPrompt}
+  async function requestInstall(){
+    if(isInstalled())return {status:'installed'};
+    const prompt=deferredInstallPrompt;if(!prompt)return {status:'unavailable'};
+    try{
+      await prompt.prompt();const choice=await prompt.userChoice;deferredInstallPrompt=null;
+      if(typeof document!=='undefined')document.dispatchEvent(new CustomEvent('cagegrind:installchange',{detail:{available:false}}));
+      return {status:choice?.outcome==='accepted'?'accepted':'dismissed'};
+    }catch{return {status:'unavailable'}}
+  }
+
+  root.CAGE_PWA=Object.freeze({compareVersions,validVersion:version=>VERSION_PATTERN.test(String(version||'')),isInstalled,installAvailable,requestInstall});
   if(typeof window==='undefined'||typeof document==='undefined'||typeof navigator==='undefined')return;
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(window.location.protocol))return;
 
@@ -23,6 +36,8 @@
   const laterButton=document.getElementById('appUpdateLater');
   const updateButton=document.getElementById('appUpdateNow');
   let registration=null,lastCheck=0,checking=false,reloadRequested=false,returnFocus=null;
+
+  function dispatchInstallEvent(name,detail={}){document.dispatchEvent(new CustomEvent(name,{detail}))}
 
   function dismissedVersion(){try{return sessionStorage.getItem(dismissedKey)||''}catch{return ''}}
   function rememberDismissal(version){try{sessionStorage.setItem(dismissedKey,version)}catch{}}
@@ -65,6 +80,8 @@
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloadRequested)window.location.reload()});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkVersion()});
   window.addEventListener('online',()=>checkVersion(true));
+  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;dispatchInstallEvent('cagegrind:installchange',{available:true})});
+  window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;dispatchInstallEvent('cagegrind:installed');dispatchInstallEvent('cagegrind:installchange',{available:false})});
   window.addEventListener('load',async()=>{
     try{
       registration=await navigator.serviceWorker.register('service-worker.js',{scope:'./',updateViaCache:'none'});
@@ -76,4 +93,5 @@
       await checkVersion(true);
     }catch{}
   });
+  queueMicrotask(()=>{if(isInstalled())dispatchInstallEvent('cagegrind:installed');else dispatchInstallEvent('cagegrind:installchange',{available:installAvailable()})});
 })(globalThis);

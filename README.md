@@ -289,6 +289,11 @@ should redirect to the canonical URL rather than serve a second copy.
 installable on supporting browsers. Transparent icons are used for the normal
 install artwork, while the separate maskable icon intentionally has an opaque
 safe-zone background for launchers that crop icons into platform shapes.
+After career setup, Home presents an install offer until installation succeeds.
+Chromium browsers use the native install prompt; iPhone and iPad players are
+directed to Share → Add to Home Screen. A successful `appinstalled` event or a
+verified standalone launch grants exactly one deterministic collectible drop,
+then permanently hides the offer for that saved career.
 
 `service-worker.js` caches the core shell and previously visited same-origin
 assets for offline fallback. `pwa.js` checks uncached `app-version.json` on
