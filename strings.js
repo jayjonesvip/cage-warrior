@@ -116,7 +116,7 @@ globalThis.CAGE_STRINGS = {
   ticker: [
     'Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.',
     'Want a miracle in the last ten seconds? Keep 5 extra energy for the haymaker, kid.',
-    'Ice bath or sauna, one treatment a day. Recovery costs cash because comfort is for contenders.',
+    'Ice bath, sauna, or massage—one treatment a day. Recovery costs cash because comfort is for contenders.',
     'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
     'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
     'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',

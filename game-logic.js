@@ -94,13 +94,14 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0};
     return {
       date:today,
       fight:clamp(nonNegativeWhole(counters.fight),0,10),
       train:clamp(nonNegativeWhole(counters.train),0,4),
       hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
       risk:clamp(nonNegativeWhole(counters.risk),0,1),
+      blackjack:clamp(nonNegativeWhole(counters.blackjack),0,1),
       publicity:clamp(nonNegativeWhole(counters.publicity),0,2),
       recovery:clamp(nonNegativeWhole(counters.recovery),0,1)
     };
@@ -169,6 +170,35 @@
     return {energy:state.energy-beforeEnergy,health:state.health-beforeHealth};
   }
 
+  function blackjackHandValue(cards){
+    const hand=Array.isArray(cards)?cards:[];
+    let total=0,aces=0;
+    for(const card of hand){
+      const raw=typeof card==='string'?card:(card&&card.rank)||'';
+      const rank=String(raw).toUpperCase().replace(/[SHDC]$/,'');
+      if(rank==='A'){total+=11;aces++}
+      else if(['K','Q','J','T','10'].includes(rank))total+=10;
+      else{const value=Number(rank);if(Number.isInteger(value)&&value>=2&&value<=9)total+=value}
+    }
+    let softAces=aces;
+    while(total>21&&softAces>0){total-=10;softAces--}
+    return {total,soft:softAces>0,blackjack:hand.length===2&&total===21,bust:total>21};
+  }
+
+  function blackjackBetLimit(cash){return Math.floor(Math.max(0,finite(cash))*.25)}
+
+  function blackjackOutcome(playerCards,dealerCards,bet){
+    const wager=Math.max(0,whole(bet)),player=blackjackHandValue(playerCards),dealer=blackjackHandValue(dealerCards);
+    let result='loss',payout=0;
+    if(player.bust){result='loss'}
+    else if(player.blackjack&&dealer.blackjack){result='push';payout=wager}
+    else if(player.blackjack){result='blackjack';payout=wager+Math.round(wager*1.5)}
+    else if(dealer.blackjack){result='loss'}
+    else if(dealer.bust||player.total>dealer.total){result='win';payout=wager*2}
+    else if(player.total===dealer.total){result='push';payout=wager}
+    return {result,payout,profit:payout-wager,player,dealer};
+  }
+
   function payoutForOpponent(opponent,level){
     const reward=Math.max(0,finite(opponent&&opponent.reward));
     const tier=Math.max(1,whole(opponent&&opponent.tier,1));
@@ -203,5 +233,5 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,nextGearPityCount,isGearPity,nextEndorsementId};
 });

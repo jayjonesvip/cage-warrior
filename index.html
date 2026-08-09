@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.1.0" />
+<meta name="app-version" content="2.2.1" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Cage Grind" />
 <meta property="og:title" content="Cage Grind — Free MMA Career Browser Game" />
@@ -30,7 +30,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=2.2.1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -56,7 +56,7 @@
   <header class="topbar">
     <img class="logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <div class="identity"><div class="identity-name-row"><div class="name" id="fighterName">ROOKIE</div><button class="top-name-edit locked" id="editFighterNameBtn" type="button" aria-label="Edit fighter name" aria-disabled="true"><span data-icon-name="edit-fighter-name" data-icon-fallback="✎">✎</span></button></div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
-    <div class="money"><b id="cashText">$0</b><small>CASH · <span id="fansText">0</span> FOLLOWERS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
+    <div class="money"><b id="cashText">$0</b><small><span id="fansText">0</span> FOLLOWERS</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
   </header>
 
   <section class="resource-hud" aria-label="Current fighter condition and attributes">
@@ -80,7 +80,7 @@
     <section class="screen active" data-screen="home">
       <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.</span></div></div>
 
-      <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Avatar</small><b id="homeAvatarText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
+      <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
       <div class="card build-card identity-setup" id="citySetup"><div class="card-title">Choose Fighting Out Of <small>Permanent</small></div><div class="city-grid" id="cityChoices"></div><div class="loadout-note" id="cityDescription">Choose your hometown. It defines the opening rungs of your title journey.</div></div>
 
@@ -117,7 +117,7 @@
       <div class="daily-reset-clock"><span>DAILY LIMITS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily training limits reset">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">1 TREATMENT LEFT</span></div><div class="action-list" id="recoveryActions"></div></div>
-      <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health. One paid recovery treatment is available each day.</div>
+      <div class="section-note">Basic training costs energy only. Coach Vega is optional and charges per session; sparring counts as two sessions and can improve two skills at once, but may cost health. Choose one paid ice bath, sauna, or massage each day.</div>
     </section>
 
     <section class="screen" data-screen="fight">
@@ -176,6 +176,31 @@
     </form>
   </div>
 
+  <div class="modal-overlay" id="blackjackModal" aria-hidden="true">
+    <div class="gig-modal blackjack-dialog" role="dialog" aria-modal="true" aria-labelledby="blackjackTitle" aria-describedby="blackjackRules">
+      <span class="blackjack-kicker">UNDERGROUND BUZZ · ONE HAND DAILY</span>
+      <h2 id="blackjackTitle">Backroom <span>Blackjack</span></h2>
+      <p id="blackjackRules">Beat the dealer without going over 21. Dealer stands on all 17s; blackjack pays 3:2. No splits, doubles, or insurance.</p>
+      <div class="blackjack-bankroll"><span>YOUR CASH <b id="blackjackCash">$0</b></span><span>MAX BET <b id="blackjackMaxBet">$0</b></span></div>
+      <div class="blackjack-bet" id="blackjackBetPanel">
+        <label for="blackjackBet">YOUR BET</label>
+        <input id="blackjackBet" type="number" min="1" step="1" inputmode="numeric" value="1">
+        <small>Maximum wager is 25% of your available cash when the hand is dealt.</small>
+      </div>
+      <div class="blackjack-table" id="blackjackTable" hidden>
+        <div class="blackjack-seat"><div class="blackjack-seat-head"><span>DEALER</span><b id="dealerTotal">?</b></div><div class="playing-cards" id="dealerCards"></div></div>
+        <div class="blackjack-seat"><div class="blackjack-seat-head"><span>YOU</span><b id="playerTotal">0</b></div><div class="playing-cards" id="playerCards"></div></div>
+        <div class="blackjack-result" id="blackjackResult" aria-live="polite"></div>
+      </div>
+      <div class="modal-actions blackjack-actions">
+        <button class="modal-cancel" id="blackjackClose" type="button">CLOSE</button>
+        <button class="modal-run" id="blackjackDeal" type="button">DEAL HAND</button>
+        <button class="modal-cancel" id="blackjackHit" type="button" hidden>HIT</button>
+        <button class="modal-run" id="blackjackStand" type="button" hidden>STAND</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="loadoutFullModal" aria-hidden="true">
     <div class="gig-modal loadout-dialog" role="dialog" aria-modal="true" aria-labelledby="loadoutFullTitle" aria-describedby="loadoutFullDescription">
       <span class="loadout-dialog-kicker">FIGHT GEAR · 4/4 SLOTS</span>
@@ -190,7 +215,7 @@
       <span class="loadout-dialog-kicker">NEW VERSION READY</span>
       <h2 id="appUpdateTitle">Update <span>Cage Grind</span></h2>
       <p id="appUpdateDescription">A newer release is ready. Update now to load the latest fixes and features without changing your saved career.</p>
-      <div class="app-update-version"><span>INSTALLED <b id="installedAppVersion">2.1.0</b></span><span>AVAILABLE <b id="availableAppVersion">2.1.0</b></span></div>
+      <div class="app-update-version"><span>INSTALLED <b id="installedAppVersion">2.2.1</b></span><span>AVAILABLE <b id="availableAppVersion">2.2.1</b></span></div>
       <div class="modal-actions"><button class="modal-cancel" id="appUpdateLater" type="button">LATER</button><button class="modal-run" id="appUpdateNow" type="button">UPDATE NOW</button></div>
     </div>
   </div>
@@ -267,9 +292,9 @@
   </div></div>
 </div>
 
-<script src="game-logic.js"></script>
-<script src="strings.js"></script>
-<script src="game.js"></script>
-<script src="pwa.js"></script>
+<script src="game-logic.js?v=2.2.1"></script>
+<script src="strings.js?v=2.2.1"></script>
+<script src="game.js?v=2.2.1"></script>
+<script src="pwa.js?v=2.2.1"></script>
 </body>
 </html>

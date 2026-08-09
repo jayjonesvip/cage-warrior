@@ -121,6 +121,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 
 | Filename | Current fallback | Item |
 | --- | --- | --- |
+| `small-gym-dog.png` | 🐶 | Small Gym Dog |
 | `dog.png` | 🐕 | Gym Dog |
 | `meal-plan.png` | 🥩 | Fight Camp Meal Plan |
 | `hot-tub.png` | 🛁 | Backyard Hot Tub |

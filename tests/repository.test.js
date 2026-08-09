@@ -20,8 +20,9 @@ vm.runInNewContext(strings, contentContext);
 const stringsData = contentContext.CAGE_STRINGS;
 
 test('external game assets are linked and the game script parses', () => {
-  assert.match(page, /<link rel="stylesheet" href="styles\.css">/);
-  assert.match(page, /<script src="game-logic\.js"><\/script>\s*<script src="strings\.js"><\/script>\s*<script src="game\.js"><\/script>\s*<script src="pwa\.js"><\/script>/);
+  const releaseVersionPattern = appVersion.replaceAll('.', '\\.');
+  assert.match(page, new RegExp(`<link rel="stylesheet" href="styles\\.css\\?v=${releaseVersionPattern}">`));
+  assert.match(page, new RegExp(`<script src="game-logic\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="strings\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="game\\.js\\?v=${releaseVersionPattern}"><\\/script>\\s*<script src="pwa\\.js\\?v=${releaseVersionPattern}"><\\/script>`));
   const pageWithoutStructuredData = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '');
   assert.doesNotMatch(pageWithoutStructuredData, /<style>|<script>(?!<\/script>)/);
   assert.doesNotThrow(() => new Function(strings));
@@ -216,6 +217,9 @@ test('career identity includes a permanent hometown and a fight-earned title lad
 
 test('career identity shows followers and fighter renaming unlocks from the top bar', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
+  assert.doesNotMatch(html, /homeAvatarText|<small>Fighter Avatar<\/small>/);
+  assert.match(html, /<b id="cashText">\$0<\/b><small><span id="fansText">0<\/span> FOLLOWERS<\/small>/);
+  assert.doesNotMatch(html, /<small>CASH ·/);
   assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
   assert.match(html, /class="identity-name-row"[\s\S]*id="editFighterNameBtn"[^>]*aria-disabled="true"/);
   assert.match(html, /data-icon-name="edit-fighter-name"/);
@@ -392,8 +396,8 @@ test('rendered icons support stable per-file PNG overrides with fallbacks', () =
   assert.match(script, /onerror="this\.remove\(\)"/);
   assert.match(script, /gameIcon\(a\.id,a\.icon\)/);
   assert.match(script, /gameIcon\(d\.id,d\.icon\)/);
-  assert.match(script, /gameIcon\(g\.id,g\.icon\)/);
-  assert.match(script, /gameIcon\(item\.id,item\.icon\)/);
+  assert.match(script, /gameIcon\(g\.iconName\|\|g\.id,g\.icon\)/);
+  assert.match(script, /gameIcon\(item\.iconName\|\|item\.id,item\.icon\)/);
   const catalog = fs.readFileSync('assets/icons/README.md', 'utf8');
   for (const name of ['nav-home', 'fight-aggressive', 'rematch', 'corner-towel', 'daily-collectible', 'title-world', 'heavy-bag-rounds', 'call-out-rival', 'tv-spot', 'titan-global', 'champ-gloves', 'ice-ring', 'home-gym', 'mansion']) {
     assert.match(catalog, new RegExp('`' + name + '\\.png`'));
@@ -558,16 +562,35 @@ test('active sponsor appears beneath Cage Rank in the Home hero', () => {
   assert.match(script, /state\.activeEndorsement\.fightsLeft\} FIGHTS LEFT/);
 });
 
-test('training includes one paid daily energy recovery treatment', () => {
+test('training includes three paid options sharing one daily recovery treatment', () => {
   assert.match(page, /Recovery Room/);
   assert.match(page, /id="recoveryLimitText"/);
   assert.match(page, /id="recoveryActions"/);
   assert.match(script, /id:'ice-bath'.*energy:25,health:0/);
   assert.match(script, /id:'sauna'.*energy:15,health:12/);
+  assert.match(script, /id:'massage'.*energy:5,health:25/);
   assert.match(script, /function recoveryFee\(\)\{return 40\+state\.level\*15\}/);
   assert.match(script, /LOGIC\.recoveryQuote/);
   assert.match(script, /LOGIC\.applyRecovery/);
   assert.match(script, /state\.dailyCounters\.recovery=1/);
+});
+
+test('Underground Buzz keeps backroom spar and adds persistent once-daily blackjack', () => {
+  assert.match(script, /id:'backroom-spar'/);
+  assert.match(script, /sessionsLeft\('risk',1\)/);
+  assert.match(page, /id="blackjackModal"/);
+  assert.match(page, /blackjack pays 3:2/);
+  assert.match(page, /id="blackjackHit"[^>]*>HIT<\/button>/);
+  assert.match(page, /id="blackjackStand"[^>]*>STAND<\/button>/);
+  assert.match(script, /sessionsLeft\('blackjack',1\)/);
+  assert.match(script, /state\.dailyCounters\.blackjack=1/);
+  assert.match(script, /blackjackHand:\s*null/);
+  assert.match(script, /s\.blackjackHand=normalizeBlackjackHand\(source\.blackjackHand\)/);
+  assert.match(script, /MAX BET \$\$\{fmt\(maxBlackjackBet\)\}/);
+  assert.match(script, /LOGIC\.blackjackBetLimit\(state\.cash\)/);
+  const deal = script.match(/function dealBlackjack\(\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+  assert.doesNotMatch(deal, /spendEnergy/);
+  assert.match(deal, /state\.cash-=bet/);
 });
 
 test('fight, training, and hustle share one live local-midnight reset timer', () => {
@@ -641,7 +664,8 @@ test('the collectible drop pool includes early-career and status cards', () => {
   for (const item of [
     ['used-car', 'Used Car'],
     ['bourbon', 'Small-Batch Bourbon'],
-    ['dog', 'Small Gym Dog'],
+    ['small-gym-dog', 'Small Gym Dog'],
+    ['dog', 'Gym Dog'],
     ['cuban-cigars', 'Cuban Cigars'],
     ['tennis-shoes', 'Fresh Tennis Shoes'],
     ['fur-coat', 'Full-Length Fur Coat']
@@ -650,6 +674,10 @@ test('the collectible drop pool includes early-career and status cards', () => {
   }
   assert.match(script, /id:'used-car'.*rarity:'COMMON'.*minLevel:1/);
   assert.match(script, /id:'fur-coat'.*rarity:'EPIC'.*minLevel:7/);
+  assert.match(script, /id:'small-gym-dog'.*name:'Small Gym Dog'.*rarity:'COMMON'.*minLevel:1/);
+  assert.match(script, /id:'dog'.*name:'Gym Dog'.*rarity:'RARE'.*minLevel:3/);
+  assert.ok(fs.existsSync('assets/icons/small-gym-dog.png'));
+  assert.ok(fs.existsSync('assets/icons/dog.png'));
   assert.match(readme, /used car, small-batch bourbon, a small gym dog, Cuban cigars/);
 });
 

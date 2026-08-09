@@ -124,7 +124,7 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
 });
 
 test('recovery treatments share one daily use and clamp restored resources',()=>{
-  const ice={energy:25,health:0},sauna={energy:15,health:12},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
+  const ice={energy:25,health:0},sauna={energy:15,health:12},massage={energy:5,health:25},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
   assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');
   assert.equal(logic.recoveryQuote({...state,cash:40},ice,55,false).reason,'cash');
   assert.equal(logic.recoveryQuote({cash:100,energy:100,maxEnergy:100,health:100,maxHealth:100},sauna,55,false).reason,'full');
@@ -132,6 +132,19 @@ test('recovery treatments share one daily use and clamp restored resources',()=>
   assert.deepEqual(logic.applyRecovery(state,sauna),{energy:15,health:6});
   assert.equal(state.energy,97);
   assert.equal(state.health,100);
+  assert.deepEqual(logic.applyRecovery({energy:95,maxEnergy:100,health:70,maxHealth:100},massage),{energy:5,health:25});
+});
+
+test('blackjack values aces correctly, caps bets, and pays standard outcomes',()=>{
+  assert.deepEqual(logic.blackjackHandValue(['AS','KH']),{total:21,soft:true,blackjack:true,bust:false});
+  assert.deepEqual(logic.blackjackHandValue(['AS','6H']),{total:17,soft:true,blackjack:false,bust:false});
+  assert.deepEqual(logic.blackjackHandValue(['AS','6H','KC']),{total:17,soft:false,blackjack:false,bust:false});
+  assert.equal(logic.blackjackHandValue(['KS','QH','2C']).bust,true);
+  assert.equal(logic.blackjackBetLimit(403),100);
+  assert.deepEqual(logic.blackjackOutcome(['AS','KH'],['9S','9H'],20),{result:'blackjack',payout:50,profit:30,player:{total:21,soft:true,blackjack:true,bust:false},dealer:{total:18,soft:false,blackjack:false,bust:false}});
+  assert.equal(logic.blackjackOutcome(['TS','QH'],['9S','9H'],20).payout,40);
+  assert.equal(logic.blackjackOutcome(['TS','8H'],['9S','9H'],20).result,'push');
+  assert.equal(logic.blackjackOutcome(['TS','8H'],['KS','QH'],20).result,'loss');
 });
 
 test('score helpers expose a trailing player for the final-ten-second decision',()=>{
@@ -164,8 +177,8 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,hustle:3,risk:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,publicity:2,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,hustle:3,risk:1,blackjack:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,blackjack:1,publicity:2,recovery:1});
 });
 
 test('daily reset countdown targets the next local midnight',()=>{

@@ -30,8 +30,9 @@ generated league.
   the fighter in.
 - Each selector disappears as soon as its choice is locked. Career systems,
   the HUD, and navigation remain hidden until hometown, fighter, and archetype
-  are complete. All three choices then live in the Career Identity card beside
-  Followers, career earnings, and the next milestone. A pencil beside the
+  are complete. The Career Identity card keeps the hometown and archetype
+  beside Followers, career earnings, and the next milestone; the selected
+  avatar remains visible in the Home hero without a duplicate identity row. A pencil beside the
   top-bar fighter name remains visibly locked for rookies; its naming modal
   unlocks at level 2 with Club Fighter status.
 - Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
@@ -193,7 +194,8 @@ generated league.
   bonuses.
 - The collectible pool also includes early-career and status drops such as a
   used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
-  shoes, and a full-length fur coat. Each supports an optional same-name PNG
+  shoes, and a full-length fur coat. Small Gym Dog is a separate Common card
+  from the existing Rare Gym Dog. Each supports an optional same-name PNG
   override in `assets/` through its stable item ID.
 
 ### Economy and training
@@ -203,12 +205,18 @@ generated league.
   career bonuses, sponsors, and appearances increase both values.
 - Side jobs, underground winnings, and daily cash increase Cash without
   inflating Career Earnings.
+- Underground Buzz keeps Backroom Spar and adds Backroom Blackjack as a
+  separate once-per-local-day game. The player chooses a whole-dollar wager up
+  to 25% of available Cash, then plays a persisted hand with Hit or Stand.
+  Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
+  wager. There are no splits, doubles, or insurance.
 - Basic training costs energy and daily sessions, not Cash.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
   better perfect-session chance. His fee is `$35 + ($20 × fighter level)` per
   session; two-session sparring pays twice the fee.
 - The Training page also has a Recovery Room with one paid treatment per local
   day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.
+  A Sports Massage restores 5 energy and 25 health.
   Treatment costs `$40 + ($15 × fighter level)`, never exceeds the resource
   maximums, and does not consume a training session.
 - Live countdowns on the Training and Hustle pages show the time remaining
@@ -219,7 +227,8 @@ generated league.
 Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, avatar and base allocation,
 generated rosters, rivalries, collections, loadouts, championships, Cash, and
-Career Earnings. Legacy Technician, Grappler, and Endurance identities map to
+Career Earnings. An in-progress blackjack hand is also persisted so a refresh
+cannot consume the wager without allowing the player to finish. Legacy Technician, Grappler, and Endurance identities map to
 Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
 tendencies migrate without losing records or rivalries, and previously retired
 regular fighters return to the permanent Past Rivals system. Legacy District and
@@ -264,6 +273,7 @@ standalone opponent silhouettes in the
 are source copies of the visual artwork. Regression tests live under `tests/` and
 cover script parsing plus behavioral save recovery and migration, resource
 clamping, fight booking and payouts, rematches, opponent availability, training,
+recovery options, blackjack rules and wager limits,
 gear pity, endorsements, daily resets, roster rules, readable text sizing,
 equipment drops, reward reveals, and the Cash/Career Earnings economy.
 

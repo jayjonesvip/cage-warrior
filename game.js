@@ -24,10 +24,10 @@
   let saveWarningShown = false;
 
   const defaultState = {
-    version:13,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:14,name:'ROOKIE',cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,publicity:0,recovery:0},
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,
     pendingFight:null,
@@ -195,7 +195,8 @@
 
     // Lifestyle — improves passive recovery
     {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. Roadwork hurts a little less.',energyRegen:.02},
-    {id:'dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'Better company. +0.03 health every recovery tick.',healthRegen:.03},
+    {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
+    {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
     {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
     {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 energy every recovery tick.',energyRegen:.15},
@@ -229,7 +230,8 @@
   ];
   const recoveryDefs = [
     {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0},
-    {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12}
+    {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12},
+    {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25}
   ];
   const FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3,FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST*FIGHT_ROUNDS,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
 
@@ -250,6 +252,16 @@
     {id:'titan-global',icon:'🌐',brand:'Titan Global',product:'Worldwide lifestyle campaign',minLevel:13,minFans:200000,signing:250000,perFight:30000,fansPerFight:2200,fights:8}
   ];
 
+  function normalizeBlackjackHand(hand){
+    if(!hand||typeof hand!=='object'||hand.date!==LOGIC.localDateKey())return null;
+    const cleanCards=cards=>Array.isArray(cards)?cards.filter(card=>typeof card==='string'&&/^[2-9TJQKA][SHDC]$/.test(card)):[];
+    const deck=cleanCards(hand.deck),player=cleanCards(hand.player),dealer=cleanCards(hand.dealer),all=[...deck,...player,...dealer];
+    if(player.length<2||dealer.length<2||all.length>52||new Set(all).size!==all.length)return null;
+    const bet=clamp(Math.floor(Number(hand.bet))||0,1,1000000000),status=hand.status==='settled'?'settled':'playing';
+    const result=['blackjack','win','push','loss'].includes(hand.result)?hand.result:'';
+    return {date:hand.date,bet,deck,player,dealer,status,result:status==='settled'?result:'',payout:status==='settled'?Math.max(0,Math.floor(Number(hand.payout))||0):0};
+  }
+
   function normalizeState(parsed){
       const source=parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
       const s = Object.assign(structuredClone(defaultState),source);
@@ -259,7 +271,7 @@
       const savedCounts=s.gearCounts&&typeof s.gearCounts==='object'&&!Array.isArray(s.gearCounts)?s.gearCounts:{};
       s.gear=[...new Set(legacyGear)];s.gearCounts={};for(const id of s.gear){const legacyCount=legacyGear.filter(x=>x===id).length;s.gearCounts[id]=Math.max(1,legacyCount,Math.floor(Number(savedCounts[id]))||0)}
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
-      s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());
+      s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;
       s.trainerOn = !!s.trainerOn;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
@@ -267,7 +279,7 @@
       s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);if(!s.socialAccountCreated)s.fans=0;
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
-      s.version=13;
+      s.version=14;
       return s;
   }
   function loadState(){
@@ -349,7 +361,7 @@
     if(!pool.length)return null;const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
   }
   function ensureDailyCounters(){
-    state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,todayKey());
+    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;
   }
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 35+state.level*20}
@@ -443,7 +455,7 @@
   }
 
   function renderCareer(){
-    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeAvatarText').textContent=avatar?`FIGHTER ${String(fighterAvatars.indexOf(avatar)+1).padStart(2,'0')}`:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
+    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),ready=!!(style&&city&&avatar&&allocationValid),next=milestoneDefs.find(m=>!state.milestones.includes(m.id));$('#app').classList.toggle('career-setup',!ready);$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#careerIdentityStatus').textContent=ready?'LOCKED IN':`${Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)}/3 COMPLETE`;$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);$('#nextMilestoneText').textContent=!city?'Choose hometown':!avatar?'Choose fighter':!style?'Choose archetype':next?`${state.level>=next.level?'⚔️':'🔒'} ${milestoneName(next)}`:'👑 ALL TITLES WON';
     const sponsor=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,sponsorBadge=$('#heroSponsor');sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${sponsor.brand}</b><em>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</em></span>`:'';
     $('#buildChoices').innerHTML=style?'':fighterStyles.map(s=>`<button class="build-choice" data-style="${s.id}"><b>${s.name}</b><small>${s.text}</small></button>`).join('');
     $('#cityChoices').innerHTML=city?'':fighterCities.map(c=>`<button class="city-choice" data-city="${c.id}">${c.name}</button>`).join('');
@@ -546,12 +558,14 @@
   }
   function renderHustle(){
     ensureDailyCounters();
-    const hustleLeft=sessionsLeft('hustle',3),riskLeft=sessionsLeft('risk',1),publicityLeft=sessionsLeft('publicity',2);
+    const hustleLeft=sessionsLeft('hustle',3),riskLeft=sessionsLeft('risk',1),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',2),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
     $('#hustleLimitText').textContent=`${hustleLeft} SHIFT${hustleLeft===1?'':'S'} LEFT`;
-    $('#riskLimitText').textContent=`${riskLeft} RISK LEFT`;
+    $('#riskLimitText').textContent=`SPAR ${riskLeft} · CARDS ${blackjackLeft}`;
     $('#publicityLimitText').textContent=`${publicityLeft} GIG${publicityLeft===1?'':'S'} LEFT`;$('#publicityLimitText').classList.toggle('exhausted',publicityLeft<1);
     $('#hustleActions').innerHTML=hustleDefs.map((a,i)=>`<button class="action" data-hustle="${i}" ${state.energy<a.cost||hustleLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>$${a.cash[0]}–${a.cash[1]}</b><small>-${a.cost} energy</small></div></button>`).join('');
-    $('#riskActions').innerHTML=riskDefs.map((a,i)=>`<button class="action" data-risk="${i}" ${state.energy<a.cost||riskLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>-${a.cost} energy</b><small>${Math.round(a.success*100)}% success</small></div></button>`).join('');
+    const sparActions=riskDefs.map((a,i)=>`<button class="action" data-risk="${i}" ${state.energy<a.cost||riskLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>-${a.cost} energy</b><small>${Math.round(a.success*100)}% success</small></div></button>`).join('');
+    const blackjackLocked=!blackjackActive&&(blackjackLeft<1||maxBlackjackBet<1),blackjackStatus=blackjackActive?'HAND IN PROGRESS':blackjackLeft<1?'PLAYED TODAY':maxBlackjackBet<1?'NEED $4 CASH':`MAX BET $${fmt(maxBlackjackBet)}`;
+    $('#riskActions').innerHTML=sparActions+`<button class="action blackjack-action" data-blackjack-open ${blackjackLocked?'disabled':''}><div class="ico">${gameIcon('blackjack','🂡')}</div><div><h3>Backroom Blackjack</h3><p>Play one real hand against the dealer. Wager up to 25% of your available cash.</p></div><div class="cost"><b>${blackjackActive?'RESUME HAND':'HIT OR STAND'}</b><small>${blackjackStatus}</small></div></button>`;
     $('#publicityActions').innerHTML=publicityDefs.map((a,i)=>{
       const unlocked=opportunityUnlocked(a),limited=publicityLeft<1,energyLow=state.energy<a.cost;
       const unavailable=limited&&unlocked?'gig-unavailable':'',availability=!unlocked?requirementText(a):limited?'NO GIGS LEFT':energyLow?`NEEDS ${a.cost} ENERGY`:'AVAILABLE NOW';
@@ -570,7 +584,7 @@
     const order=['Fight Gear','Bling','Lifestyle','Property & Rides'],owned=gearItems.filter(g=>gearCount(g.id)>0);
     const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive follower bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
     if(!owned.length){$('#gearShop').innerHTML='<div class="gear-empty"><b>NO GEAR YET</b><span>Win fights to earn deterministic drops. Your fourth win without a drop is guaranteed to produce one.</span></div>';return}
-    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
+    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.iconName||g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
   }
   function openLoadoutFullDialog(trigger){const modal=$('#loadoutFullModal');loadoutDialogReturnFocus=trigger&&typeof trigger.focus==='function'?trigger:null;modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.lose();requestAnimationFrame(()=>$('#loadoutFullOk').focus())}
   function closeLoadoutFullDialog(){const modal=$('#loadoutFullModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();const returnFocus=loadoutDialogReturnFocus;loadoutDialogReturnFocus=null;if(returnFocus&&returnFocus.isConnected)requestAnimationFrame(()=>returnFocus.focus())}
@@ -757,6 +771,47 @@
     const nextOffer=nextEndorsementOffer();if(!nextOffer){toast('Every endorsement tier is complete.','#6ed7ff');return}if(d.id!==nextOffer.id){toast(`${nextOffer.brand} is the only offer on the table. Land that deal first.`,'#ffcf78');return}
     if(state.level<d.minLevel||state.fans<d.minFans){toast(`Needs LVL ${d.minLevel} and ${fmt(d.minFans)} followers`,'#75cfff');return}
     initAudio();const history=Array.isArray(state.endorsementHistory)?state.endorsementHistory:[];state.activeEndorsement={id:d.id,fightsLeft:d.fights};state.endorsementHistory=[...new Set([...history,d.id])];receiveMoney(d.signing,true);changeFollowers(Math.round(d.fansPerFight*.5));saveState();openSocialCycle('sponsor',{brand:d.brand});sfx.win();confettiBurst();toast(`${d.brand} SIGNED! +$${fmt(d.signing)}`,'#6ed7ff');updateUI();
+  }
+  function shuffledBlackjackDeck(){
+    const deck=[];for(const suit of ['S','H','D','C'])for(const rank of ['A','2','3','4','5','6','7','8','9','T','J','Q','K'])deck.push(rank+suit);
+    for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}return deck;
+  }
+  function blackjackCard(card,hidden=false){
+    if(hidden)return '<span class="playing-card card-back" aria-label="Hidden dealer card">CG</span>';
+    const rank=card[0]==='T'?'10':card[0],suit={S:'♠',H:'♥',D:'♦',C:'♣'}[card[1]],red=card[1]==='H'||card[1]==='D';return `<span class="playing-card ${red?'red':''}" aria-label="${rank} of ${suit}"><b>${rank}</b><i>${suit}</i></span>`;
+  }
+  function blackjackResultText(hand){
+    const profit=(hand.payout||0)-hand.bet;if(hand.result==='blackjack')return `BLACKJACK · YOU WIN $${fmt(profit)}`;if(hand.result==='win')return `YOU BEAT THE DEALER · +$${fmt(profit)}`;if(hand.result==='push')return `PUSH · YOUR $${fmt(hand.bet)} BET WAS RETURNED`;return `THE HOUSE WINS · -$${fmt(hand.bet)}`;
+  }
+  function renderBlackjackDialog(){
+    const hand=state.blackjackHand,maxBet=LOGIC.blackjackBetLimit(state.cash),active=hand?.status==='playing',settled=hand?.status==='settled';
+    $('#blackjackCash').textContent='$'+fmt(state.cash);$('#blackjackMaxBet').textContent=hand?`$${fmt(hand.bet)} WAGER`:'$'+fmt(maxBet);$('#blackjackBetPanel').hidden=!!hand;$('#blackjackTable').hidden=!hand;
+    const bet=$('#blackjackBet');bet.max=String(maxBet);if(!hand){const suggested=Math.max(1,Math.min(50,maxBet));bet.value=String(suggested);bet.disabled=maxBet<1}
+    $('#blackjackDeal').hidden=!!hand;$('#blackjackDeal').disabled=maxBet<1;$('#blackjackHit').hidden=!active;$('#blackjackStand').hidden=!active;
+    if(!hand){$('#blackjackResult').textContent='';return}
+    const revealDealer=settled,dealerValue=LOGIC.blackjackHandValue(revealDealer?hand.dealer:[hand.dealer[0]]),playerValue=LOGIC.blackjackHandValue(hand.player);
+    $('#dealerCards').innerHTML=hand.dealer.map((card,index)=>blackjackCard(card,!revealDealer&&index===1)).join('');$('#playerCards').innerHTML=hand.player.map(card=>blackjackCard(card)).join('');$('#dealerTotal').textContent=revealDealer?dealerValue.total:`${dealerValue.total} + ?`;$('#playerTotal').textContent=playerValue.total;
+    const result=$('#blackjackResult');result.textContent=settled?blackjackResultText(hand):`$${fmt(hand.bet)} ON THE TABLE`;result.className=`blackjack-result${settled?` ${hand.result}`:''}`;
+  }
+  function openBlackjack(){
+    ensureDailyCounters();if(!state.blackjackHand&&sessionsLeft('blackjack',1)<1){toast('You already played today’s blackjack hand.','#ff766d');return}if(!state.blackjackHand&&LOGIC.blackjackBetLimit(state.cash)<1){toast('You need at least $4 to make a legal wager.','#ffcf78');return}
+    initAudio();const modal=$('#blackjackModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');renderBlackjackDialog();sfx.tap();requestAnimationFrame(()=>(state.blackjackHand?$('#blackjackHit'):$('#blackjackBet')).focus());
+  }
+  function closeBlackjack(){const modal=$('#blackjackModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
+  function settleBlackjack(){
+    const hand=state.blackjackHand;if(!hand||hand.status!=='playing')return;const outcome=LOGIC.blackjackOutcome(hand.player,hand.dealer,hand.bet);hand.status='settled';hand.result=outcome.result;hand.payout=outcome.payout;state.cash+=outcome.payout;saveState();
+    if(outcome.result==='blackjack'||outcome.result==='win'){sfx.coin();confettiBurst()}else if(outcome.result==='loss'){sfx.lose();shake()}else sfx.tap();updateUI();renderBlackjackDialog();
+  }
+  function playBlackjackDealer(){
+    const hand=state.blackjackHand;if(!hand||hand.status!=='playing')return;while(LOGIC.blackjackHandValue(hand.dealer).total<17&&hand.deck.length)hand.dealer.push(hand.deck.pop());settleBlackjack();
+  }
+  function dealBlackjack(){
+    ensureDailyCounters();if(state.blackjackHand||sessionsLeft('blackjack',1)<1)return;const maxBet=LOGIC.blackjackBetLimit(state.cash),bet=Math.floor(Number($('#blackjackBet').value));if(!Number.isFinite(bet)||bet<1||bet>maxBet){toast(`Choose a whole-dollar bet from $1 to $${fmt(maxBet)}.`,'#ff766d');return}
+    initAudio();const deck=shuffledBlackjackDeck(),player=[deck.pop()],dealer=[deck.pop()];player.push(deck.pop());dealer.push(deck.pop());state.cash-=bet;state.dailyCounters.blackjack=1;state.blackjackHand={date:todayKey(),bet,deck,player,dealer,status:'playing',result:'',payout:0};saveState();sfx.tap();
+    const playerValue=LOGIC.blackjackHandValue(player),dealerValue=LOGIC.blackjackHandValue(dealer);if(playerValue.blackjack||dealerValue.blackjack)settleBlackjack();else{updateUI();renderBlackjackDialog()}
+  }
+  function hitBlackjack(){
+    const hand=state.blackjackHand;if(!hand||hand.status!=='playing'||!hand.deck.length)return;hand.player.push(hand.deck.pop());saveState();sfx.tap();const value=LOGIC.blackjackHandValue(hand.player);if(value.bust)settleBlackjack();else if(value.total===21)playBlackjackDealer();else renderBlackjackDialog();
   }
   function handleRisk(i){
     ensureDailyCounters();const a=riskDefs[i];initAudio();
@@ -999,7 +1054,7 @@
   }
 
   function revealGearDrop(){
-    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${gameIcon(item.id,item.icon)}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
+    if(!pendingResultDrop||resultDropRevealed)return false;resultDropRevealed=true;const drop=pendingResultDrop,item=drop.item,status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;const lootBox=$('#lootBox');lootBox.className=`loot drop-reveal drop-${drop.rarity.toLowerCase()}`;lootBox.innerHTML=`<span class="drop-kicker">${drop.rarity} GEAR DROP</span><span class="drop-icon">${gameIcon(item.iconName||item.id,item.icon)}</span><strong class="drop-name">${item.name}</strong><span class="drop-meta">${status}</span><small class="drop-reason">${drop.reason} · ${item.category}</small>${drop.extras?`<small class="drop-extras">${drop.extras}</small>`:''}`;$('#resultModal .result-card').classList.add('drop-celebration');$('#continueBtn').textContent='CONTINUE';sfx.coin();confettiBurst();if(drop.rarity==='EPIC'||drop.rarity==='LEGENDARY')scheduleFight(confettiBurst,650);return true;
   }
 
   function handleResultAction(){if(revealGearDrop())return;closeResult()}
@@ -1030,6 +1085,7 @@
     const hu=e.target.closest('[data-hustle]');if(hu){handleHustle(+hu.dataset.hustle);return}
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}
+    const blackjack=e.target.closest('[data-blackjack-open]');if(blackjack){openBlackjack();return}
     const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
     const social=e.target.closest('[data-social-post]');if(social){handleSocialPost(social.dataset.socialPost);return}
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}
@@ -1046,6 +1102,8 @@
   $('#autographRun').addEventListener('click',runAutographSigning);
   $('#autographCancel').addEventListener('click',closeAutographModal);
   $('#autographModal').addEventListener('click',e=>{if(e.target===$('#autographModal'))closeAutographModal()});
+  $('#blackjackDeal').addEventListener('click',dealBlackjack);$('#blackjackHit').addEventListener('click',hitBlackjack);$('#blackjackStand').addEventListener('click',playBlackjackDealer);$('#blackjackClose').addEventListener('click',closeBlackjack);
+  $('#blackjackModal').addEventListener('click',e=>{if(e.target===$('#blackjackModal'))closeBlackjack()});$('#blackjackModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeBlackjack()});
   $('#editFighterNameBtn').addEventListener('click',openFighterNameModal);
   $('#cancelFighterNameBtn').addEventListener('click',closeFighterNameModal);
   $('#fighterNameForm').addEventListener('submit',saveFighterName);
