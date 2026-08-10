@@ -237,6 +237,18 @@
     }
     return ratings;
   }
+
+  function shouldPersistCareer(retirementPending,saveWasKnown=false,currentRaw=undefined){
+    return retirementPending!==true&&!(saveWasKnown===true&&currentRaw===null);
+  }
+
+  function clearCareerStorage(storage,keys){
+    const removed=[];
+    for(const key of Array.isArray(keys)?keys:[]){
+      try{storage?.removeItem?.(key);removed.push(key)}catch(error){/* one blocked key must not preserve the others */}
+    }
+    return removed;
+  }
   function socialInteractionReward(seed){
     const value=nonNegativeWhole(seed);
     return {followers:5+value%8,hype:1+Math.floor(value/8)%3};
@@ -245,5 +257,5 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId};
 });

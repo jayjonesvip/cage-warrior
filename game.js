@@ -23,6 +23,7 @@
   const ENDORSEMENT_FIGHTS = {volt:4,ironhide:5,'apex-wireless':6,'northline-auto':7,'titan-global':8};
   const ENDORSEMENT_IDS = Object.keys(ENDORSEMENT_FIGHTS);
   let saveWarningShown = false;
+  let careerSaveKnown = false;
 
   const defaultState = {
     version:18,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
@@ -329,14 +330,17 @@
   }
   function loadState(){
     const readRaw=key=>{try{return localStorage.getItem(key)}catch(e){return null}};
-    return LOGIC.selectStoredState({primary:readRaw(SAVE_KEY),backup:readRaw(SAVE_BACKUP_KEY),legacy:readRaw('fytr-save-v1')},normalizeState,defaultState);
+    const primary=readRaw(SAVE_KEY);careerSaveKnown=primary!==null;
+    return LOGIC.selectStoredState({primary,backup:readRaw(SAVE_BACKUP_KEY),legacy:readRaw('fytr-save-v1')},normalizeState,defaultState);
   }
   function saveState(){
+    let current;try{current=localStorage.getItem(SAVE_KEY)}catch(e){current=undefined}
+    if(!LOGIC.shouldPersistCareer(retirementPending,careerSaveKnown,current))return;
     state.lastSave=Date.now();
     try{
-      const current=localStorage.getItem(SAVE_KEY);if(LOGIC.shouldBackupRaw(current,normalizeState))localStorage.setItem(SAVE_BACKUP_KEY,current);
+      if(LOGIC.shouldBackupRaw(current,normalizeState))localStorage.setItem(SAVE_BACKUP_KEY,current);
     }catch(e){/* A backup is helpful but must never block the primary save. */}
-    try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));saveWarningShown=false}
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));careerSaveKnown=true;saveWarningShown=false}
     catch(e){if(!saveWarningShown){saveWarningShown=true;setTimeout(()=>toast('SAVE FAILED · Check browser storage before closing.','#ff766d'),0)}}
   }
   function todayKey(){return LOGIC.localDateKey()}
@@ -537,7 +541,8 @@
     try{
       if(SHARED_FEED?.configured?.()&&SHARED_FEED.retireProfile)await SHARED_FEED.retireProfile();
       trackEvent('career_retired',{career_level:state.level,career_wins:state.wins,career_losses:state.losses});
-      for(const key of [SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1']){try{localStorage.removeItem(key)}catch{/* reload still resets the in-memory career */}}
+      window.removeEventListener('beforeunload',saveState);
+      LOGIC.clearCareerStorage(localStorage,[SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1']);
       window.location.reload();
     }catch(error){retirementPending=false;button.disabled=false;button.textContent='RETIRE FIGHTER';toast('RETIREMENT COULD NOT BE POSTED · CAREER KEPT SAFE','#ff766d');console.warn('Career retirement failed:',error)}
   }
