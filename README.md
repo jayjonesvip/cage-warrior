@@ -83,7 +83,9 @@ generated league.
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it
   results in an immediate knockout loss. A haymaker costs 5 additional energy
-  beyond the energy reserved for any rounds still to come.
+  beyond the energy reserved for any rounds still to come. Its landing chance
+  starts at 15%, then responds to attributes, condition, damage, and the
+  Brawler archetype, with a 68% maximum.
 - Three-round fight clearance requires 30 energy. The game charges 10 energy
   only when each round actually begins, so a first-round finish costs 10, a
   second-round finish costs 20, and a fight that reaches Round 3 costs 30.

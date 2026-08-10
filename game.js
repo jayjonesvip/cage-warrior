@@ -1046,7 +1046,7 @@
     }
     container.innerHTML=choices.map(({plan,isSignature,label,description})=>`<button class="corner-plan-btn ${isSignature?'signature':'response'}" data-fight-plan="${plan.id}" data-plan-context="corner"><b>${label}</b><small>${description}</small></button>`).join('');
   }
-  function haymakerChance(sim){return clamp(.34+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.20,.68)}
+  function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.15,.68)}
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,FIGHT_ROUND_COST)>=HAYMAKER_ENERGY}
   function beginFightApproach(approach){
