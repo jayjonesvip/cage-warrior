@@ -130,11 +130,13 @@ generated league.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.
-- A fighter profile offers a stable daily selection of three to five canned
-  interactions drawn from larger string pools: callouts, props, welcomes,
-  respect, and putting another fighter on notice. Supabase enforces five direct
-  fighter interactions per UTC day; `CageReporter` career coverage does not use
-  that allowance. These social posts do not fabricate an accepted online fight.
+- A fighter profile offers exactly three randomized, personalized message
+  drafts presented as text-style composers with explicit **Send** buttons. The
+  roughly 50-message pool covers callouts, props, welcomes, respect, and putting
+  another fighter on notice. A confirmed post awards 5–12 Followers and 1–3
+  Hype. Supabase enforces five direct fighter interactions per UTC day;
+  `CageReporter` career coverage does not use that allowance. These social posts
+  do not fabricate an accepted online fight.
 
 ### Career opponents
 

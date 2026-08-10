@@ -88,7 +88,12 @@ globalThis.CAGE_STRINGS = {
           '@{handle}, the record looks good. Let us see what happens when the cage door closes.',
           '@{handle}, no disrespect—but I see a fight the crowd would remember.',
           'Matchmakers, put @{handle} across from me. I will handle the rest.',
-          '@{handle}, you have my attention. Now earn the contract with my name on it.'
+          '@{handle}, you have my attention. Now earn the contract with my name on it.',
+          '@{handle}, your style against mine would sell every seat in the building.',
+          'I respect the climb, @{handle}, but I would still take that matchup tomorrow.',
+          '@{handle}, tell your team to keep the phone close. My side is interested.',
+          'The division keeps talking about @{handle}. I would rather settle it in the cage.',
+          '@{handle}, you bring the record. I will bring the pressure. Let us make it official.'
         ]
       },
       props: {
@@ -98,7 +103,12 @@ globalThis.CAGE_STRINGS = {
           'Respect to @{handle}. That record was not built by taking easy nights.',
           '@{handle} keeps showing up prepared. The sport needs more of that.',
           'Credit where it is due: @{handle} is building a run worth watching.',
-          'Strong work from @{handle}. Nothing fake about that climb.'
+          'Strong work from @{handle}. Nothing fake about that climb.',
+          '@{targetName} keeps answering every question the cage asks. Respect.',
+          'That last performance put @{handle} on my radar for all the right reasons.',
+          'No shortcuts in this game. @{handle} clearly understands that.',
+          'The tape does not lie—@{handle} has been getting better every fight.',
+          'Flowers while they can hear them: @{handle} is doing serious work.'
         ]
       },
       welcome: {
@@ -108,7 +118,12 @@ globalThis.CAGE_STRINGS = {
           '@{handle} just joined the conversation. Welcome to the noise.',
           'Good to see @{handle} on the feed. Now give everybody a fight to talk about.',
           'Welcome, @{handle}. Keep the posts honest and the fights violent.',
-          'Another real fighter enters the timeline. Welcome, @{handle}.'
+          'Another real fighter enters the timeline. Welcome, @{handle}.',
+          'Welcome aboard, @{handle}. The feed just got a little more dangerous.',
+          '@{targetName} is here. Somebody warn the matchmakers the timeline has teeth now.',
+          'Glad to see @{handle} join us. The grind is better with real fighters in it.',
+          'New name on the feed, proven name in the cage. Welcome, @{handle}.',
+          'Welcome to Cage Grind, @{handle}. Talk your talk and back it up under the lights.'
         ]
       },
       respect: {
@@ -118,7 +133,12 @@ globalThis.CAGE_STRINGS = {
           'Different gyms, same hard road. Respect to @{handle}.',
           'You can want the same belt and still respect the work. Salute, @{handle}.',
           '@{handle} understands what this life costs. Nothing but respect.',
-          'No callout today—just respect for the work @{handle} is doing.'
+          'No callout today—just respect for the work @{handle} is doing.',
+          'We may cross paths someday, @{handle}. Until then, respect for the climb.',
+          'Records get attention. Consistency earns respect. @{handle} has both.',
+          'Every fighter knows the hours nobody sees. Salute to @{handle} for putting them in.',
+          '@{targetName}, keep representing your city and your gym the right way.',
+          'There is room for rivalry and respect. @{handle} has earned the second one today.'
         ]
       },
       watching: {
@@ -128,7 +148,12 @@ globalThis.CAGE_STRINGS = {
           '@{handle} is climbing fast. Good—the division needs pressure.',
           'Keep an eye on @{handle}. That name is going to matter soon.',
           '@{handle}, I see the momentum. I am watching where it goes.',
-          'The roster is getting interesting. @{handle} might be part of the reason.'
+          'The roster is getting interesting. @{handle} might be part of the reason.',
+          '@{handle} is collecting wins. I am collecting notes.',
+          'The rankings move differently when @{targetName} starts making noise.',
+          'I watched the tape on @{handle}. Talented, dangerous, and definitely beatable.',
+          '@{handle}, enjoy the momentum. Every contender has somebody studying them.',
+          'The division noticed @{handle}. Now let us see how they handle the spotlight.'
         ]
       }
     }

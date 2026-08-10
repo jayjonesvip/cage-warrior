@@ -123,6 +123,13 @@ test('network opponent ratings combine level, avatar allocation, and archetype w
   assert.deepEqual(logic.networkOpponentRatings(5,avatar,style,.7),levelFive);
 });
 
+test('confirmed fighter interactions award bounded deterministic social rewards',()=>{
+  assert.deepEqual(logic.socialInteractionReward(0),{followers:5,hype:1});
+  assert.deepEqual(logic.socialInteractionReward(7),{followers:12,hype:1});
+  assert.deepEqual(logic.socialInteractionReward(23),{followers:12,hype:3});
+  assert.deepEqual(logic.socialInteractionReward(-50),{followers:5,hype:1});
+});
+
 test('training quote enforces daily, cash, and energy costs before rewards',()=>{
   const action={cost:20,sessions:2,gain:2};
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');

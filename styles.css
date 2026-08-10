@@ -26,11 +26,12 @@
 .fighter-bio-dialog p{max-width:330px;margin:8px auto 15px;font-size:11px;line-height:1.55}
 .fighter-bio-dialog .modal-actions.single-action{grid-template-columns:1fr}
 .fighter-bio-interactions{display:grid;gap:7px;max-height:min(38vh,300px);margin:11px 0;overflow-y:auto;text-align:left;scrollbar-width:thin}
-.fighter-bio-interaction{width:100%;display:grid;gap:4px;padding:9px 10px;border:1px solid #3974a5;border-radius:9px;background:linear-gradient(145deg,#102844,#07111d);color:#eef8ff;text-align:left;box-shadow:0 2px 0 #02070d}
-.fighter-bio-interaction:active{transform:translateY(1px);box-shadow:0 1px 0 #02070d}
-.fighter-bio-interaction:disabled{opacity:.45;filter:grayscale(1)}
-.fighter-bio-interaction b{color:#72dbff;font-size:9px;font-weight:950;letter-spacing:.45px}
-.fighter-bio-interaction small{color:#b6c7d8;font-size:8.5px;line-height:1.35}
+.fighter-message-composer{display:grid;grid-template-columns:minmax(0,1fr) 58px;min-height:66px;overflow:hidden;border:1px solid #3974a5;border-radius:9px;background:#07111d;box-shadow:inset 0 1px #ffffff0d,0 2px 0 #02070d}
+.fighter-message-text{display:flex;align-items:center;padding:9px 10px;color:#c9d8e8;font-family:system-ui,sans-serif;font-size:9px;line-height:1.4;text-transform:none}
+.fighter-message-send{border:0;border-left:1px solid #4fbff5;background:linear-gradient(180deg,#55c9ff,#1473d8);color:#fff;font-family:system-ui,sans-serif;font-size:9px;font-weight:950;letter-spacing:.5px;box-shadow:inset 0 1px #ffffff55}
+.fighter-message-send:active{filter:brightness(1.12)}
+.fighter-message-send:disabled{background:#24323f;color:#748595;box-shadow:none}
+.fighter-message-reward{color:#74dcff;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;letter-spacing:.45px;text-align:center}
 .fighter-bio-limit{padding:8px;border:1px solid #325777;border-radius:8px;background:#06101a;color:#8fa7bb;font-size:8.5px;font-weight:900;text-align:center}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01040a;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
