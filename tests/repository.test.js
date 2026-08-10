@@ -20,6 +20,7 @@ const cageAvatarMigration = fs.readFileSync('supabase/migrations/20260809150000_
 const cageInteractionMigration = fs.readFileSync('supabase/migrations/20260809200000_fighter_interactions.sql', 'utf8');
 const cageProfileCountMigration = fs.readFileSync('supabase/migrations/20260809210000_cage_profile_count.sql', 'utf8');
 const cageOpponentMigration = fs.readFileSync('supabase/migrations/20260809220000_cage_opponent_candidates.sql', 'utf8');
+const cageIdentityMigration = fs.readFileSync('supabase/migrations/20260810120000_permanent_fighter_identity.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -177,7 +178,7 @@ test('real Cage Feed fighters expose validated avatars and public bios', () => {
   assert.match(cageAvatarMigration, /register_cage_profile\([\s\S]*p_fighter_avatar text/i);
   assert.match(cageAvatarMigration, /revoke execute on function public\.register_cage_profile\(text,text,text,integer,integer,integer,text\) from public, anon/i);
   assert.match(cageSocial, /p_fighter_avatar:profile\.fighterAvatar/);
-  assert.match(supabaseClient, /select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses/);
+  assert.match(supabaseClient, /select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&retired_at=is.null/);
   assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /data-feed-profile=/);
   assert.match(script, /function fighterBioSentence\(profile\)/);
@@ -367,10 +368,10 @@ test('scalable copy pools are separated from gameplay logic', () => {
 });
 
 test('career identity includes a permanent hometown and a fight-earned title ladder', () => {
-  for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND']) {
+  for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND', 'SEATTLE', 'NEW ORLEANS', 'HAWAII']) {
     assert.match(script, new RegExp(`name:'${city}'`));
   }
-  for (const region of ['SOUTHWEST', 'WEST COAST', 'MIDWEST', 'NORTHEAST', 'SOUTHEAST', 'GULF COAST', 'GREAT LAKES']) {
+  for (const region of ['SOUTHWEST', 'WEST COAST', 'MIDWEST', 'NORTHEAST', 'SOUTHEAST', 'GULF COAST', 'GREAT LAKES', 'PACIFIC NORTHWEST', 'DEEP SOUTH', 'PACIFIC ISLANDS']) {
     assert.match(script, new RegExp(`region:'${region}'`));
   }
   assert.match(html, /Fighting Out Of/);
@@ -390,26 +391,50 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(readme, /belt is awarded only after that fighter is defeated/);
 });
 
-test('career identity shows followers and fighter renaming unlocks from the top bar', () => {
+test('fighter identity is globally unique, permanent, and locked before the career starts', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
   assert.doesNotMatch(html, /homeAvatarText|<small>Fighter Avatar<\/small>/);
   assert.match(html, /<b id="cashText">\$0<\/b><small class="audience-counts"><span id="fansText">0<\/span> FOLLOWERS[\s\S]*<span id="followingText">0<\/span> FOLLOWING<\/small>/);
   assert.doesNotMatch(html, /<small>CASH ·/);
   assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
-  assert.match(html, /class="identity-name-row"[\s\S]*id="editFighterNameBtn"[^>]*aria-disabled="true"/);
-  assert.match(html, /data-icon-name="edit-fighter-name"/);
-  assert.match(css, /\.top-name-edit\{[^}]*margin-left:3px/);
-  assert.match(css, /\.top-name-edit \.game-icon\{[^}]*width:10px;height:10px[^}]*transform:scaleX\(-1\)/);
-  assert.match(html, /id="fighterNameModal"[^>]*aria-hidden="true"/);
-  assert.match(html, /id="fighterNameInput"[^>]*minlength="2"[^>]*maxlength="24"/);
-  assert.match(script, /function normalizeFighterName\(value\)/);
-  assert.match(script, /s\.name=normalizeFighterName\(s\.name\)\|\|defaultState\.name/);
-  assert.match(script, /function openFighterNameModal\(\)\{if\(state\.level<2\)/);
-  assert.match(script, /NAME EDITING UNLOCKS AT LVL 2/);
-  assert.match(script, /state\.name=name;trackEvent\('fighter_name_changed'\);closeFighterNameModal\(\)/);
-  assert.match(script, /nameButton\.classList\.toggle\('locked',!nameUnlocked\)/);
+  assert.doesNotMatch(html, /editFighterNameBtn|fighterNameModal|fighterNameInput|edit-fighter-name/);
+  assert.match(html, /id="fighterNameSetup"[^>]*hidden/);
+  assert.match(html, /id="newFighterNameBtn"[^>]*>NEW NAME<\/button>/);
+  assert.match(html, /id="lockFighterNameBtn"[^>]*>READY<\/button>/);
+  assert.match(html, /cannot be edited after you press Ready/i);
+  assert.match(script, /version:18,name:'ROOKIE',nameLocked:false/);
+  assert.match(script, /function randomIdentitySuggestion\(\)/);
+  assert.match(script, /function identityClaimCandidates\(preferred\)/);
+  assert.match(script, /state\.nameLocked=true;state\.socialProfileId=profile\.id/);
+  assert.match(cageIdentityMigration, /create table if not exists public\.cage_name_registry/i);
+  assert.match(cageIdentityMigration, /on conflict \(name\) do nothing/i);
+  assert.match(cageIdentityMigration, /create or replace function public\.claim_cage_identity/i);
+  assert.match(cageIdentityMigration, /retired_at timestamptz/i);
+  assert.doesNotMatch(supabaseClient, /fighter_name|author_name|target_name/);
+  assert.match(script, /handle=normalizeIdentityName\(profile\?\.handle\)[\s\S]{0,700}\|\|!handle\|\|!name\|\|!avatar\|\|!arch/);
+  assert.doesNotMatch(script, /\[A-Za-z0-9\]\{2,31\}_\[0-9\]/);
   assert.match(script, /\$\('#careerFollowersText'\)\.textContent=fmt\(state\.fans\)/);
-  assert.match(readme, /naming modal\s+unlocks at level 2/);
+});
+
+test('identity word pools cover ten hometowns and retain wildcard exhaustion fallbacks', () => {
+  assert.equal(Object.keys(stringsData.fighterIdentity.cities).length, 10);
+  assert.equal(Object.keys(stringsData.fighterIdentity.styles).length, 7);
+  for (const words of Object.values(stringsData.fighterIdentity.cities)) assert.ok(words.length >= 12);
+  for (const words of Object.values(stringsData.fighterIdentity.styles)) assert.ok(words.length >= 12);
+  assert.ok(stringsData.fighterIdentity.modifiers.length >= 18);
+  assert.match(script, /Math\.random\(\)<\.2\?pick\(pools\.modifiers\)/);
+  assert.match(script, /for\(let i=0;i<80;i\+\+\)add\(`\$\{pools\.modifiers/);
+});
+
+test('retirement is warned, reported, and clears only Cage Grind career saves', () => {
+  assert.match(page, /id="retireCareerBtn"[^>]*>RETIRE FIGHTER<\/button>/);
+  assert.match(page, /id="retireCareerModal"[^>]*aria-hidden="true"/);
+  assert.match(page, /THIS CANNOT BE UNDONE/);
+  assert.match(script, /await SHARED_FEED\.retireProfile\(\)/);
+  assert.match(script, /for\(const key of \[SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1'\]\)/);
+  assert.doesNotMatch(script, /localStorage\.clear\(/);
+  assert.match(cageIdentityMigration, /'cagereporter','reporter',[\s\S]*has officially retired from competition/i);
+  assert.match(cageIdentityMigration, /update public\.cage_name_registry\s+set retired_at=now\(\)/i);
 });
 
 test('career opponent roster uses proportional two-across collectible fighter cards', () => {
@@ -510,7 +535,7 @@ test('gear collection shows owned quantities and rarity above icons', () => {
 test('permanent identity onboarding gates the career and removes completed selectors', () => {
   const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
   const trainStart = html.indexOf('<section class="screen" data-screen="train">');
-  for (const id of ['careerIdentityCard', 'citySetup', 'fighterSetup', 'archetypeSetup', 'careerGameContent']) {
+  for (const id of ['careerIdentityCard', 'citySetup', 'fighterSetup', 'archetypeSetup', 'fighterNameSetup', 'careerGameContent']) {
     const position = html.indexOf(`id="${id}"`);
     assert.ok(position > homeStart && position < trainStart, `${id} should be on the Home screen`);
   }
@@ -519,6 +544,7 @@ test('permanent identity onboarding gates the career and removes completed selec
   assert.match(script, /\$\('#app'\)\.classList\.toggle\('career-setup',!ready\)/);
   assert.match(script, /\$\('#fighterSetup'\)\.hidden=!city\|\|!!avatar/);
   assert.match(script, /\$\('#archetypeSetup'\)\.hidden=!city\|\|!avatar\|\|!!style/);
+  assert.match(script, /\$\('#fighterNameSetup'\)\.hidden=!coreReady\|\|state\.nameLocked/);
   assert.match(script, /\$\('#citySetup'\)\.hidden=!!city/);
   assert.match(script, /\$\('#buildChoices'\)\.innerHTML=style\?'':fighterStyles\.map/);
   assert.match(script, /\$\('#cityChoices'\)\.innerHTML=city\?'':fighterCities\.map/);

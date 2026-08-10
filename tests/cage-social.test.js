@@ -75,7 +75,7 @@ test('expired anonymous sessions refresh without creating a second player identi
   assert.deepEqual(JSON.parse(calls[0].options.body), { refresh_token: 'refresh-token' });
 });
 
-test('profile registration, global feed reads, roster filtering, and callout publishing use authenticated REST requests', async () => {
+test('identity claiming, profile sync, retirement, feed reads, roster filtering, and posting use authenticated REST requests', async () => {
   const storage = memoryStorage();
   const otherId = '22222222-2222-4222-8222-222222222222';
   const requests = [];
@@ -87,14 +87,16 @@ test('profile registration, global feed reads, roster filtering, and callout pub
     fetchImpl: async (url, options) => {
       requests.push({ url, options });
       if (url.endsWith('/auth/v1/signup')) return jsonResponse(session);
-      if (url.endsWith('/rest/v1/rpc/register_cage_profile')) return jsonResponse({ id: session.user.id, handle: 'NYCBrawler_01' });
+      if (url.endsWith('/rest/v1/rpc/claim_cage_identity')) return jsonResponse({ id: session.user.id, handle: 'sunnyfist' });
+      if (url.endsWith('/rest/v1/rpc/sync_cage_profile')) return jsonResponse({ id: session.user.id, handle: 'sunnyfist' });
+      if (url.endsWith('/rest/v1/rpc/retire_cage_profile')) return jsonResponse({ id: session.user.id, handle: 'sunnyfist', retired_at: '2026-08-10T12:00:00Z' });
       if (url.includes('/rest/v1/cage_feed_posts?')) return jsonResponse([{ id: 7, post_kind: 'player', body: 'Back to work.' }]);
       if (url.includes('/rest/v1/cage_profiles?')) return jsonResponse([
-        { id: session.user.id, handle: 'NYCBrawler_01' },
-        { id: otherId, handle: 'CHICounter_01', fighter_name: 'ALEX KING' },
+        { id: session.user.id, handle: 'sunnyfist' },
+        { id: otherId, handle: 'windycounter' },
       ]);
       if (url.endsWith('/rest/v1/rpc/get_cage_opponent_candidates')) return jsonResponse([
-        { id: otherId, handle: 'CHICounter_01', fighter_name: 'ALEX KING', level: 4, fighter_avatar: 'fighter-08', archetype: 'counter' },
+        { id: otherId, handle: 'windycounter', level: 4, fighter_avatar: 'fighter-08', archetype: 'counter' },
       ]);
       if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
@@ -103,24 +105,30 @@ test('profile registration, global feed reads, roster filtering, and callout pub
     },
   });
 
-  const profile = await client.registerProfile({ fighterName: 'JAY JONES', city: 'new-york', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
+  const claimed = await client.claimIdentity({ candidates: ['sunnyfist','cactushammer'], city: 'phoenix', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 1, wins: 0, losses: 0 });
+  const profile = await client.registerProfile({ fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
   const profileCount = await client.loadProfileCount();
   const opponents = await client.loadOpponentCandidates(4, 12);
   const remaining = await client.loadInteractionAllowance();
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
+  const retired = await client.retireProfile();
 
-  assert.equal(profile.handle, 'NYCBrawler_01');
+  assert.equal(claimed.handle, 'sunnyfist');
+  assert.equal(profile.handle, 'sunnyfist');
+  assert.equal(retired.retired_at, '2026-08-10T12:00:00Z');
   assert.equal(feed[0].id, 7);
   assert.deepEqual(roster.map(row => row.id), [otherId]);
   assert.equal(profileCount, 27);
-  assert.equal(opponents[0].handle, 'CHICounter_01');
+  assert.equal(opponents[0].handle, 'windycounter');
   assert.equal(remaining, 3);
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));
-  const registerBody = JSON.parse(authenticated.find(request => request.url.endsWith('register_cage_profile')).options.body);
-  assert.deepEqual(registerBody, { p_fighter_name: 'JAY JONES', p_city: 'new-york', p_archetype: 'brawler', p_level: 4, p_wins: 7, p_losses: 2, p_fighter_avatar: 'fighter-07' });
+  const claimBody = JSON.parse(authenticated.find(request => request.url.endsWith('claim_cage_identity')).options.body);
+  assert.deepEqual(claimBody, { p_candidates: ['sunnyfist','cactushammer'], p_city: 'phoenix', p_archetype: 'brawler', p_fighter_avatar: 'fighter-07', p_level: 1, p_wins: 0, p_losses: 0 });
+  const syncBody = JSON.parse(authenticated.find(request => request.url.endsWith('sync_cage_profile')).options.body);
+  assert.deepEqual(syncBody, { p_level: 4, p_wins: 7, p_losses: 2, p_fighter_avatar: 'fighter-07' });
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');
