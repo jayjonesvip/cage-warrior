@@ -135,7 +135,9 @@ generated league.
   and rank, cumulative max-energy and max-health gains, partial recovery,
   career bonus, and any newly unlocked title challenge. Ordinary levels restore
   up to 30 energy and 25 health; title-challenge levels 5, 9, 12, and 15 fully
-  restore both resources.
+  restore both resources. Celebration effects share one bounded canvas loop,
+  respect reduced-motion preferences, and stop when their result dialog closes
+  so repeated rewards cannot accumulate background animation work.
 
 ### Cage Feed
 

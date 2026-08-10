@@ -50,6 +50,8 @@
   let pendingResultDrop = null;
   let resultDropRevealed = false;
   let resultActionTimer = null;
+  let confettiFrameId = null;
+  let confettiRun = 0;
   let levelUpSummary = null;
   let combatLocked = false;
   let fightSpeed = 1;
@@ -496,7 +498,7 @@
     if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus,titleRestore:!!previous?.titleRestore||titleRestore};trackEvent('level_up',{from_level:startingLevel,to_level:state.level,levels_gained:state.level-startingLevel});ensureRoster();showLevelUp(levelUpSummary)}
   }
   function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id)),recovery=summary.titleRestore?'Title milestone reached — energy and health fully restored.':'Your corner restored up to 30 energy and 25 health per level.';$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`${recovery} ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
-  function closeLevelUp(){const modal=$('#levelUpModal');modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
+  function closeLevelUp(){const modal=$('#levelUpModal');clearTimeout(modal._burstTimer);modal._burstTimer=null;stopConfetti();modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
   function spendEnergy(n){if(!LOGIC.spendEnergy(state,n)){toast('Not enough energy. It refills over time.','#ff766d');return false}return true}
 
   function updateUI(){
@@ -1216,11 +1218,18 @@
   }
 
   function closeResult(){
-    clearTimeout(resultActionTimer);resultActionTimer=null;clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home');
+    clearTimeout(resultActionTimer);resultActionTimer=null;stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home');
+  }
+
+  function stopConfetti(){
+    confettiRun++;if(confettiFrameId!==null)cancelAnimationFrame(confettiFrameId);confettiFrameId=null;const canvas=$('#confetti'),context=canvas&&canvas.getContext('2d');if(context)context.clearRect(0,0,canvas.width,canvas.height);
   }
 
   function confettiBurst(){
-    const c=$('#confetti');if(!c)return false;const r=c.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);c.width=r.width*dpr;c.height=r.height*dpr;const x=c.getContext('2d');if(!x)return false;x.setTransform(dpr,0,0,dpr,0,0);let bits=[];const colors=['#6ed7ff','#227cff','#5578ff','#a8e9ff','#ffffff'];for(let i=0;i<90;i++)bits.push({x:r.width/2,y:r.height*.24,vx:rand(-5,5),vy:rand(-10,-3),g:.24,w:rint(3,8),h:rint(4,12),a:rand(0,6),va:rand(-.2,.2),c:colors[rint(0,colors.length-1)]});let n=0;function frame(){x.clearRect(0,0,r.width,r.height);for(const b of bits){b.x+=b.vx;b.y+=b.vy;b.vy+=b.g;b.a+=b.va;x.save();x.translate(b.x,b.y);x.rotate(b.a);x.fillStyle=b.c;x.fillRect(-b.w/2,-b.h/2,b.w,b.h);x.restore()}if(n++<105)requestAnimationFrame(frame);else x.clearRect(0,0,r.width,r.height)}requestAnimationFrame(frame);return true
+    const c=$('#confetti');if(!c||document.hidden||globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)return false;const r=c.getBoundingClientRect();if(!r.width||!r.height)return false;
+    stopConfetti();const run=++confettiRun,dpr=Math.min(1.25,devicePixelRatio||1),x=c.getContext('2d');if(!x)return false;c.width=Math.ceil(r.width*dpr);c.height=Math.ceil(r.height*dpr);x.setTransform(dpr,0,0,dpr,0,0);
+    const count=r.width<700?48:64,bits=[],colors=['#6ed7ff','#227cff','#5578ff','#a8e9ff','#ffffff'];for(let i=0;i<count;i++)bits.push({x:r.width/2,y:r.height*.24,vx:rand(-5,5),vy:rand(-10,-3),g:.24,w:rint(3,8),h:rint(4,12),a:rand(0,6),va:rand(-.2,.2),c:colors[rint(0,colors.length-1)]});
+    const started=performance.now();let previous=started;function frame(now){if(run!==confettiRun)return;const step=Math.min(2,Math.max(.25,(now-previous)/16.67));previous=now;x.clearRect(0,0,r.width,r.height);for(const b of bits){b.x+=b.vx*step;b.y+=b.vy*step;b.vy+=b.g*step;b.a+=b.va*step;x.save();x.translate(b.x,b.y);x.rotate(b.a);x.fillStyle=b.c;x.fillRect(-b.w/2,-b.h/2,b.w,b.h);x.restore()}if(now-started<1200)confettiFrameId=requestAnimationFrame(frame);else{confettiFrameId=null;x.clearRect(0,0,r.width,r.height)}}confettiFrameId=requestAnimationFrame(frame);return true
   }
 
   // Global events
