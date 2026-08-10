@@ -911,7 +911,11 @@ test('level ups receive a dedicated promotion celebration', () => {
   assert.match(script, /up to 30 energy and 25 health per level/);
   assert.doesNotMatch(script, /state\.energy=state\.maxEnergy;state\.maxHealth\+=5;state\.health=state\.maxHealth/);
   assert.match(script, /modal\._burstTimer=setTimeout\(confettiBurst,620\)/);
-  assert.match(script, /function closeLevelUp\(\)/);
+  assert.match(script, /function closeLevelUp\(\).*clearTimeout\(modal\._burstTimer\).*stopConfetti\(\)/);
+  assert.match(script, /function stopConfetti\(\).*cancelAnimationFrame\(confettiFrameId\)/s);
+  assert.match(script, /const count=r\.width<700\?48:64/);
+  assert.match(script, /Math\.min\(1\.25,devicePixelRatio\|\|1\)/);
+  assert.doesNotMatch(script, /if\(n\+\+<105\)requestAnimationFrame\(frame\)/);
   assert.match(script, /\$\('#levelUpContinue'\)\.addEventListener\('click',closeLevelUp\)/);
 });
 
