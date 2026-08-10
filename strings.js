@@ -21,7 +21,7 @@ globalThis.CAGE_STRINGS = {
       submission: ['hunter','choke','tap','snare','triangle','armbar','guillotine','heelhook','necktie','limb','squeeze','catch'],
       wrestleBox: ['wrestleboxer','hybrid','boxer','shooter','clinch','level','doubleleg','sprawl','mixer','cross','chainbox','switchhit']
     },
-    modifiers: ['iron','rogue','wild','prime','lucky','heavy','silent','midnight','red','black','cold','golden','savage','wicked','true','dark','rapid','mad']
+    modifiers: ['iron','rogue','wild','prime','lucky','heavy','silent','midnight','red','black','cold','golden','savage','wicked','true','dark','rapid','mad','electric','thunder','neon','steel','shadow','storm','venom','outlaw','gritty','relentless','blazing','phantom','cosmic','fearless','turbo','brutal','atomic','rebel']
   },
 
   opponentNames: {
