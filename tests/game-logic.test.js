@@ -113,6 +113,26 @@ test('opponent availability covers current fights, locked titles, and accepted r
   assert.equal(logic.opponentAvailable({championship:true,titleId:'regional',tier:5,titleDefeated:false},context),false);
 });
 
+test('retirement suppresses unload saves and clears only career storage',()=>{
+  const values=new Map([
+    ['cage-warrior-save-v3','progressed career'],
+    ['cage-warrior-save-backup-v1','progressed backup'],
+    ['fytr-save-v1','legacy career'],
+    ['unrelated-preference','keep me'],
+  ]);
+  const storage={removeItem:key=>values.delete(key)};
+
+  assert.equal(logic.shouldPersistCareer(false),true);
+  assert.equal(logic.shouldPersistCareer(true),false);
+  assert.deepEqual(logic.clearCareerStorage(storage,['cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1']),[
+    'cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1'
+  ]);
+  assert.equal(values.has('cage-warrior-save-v3'),false);
+  assert.equal(values.has('cage-warrior-save-backup-v1'),false);
+  assert.equal(values.has('fytr-save-v1'),false);
+  assert.equal(values.get('unrelated-preference'),'keep me');
+});
+
 test('network opponent ratings combine level, avatar allocation, and archetype without changing balance bounds',()=>{
   const avatar={power:8,speed:6,chin:2,cardio:4},style={power:2,speed:-1,chin:1,cardio:0};
   const levelOne=logic.networkOpponentRatings(1,avatar,style,.7);
