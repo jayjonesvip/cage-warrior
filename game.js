@@ -508,8 +508,8 @@
     if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
     if(lastShownHealth!==null&&healthNow<lastShownHealth)flashResource('health',lastShownHealth-healthNow);
     lastShownEnergy=energyNow;lastShownHealth=healthNow;
-    $('#hudEnergyText').textContent=`${energyNow}/${state.maxEnergy}`;$('#hudEnergyBar').style.width=(state.energy/state.maxEnergy*100)+'%';
-    $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';
+    $('#hudEnergyText').textContent=`${energyNow}/${state.maxEnergy}`;$('#hudEnergyBar').style.width=(state.energy/state.maxEnergy*100)+'%';$('#energyHud').classList.toggle('critical',LOGIC.resourceIsCritical(state.energy,state.maxEnergy));
+    $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';$('#healthHud').classList.toggle('critical',LOGIC.resourceIsCritical(state.health,state.maxHealth));
     $('#xpText').textContent=`${Math.floor(state.xp)}/${xpNeed()}`;
     $('#hypeText').textContent=Math.floor(state.hype)+'%';
     ['power','speed','chin','cardio'].forEach(k=>{$('#'+k+'Stat').textContent=effectiveStat(k);$('#'+k+'Mini').style.width=clamp(effectiveStat(k)*4,5,100)+'%'});

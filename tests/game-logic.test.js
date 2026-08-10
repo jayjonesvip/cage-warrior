@@ -93,6 +93,14 @@ test('ordinary level ups grant partial recovery while title milestones restore f
   assert.deepEqual(milestone,{energy:103,maxEnergy:103,health:105,maxHealth:105});
 });
 
+test('resource warning state begins only below twenty-five percent',()=>{
+  assert.equal(logic.resourceIsCritical(24,100),true);
+  assert.equal(logic.resourceIsCritical(24.99,100),true);
+  assert.equal(logic.resourceIsCritical(25,100),false);
+  assert.equal(logic.resourceIsCritical(26,100),false);
+  assert.equal(logic.resourceIsCritical(-20,100),true);
+});
+
 test('fight and rematch payouts preserve existing formulas',()=>{
   const newOpponent={reward:200,tier:3,lossesToPlayer:0};
   const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};

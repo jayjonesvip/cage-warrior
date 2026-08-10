@@ -122,6 +122,11 @@
     return state;
   }
 
+  function resourceIsCritical(value,maximum){
+    const max=Math.max(1,finite(maximum,1));
+    return clamp(finite(value),0,max)/max<.25;
+  }
+
   function bookFight(state,key,cost=15,startedAt=Date.now(),requiredEnergy=cost){
     if(state.pendingFight)return {ok:false,reason:'pending'};
     if(state.energy<Math.max(cost,finite(requiredEnergy,cost)))return {ok:false,reason:'energy'};
@@ -273,5 +278,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

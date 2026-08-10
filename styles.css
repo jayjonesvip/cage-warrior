@@ -91,6 +91,7 @@
   .hud-meter i{display:block;height:100%;width:100%;border-radius:8px;transition:width .25s}
   .energy-hud .hud-meter i{background:linear-gradient(90deg,#0f67a1,#5be0ff)}
   .health-hud .hud-meter i{background:linear-gradient(90deg,#174a98,#2f8fff)}
+  .hud-resource.critical .hud-meter i{background:linear-gradient(90deg,#8f111b,#ff404c);box-shadow:0 0 8px #ff334499}
   .hud-resource em{position:absolute;right:5px;top:50%;opacity:0;pointer-events:none;font-family:system-ui,sans-serif;font-style:normal;font-size:13px;font-weight:1000;text-shadow:0 2px 5px #000;transform:translateY(-50%) scale(.7)}
   .hud-resource em.show{animation:hudDelta .9s ease-out both}
   .hud-resource.drop-energy{animation:hudEnergyDrop .62s ease-out}
