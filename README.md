@@ -197,6 +197,9 @@ generated league.
   never purchased.
 - The home-screen Daily Drop awards Cash, energy, and one deterministic,
   level-eligible collectible every day. It does not reset fight-drop pity.
+- Collectible card artwork is emphasized within the fixed two-column card
+  layout, while the Daily Drop uses the same high-contrast label treatment as
+  other primary actions.
 - A win has a 25% base drop chance. Upsets, rivalries, and KO/TKO finishes
   improve the chance, up to 75%.
 - The fourth win without a drop guarantees one. Winning a title guarantees a
