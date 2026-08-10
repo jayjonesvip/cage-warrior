@@ -964,8 +964,11 @@ test('daily drop guarantees a deterministic collectible without resetting fight 
 });
 
 test('fight result action celebrates wins without labeling losses as reward claims', () => {
-  assert.match(script, /\$\('#continueBtn'\)\.textContent=win\?'CLAIM REWARDS':'CONTINUE'/);
-  assert.match(script, /function handleResultAction\(\)\{if\(revealGearDrop\(\)\)return;closeResult\(\)\}/);
+  assert.match(script, /armResultAction\(win\?'CLAIM REWARDS':'CONTINUE'\)/);
+  assert.match(script, /function handleResultAction\(\)/);
+  assert.match(script, /if\(resultActionTimer\)return/);
+  assert.match(script, /LOGIC\.normalizeGearDrop\(pendingResultDrop,gearRarityOrder\)/);
+  assert.match(script, /DROP SAVED · OPEN GEAR TO VIEW IT/);
   assert.match(script, /BONUS GEAR DROP READY/);
   assert.match(script, /drop-icon/);
 });

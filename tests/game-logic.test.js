@@ -206,6 +206,27 @@ test('gear pity guarantees the fourth win without an earlier drop',()=>{
   assert.equal(logic.isGearPity(count),true);
 });
 
+test('gear drop reveal data is normalized without mutating the awarded item',()=>{
+  const item={id:'small-gym-dog',name:' Small Gym Dog ',category:' Lifestyle ',rarity:'COMMON',icon:'dog'};
+  const drop=logic.normalizeGearDrop({item,rarity:'common',count:'2.9',isNew:true,reason:' DAILY DROP ',extras:'+$100 CASH'});
+  assert.deepEqual(drop,{
+    item:{id:'small-gym-dog',name:'Small Gym Dog',category:'Lifestyle',rarity:'COMMON',icon:'dog'},
+    rarity:'COMMON',count:2,isNew:true,reason:'DAILY DROP',extras:'+$100 CASH'
+  });
+  assert.equal(item.name,' Small Gym Dog ');
+});
+
+test('invalid or stale gear drop data is rejected before the result UI renders it',()=>{
+  const validItem={id:'wraps',name:'Stiff Hand Wraps',category:'Fight Gear',rarity:'COMMON'};
+  assert.equal(logic.normalizeGearDrop(null),null);
+  assert.equal(logic.normalizeGearDrop({item:null,rarity:'COMMON'}),null);
+  assert.equal(logic.normalizeGearDrop({item:{id:'missing',name:'',category:'Lifestyle'},rarity:'COMMON'}),null);
+  assert.equal(logic.normalizeGearDrop({item:validItem,rarity:'MYTHIC'}),null);
+  assert.deepEqual(logic.normalizeGearDrop({item:validItem,count:-4}),{
+    item:validItem,rarity:'COMMON',count:1,isNew:false,reason:'GEAR DROP',extras:''
+  });
+});
+
 test('endorsement progression exposes only the next unsigned deal',()=>{
   const ids=['volt','ironhide','apex'];
   assert.equal(logic.nextEndorsementId(ids,[]),'volt');
