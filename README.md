@@ -38,7 +38,9 @@ generated league.
 - Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
-  obvious.
+  obvious. Enabled primary actions use consistent bold white labels across the
+  game; secondary, disabled, locked, and destructive controls retain their
+  quieter semantic treatments.
 - An active endorsement appears in the Home hero directly beneath Cage Rank,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,

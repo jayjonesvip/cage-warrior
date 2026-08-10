@@ -549,6 +549,11 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
+  assert.match(css, /--cta-text:#fff/);
+  assert.match(css, /--cta-weight:950/);
+  assert.match(css, /\.choice-action\{[^}]*color:var\(--cta-text\)[^}]*font-weight:var\(--cta-weight\)/);
+  assert.match(css, /\.install-offer button:not\(:disabled\),\.choice-action,\.feed-open,\.fight-btn:not\(:disabled\):not\(\.locked\),\.gear button:not\(:disabled\),\.tape-action\.fight:not\(:disabled\),\.continue-btn,\.level-up-continue,\.modal-run:not\(:disabled\),\.fighter-message-send:not\(:disabled\)\{[^}]*color:var\(--cta-text\)!important;[^}]*font-weight:var\(--cta-weight\)!important/);
+  assert.match(css, /\.install-offer button:disabled\{[^}]*color:#879bad;[^}]*text-shadow:none/);
   assert.match(html, /\.choice p\{[^}]*font-size:11\.5px;line-height:1\.35/);
   assert.doesNotMatch(page, /<article class="choice gear">/, 'home card must not inherit collectible gear-card typography');
 });
