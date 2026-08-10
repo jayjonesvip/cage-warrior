@@ -431,7 +431,7 @@ test('retirement is warned, reported, and clears only Cage Grind career saves', 
   assert.match(page, /id="retireCareerModal"[^>]*aria-hidden="true"/);
   assert.match(page, /THIS CANNOT BE UNDONE/);
   assert.match(script, /await SHARED_FEED\.retireProfile\(\)/);
-  assert.match(script, /if\(!LOGIC\.shouldPersistCareer\(retirementPending\)\)return/);
+  assert.match(script, /if\(!LOGIC\.shouldPersistCareer\(retirementPending,careerSaveKnown,current\)\)return/);
   assert.match(script, /window\.removeEventListener\('beforeunload',saveState\)/);
   assert.match(script, /LOGIC\.clearCareerStorage\(localStorage,\[SAVE_KEY,SAVE_BACKUP_KEY,'fytr-save-v1'\]\)/);
   assert.doesNotMatch(script, /localStorage\.clear\(/);

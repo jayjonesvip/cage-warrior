@@ -238,7 +238,9 @@
     return ratings;
   }
 
-  function shouldPersistCareer(retirementPending){return retirementPending!==true}
+  function shouldPersistCareer(retirementPending,saveWasKnown=false,currentRaw=undefined){
+    return retirementPending!==true&&!(saveWasKnown===true&&currentRaw===null);
+  }
 
   function clearCareerStorage(storage,keys){
     const removed=[];

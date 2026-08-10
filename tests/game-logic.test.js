@@ -124,6 +124,9 @@ test('retirement suppresses unload saves and clears only career storage',()=>{
 
   assert.equal(logic.shouldPersistCareer(false),true);
   assert.equal(logic.shouldPersistCareer(true),false);
+  assert.equal(logic.shouldPersistCareer(false,true,null),false,'a removed active save must not be resurrected');
+  assert.equal(logic.shouldPersistCareer(false,false,null),true,'a new career may create its first save');
+  assert.equal(logic.shouldPersistCareer(false,true,undefined),true,'an unreadable store should retain normal save error handling');
   assert.deepEqual(logic.clearCareerStorage(storage,['cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1']),[
     'cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1'
   ]);
