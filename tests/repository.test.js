@@ -406,7 +406,7 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.doesNotMatch(html, /id="homeFighterNameText"|career-name-display/);
   assert.doesNotMatch(html, /editFighterNameBtn|fighterNameModal|fighterNameInput|edit-fighter-name/);
   assert.match(html, /id="fighterNameSetup"[^>]*hidden/);
-  assert.match(html, /id="newFighterNameBtn"[^>]*>NEW NAME<\/button>/);
+  assert.match(html, /id="newFighterNameBtn"[^>]*>[\s\S]*data-icon-name="shuffle-name"[\s\S]*<span>NEW NAME<\/span><\/button>/);
   assert.match(html, /id="lockFighterNameBtn"[^>]*>READY<\/button>/);
   assert.match(html, /cannot be edited after you press Ready/i);
   assert.match(script, /version:18,name:'ROOKIE',nameLocked:false/);
@@ -428,8 +428,10 @@ test('identity word pools cover ten hometowns and retain wildcard exhaustion fal
   assert.equal(Object.keys(stringsData.fighterIdentity.styles).length, 7);
   for (const words of Object.values(stringsData.fighterIdentity.cities)) assert.ok(words.length >= 12);
   for (const words of Object.values(stringsData.fighterIdentity.styles)) assert.ok(words.length >= 12);
-  assert.ok(stringsData.fighterIdentity.modifiers.length >= 18);
-  assert.match(script, /Math\.random\(\)<\.2\?pick\(pools\.modifiers\)/);
+  assert.ok(stringsData.fighterIdentity.modifiers.length >= 36);
+  assert.match(script, /Math\.random\(\)<\.33\?pick\(pools\.modifiers\)/);
+  assert.match(script, /identityShufflePending=true[\s\S]*classList\.add\('shuffling'\)[\s\S]*setTimeout\([\s\S]*classList\.remove\('shuffling'\)/);
+  assert.match(css, /#newFighterNameBtn\.shuffling \.name-shuffle-icon\{animation:nameShuffleSpin/);
   assert.match(script, /for\(let i=0;i<80;i\+\+\)add\(`\$\{pools\.modifiers/);
 });
 

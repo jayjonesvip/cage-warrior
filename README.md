@@ -54,7 +54,8 @@ generated league.
   avatar remains visible in the Home hero without a duplicate identity row.
   The fighter name is also the Cage Feed username and cannot be edited after
   **Ready**. Names normally combine hometown and archetype words without a
-  numeric suffix; wildcard modifiers expand the pool when necessary.
+  numeric suffix; the animated shuffle reroll has a 33% chance to add one of
+  the expanded wildcard modifiers.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,
