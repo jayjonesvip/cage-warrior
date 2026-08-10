@@ -1,4 +1,29 @@
 globalThis.CAGE_STRINGS = {
+  fighterIdentity: {
+    cities: {
+      phoenix: ['phx','sun','sunny','cactus','desert','mesa','valley','copper','saguaro','heat','ember','dust'],
+      'los-angeles': ['la','socal','sunset','venice','angel','pacific','palm','coast','westside','freeway','hollywood','boulevard'],
+      chicago: ['chi','windy','loop','midway','lake','stockyard','southside','skyline','frost','steel','city','lakeshore'],
+      'new-york': ['nyc','empire','borough','bronx','brooklyn','queens','uptown','downtown','subway','hudson','liberty','concrete'],
+      miami: ['mia','vice','neon','beach','southbeach','ocean','palm','tropic','bay','surf','flamingo','sunrise'],
+      houston: ['hou','htown','bayou','space','orbit','mission','gulf','lonestar','oil','magnolia','humid','star'],
+      cleveland: ['cle','erie','lake','northcoast','rock','river','rustbelt','terminal','shore','factory','frost','steel'],
+      seattle: ['sea','emerald','sound','rain','cascade','northwest','puget','needle','evergreen','harbor','ferry','coffee'],
+      'new-orleans': ['nola','crescent','jazz','bourbon','voodoo','delta','brass','mardi','frenchquarter','gulf','swamp','bayou'],
+      hawaii: ['hi','aloha','island','kona','maui','oahu','wave','volcano','reef','trade','lava','pacific']
+    },
+    styles: {
+      pressure: ['pressure','swarm','pace','storm','wave','rush','surge','grinder','march','volume','engine','tsunami'],
+      counter: ['counter','sniper','trap','timing','read','razor','recoil','answer','intercept','precision','ghost','laser'],
+      brawler: ['brawler','puncher','fist','hammer','bruiser','slugger','knuckle','haymaker','scrapper','mauler','crusher','wreck'],
+      trickster: ['trickster','phantom','feint','spin','shuffle','chaos','glitch','switch','riddle','mischief','smoke','angle'],
+      control: ['grappler','clamp','chain','anchor','lock','vise','smother','mat','grip','drag','cradle','ride'],
+      submission: ['hunter','choke','tap','snare','triangle','armbar','guillotine','heelhook','necktie','limb','squeeze','catch'],
+      wrestleBox: ['wrestleboxer','hybrid','boxer','shooter','clinch','level','doubleleg','sprawl','mixer','cross','chainbox','switchhit']
+    },
+    modifiers: ['iron','rogue','wild','prime','lucky','heavy','silent','midnight','red','black','cold','golden','savage','wicked','true','dark','rapid','mad']
+  },
+
   opponentNames: {
     first: ['AARON','ACE','ADAM','ALEKSEI','ANDRE','ANTON','AXEL','BOONE','BRYCE','CALEB','CARLOS','CHRIS','CRUZ','DAMON','DANTE','DARIUS','DIEGO','DMITRI','DOM','ELI','ENZO','ERIK','FINN','GABE','HECTOR','ISAAC','IVAN','JACE','JAMAL','JAVIER','JONAH','JULIAN','KAI','LEO','MALIK','MARCUS','MATEO','MIKHAIL','NICO','NIKOLAI','OMAR','PAVEL','RAFA','ROMAN','RYAN','SERGEI','SILAS','TATE','TOMAS','TY','VANCE','VIKTOR','YURI','ZANE'],
     last: ['ANDERSON','BISHOP','BLACK','BLAZE','BROWN','CARTER','CASTILLO','COLE','CROW','DAVIS','DIAZ','DRAKE','FEDOROV','FROST','GARCIA','GONZALEZ','GRAVES','HALE','HAYES','HERNANDEZ','IVANOV','JACKSON','JOHNSON','JONES','KARPOV','KNOX','KOZLOV','KUZNETSOV','LEBEDEV','MARTINEZ','MERCER','MILLER','MOROZOV','NASH','ORLOV','PETROV','PIKE','POPOV','QUINN','REYES','RODRIGUEZ','ROOK','SANTOS','SHAW','SMIRNOV','SMITH','SOKOLOV','STEEL','STONE','THOMPSON','VALE','VOLKOV','WARD','WILLIAMS','WOLFE','YOUNG','ZAITSEV']

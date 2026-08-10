@@ -33,23 +33,33 @@ generated league.
 
 ### Fighting and progression
 
-- New careers complete three permanent Home-screen choices in order. First,
+- New careers complete four permanent Home-screen choices in order. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
-  Miami, Houston, or Cleveland. Next, choose one of 20 fighter avatar cards.
+  Miami, Houston, Cleveland, Seattle, New Orleans, or Hawaii. Next, choose one of
+  20 fighter avatar cards. New Orleans belongs to the Deep South title region;
+  Hawaii belongs to the Pacific Islands.
   Finally, choose one of seven permanent MMA archetypes: Pressure Fighter,
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
-  Submission Hunter, or Wrestle-Boxer.
+  Submission Hunter, or Wrestle-Boxer. The last step suggests a city-and-style
+  fighter name. **New Name** rerolls it, while **Ready** checks the global roster,
+  permanently reserves the unique identity, and starts the career.
 - Every avatar has a unique base allocation across Power, Speed, Chin, and
   Cardio. Each value is a whole number from 2 through 8 and the four values
   always total exactly 20. The game validates that allocation before locking
   the fighter in.
 - Each selector disappears as soon as its choice is locked. Career systems,
-  the HUD, and navigation remain hidden until hometown, fighter, and archetype
-  are complete. The Career Identity card keeps the hometown and archetype
+  the HUD, and navigation remain hidden until hometown, fighter, archetype, and
+  permanent fighter name are complete. The Career Identity card keeps the hometown and archetype
   beside Followers, career earnings, and the next milestone; the selected
-  avatar remains visible in the Home hero without a duplicate identity row. A pencil beside the
-  top-bar fighter name remains visibly locked for rookies; its naming modal
-  unlocks at level 2 with Club Fighter status.
+  avatar remains visible in the Home hero without a duplicate identity row.
+  The fighter name is also the Cage Feed username and cannot be edited after
+  **Ready**. Names normally combine hometown and archetype words without a
+  numeric suffix; wildcard modifiers expand the pool when necessary.
+- Home includes a deliberately red **Retire Fighter** action. Its confirmation
+  warns that the local career, record, Cash, gear, and progress will be lost.
+  CageReporter publishes the retirement, the name remains permanently reserved,
+  and the game returns to the first fighter-creation step. If the public
+  retirement cannot be recorded, the local career is kept safe.
 - Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
@@ -134,12 +144,13 @@ generated league.
   Existing saved careers that already have Followers are treated as connected
   accounts and keep their audience.
 - Cage Feed uses Supabase for a shared global timeline while the career itself
-  remains in `localStorage`. If Supabase is offline or has not been configured,
-  the existing local feed remains available and gameplay is never blocked.
-- The first successful connection receives an atomic, database-enforced handle
-  derived from the permanent identity, such as `NYCBrawler_01`. The numeric
-  suffix advances until a unique handle is found; later fighter-name edits do
-  not unexpectedly change the handle.
+  remains in `localStorage`. A connection is required only when **Ready**
+  reserves a new globally unique identity and when a retirement is published;
+  an established career and its local gameplay remain available offline.
+- Fighter name and Cage Feed username are one lowercase value, such as
+  `sunnypuncher`, `cactusfist`, or the wildcard `roguecactushammer`. The database
+  claims it atomically, silently tries another generated combination on a
+  collision, and never releases claimed or retired names for reuse.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The top-bar audience line shows both Followers and Following. Following is the
@@ -166,8 +177,8 @@ generated league.
   head-to-head history.
 - The **Cage Network** can add up to two recently active, exact-level real
   fighter profiles beside the three locally generated contenders. These are
-  clearly labeled AI-controlled snapshots that use the fighter's public name,
-  handle, portrait, archetype, and record. Their combat ratings are derived
+  clearly labeled AI-controlled snapshots that use the fighter's public
+  identity, portrait, archetype, and record. Their combat ratings are derived
   deterministically from level, avatar allocation, and archetype.
 - Cage Network snapshots persist in the local career and remain playable
   offline. Fighting one never changes the real fighter's public record, never
@@ -280,6 +291,10 @@ Invalid JSON and empty save values cannot replace that backup. Save migration
 also clamps resources to their valid ranges, discards malformed roster entries,
 and repairs interrupted-fight booking data before play resumes. Daily rewards
 and activity limits reset on the player's local calendar date.
+Version 18 save migration merges legacy fighter names and Cage Feed handles into
+one locked identity without discarding career progress. Only Cage Grind's
+primary, backup, and legacy career keys are removed on retirement; the browser's
+Supabase session and unrelated site storage are left intact.
 
 ### Replaceable icons
 
@@ -355,6 +370,9 @@ The profile-count migration supplies the exact shared-roster Following count.
 The opponent-candidate migration supplies authenticated, exact-level profiles
 updated within the last 30 days for local AI snapshots; the game falls back to
 its generated roster if the RPC or network is unavailable. In the Supabase
+identity migration, `cage_name_registry` permanently reserves unique names,
+removes duplicate public name fields, excludes retired profiles from active
+counts and opponents, and adds the retirement announcement RPC. In the Supabase
 Dashboard, enable **Authentication → Providers → Anonymous Sign-Ins**. The
 migration enables Row Level Security, permits authenticated reads, and restricts
 profile and post creation to validated RPC functions. Never place a secret or

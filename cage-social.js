@@ -18,14 +18,29 @@
 
     async function registerProfile(profile){
       const data=await database.registerCageProfile({
-        p_fighter_name:profile.fighterName,
-        p_city:profile.city,
-        p_archetype:profile.archetype,
         p_level:profile.level,
         p_wins:profile.wins,
         p_losses:profile.losses,
         p_fighter_avatar:profile.fighterAvatar
       });
+      return Array.isArray(data)?data[0]||null:data;
+    }
+
+    async function claimIdentity(profile){
+      const data=await database.claimCageIdentity({
+        p_candidates:Array.isArray(profile.candidates)?profile.candidates:[],
+        p_city:profile.city,
+        p_archetype:profile.archetype,
+        p_fighter_avatar:profile.fighterAvatar,
+        p_level:profile.level,
+        p_wins:profile.wins,
+        p_losses:profile.losses
+      });
+      return Array.isArray(data)?data[0]||null:data;
+    }
+
+    async function retireProfile(){
+      const data=await database.retireCageProfile();
       return Array.isArray(data)?data[0]||null:data;
     }
 
@@ -64,7 +79,7 @@
       return database.insertCagePost({p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

@@ -96,14 +96,16 @@
 
     async function rpc(name,args){return authenticatedRequest(`/rest/v1/rpc/${encodeURIComponent(name)}`,{method:'POST',body:args})}
 
-    async function registerCageProfile(values){return rpc('register_cage_profile',values)}
+    async function registerCageProfile(values){return rpc('sync_cage_profile',values)}
+    async function claimCageIdentity(values){return rpc('claim_cage_identity',values)}
+    async function retireCageProfile(){return rpc('retire_cage_profile',{})}
 
     async function selectCageFeed(limit){
-      return authenticatedRequest(`/rest/v1/cage_feed_posts?select=id,author_id,author_handle,author_name,post_kind,body,target_profile_id,target_handle,target_name,created_at&order=created_at.desc&limit=${limit}`);
+      return authenticatedRequest(`/rest/v1/cage_feed_posts?select=id,author_id,author_handle,post_kind,body,target_profile_id,target_handle,created_at&order=created_at.desc&limit=${limit}`);
     }
 
     async function selectCageProfiles(limit){
-      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,fighter_name,city,archetype,fighter_avatar,level,wins,losses,updated_at&order=updated_at.desc&limit=${limit}`);
+      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
     }
 
     async function countCageProfiles(){return rpc('get_cage_profile_count',{})}
@@ -111,7 +113,7 @@
     async function getCageInteractionsRemaining(){return rpc('get_cage_interactions_remaining',{})}
     async function insertCagePost(values){return rpc('publish_cage_post',values)}
 
-    return {configured,ensureSession,registerCageProfile,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,sessionUserId:()=>session?.user?.id||''};
+    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};
