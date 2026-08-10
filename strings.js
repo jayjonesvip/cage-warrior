@@ -159,6 +159,60 @@ globalThis.CAGE_STRINGS = {
     }
   },
 
+  corner: {
+    states: {
+      ahead: {
+        label:'PROTECT THE LEAD',
+        advice:'You banked the last round. Stay sharp and do not give them the mistake they need.'
+      },
+      behind: {
+        label:"YOU'RE BEHIND — GO TAKE IT",
+        advice:'That round got away from us. Raise the pace and make the judges remember the finish.'
+      },
+      even: {
+        label:'TOO CLOSE TO CALL',
+        advice:'Nobody owns this fight yet. Win the next five minutes clean.'
+      }
+    },
+    matchups: {
+      pressure: {
+        advice:"They're walking you down and building volume. Make them reset before they can swarm.",
+        plan:'counter',action:'CIRCLE OFF THE FENCE',
+        description:'Draw the rush, change the angle, and punish the opening.'
+      },
+      counter: {
+        advice:"They're waiting for you to overreach. Give them feints, not easy counters.",
+        plan:'control',action:'STOP CHASING',
+        description:'Crowd their timing and make them work before they can set a trap.'
+      },
+      brawler: {
+        advice:"They're loading up for one big shot. Stay composed and make every swing cost them.",
+        plan:'control',action:'STAY OUT OF THE POCKET',
+        description:'Smother the power, control the position, and deny the wild exchange.'
+      },
+      trickster: {
+        advice:"They're breaking rhythm with feints and odd angles. Keep the picture simple and own the center.",
+        plan:'control',action:'CONTROL THE DISTANCE',
+        description:'Cut off the exits and force them into a predictable exchange.'
+      },
+      control: {
+        advice:"They're driving every exchange toward the fence. Win the first grip and get your back off the cage.",
+        plan:'submission',action:'DEFEND THE TAKEDOWN',
+        description:'Stay dangerous in the scramble and attack every exposed neck or limb.'
+      },
+      submission: {
+        advice:"They're hunting your neck whenever the distance closes. Protect the entry and make them pay for reaching.",
+        plan:'pressure',action:'PROTECT YOUR NECK',
+        description:'Keep them backing up so they cannot settle into submission attacks.'
+      },
+      wrestleBox: {
+        advice:"They're mixing hands with level changes. Make them commit to one phase before you answer.",
+        plan:'submission',action:'MAKE THEM COMMIT',
+        description:'Read the transition and attack when they switch between striking and wrestling.'
+      }
+    }
+  },
+
   ticker: [
     'Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.',
     'Want a miracle in the last ten seconds? Keep 5 extra energy for the haymaker, kid.',

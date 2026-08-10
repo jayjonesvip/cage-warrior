@@ -465,18 +465,20 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(script, /simulateRound\(fight,1,signature,\{mode:approach\}\);fight\.tendencyRevealed=true/);
   assert.match(script, /openingInitiative=round===1&&opening\?\.mode==='aggressive'\?\.08:round===1&&opening\?\.mode==='feel'\?-\.07:0/);
   assert.match(script, /function renderCornerPlans\(container,nextRound\)/);
-  assert.match(script, /sameStyle\?\[signature\]:\[signature,opponentStyle\]/);
-  assert.match(script, /isSignature\?'FIGHT YOUR WAY':`ADAPT TO \$\{plan\.name\}`/);
-  assert.match(script, /next===3\?'FINAL ROUND: MAKE YOUR CALL':'ROUND 2: STYLE DECISION'/);
-  assert.doesNotMatch(script, /STICK WITH|FIGHT AS|ROUND \$\{next\}: CORNER CALL/);
+  assert.match(script, /function cornerFightState\(rounds\)/);
+  assert.match(script, /sameStyle=signature===opponentStyle\|\|signature===responsePlan\.id/);
+  assert.match(script, /label:'FIGHT YOUR WAY'/);
+  assert.match(script, /roundLabel=next===3\?'FINAL ROUND':'ROUND 2'/);
+  assert.match(script, /stateCopy=STRINGS\.corner\.states\[fightState\]/);
+  assert.doesNotMatch(script, /ADAPT TO|STYLE DECISION|MAKE YOUR CALL|STICK WITH|FIGHT AS|ROUND \$\{next\}: CORNER CALL/);
   assert.doesNotMatch(script, /renderPlanGrid/);
-  assert.match(script, /class="corner-style-options"/);
-  assert.match(script, /class="plan-btn \$\{isSignature\?'signature':'mirror'\}"[^>]*>\$\{label\}<\/button>/);
+  assert.match(script, /class="corner-coach-quote"/);
+  assert.match(script, /class="corner-plan-btn \$\{isSignature\?'signature':'response'\}"/);
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
-  assert.match(css, /\.plan-btn\.signature\{[^}]*background:linear-gradient\(#42b8f3,#1160b8\)/);
-  assert.match(css, /\.plan-btn\.mirror\{[^}]*background:linear-gradient\(#3b4856,#18212b\)/);
-  assert.match(script, /TENDENCY REVEALED/);
+  assert.match(css, /\.corner-plan-btn\.signature\{[^}]*background:linear-gradient\(#42b8f3,#1160b8\)/);
+  assert.match(css, /\.corner-plan-btn\.response\{[^}]*background:linear-gradient\(#3b4856,#18212b\)/);
+  assert.match(script, /OPPONENT READ/);
   assert.match(script, /DEEP READ/);
   assert.doesNotMatch(html, /id="skipBtn"/);
   assert.doesNotMatch(script, /function skipFight\(\)/);
@@ -595,7 +597,7 @@ test('archetype presentation uses clean text labels without decorative icons', (
   assert.match(script, /<b>\$\{s\.name\}<\/b>/);
   assert.match(script, /\$\('#homeStyleText'\)\.textContent=style\?style\.name:'NOT SELECTED'/);
   assert.match(script, /toast\(`\$\{style\.name\} IDENTITY LOCKED IN`/);
-  assert.match(script, /\$\{isSignature\?'YOUR STYLE':'THEIR STYLE'\} · \$\{plan\.name\}/);
+  assert.match(script, /class="corner-readline">\$\{readLabel\} · \$\{style\?\.name\|\|fight\.o\.tag\}/);
   assert.doesNotMatch(script, /\$\{(?:s|style|plan)\.icon\}/);
 });
 
@@ -923,10 +925,14 @@ test('round strategy combines matchup and player proficiency', () => {
   assert.match(script, /striking\.includes\(planId\)\?-\.09/);
   assert.match(script, /function matchupEdge\(planId,opponentId\)/);
   assert.match(script, /matchupEdge\(planId,tendency\)\+planFamiliarity\(state\.fighterStyle,planId\)/);
-  assert.match(script, /class="plan-badge signature">YOUR SIGNATURE/);
-  assert.match(script, /class="plan-badge unfamiliar">THEIR STYLE/);
-  assert.match(script, /class="plan-badge good">TACTICAL EDGE/);
-  assert.match(script, /class="plan-badge risky">TACTICAL RISK/);
+  const counterPlans=Object.values(stringsData.corner.matchups);
+  assert.equal(counterPlans.length,7);
+  assert.equal(new Set(counterPlans.map(choice=>choice.action)).size,7);
+  assert.ok(counterPlans.every(choice=>choice.plan&&choice.action&&choice.advice&&choice.description));
+  assert.match(script, /responsePlan=planDefs\.find\(plan=>plan\.id===matchup\.plan\)/);
+  assert.match(script, /edge=strategyEdge\(responsePlan\.id,opponentStyle\)/);
+  assert.match(script, /Your corner sees a strong tactical edge/);
+  assert.match(script, /risky switch outside your natural game/);
   assert.match(script, /function techniqueFor\(archetype,roll\)/);
 });
 

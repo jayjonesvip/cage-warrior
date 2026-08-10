@@ -55,8 +55,9 @@ generated league.
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
 - Followers are the fighter's lasting social audience, while Hype represents
-  short-term attention. Cage Feed interactions now focus on the shared fighter
-  community without directly changing either career resource.
+  short-term attention. Successful fighter-to-fighter Cage Feed posts add a
+  small, deterministic burst of both while keeping the shared community feed
+  at the center of the interaction.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
@@ -65,14 +66,14 @@ generated league.
   Out** uses that same signature discipline more cautiously, conceding some
   early initiative in exchange for a deeper corner read. Either choice reveals
   the opponent's basic tendency after Round 1.
-- Round 2 is a **Style Decision** and the final round asks the player to
-  **Make Your Call**. The grounded tactical choices are **Fight Your Way** with
-  the signature style or **Adapt To** the opponent's revealed archetype. Style
-  descriptions and warnings sit above stacked blue and slate-grey buttons.
-  Fighting outside your discipline carries a real penalty. When both fighters
-  share an archetype, the duplicate choice collapses into one **Fight Your
-  Way** action. The corner-call surface snaps directly to the live fight card
-  edges.
+- Between rounds, the corner gives an unofficial **Protect the Lead**, **Too
+  Close to Call**, or **You're Behind** read, followed by natural matchup
+  advice. The grounded tactical choices are **Fight Your Way** with the
+  signature style or an action-specific counter such as **Protect Your Neck**
+  or **Circle Off the Fence**. Deep reads still identify strong, workable, or
+  risky adjustments. When the signature style already supplies the answer,
+  the duplicate choice collapses into one **Fight Your Way** action. The
+  coach's-corner surface snaps directly to the live fight card edges.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
