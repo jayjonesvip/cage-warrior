@@ -238,6 +238,9 @@ generated league.
   remain eligible at higher levels.
 - Duplicate copies increase the collectible quantity but never stack the
   item's perk.
+- Drop reveals validate their reward data before rendering. If a stale item or
+  a device-specific celebration effect fails, the awarded collectible remains
+  saved and the result dialog recovers instead of blocking the career.
 - Owned items appear as fixed 2:3 collectible cards, two across on mobile,
   with full-card Common, Rare, Epic, and Legendary treatments.
 - Fight Gear uses a four-slot active loadout. Attempting to equip a fifth item

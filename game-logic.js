@@ -257,5 +257,21 @@
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId};
+  function normalizeGearDrop(drop,rarities=['COMMON','RARE','EPIC','LEGENDARY']){
+    if(!drop||typeof drop!=='object'||!drop.item||typeof drop.item!=='object')return null;
+    const item=drop.item,id=typeof item.id==='string'?item.id.trim():'',name=typeof item.name==='string'?item.name.trim():'',category=typeof item.category==='string'?item.category.trim():'';
+    if(!id||!name||!category)return null;
+    const allowed=(Array.isArray(rarities)?rarities:[]).map(value=>String(value).toUpperCase()),rarity=String(drop.rarity||item.rarity||'').toUpperCase();
+    if(!allowed.includes(rarity))return null;
+    return {
+      item:Object.assign({},item,{id,name,category}),
+      rarity,
+      count:Math.max(1,nonNegativeWhole(drop.count,1)),
+      isNew:drop.isNew===true,
+      reason:typeof drop.reason==='string'&&drop.reason.trim()?drop.reason.trim():'GEAR DROP',
+      extras:typeof drop.extras==='string'?drop.extras:''
+    };
+  }
+
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
