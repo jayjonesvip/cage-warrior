@@ -10,6 +10,18 @@ The page loads its presentation from `styles.css`, scalable copy pools from
 `strings.js`, testable gameplay rules from `game-logic.js`, and browser
 interactions from `game.js`.
 
+### Responsive desktop interface
+
+- Phone and installed-mobile layouts remain unchanged below 1100px.
+- At desktop widths, navigation becomes a persistent left rail, the fighter
+  HUD becomes a single horizontal command bar, and the playable area expands
+  to a 1440px maximum workspace.
+- Home uses a split career dashboard, Training and Hustle use two-column
+  workspaces, opponents and gear render four across, and Cage Feed receives a
+  wider reading column.
+- Fight Night keeps the same simulation and decisions, while the live timeline
+  and between-round corner decision can appear side by side.
+
 ## Current game
 
 Build a fighter from unknown rookie to champion through tactical fights,

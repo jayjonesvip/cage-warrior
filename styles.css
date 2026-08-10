@@ -320,3 +320,49 @@
   /* Bottom decision surfaces snap to their container edges instead of floating. */
   .screen[data-screen="feed"].active{padding-bottom:8px}
   .corner-panel{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0}
+
+  /* Desktop workspace: the phone UI remains unchanged below this breakpoint. */
+  @media (min-width:1100px){
+    body{align-items:stretch;background:radial-gradient(circle at 50% -20%,#153967 0,transparent 38%),linear-gradient(135deg,#02050a,#07101a 55%,#02050a)}
+    #app{width:min(100vw,1440px);height:100dvh;margin:0;border:0;border-radius:0;box-shadow:0 0 80px #000}
+    .topbar{height:84px;padding:12px 28px 12px 18px;gap:18px}
+    .logo{flex-basis:104px;width:104px;height:60px}
+    .identity{max-width:480px}.identity .name{font-size:18px}.identity .sub{font-size:11px}.top-progress{font-size:9.5px}.top-progress b{font-size:10px}
+    .money{margin-left:auto}.money>b{font-size:23px}.money small{font-size:10px}
+    .resource-hud{left:132px;top:84px;height:66px;padding:7px 18px;flex-direction:row;gap:10px}
+    .hud-condition-row{flex:0 1 44%;height:100%;gap:10px}.hud-attributes-row{flex:1;height:100%;gap:8px}
+    .hud-resource{grid-template-columns:62px 1fr 58px;padding:6px 9px}.hud-resource span{font-size:9.5px}.hud-resource b{font-size:12px}.hud-meter{height:8px}
+    .hud-attribute{padding:5px 8px}.hud-attribute span{font-size:9.5px}.hud-attribute b{font-size:17px}.hud-attribute .mini{height:4px}
+    .bottomnav{left:0;right:auto;top:84px;bottom:0;width:132px;height:auto;padding:16px 10px;grid-template-columns:1fr;grid-template-rows:repeat(6,74px);align-content:center;gap:7px;border-top:0;border-right:1px solid #223b5e;box-shadow:7px 0 20px #000a}
+    .navbtn{position:relative;padding:8px 6px;border:1px solid transparent;border-radius:11px;font-size:10px;letter-spacing:.55px;gap:7px;transition:background .15s,border-color .15s,transform .15s}
+    .navbtn:hover{border-color:#29496d;background:#0d2035;color:#d9f3ff}.navbtn:active{transform:translateY(1px)}
+    .navbtn .ni{font-size:29px}.navbtn.active{border-color:#2d679c;background:linear-gradient(135deg,#16497d,#091625);box-shadow:inset 3px 0 #64d3ff,0 5px 12px #0008}
+    .main{left:132px;top:150px;bottom:0}.screen{padding:18px 22px 40px}
+    #app.career-setup .main{left:0;top:84px;bottom:0}#app.career-setup .screen[data-screen="home"]{max-width:1200px;margin:0 auto;padding:24px 30px 48px}
+    .card{margin-bottom:16px}.section-note{grid-column:1/-1;font-size:11px;padding:2px 6px 16px}.card-title{padding:13px 15px 11px;font-size:19px}.card-title small{font-size:10px}
+    .daily-reset-clock{margin:0;padding:10px 14px}.daily-reset-clock span,.daily-reset-clock small{font-size:9.5px}.daily-reset-clock strong{font-size:22px}
+    .screen[data-screen="home"] .ticker{font-size:12px;padding:11px 14px}
+    .screen[data-screen="home"] #careerIdentityCard .career-strip{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:12px}.screen[data-screen="home"] #careerIdentityCard .career-token:last-child{grid-column:auto}
+    .career-token{padding:11px}.career-token small{font-size:9px}.career-token b{font-size:14px}
+    #careerGameContent{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(440px,1fr);gap:16px;align-items:stretch}
+    #careerGameContent .hero{height:auto;min-height:500px;margin:0}.hero-art img{height:108%;max-width:72%}.hero-copy{left:20px;right:20px;bottom:18px}.hero-copy h1{font-size:38px}.record b{font-size:31px}
+    .rank-chip{top:18px;left:18px}.daily{top:18px;right:18px;padding:10px 14px;font-size:13px}.hero-sponsor{top:58px;left:18px}
+    .choice-grid{height:100%;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;margin:0}.choice{min-height:238px;padding:16px}.choice h3{font-size:24px}.choice p{font-size:12.5px}.choice-art{top:48px;height:142px}.choice-action{min-height:39px;font-size:12px}
+    .install-offer{max-width:780px}.city-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.avatar-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:12px}.build-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px}
+    .screen[data-screen="train"].active{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-content:start;gap:16px}.screen[data-screen="train"] .trainer-card,.screen[data-screen="train"] .daily-reset-clock,.screen[data-screen="train"] .card{margin:0}.screen[data-screen="train"] .section-note{grid-column:1/-1}
+    .trainer-card{min-height:72px;padding:13px}.trainer-card h3{font-size:19px}.trainer-card p{font-size:10px}.trainer-toggle{min-width:160px}
+    .screen[data-screen="hustle"].active{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-content:start;gap:16px}.screen[data-screen="hustle"] .daily-reset-clock{grid-column:1/-1}.screen[data-screen="hustle"] .card{margin:0}
+    .action-list{gap:11px;padding:12px}.action{min-height:76px;padding:12px;grid-template-columns:54px 1fr auto}.action h3{font-size:16px}.action p{font-size:10px}.action .ico{width:48px;height:48px}
+    .screen[data-screen="fight"]>.card{max-width:1280px;margin:0 auto 16px}.screen[data-screen="fight"]>.daily-reset-clock{max-width:1280px;margin:0 auto 16px}.screen[data-screen="fight"]>.section-note{max-width:1280px;margin:0 auto}
+    .opponent-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:14px}.roster-group{padding:11px 15px;font-size:11px}.roster-group small{font-size:9.5px}
+    .screen[data-screen="gear"]{max-width:1280px;margin:0 auto}.screen[data-screen="gear"] .gear-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:14px}
+    .gear.collectible-card{padding:11px;gap:8px}.collectible-card .gear-icon{width:76%;font-size:clamp(64px,6vw,96px)}.collectible-card .gear-copy h3{font-size:16px}.collectible-card .gear-copy p{font-size:10px}.gear.collectible-card .gear-footer .equip-btn{min-height:36px;font-size:11px}
+    .screen[data-screen="feed"].active{padding:20px 24px 30px}.feed-page-card{width:min(100%,980px);margin:0 auto}.feed-post{grid-template-columns:46px minmax(0,1fr);gap:12px;padding:14px 16px}.feed-avatar{width:46px;height:46px}.feed-post-head b{font-size:13px}.feed-post-head span,.feed-post-head time{font-size:10px}.feed-post p{font-size:12px;line-height:1.45}.feed-reactions{font-size:10px}.feed-page-note{padding:12px 16px;font-size:10.5px}
+    .modal-overlay{padding:24px}.gig-modal{max-width:560px}.fighter-bio-dialog{max-width:620px}.result-card{max-width:560px}#toast{top:166px;max-width:560px}
+    .sim-shell{width:min(100%,1180px);margin:0 auto;padding:18px 28px 22px;gap:14px}.sim-header b{font-size:30px}.sim-stage{min-height:0}
+    .tape-card{width:min(100%,900px);max-height:calc(100dvh - 104px);margin:auto;overflow-y:auto}.tape-versus-cards{width:min(100%,590px);margin:0 auto}.tape-purse{padding:14px 10px 11px}.tape-purse strong{font-size:42px}.tape-scout,.tape-actions{width:min(calc(100% - 20px),720px);margin-right:auto;margin-left:auto}
+    .opening-card{width:min(100%,840px);margin:auto}.opening-copy{padding:26px 22px 18px}.opening-copy h2{font-size:38px}.opening-copy p{font-size:12px}.opening-options{gap:14px;padding:0 18px 18px}.opening-choice{min-height:210px;padding:18px}.opening-choice .opening-icon{font-size:70px}.opening-choice b{font-size:18px}.opening-choice small{font-size:10px}
+    .live-card{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.8fr);grid-template-rows:auto auto minmax(0,1fr)}.live-title,.live-score{grid-column:1/-1}.action-feed{grid-column:1;grid-row:3;padding:14px 18px 24px}
+    .live-card>#cornerChoice{grid-column:2;grid-row:3;min-height:0;overflow-y:auto;border-left:1px solid #274663;background:#07101a}.live-card>#cornerChoice:empty{display:none}.live-card:has(>#cornerChoice:empty){grid-template-columns:1fr}.live-card:has(>#cornerChoice:empty) .action-feed{grid-column:1/-1}
+    .live-card>#cornerChoice .corner-panel{min-height:100%;border-top:0;border-left:0;padding:16px}.live-title{padding:13px 16px}.live-title b{font-size:20px}.live-score{padding:13px 18px}.live-fighter b{font-size:16px}.live-fighter small{font-size:9.5px}.sim-footer{font-size:10px}
+  }

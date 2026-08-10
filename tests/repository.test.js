@@ -273,6 +273,18 @@ test('mobile viewport permits accessibility zoom', () => {
   assert.doesNotMatch(viewport, /maximum-scale\s*=\s*1/i);
 });
 
+test('desktop breakpoint expands the same game into a persistent workspace', () => {
+  assert.match(html, /@media \(min-width:1100px\)\{/);
+  assert.match(html, /#app\{width:min\(100vw,1440px\);height:100dvh/);
+  assert.match(html, /\.bottomnav\{[^}]*width:132px[^}]*grid-template-rows:repeat\(6,74px\)/);
+  assert.match(html, /\.resource-hud\{left:132px;top:84px;height:66px[^}]*flex-direction:row/);
+  assert.match(html, /#careerGameContent\{display:grid;grid-template-columns:minmax\(420px,1\.15fr\) minmax\(440px,1fr\)/);
+  assert.match(html, /\.opponent-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.screen\[data-screen="gear"\] \.gear-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.live-card\{display:grid;grid-template-columns:minmax\(0,1\.5fr\) minmax\(340px,\.8fr\)/);
+  assert.match(readme, /Responsive desktop interface/);
+});
+
 test('interface text never renders below 8.5px', () => {
   const fontSizes = [...html.matchAll(/font-size:\s*([\d.]+)px/g)].map(match => Number(match[1]));
   assert.ok(fontSizes.length > 0, 'expected pixel font sizes in the interface');
