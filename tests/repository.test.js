@@ -283,7 +283,14 @@ test('desktop breakpoint expands the same game into a persistent workspace', () 
   assert.match(html, /\.opponent-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(html, /\.screen\[data-screen="gear"\] \.gear-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(html, /\.live-card\{display:grid;grid-template-columns:minmax\(0,1\.5fr\) minmax\(340px,\.8fr\)/);
+  assert.match(html, /\.screen\[data-screen="hustle"\]\.active\{[^}]*grid-auto-rows:max-content/);
+  assert.match(html, /\.screen\[data-screen="hustle"\] \.card\{[^}]*min-height:max-content/);
   assert.match(readme, /Responsive desktop interface/);
+});
+
+test('matchup and hustle cards keep consistent full-bleed surfaces', () => {
+  assert.match(css, /\.tape-player-art\{height:100%;object-fit:cover;object-position:center top\}/);
+  assert.match(css, /\.career-card \.card-title\{background:linear-gradient\(#17283f,#0a111d\);border-bottom-color:#203a5d\}/);
 });
 
 test('interface text never renders below 8.5px', () => {
