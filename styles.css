@@ -14,6 +14,15 @@
     --cta-text:#fff;
     --cta-weight:950;
     --cta-shadow:0 1px 2px #000d;
+    --button-primary:linear-gradient(#49bfff,#1761b8);
+    --button-primary-border:#69d8ff;
+    --button-primary-shadow:0 4px 0 #07346a;
+    --button-secondary:linear-gradient(#3b4856,#18212b);
+    --button-secondary-border:#6d7d8d;
+    --button-secondary-shadow:0 4px 0 #080d12;
+    --button-special:linear-gradient(#e8b83f,#955508);
+    --button-special-border:#ffe08a;
+    --button-special-shadow:0 4px 0 #573006,0 0 12px #e7ad3650;
     --safe-top:env(safe-area-inset-top,0px);
     --safe-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -32,7 +41,7 @@
 .fighter-bio-dialog .modal-run{font-size:14px}
 .fighter-bio-interactions{display:grid;gap:7px;max-height:min(38vh,300px);margin:11px 0;overflow-y:auto;text-align:left;scrollbar-width:thin}
 .fighter-message-composer{display:grid;grid-template-columns:minmax(0,1fr) 58px;min-height:66px;overflow:hidden;border:1px solid #3974a5;border-radius:9px;background:#07111d;box-shadow:inset 0 1px #ffffff0d,0 2px 0 #02070d}
-.fighter-message-text{display:flex;align-items:center;padding:9px 10px;color:#c9d8e8;font-family:system-ui,sans-serif;font-size:10px;line-height:1.4;text-transform:none}
+.fighter-message-text{display:flex;align-items:center;padding:9px 10px;color:#c9d8e8;font-family:system-ui,sans-serif;font-size:12px;line-height:1.4;text-transform:none}
 .fighter-message-send{border:0;border-left:1px solid #4fbff5;background:linear-gradient(180deg,#55c9ff,#1473d8);color:#fff;font-family:system-ui,sans-serif;font-size:10px;font-weight:950;letter-spacing:.5px;box-shadow:inset 0 1px #ffffff55}
 .fighter-message-send:active{filter:brightness(1.12)}
 .fighter-message-send:disabled{background:#24323f;color:#748595;box-shadow:none}
@@ -312,10 +321,15 @@
   .gear.equip-bursting{animation:equipCardBurst .68s cubic-bezier(.2,.9,.2,1)}.gear.equip-bursting .gear-icon{animation:equipIconBurst .65s cubic-bezier(.15,1.5,.3,1)}.gear.equip-bursting .gear-flair{animation:equipFlairBurst .68s ease-out}.gear.equip-bursting .equip-burst{animation:equipBurstShow .68s ease-out}.gear.equip-bursting .equip-burst:before{animation:equipRays .68s ease-out}.gear.equip-bursting .equip-burst:after{animation:equipRing .68s ease-out}.gear.equip-bursting .equip-btn{animation:equipButtonFlash .68s ease-out}
   @keyframes gearFlairSpin{to{transform:rotate(360deg)}}@keyframes equipCardBurst{0%{transform:scale(1)}35%{transform:scale(1.035);filter:brightness(1.55)}100%{transform:scale(1)}}@keyframes equipIconBurst{0%{transform:scale(.75) rotate(-10deg)}42%{transform:scale(1.3) rotate(5deg)}100%{transform:none}}@keyframes equipFlairBurst{0%{transform:scale(.35) rotate(0);opacity:0}42%{opacity:.9}100%{transform:scale(1.45) rotate(75deg);opacity:0}}@keyframes equipBurstShow{0%,100%{opacity:0}12%,68%{opacity:1}}@keyframes equipRays{from{transform:scale(.15) rotate(0)}to{transform:scale(1.35) rotate(70deg);opacity:0}}@keyframes equipRing{from{transform:scale(.2);opacity:1}to{transform:scale(2.4);opacity:0}}@keyframes equipButtonFlash{0%,100%{filter:none}35%{filter:brightness(2);box-shadow:0 0 26px #fff}}
 
-  /* Enabled primary actions share one readable label treatment. Secondary,
-     destructive, disabled, and locked controls keep their semantic colors. */
+  /* Enabled actions use three predictable colors: blue primary, slate
+     secondary, and amber for rare or limited opportunities. */
   .install-offer button:not(:disabled),.choice-action,.feed-open,.fight-btn:not(:disabled):not(.locked),.daily:not(:disabled),.gear button:not(:disabled),.tape-action.fight:not(:disabled),.continue-btn,.level-up-continue,.modal-run:not(:disabled),.fighter-message-send:not(:disabled){color:var(--cta-text)!important;font-weight:var(--cta-weight)!important;text-shadow:var(--cta-shadow)}
   .opening-choice b{color:var(--cta-text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-weight:var(--cta-weight);text-shadow:var(--cta-shadow)}
+
+  .install-offer button:not(:disabled),.choice.red .choice-action,.choice:not(.red) .choice-action,.choice.hustle .choice-action,.choice.legacy .choice-action,.feed-open,.fight-btn:not(:disabled):not(.locked):not(.title):not(.taunt),.gear.collectible-card:not(.equipped) .gear-footer .equip-btn,.trainer-toggle.active,.tape-action.fight:not(:disabled),.corner-plan-btn.signature,.crisis-btn.haymaker:not(:disabled),.last-chance-btn.haymaker:not(:disabled),.continue-btn,.modal-run:not(:disabled),.fighter-message-send:not(:disabled){border-color:var(--button-primary-border);background:var(--button-primary);box-shadow:var(--button-primary-shadow)}
+  .action:not(:disabled),.recovery-card .action:not(:disabled),.action.future:not(:disabled),.action.future.gig-unavailable,.blackjack-action:not(:disabled),.trainer-toggle:not(.active),.tape-action:not(.fight):not(:disabled),.opening-choice.aggressive,.opening-choice.feel,.corner-plan-btn.response,.crisis-btn.towel,.last-chance-btn.discipline,.details-toggle,.modal-cancel,.sim-control:not(.active),.gear.collectible-card.equipped .gear-footer .equip-btn{border-color:var(--button-secondary-border)!important;background:var(--button-secondary)!important;box-shadow:var(--button-secondary-shadow)!important;color:var(--cta-text);font-weight:var(--cta-weight);text-shadow:var(--cta-shadow)}
+  .daily:not(:disabled),.fight-btn.title:not(:disabled),.fight-btn.taunt:not(:disabled),.level-up-continue{border-color:var(--button-special-border);background:var(--button-special);box-shadow:var(--button-special-shadow);color:var(--cta-text)!important;font-weight:var(--cta-weight)!important;text-shadow:var(--cta-shadow)}
+  .sim-control.active{border-color:var(--button-primary-border);background:var(--button-primary);color:var(--cta-text);font-weight:var(--cta-weight);text-shadow:var(--cta-shadow)}
 
   /* Bottom decision surfaces snap to their container edges instead of floating. */
   .screen[data-screen="feed"].active{padding-bottom:8px}
