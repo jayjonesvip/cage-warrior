@@ -131,7 +131,8 @@ generated league.
   live count of real fighter profiles in the shared Cage Feed roster.
 - The timeline owns the Feed explanation and scrolls inside its own card.
   Generic composer controls are removed; interaction begins by tapping a real
-  fighter's avatar and opening their public profile.
+  fighter's avatar and opening their public profile. Feed and fighter-profile
+  copy uses a larger mobile text scale for easier reading.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.

@@ -640,6 +640,13 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(html, /id="socialTimeline"/);
   assert.match(html, /data-nav="feed"[\s\S]*data-icon-name="nav-feed"[\s\S]*id="feedNavBadge"/);
   assert.match(html, /class="card feed-page-card"[\s\S]*class="feed-page-note"[\s\S]*id="socialTimeline"/);
+  assert.match(html, /\.feed-post p\{[^}]*font-size:10\.5px/);
+  assert.match(html, /\.feed-post-head b\{[^}]*font-size:11px/);
+  assert.match(html, /\.feed-post-head span\{[^}]*font-size:9\.5px/);
+  assert.match(html, /\.feed-page-note\{[^}]*font-size:9\.5px/);
+  assert.match(html, /\.fighter-message-text\{[^}]*font-size:10px/);
+  assert.match(html, /\.fighter-bio-dialog \.loadout-dialog-kicker\{font-size:9\.5px\}/);
+  assert.match(html, /\.fighter-bio-dialog \.modal-run\{font-size:14px\}/);
   assert.doesNotMatch(page, /social-composer|socialActions|Make Your Post|feed-compose-head/);
   assert.match(html, /\.screen\[data-screen="feed"\]\.active\{display:flex/);
   assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:8px\}/);
