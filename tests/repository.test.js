@@ -273,6 +273,18 @@ test('mobile viewport permits accessibility zoom', () => {
   assert.doesNotMatch(viewport, /maximum-scale\s*=\s*1/i);
 });
 
+test('desktop breakpoint expands the same game into a persistent workspace', () => {
+  assert.match(html, /@media \(min-width:1100px\)\{/);
+  assert.match(html, /#app\{width:min\(100vw,1440px\);height:100dvh/);
+  assert.match(html, /\.bottomnav\{[^}]*width:132px[^}]*grid-template-rows:repeat\(6,74px\)/);
+  assert.match(html, /\.resource-hud\{left:132px;top:84px;height:66px[^}]*flex-direction:row/);
+  assert.match(html, /#careerGameContent\{display:grid;grid-template-columns:minmax\(420px,1\.15fr\) minmax\(440px,1fr\)/);
+  assert.match(html, /\.opponent-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.screen\[data-screen="gear"\] \.gear-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.live-card\{display:grid;grid-template-columns:minmax\(0,1\.5fr\) minmax\(340px,\.8fr\)/);
+  assert.match(readme, /Responsive desktop interface/);
+});
+
 test('interface text never renders below 8.5px', () => {
   const fontSizes = [...html.matchAll(/font-size:\s*([\d.]+)px/g)].map(match => Number(match[1]));
   assert.ok(fontSizes.length > 0, 'expected pixel font sizes in the interface');
@@ -552,8 +564,15 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
   assert.match(css, /--cta-text:#fff/);
   assert.match(css, /--cta-weight:950/);
+  assert.match(css, /--button-primary:linear-gradient\(#49bfff,#1761b8\)/);
+  assert.match(css, /--button-secondary:linear-gradient\(#3b4856,#18212b\)/);
+  assert.match(css, /--button-special:linear-gradient\(#e8b83f,#955508\)/);
   assert.match(css, /\.choice-action\{[^}]*color:var\(--cta-text\)[^}]*font-weight:var\(--cta-weight\)/);
   assert.match(css, /\.install-offer button:not\(:disabled\),\.choice-action,\.feed-open,\.fight-btn:not\(:disabled\):not\(\.locked\),\.daily:not\(:disabled\),\.gear button:not\(:disabled\),\.tape-action\.fight:not\(:disabled\),\.continue-btn,\.level-up-continue,\.modal-run:not\(:disabled\),\.fighter-message-send:not\(:disabled\)\{[^}]*color:var\(--cta-text\)!important;[^}]*font-weight:var\(--cta-weight\)!important/);
+  assert.match(css, /\.choice\.red \.choice-action,[^}]*\.choice\.legacy \.choice-action[^}]*background:var\(--button-primary\)/);
+  assert.match(css, /\.opening-choice\.aggressive,\.opening-choice\.feel,[^}]*background:var\(--button-secondary\)!important/);
+  assert.match(css, /\.daily:not\(:disabled\),\.fight-btn\.title:not\(:disabled\),\.fight-btn\.taunt:not\(:disabled\),\.level-up-continue\{[^}]*background:var\(--button-special\)/);
+  assert.match(css, /\.gear\.collectible-card\.equipped \.gear-footer \.equip-btn\{[^}]*background:var\(--button-secondary\)!important/);
   assert.match(css, /\.install-offer button:disabled\{[^}]*color:#879bad;[^}]*text-shadow:none/);
   assert.match(html, /\.choice p\{[^}]*font-size:11\.5px;line-height:1\.35/);
   assert.doesNotMatch(page, /<article class="choice gear">/, 'home card must not inherit collectible gear-card typography');
@@ -644,7 +663,7 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(html, /\.feed-post-head b\{[^}]*font-size:11px/);
   assert.match(html, /\.feed-post-head span\{[^}]*font-size:9\.5px/);
   assert.match(html, /\.feed-page-note\{[^}]*font-size:9\.5px/);
-  assert.match(html, /\.fighter-message-text\{[^}]*font-size:10px/);
+  assert.match(html, /\.fighter-message-text\{[^}]*font-size:12px/);
   assert.match(html, /\.fighter-bio-dialog \.loadout-dialog-kicker\{font-size:9\.5px\}/);
   assert.match(html, /\.fighter-bio-dialog \.modal-run\{font-size:14px\}/);
   assert.doesNotMatch(page, /social-composer|socialActions|Make Your Post|feed-compose-head/);

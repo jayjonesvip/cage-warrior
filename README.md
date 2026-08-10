@@ -10,6 +10,21 @@ The page loads its presentation from `styles.css`, scalable copy pools from
 `strings.js`, testable gameplay rules from `game-logic.js`, and browser
 interactions from `game.js`.
 
+### Responsive desktop interface
+
+- Phone and installed-mobile layouts remain unchanged below 1100px.
+- At desktop widths, navigation becomes a persistent left rail, the fighter
+  HUD becomes a single horizontal command bar, and the playable area expands
+  to a 1440px maximum workspace.
+- Home uses a split career dashboard, Training and Hustle use two-column
+  workspaces, opponents and gear render four across, and Cage Feed receives a
+  wider reading column.
+- Fight Night keeps the same simulation and decisions, while the live timeline
+  and between-round corner decision can appear side by side.
+- Buttons use one shared three-color language at every screen size: blue for
+  primary actions, slate for secondary choices, and amber for rare rewards,
+  title opportunities, and other limited moments.
+
 ## Current game
 
 Build a fighter from unknown rookie to champion through tactical fights,
@@ -38,9 +53,9 @@ generated league.
 - Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
-  obvious. Enabled primary actions use consistent bold white labels across the
-  game; secondary, disabled, locked, and destructive controls retain their
-  quieter semantic treatments.
+  obvious. Enabled primary actions use consistent blue fills and bold white
+  labels; secondary controls use slate, special opportunities use amber, and
+  disabled or locked controls remain visibly subdued.
 - An active endorsement appears in the Home hero directly beneath Cage Rank,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,
