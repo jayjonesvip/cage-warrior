@@ -56,9 +56,12 @@ generated league.
   The fighter name is also the Cage Feed username and cannot be edited after
   **Ready**. New names use CapitalCase without a numeric suffix, such as
   `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Every hometown uses
-  the same 20 colors, 22 weather terms, and 26 dangerous animals, producing 960
-  combinations per city. City endings are PHX, LAX, CHI, NYC, MIA, HOU, CLE,
-  SEA, NOLA, and HNL.
+  the same 76 opening words (colors, former wildcard modifiers, and 24
+  nationality/origin terms), plus 23 weather/force, 33 animal, and 24 combat
+  terms. Exact repeated words are excluded, producing 6,078 combinations per
+  city and 60,780 across all ten
+  hometowns. City endings are PHX, LAX, CHI,
+  NYC, MIA, HOU, CLE, SEA, NOLA, and HNL.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,

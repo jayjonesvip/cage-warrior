@@ -376,12 +376,12 @@
   function currentAvatar(){return fighterAvatars.find(a=>a.id===state.fighterAvatar)||null}
   function normalizeFighterName(value){const name=typeof value==='string'?value.trim().replace(/\s+/g,' '):'';return name.length>=2&&name.length<=24&&/^[\p{L}\p{N} .'-]+$/u.test(name)?name:''}
   function normalizeIdentityName(value){return LOGIC.normalizeFighterIdentity(value)}
-  function identityPools(){const pools=STRINGS.fighterIdentity||{};return {colors:pools.colors||[],descriptors:[...(pools.weather||[]),...(pools.animals||[])],cityCode:pools.cityCodes?.[state.fighterCity]||''}}
-  function canonicalIdentitySuggestion(){const pools=identityPools();return LOGIC.buildFighterIdentity(pools.colors[0]||'White',pools.descriptors[0]||'Drizzle',pools.cityCode||'PHX')||'WhiteDrizzlePHX'}
-  function randomIdentitySuggestion(){const pools=identityPools(),pick=list=>list[Math.floor(Math.random()*list.length)]||'';return LOGIC.buildFighterIdentity(pick(pools.colors),pick(pools.descriptors),pools.cityCode)||canonicalIdentitySuggestion()}
+  function identityPools(){const pools=STRINGS.fighterIdentity||{};return {openers:[...(pools.colors||[]),...(pools.origins||[])],descriptors:[...(pools.weather||[]),...(pools.animals||[]),...(pools.combat||[])],cityCode:pools.cityCodes?.[state.fighterCity]||''}}
+  function canonicalIdentitySuggestion(){const pools=identityPools();return LOGIC.buildFighterIdentity(pools.openers[0]||'White',pools.descriptors[0]||'Drizzle',pools.cityCode||'PHX')||'WhiteDrizzlePHX'}
+  function randomIdentitySuggestion(){const pools=identityPools(),pick=list=>list[Math.floor(Math.random()*list.length)]||'',opener=pick(pools.openers),descriptors=pools.descriptors.filter(word=>word!==opener);return LOGIC.buildFighterIdentity(opener,pick(descriptors),pools.cityCode)||canonicalIdentitySuggestion()}
   function identityClaimCandidates(preferred){
     const pools=identityPools(),names=[],add=value=>{const name=normalizeIdentityName(value);if(name&&!names.includes(name))names.push(name)};add(preferred);add(canonicalIdentitySuggestion());
-    const combinations=pools.colors.flatMap(color=>pools.descriptors.map(descriptor=>LOGIC.buildFighterIdentity(color,descriptor,pools.cityCode))).filter(Boolean),total=combinations.length,start=total?hashSeed(`${preferred}|${state.fighterAvatar}|${state.fighterStyle}`)%total:0;
+    const combinations=pools.openers.flatMap(opener=>pools.descriptors.filter(descriptor=>descriptor!==opener).map(descriptor=>LOGIC.buildFighterIdentity(opener,descriptor,pools.cityCode))).filter(Boolean),total=combinations.length,start=total?hashSeed(`${preferred}|${state.fighterAvatar}|${state.fighterStyle}`)%total:0;
     for(let i=0;i<total&&names.length<300;i++)add(combinations[(start+i*37)%total]);
     return names.slice(0,300);
   }

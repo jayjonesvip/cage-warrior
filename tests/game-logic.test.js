@@ -165,6 +165,8 @@ test('fighter identities preserve CapitalCase and use color descriptor city form
   assert.equal(logic.buildFighterIdentity('white','drizzle','phx'),'WhiteDrizzlePHX');
   assert.equal(logic.buildFighterIdentity('Golden','Tornado','NYC'),'GoldenTornadoNYC');
   assert.equal(logic.buildFighterIdentity('blue','viper','cle'),'BlueViperCLE');
+  assert.equal(logic.buildFighterIdentity('Mexican','Wind','SEA'),'MexicanWindSEA');
+  assert.equal(logic.buildFighterIdentity('Russian','Hammer','NYC'),'RussianHammerNYC');
   assert.equal(logic.normalizeFighterIdentity('DarkCobraLAX'),'DarkCobraLAX');
   assert.equal(logic.normalizeFighterIdentity('legacyfighter'),'legacyfighter');
   assert.equal(logic.normalizeFighterIdentity('phxbrawler_01'),'phxbrawler_01');

@@ -433,17 +433,36 @@ test('fighter identity is globally unique, permanent, and locked before the care
 
 test('identity names share substantial CapitalCase color and descriptor pools', () => {
   const pools = stringsData.fighterIdentity;
-  assert.ok(pools.colors.length >= 20);
-  assert.ok(pools.weather.length >= 20);
-  assert.ok(pools.animals.length >= 20);
+  assert.equal(pools.colors.length, 52);
+  assert.equal(pools.origins.length, 24);
+  assert.equal(pools.weather.length, 23);
+  assert.equal(pools.animals.length, 33);
+  assert.equal(pools.combat.length, 24);
   assert.ok(pools.colors.includes('Dark'));
   assert.ok(pools.colors.includes('Light'));
+  assert.ok(pools.colors.includes('Turbo'));
+  assert.ok(pools.colors.includes('Rebel'));
+  assert.ok(pools.origins.includes('American'));
+  assert.ok(pools.origins.includes('Mexican'));
+  assert.ok(pools.origins.includes('Russian'));
+  assert.ok(pools.weather.includes('Wind'));
+  assert.ok(pools.weather.includes('Pressure'));
+  assert.ok(pools.animals.includes('Mastodon'));
+  assert.ok(pools.animals.includes('Raccoon'));
+  assert.ok(pools.combat.includes('Hammer'));
+  assert.ok(pools.combat.includes('Bomber'));
+  assert.ok(pools.combat.includes('Fist'));
+  assert.ok(pools.combat.includes('Claw'));
+  assert.ok(!pools.weather.includes('Gale'));
   assert.deepEqual(
     JSON.parse(JSON.stringify(pools.cityCodes)),
     {phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL'}
   );
-  assert.equal(pools.colors.length * (pools.weather.length + pools.animals.length), 960);
-  assert.match(script, /LOGIC\.buildFighterIdentity\(pools\.colors\[0\]\|\|'White',pools\.descriptors\[0\]\|\|'Drizzle',pools\.cityCode\|\|'PHX'\)/);
+  const openers = [...pools.colors, ...pools.origins];
+  const descriptors = [...pools.weather, ...pools.animals, ...pools.combat];
+  assert.equal(openers.reduce((total, opener) => total + descriptors.filter(descriptor => descriptor !== opener).length, 0), 6078);
+  assert.match(script, /pools\.descriptors\.filter\(word=>word!==opener\)/);
+  assert.match(script, /LOGIC\.buildFighterIdentity\(pools\.openers\[0\]\|\|'White',pools\.descriptors\[0\]\|\|'Drizzle',pools\.cityCode\|\|'PHX'\)/);
   assert.match(script, /return names\.slice\(0,300\)/);
   assert.match(script, /identityShufflePending=true[\s\S]*classList\.add\('shuffling'\)[\s\S]*setTimeout\([\s\S]*classList\.remove\('shuffling'\)/);
   assert.match(css, /#newFighterNameBtn\.shuffling \.name-shuffle-icon\{animation:nameShuffleSpin/);
