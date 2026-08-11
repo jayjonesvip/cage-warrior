@@ -1210,9 +1210,22 @@ test('surviving rounds pause for one contextual Sim+ decision at the midpoint', 
   assert.match(script, /type:'fightMoment'/);
   assert.match(script, /data-fight-moment="\$\{choice\.id\}"/);
   assert.match(script, /function resolveFightMoment\(choiceId\)/);
+  assert.match(script, /function fightMomentEffectChips/);
+  assert.match(script, /fight-moment-result \$\{success\?'success':'failure'\}/);
+  assert.match(script, /moment-effect-chips/);
+  assert.match(script, /pulseFightCondition\('opponent'\)/);
+  assert.match(script, /pulseFightCondition\('player'\)/);
   assert.match(script, /scoreRoundState\(round\)/);
   assert.match(script, /fight_moment_selected/);
   assert.match(script, /fight\.deepRead\?` · \$\{chance\}% read`/);
   assert.match(html, /\.fight-moment-panel\{/);
+  assert.match(html, /\.fight-moment-result\.success\{/);
+  assert.match(html, /\.fight-moment-result\.failure\{/);
+  assert.match(html, /@keyframes momentConditionImpact/);
   assert.match(readme, /FIGHT-DECISION-MATRIX\.md/);
+});
+
+test('opponent fight actions use a distinct red commentary treatment', () => {
+  assert.match(html, /\.action-line\.opp\{[^}]*border-color:#f06a62;[^}]*background:linear-gradient\(90deg,#351418e8,#211116d9\);[^}]*color:#ffd9d5/);
+  assert.match(html, /\.action-line\.opp \.stamp\{color:#e68c86\}/);
 });

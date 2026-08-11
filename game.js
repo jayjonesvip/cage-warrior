@@ -1235,6 +1235,12 @@
     if(control){stats.control+=control;totals.control+=control}
     if(takedown){stats.attempted++;stats.landed++;stats.takedowns+=takedown;totals.attempted++;totals.landed++;totals.takedowns+=takedown}
   }
+  function fightMomentEffectChips({damage=0,selfDamage=0,control=0,oppControl=0,takedown=0}={}){
+    const chips=[];if(damage)chips.push(`+${damage} DAMAGE`);if(selfDamage)chips.push(`-${selfDamage} CONDITION`);if(control)chips.push(`+${control}s CONTROL`);if(oppControl)chips.push(`OPP +${oppControl}s CONTROL`);if(takedown)chips.push(`+${takedown} TAKEDOWN`);if(!chips.length)chips.push('POSITION RESET');return chips;
+  }
+  function pulseFightCondition(target){
+    const bar=$(target==='player'?'#livePlayerCondition':'#liveOppCondition');if(!bar)return;bar.classList.remove('moment-impact');void bar.offsetWidth;bar.classList.add('moment-impact');
+  }
   function resolveFightMoment(choiceId){
     if(!fight?.pendingMoment)return;const item=fight.pendingMoment,def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,choice=def.choices.find(option=>option.id===choiceId);if(!choice)return;
     const success=Math.random()<fightMomentChance(choice),effect=success?choice.success:choice.fail,round=fight.rounds.find(entry=>entry.round===item.round);if(!round)return;
@@ -1244,7 +1250,9 @@
     for(let i=fightTimelineIndex+1;i<fight.timeline.length;i++){const future=fight.timeline[i];if(future.round!==item.round)break;if(future.playerCondition!=null){future.playerCondition=clamp(future.playerCondition-selfDamage,0,100);future.oppCondition=clamp(future.oppCondition-damage,0,100)}}
     const outcome=success?(damage>=12?'The gamble pays off with a major momentum swing.':control>=30?'You take command of the position.':'The adjustment works and you win the exchange.'):(selfDamage>=8?'The gamble backfires and you eat a hard counter.':oppControl>=18?'The opponent reads it and takes control.':'The opening closes before you can capitalize.');
     trackEvent('fight_moment_selected',{round_number:item.round,moment_id:item.moment,choice_id:choice.id,outcome:success?'success':'failure',player_archetype:state.fighterStyle});
-    fight.resolvedMoments.push(item.round);fight.pendingMoment=null;$('#cornerChoice').innerHTML='';$('#speedBtn').disabled=false;appendFightLine({clock:item.clock,text:`${choice.label}: ${outcome}`,className:success?'big':'opp',playerCondition:clamp(item.playerCondition-selfDamage,0,100),oppCondition:clamp(item.oppCondition-damage,0,100),big:success&&damage>=12,landed:success,side:success?'player':'opp'});playFightTimeline(fightTimelineIndex+1);
+    const chips=fightMomentEffectChips({damage,selfDamage,control,oppControl,takedown}),resultTitle=success?`${choice.label} WORKED`:`${choice.label} COUNTERED`,box=$('#cornerChoice');
+    fight.resolvedMoments.push(item.round);fight.pendingMoment=null;box.innerHTML=`<div class="corner-panel fight-moment-result ${success?'success':'failure'}"><div class="moment-result-mark">${success?'✓':'✕'}</div><div><h3>${resultTitle}</h3><div class="moment-effect-chips">${chips.map(chip=>`<span>${chip}</span>`).join('')}</div><p>${outcome}</p></div></div>`;box.scrollTop=0;if(damage)pulseFightCondition('opponent');if(selfDamage)pulseFightCondition('player');
+    scheduleFight(()=>{box.innerHTML='';$('#livePlayerCondition').classList.remove('moment-impact');$('#liveOppCondition').classList.remove('moment-impact');$('#speedBtn').disabled=false;appendFightLine({clock:item.clock,text:`${choice.label}: ${outcome}`,className:success?'big':'opp',playerCondition:clamp(item.playerCondition-selfDamage,0,100),oppCondition:clamp(item.oppCondition-damage,0,100),big:success&&damage>=12,landed:success,side:success?'player':'opp'});playFightTimeline(fightTimelineIndex+1)},900*fightSpeed);
   }
   function showLastChanceDecision(){
     if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;if(!LOGIC.playerTrailing(fight.rounds)){settleFightDecision(fight);playFightTimeline(fightTimelineIndex+1);return}const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');
