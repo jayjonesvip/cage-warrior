@@ -195,6 +195,18 @@ test('fighter identities preserve CapitalCase and use color descriptor city form
   assert.equal(logic.buildFighterIdentity('Blue','Viper','too-long'),'');
 });
 
+test('shared fighter opponent names keep CapitalCase without rewriting stored handles',()=>{
+  const openers=['White','Polish','Turbo'];
+  const descriptors=['Drizzle','Lightning','Thunder'];
+  const cityCodes=['PHX','NOLA','LAX','NYC'];
+  assert.equal(logic.displayFighterIdentity('PolishLightningNOLA',openers,descriptors,cityCodes),'PolishLightningNOLA');
+  assert.equal(logic.displayFighterIdentity('POLISHLIGHTNINGNOLA',openers,descriptors,cityCodes),'PolishLightningNOLA');
+  assert.equal(logic.displayFighterIdentity('TURBOTHUNDERLAX',openers,descriptors,cityCodes),'TurboThunderLAX');
+  assert.equal(logic.displayFighterIdentity('phxbrawler_01',openers,descriptors,cityCodes),'PHXBrawler_01');
+  assert.equal(logic.displayFighterIdentity('NYCTRICKSTER_01',openers,descriptors,cityCodes),'NYCTrickster_01');
+  assert.equal(logic.displayFighterIdentity('ROCKYVOLUME',openers,descriptors,cityCodes),'Rockyvolume');
+});
+
 test('fighter identity randomizer uses the full pools and supports deterministic tests',()=>{
   assert.equal(logic.randomFighterIdentity(['White','Golden'],['Drizzle','Viper'],'SEA',()=>0),'WhiteDrizzleSEA');
   const values=[0.75,0.5];

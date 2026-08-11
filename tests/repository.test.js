@@ -891,6 +891,10 @@ test('Cage Network profiles become safe local AI opponent snapshots', () => {
   assert.match(supabaseClient, /selectCageOpponentCandidates/);
   assert.match(cageSocial, /loadOpponentCandidates/);
   assert.match(script, /function networkOpponentFromProfile\(profile,tier\)/);
+  assert.match(script, /function networkOpponentDisplayName\(value\)/);
+  assert.match(script, /name=networkOpponentDisplayName\(handle\)/);
+  assert.match(script, /o\.network&&o\.networkHandle\)o\.name=networkOpponentDisplayName\(o\.networkHandle\)/);
+  assert.doesNotMatch(script, /name=handle\.toUpperCase\(\)/);
   assert.match(script, /network:true,sourceProfileId:id/);
   assert.match(script, /LOGIC\.networkOpponentRatings/);
   assert.match(script, /if\(screen==='fight'\)queueMicrotask\(syncNetworkOpponents\)/);

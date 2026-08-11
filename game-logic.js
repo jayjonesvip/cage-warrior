@@ -274,6 +274,25 @@
     const name=String(value||'').replace(/[^A-Za-z0-9_]+/g,'').slice(0,32);
     return /^[A-Za-z][A-Za-z0-9_]{2,31}$/.test(name)?name:'';
   }
+  function displayFighterIdentity(value,openers=[],descriptors=[],cityCodes=[]){
+    const name=normalizeFighterIdentity(value);
+    if(!name)return name;
+    const codes=[...cityCodes].sort((a,b)=>String(b).length-String(a).length),legacySerial=name.match(/(_\d+)$/),legacyPrefix=legacySerial&&codes.find(code=>name.toUpperCase().startsWith(String(code).toUpperCase()));
+    if(legacyPrefix){
+      const middle=name.slice(String(legacyPrefix).length,-legacySerial[1].length);
+      if(middle)return `${String(legacyPrefix).toUpperCase()}${middle[0].toUpperCase()}${middle.slice(1).toLowerCase()}${legacySerial[1]}`;
+    }
+    if(/[a-z]/.test(name))return name;
+    const canonical=(list,token)=>list.find(word=>String(word).toUpperCase()===token)||'';
+    const suffix=codes.find(code=>name.endsWith(String(code).toUpperCase()))||'';
+    const stem=suffix?name.slice(0,-String(suffix).length):name;
+    const first=[...openers].sort((a,b)=>String(b).length-String(a).length).find(word=>stem.startsWith(String(word).toUpperCase()))||'';
+    if(first){
+      const second=canonical(descriptors,stem.slice(String(first).length));
+      if(second)return `${first}${second}${String(suffix).toUpperCase()}`;
+    }
+    return name[0].toUpperCase()+name.slice(1).toLowerCase();
+  }
   function buildFighterIdentity(color,descriptor,cityCode){
     const word=value=>{const clean=String(value||'').replace(/[^A-Za-z]+/g,'');return clean?clean[0].toUpperCase()+clean.slice(1).toLowerCase():''},suffix=String(cityCode||'').toUpperCase().replace(/[^A-Z]+/g,'');
     if(!/^[A-Z]{3,4}$/.test(suffix))return '';
@@ -305,5 +324,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
