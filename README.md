@@ -93,7 +93,9 @@ generated league.
   disabled or locked controls remain visibly subdued.
 - Fighter selection places each transparent portrait over a blue arena-light
   gradient, with a brighter keyboard-focus and hover treatment around the card.
-- An active endorsement appears in the Home hero directly beneath Cage Rank,
+- The Home hero shows a Cage Status tied to the real title ladder: Prospect,
+  Contender, Title Challenger, or the fighter's current championship.
+- An active endorsement appears in the Home hero directly beneath Cage Status,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,
   80,000, and 200,000 Followers. Only the next brand may offer a contract, so

@@ -31,7 +31,7 @@
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
-    socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,
+    socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},
     pendingFight:null,
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,milestones:[],equippedGear:[],leagueInitialized:false
   };
@@ -359,7 +359,7 @@
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
-      s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);s.socialProfileId=typeof source.socialProfileId==='string'&&/^[0-9a-f-]{36}$/i.test(source.socialProfileId)?source.socialProfileId:'';s.socialLastRemotePostId=Math.max(0,Math.floor(Number(source.socialLastRemotePostId))||0);s.socialRemoteInitialized=source.socialRemoteInitialized===true;s.socialFollowingCount=Math.max(0,Math.floor(Number(source.socialFollowingCount))||0);if(!s.socialAccountCreated){s.fans=0;s.socialFollowingCount=0}
+      s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);s.socialProfileId=typeof source.socialProfileId==='string'&&/^[0-9a-f-]{36}$/i.test(source.socialProfileId)?source.socialProfileId:'';s.socialLastRemotePostId=Math.max(0,Math.floor(Number(source.socialLastRemotePostId))||0);s.socialRemoteInitialized=source.socialRemoteInitialized===true;s.socialFollowingCount=Math.max(0,Math.floor(Number(source.socialFollowingCount))||0);const savedHeadlineCounts=source.socialHeadlineCounts&&typeof source.socialHeadlineCounts==='object'&&!Array.isArray(source.socialHeadlineCounts)?source.socialHeadlineCounts:{};s.socialHeadlineCounts={};for(const key of ['fightWin','fightStreak','fightLoss','appearance','viralAppearance','autographFree','autographStandard','autographExpensive','sponsor'])s.socialHeadlineCounts[key]=Math.max(0,Math.floor(Number(savedHeadlineCounts[key]))||0);if(!s.socialAccountCreated){s.fans=0;s.socialFollowingCount=0}
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland','seattle','new-orleans','hawaii'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
       const coreReady=!!(s.fighterStyle&&s.fighterCity&&s.fighterAvatar&&validFighterAllocation(s.fighterBaseStats)),legacyHandle=normalizeIdentityName(source.socialHandle),legacyName=normalizeIdentityName(source.name);s.nameLocked=coreReady&&(source.nameLocked===undefined?true:source.nameLocked===true);s.name=s.nameLocked?(legacyHandle||legacyName||'cagefighter'):'ROOKIE';delete s.socialHandle;
@@ -413,7 +413,14 @@
     if(landingEntered)return;landingEntered=true;const page=$('#landingPage'),button=$('#landingEnterBtn'),mode=landingMode;button.disabled=true;trackEvent('landing_enter',{career_state:mode});sfx.tap();page.classList.add('leaving');
     setTimeout(()=>{page.hidden=true;page.classList.remove('leaving');document.body.classList.remove('landing-active');$('#app').removeAttribute('aria-hidden');$('.screen[data-screen="home"]').scrollTop=0;trackEvent('game_screen_view',{screen_name:'home',entry_point:'landing'});setTimeout(showRecoveryReport,180)},230);
   }
-  function cageRank(){return Math.max(1,999-state.wins*37-state.level*19)}
+  function cageStatus(){
+    const championship=[...milestoneDefs].reverse().find(milestone=>state.milestones.includes(milestone.id));
+    const next=milestoneDefs.find(milestone=>!state.milestones.includes(milestone.id));
+    if(next&&state.level>=next.level)return 'TITLE CHALLENGER';
+    if(championship)return milestoneName(championship).replace(/ TITLE$/,' CHAMPION');
+    if(next&&state.level>=next.level-2)return 'CONTENDER';
+    return 'PROSPECT';
+  }
   function xpNeed(){return 80+state.level*40}
   function effectiveStat(key){
     let v=state.stats[key],style=fighterStyles.find(s=>s.id===state.fighterStyle);if(style&&style.stats[key])v+=style.stats[key];
@@ -553,7 +560,7 @@
 
   function updateUI(){
     $('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;$('#rankText').textContent=rankName();
-    $('#cashText').textContent='$'+fmt(state.cash);$('#fansText').textContent=fmt(state.fans);$('#followingText').textContent=fmt(state.socialFollowingCount);$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageRank').textContent='#'+cageRank();
+    $('#cashText').textContent='$'+fmt(state.cash);$('#fansText').textContent=fmt(state.fans);$('#followingText').textContent=fmt(state.socialFollowingCount);$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageStatus').textContent=cageStatus();
     const energyNow=Math.floor(state.energy),healthNow=Math.floor(state.health);
     if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
     if(lastShownHealth!==null&&healthNow<lastShownHealth)flashResource('health',lastShownHealth-healthNow);
@@ -654,26 +661,36 @@
     const accountPosts=copyPosts([STRINGS.social.account[0],{profile:'media',text:'{name} has joined the global fight conversation.'}],{name:state.name});addSocialPosts(accountPosts);
     const firstFollowers=firstAccount?changeFollowers(5):0;if(firstAccount)trackEvent('social_account_created',{followers_awarded:firstFollowers});toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
   }
+  function drawSocialHeadline(key,entries){
+    const pool=(Array.isArray(entries)?entries:[entries]).filter(entry=>entry?.profile==='media');if(!pool.length)return null;
+    const count=Math.max(0,Math.floor(Number(state.socialHeadlineCounts?.[key]))||0),deck=[...pool],batch=Math.floor(count/pool.length),random=seededRandom(hashSeed(`reporter-posts|${state.socialProfileId||state.name}|${key}|${batch}`));
+    for(let index=deck.length-1;index>0;index--){const swap=Math.floor(random()*(index+1));[deck[index],deck[swap]]=[deck[swap],deck[index]]}
+    state.socialHeadlineCounts=state.socialHeadlineCounts&&typeof state.socialHeadlineCounts==='object'?state.socialHeadlineCounts:{};state.socialHeadlineCounts[key]=count+1;return deck[count%deck.length];
+  }
   function openSocialCycle(type,data={}){
     if(!ensureSocialFeed())return;state.socialCycle=Math.max(1,state.socialCycle+1);
-    const name=state.name,posts=[],cycles=STRINGS.social.cycles;
+    const name=state.name,posts=[],cycles=STRINGS.social.cycles,addHeadline=(key,entries,values)=>{const headline=drawSocialHeadline(key,entries);if(headline)posts.push(...copyPosts([headline],values))};
     if(type==='fight'){
       const values={name,opponent:data.opponent,finish:String(data.method||'decision').toUpperCase(),winStreak:data.winStreak,titleSuffix:data.title?` The new ${data.title} champion has arrived.`:''};
-      if(data.win){if(data.winStreak>=2)posts.push(...copyPosts([cycles.fightStreakHeadline],values));posts.push(...copyPosts(cycles.fightWin,values),...copyPosts([data.winStreak>=2?cycles.fightStreakHater:cycles.fightWinHater],values))}
-      else posts.push(...copyPosts(cycles.fightLoss,values));
+      if(data.win){if(data.winStreak>=2)addHeadline('fightStreak',cycles.fightStreakHeadline,values);addHeadline('fightWin',cycles.fightWin,values)}
+      else addHeadline('fightLoss',cycles.fightLoss,values);
     }else if(type==='appearance'){
-      posts.push(...copyPosts(data.viral?cycles.viralAppearance:cycles.appearance,{name,title:data.title}));
+      const key=data.viral?'viralAppearance':'appearance';addHeadline(key,cycles[key],{name,title:data.title});
     }else if(type==='autograph'){
-      const template=data.price===0?cycles.autographFree:data.price>35?cycles.autographExpensive:cycles.autographStandard;posts.push(...copyPosts(template,{name,price:data.price,signatures:data.signatures}));
+      const key=data.price===0?'autographFree':data.price>35?'autographExpensive':'autographStandard';addHeadline(key,cycles[key],{name,price:data.price,signatures:data.signatures});
     }else if(type==='sponsor'){
-      posts.push(...copyPosts(cycles.sponsor,{name,brand:data.brand}));
+      addHeadline('sponsor',cycles.sponsor,{name,brand:data.brand});
     }
-    const reporterPosts=posts.filter(post=>post.profile==='media');if(reporterPosts.length){addSocialPosts(reporterPosts);queueSharedPosts(reporterPosts.map(post=>({kind:'reporter',body:post.text})))}
+    const reporterPosts=posts.filter(post=>post.profile==='media');if(reporterPosts.length){addSocialPosts(reporterPosts);saveState();queueSharedPosts(reporterPosts.map(post=>({kind:'reporter',body:post.text})))}
   }
   function feedAge(post){if(post.createdAt){const seconds=Math.max(0,Math.floor((Date.now()-new Date(post.createdAt).getTime())/1000));if(seconds<60)return 'NOW';if(seconds<3600)return `${Math.floor(seconds/60)}M`;if(seconds<86400)return `${Math.floor(seconds/3600)}H`;return `${Math.floor(seconds/86400)}D`}const age=Math.max(0,state.socialCycle-(Number(post.cycle)||0));return age===0?'NOW':age===1?'1 EVENT AGO':`${age} EVENTS AGO`}
   function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase(),reactions=post.shared?'':`<div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div>`,avatar=post.profileId?`<button class="feed-avatar fighter-photo" type="button" data-feed-profile="${escapeHtml(post.profileId)}" aria-label="View ${escapeHtml(post.author)} fighter bio">${post.avatarAsset?`<img src="${escapeHtml(post.avatarAsset)}" alt="">`:escapeHtml(initials)}</button>`:`<div class="feed-avatar">${escapeHtml(initials)}</div>`;return `<article class="feed-post ${escapeHtml(post.tone||'media')}">${avatar}<div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b><span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p>${reactions}</div></article>`}
   function fighterBioSentence(profile){const city=fighterCities.find(item=>item.id===profile.city)?.name||String(profile.city||'UNKNOWN').toUpperCase(),style=fighterStyles.find(item=>item.id===profile.archetype)?.name||'FIGHTER',wins=Math.max(0,Number(profile.wins)||0),losses=Math.max(0,Number(profile.losses)||0);return `${profile.handle} is a Level ${Math.max(1,Number(profile.level)||1)} ${style.toLowerCase()} fighting out of ${city}, with a professional record of ${wins} win${wins===1?'':'s'} and ${losses} loss${losses===1?'':'es'}.`}
-  function fighterInteractionChoices(profile){const definitions=STRINGS.social.interactions,pool=Object.entries(definitions).flatMap(([kind,definition])=>definition.messages.map((message,index)=>({id:`${kind}-${index}`,kind,message}))),seed=hashSeed(`${state.socialProfileId}|${profile.id}|${new Date().toISOString().slice(0,10)}|${sharedSocialInteractionsRemaining}`),random=seededRandom(seed);for(let index=pool.length-1;index>0;index--){const swap=Math.floor(random()*(index+1));[pool[index],pool[swap]]=[pool[swap],pool[index]]}return pool.slice(0,3).map(choice=>({id:choice.id,kind:choice.kind,text:copyText(choice.message,{name:state.name,handle:profile.handle,targetName:profile.handle})}))}
+  function fighterInteractionChoices(profile){
+    const definitions=STRINGS.social.interactions,pool=Object.entries(definitions).flatMap(([kind,definition])=>definition.messages.map((message,index)=>({id:`${kind}-${index}`,kind,message}))),dailyDeckSeed=hashSeed(`fighter-posts|${state.socialProfileId||state.name}|${todayKey()}`),random=seededRandom(dailyDeckSeed);
+    for(let index=pool.length-1;index>0;index--){const swap=Math.floor(random()*(index+1));[pool[index],pool[swap]]=[pool[swap],pool[index]]}
+    const dealt=Math.max(0,5-sharedSocialInteractionsRemaining)*3;return pool.slice(dealt,dealt+3).map(choice=>({id:choice.id,kind:choice.kind,text:copyText(choice.message,{name:state.name,handle:profile.handle,targetName:profile.handle})}))
+  }
   function renderFighterBioInteractions(profile){const container=$('#fighterBioInteractions');if(!profile||profile.id===state.socialProfileId){container.innerHTML='<div class="fighter-bio-limit">THIS IS YOUR PUBLIC FIGHTER PROFILE</div>';return}if(sharedSocialStatus!=='ready'){container.innerHTML='<div class="fighter-bio-limit">GLOBAL FEED CONNECTION REQUIRED</div>';return}if(sharedSocialInteractionsRemaining<1){container.innerHTML='<div class="fighter-bio-limit">DAILY LIMIT REACHED · 0 OF 5 POSTS LEFT</div>';return}container.innerHTML=`<div class="fighter-bio-limit">${sharedSocialInteractionsRemaining} OF 5 FIGHTER POSTS LEFT TODAY</div>${fighterInteractionChoices(profile).map(choice=>`<div class="fighter-message-composer"><div class="fighter-message-text" role="textbox" aria-readonly="true">${escapeHtml(choice.text)}</div><button class="fighter-message-send" type="button" data-fighter-interaction="${choice.id}" data-target-profile="${escapeHtml(profile.id)}" ${fighterInteractionPending?'disabled':''} aria-label="Send this message to @${escapeHtml(profile.handle)}">SEND</button></div>`).join('')}<div class="fighter-message-reward">EACH POST EARNS FOLLOWERS + HYPE</div>`}
   function openFighterBio(profile){if(!profile)return;activeBioProfileId=profile.id;const avatar=fighterAvatars.find(item=>item.id===profile.fighter_avatar);$('#fighterBioAvatar').innerHTML=avatar?`<img src="${escapeHtml(avatar.asset)}" alt="${escapeHtml(profile.handle)}">`:'<span>CG</span>';$('#fighterBioHandle').textContent=`@${profile.handle}`;$('#fighterBioTitle').textContent=profile.handle;$('#fighterBioText').textContent=fighterBioSentence(profile);renderFighterBioInteractions(profile);$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
   function closeFighterBio(){activeBioProfileId='';$('#fighterBioModal').classList.remove('open');$('#fighterBioModal').setAttribute('aria-hidden','true')}
@@ -1227,7 +1244,7 @@
   function showFightMoment(item){
     if(!fight||fight.resolvedMoments.includes(item.round)){playFightTimeline(fightTimelineIndex+1);return}
     const def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,box=$('#cornerChoice');fight.pendingMoment=item;$('#speedBtn').disabled=true;
-    const choices=def.choices.map(choice=>{const chance=Math.round(fightMomentChance(choice)*100),read=fight.deepRead?` · ${chance}% read`:'';return `<button class="moment-choice" data-fight-moment="${choice.id}"><b>${choice.label}</b><small>${choice.risk}${read}</small></button>`}).join('');
+    const choices=def.choices.map(choice=>{const chance=Math.round(fightMomentChance(choice)*100),successLabel=fight.deepRead?` · ${chance}% SUCCESS`:'';return `<button class="moment-choice" data-fight-moment="${choice.id}"><b>${choice.label}</b><small>${choice.risk}${successLabel}</small></button>`}).join('');
     box.innerHTML=`<div class="corner-panel fight-moment-panel"><div class="moment-kicker">${item.clock} · SIM+ DECISION</div><h3>${def.title}</h3><p>${def.prompt}</p><div class="moment-choice-list">${choices}</div></div>`;box.scrollTop=0;sfx.tap();
   }
   function addMomentStats(stats,totals,{damage=0,control=0,takedown=0}={}){
