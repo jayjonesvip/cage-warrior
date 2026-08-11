@@ -661,13 +661,18 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
     assert.ok(values.every(value => Number.isInteger(value) && value >= 2 && value <= 8));
     assert.equal(values.reduce((sum, value) => sum + value, 0), 20);
     assert.ok(fs.existsSync(avatar.asset), `${avatar.asset} should exist`);
+    assert.match(avatar.asset, /^assets\/fighter-avatar-\d{2}\.png$/);
+    const png = fs.readFileSync(avatar.asset);
+    assert.equal(png.subarray(1, 4).toString(), 'PNG', `${avatar.asset} must be a PNG`);
+    assert.equal(png[25], 6, `${avatar.asset} must retain an RGBA alpha channel`);
   }
   assert.match(html, /\.avatar-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.avatar-card\{[^}]*aspect-ratio:2\/3/);
   assert.match(script, /function validFighterAllocation\(stats\)/);
   assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
   assert.match(script, /===20/);
-  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 40);
+  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.png$/.test(name)).length, 40);
+  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpe?g$/.test(name)).length, 0);
   const silhouetteAssets = fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name));
   assert.equal(silhouetteAssets.length, 24);
   for (let index = 1; index <= 24; index += 1) {
