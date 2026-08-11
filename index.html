@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.24" />
+<meta name="app-version" content="2.5.26" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.24">
+<link rel="stylesheet" href="styles.css?v=2.5.26">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -196,7 +196,7 @@
     <section class="screen" data-screen="fight">
       <div class="daily-reset-clock"><span>DAILY FIGHTS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily fight limit resets">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Career Opponents <span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span><small id="rosterSummary">Level-based round cost</small></div><div id="opponentList"></div></div>
-      <div class="section-note">Preview an opponent's Tale of the Tape, confirm the fight, then choose Aggressive or Feel Them Out for Round 1. Between rounds, listen to your corner and choose your signature game or a specific counter.</div>
+      <div class="section-note">Preview the Tale of the Tape, then hire a coach for outcome-shaping Sim+ decisions or keep the full purse and trust your fighter in Quick Sim.</div>
     </section>
 
     <section class="screen" data-screen="hustle">
@@ -334,7 +334,8 @@
             <article class="tape-fighter-card opponent-card"><div class="tape-card-top"><span>OPPONENT</span><span id="tapeOppRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-opp-sprite" id="tapeOppSprite" alt="Opponent silhouette"></div><h3 id="tapeOppName">OPPONENT</h3><div class="tape-mini-stats"><span id="tapeOPower">PWR 5</span><span id="tapeOSpeed">SPD 5</span><span id="tapeOChin">CHN 5</span><span id="tapeOCardio">CAR 5</span></div></article>
           </div>
           <div class="tape-scout" id="walkoutText">Compare the matchup before you sign for the fight.</div>
-          <div class="tape-actions"><button class="tape-action" id="tapeBackBtn" type="button">GO BACK</button><button class="tape-action fight" id="tapeFightBtn" type="button">FIGHT!</button><div class="tape-clearance" id="tapeClearance"></div></div>
+          <div class="tape-mode"><div class="tape-mode-head"><b>FIGHT MODE</b><small>REMEMBERS YOUR CHOICE</small></div><div class="fight-mode-toggle" role="group" aria-label="Fight mode"><button class="fight-mode-toggle-btn" data-fight-mode-toggle="sim-plus" type="button" aria-pressed="true">HIRE COACH<small>SIM+ · 10% ON WINS</small></button><button class="fight-mode-toggle-btn" data-fight-mode-toggle="quick" type="button" aria-pressed="false">TRUST FIGHTER<small>QUICK · KEEP 100%</small></button></div><p id="tapeModeDescription">Your tactical decisions can change the outcome. The coach collects only when you win.</p></div>
+          <div class="tape-actions"><button class="tape-action" id="tapeBackBtn" type="button">GO BACK</button><button class="tape-action fight" id="tapeFightBtn" type="button">FIGHT WITH COACH</button><div class="tape-clearance" id="tapeClearance"></div></div>
         </div>
       </div>
 
@@ -377,12 +378,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.24"></script>
-<script src="strings.js?v=2.5.24"></script>
-<script src="analytics.js?v=2.5.24"></script>
-<script src="supabase-client.js?v=2.5.24"></script>
-<script src="cage-social.js?v=2.5.24"></script>
-<script src="game.js?v=2.5.24"></script>
-<script src="pwa.js?v=2.5.24"></script>
+<script src="game-logic.js?v=2.5.26"></script>
+<script src="strings.js?v=2.5.26"></script>
+<script src="analytics.js?v=2.5.26"></script>
+<script src="supabase-client.js?v=2.5.26"></script>
+<script src="cage-social.js?v=2.5.26"></script>
+<script src="game.js?v=2.5.26"></script>
+<script src="pwa.js?v=2.5.26"></script>
 </body>
 </html>

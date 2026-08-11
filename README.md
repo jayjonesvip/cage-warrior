@@ -124,6 +124,13 @@ generated league.
   Out** uses that same signature discipline more cautiously, conceding some
   early initiative in exchange for a deeper corner read. Either choice reveals
   the opponent's basic tendency after Round 1.
+- Before the fight, players choose their corner. **Hire the Coach** enables the
+  full Sim+ opening, contextual round decisions, and corner adjustments; those
+  calls can change damage, control, scorecards, and the outcome, and the coach
+  receives 10% of fight winnings only after a win. **Quick Sim** keeps the full
+  purse and automatically runs an accelerated fight using the fighter's stats
+  and signature style without decision prompts. The Tale of the Tape toggle
+  remembers the last selected mode for the next fight.
 - Between rounds, the corner gives an unofficial **Protect the Lead**, **Too
   Close to Call**, or **You're Behind** read, followed by natural matchup
   advice. The grounded tactical choices are **Fight Your Way** with the

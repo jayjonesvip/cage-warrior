@@ -600,10 +600,10 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /class="tape-energy" id="tapeEnergy">18 ENERGY CLEARANCE · 6 PER ROUND/);
   assert.match(html, /KEEP 5 EXTRA FOR A HAYMAKER/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
-  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
+  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT WITH COACH<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
   assert.match(script, /function closeFightPreview\(\)/);
-  assert.match(script, /function commitFight\(o=fight\?\.o\)/);
+  assert.match(script, /function commitFight\(mode,o=fight\?\.o\)/);
   const preview = script.match(/function openTaleOfTape\(o\)\{([\s\S]*?)\n\s*\}/)?.[1] || '';
   assert.doesNotMatch(preview, /spendEnergy|pendingFight/);
   assert.match(html, /data-opening-approach="aggressive"/);
@@ -637,6 +637,33 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.doesNotMatch(html, /id="skipBtn"/);
   assert.doesNotMatch(script, /function skipFight\(\)/);
   assert.doesNotMatch(script, /fight\.rounds\.length<3\)simulateRound/);
+});
+
+test('fight launch remembers a win-paid Sim+ coach or automatic Quick Sim toggle', () => {
+  assert.doesNotMatch(page, /id="modeStage"/);
+  assert.match(page, /class="fight-mode-toggle"/);
+  assert.match(page, /data-fight-mode-toggle="sim-plus"/);
+  assert.match(page, /HIRE COACH/);
+  assert.match(page, /SIM\+ · 10% ON WINS/);
+  assert.match(page, /data-fight-mode-toggle="quick"/);
+  assert.match(page, /TRUST FIGHTER/);
+  assert.match(page, /QUICK · KEEP 100%/);
+  assert.match(script, /fightModePreference:'sim-plus'/);
+  assert.match(script, /source\.fightModePreference==='quick'\?'quick':'sim-plus'/);
+  assert.match(script, /function renderFightModeToggle\(\)/);
+  assert.match(script, /function selectFightMode\(mode\)/);
+  assert.match(script, /saveState\(\);sfx\.tap\(\)/);
+  assert.match(script, /commitFight\(state\.fightModePreference\)/);
+  assert.match(script, /\['sim-plus','quick'\]\.includes\(mode\)/);
+  assert.match(script, /function beginQuickFight\(\)/);
+  assert.match(script, /fight\.timeline=fight\.timeline\.filter\(item=>item\.type!=='fightMoment'&&item\.type!=='lastChance'\)/);
+  assert.match(script, /coachCut=fight\.mode==='sim-plus'\?Math\.round\(cash\*\.10\):0/);
+  assert.match(script, /COACH SHARE: -\$\$\{fmt\(coachCut\)\} · 10% OF WINNINGS/);
+  assert.match(script, /coach_cut:coachCut/);
+  assert.match(script, /fight_mode:fight\.mode\|\|'sim-plus'/);
+  assert.match(script, /data-fight-mode-toggle/);
+  assert.match(css, /\.fight-mode-toggle\{/);
+  assert.match(css, /\.fight-mode-toggle-btn\[aria-pressed="true"\]/);
 });
 
 test('gear collection shows owned quantities and rarity above icons', () => {
