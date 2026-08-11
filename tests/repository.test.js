@@ -542,7 +542,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /id="tapePurse"/);
   assert.match(html, /class="tape-fighter-card player-card"/);
   assert.match(html, /class="tape-fighter-card opponent-card"/);
-  assert.match(html, /class="tape-energy">30 ENERGY CLEARANCE · 10 PER ROUND/);
+  assert.match(html, /class="tape-energy" id="tapeEnergy">18 ENERGY CLEARANCE · 6 PER ROUND/);
   assert.match(html, /KEEP 5 EXTRA FOR A HAYMAKER/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
   assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT!<\/button>/);
@@ -692,7 +692,7 @@ test('home ticker teaches current mechanics in a shady promoter voice', () => {
   const heroPosition = html.indexOf('<div class="hero">', homeStart);
   assert.ok(tickerPosition > homeStart && tickerPosition < identityPosition && tickerPosition < heroPosition, 'ticker should lead the unlocked Home screen');
   assert.match(html.slice(homeStart, identityPosition), /class="card career-after-setup"/);
-  assert.ok(stringsData.ticker.some(line => /30 energy ready.*10 every round/.test(line)));
+  assert.ok(stringsData.ticker.some(line => /round costs climb with your career/i.test(line)));
   assert.ok(stringsData.ticker.some(line => /20 health before a bout/.test(line)));
   assert.match(script, /const tickerLines=STRINGS\.ticker/);
   const ticker = stringsData.ticker.join('\n');
@@ -1092,10 +1092,14 @@ test('low-condition corner crisis offers towel or last-chance haymaker outcomes'
   assert.match(readme, /Throwing in the towel gives the opponent a TKO win/);
 });
 
-test('fights charge per started round and pause for a trailing final-ten-second choice', () => {
-  assert.match(script, /FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3/);
-  assert.match(script, /FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST\*FIGHT_ROUNDS,HAYMAKER_ENERGY=5/);
-  assert.match(script, /LOGIC\.bookFight\(state,o\.key,FIGHT_ROUND_COST,Date\.now\(\),FIGHT_CLEARANCE_ENERGY\)/);
+test('fights charge a level-based rate per started round and pause for a trailing final-ten-second choice', () => {
+  assert.match(script, /FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5/);
+  assert.match(script, /currentFightRoundCost=\(\)=>LOGIC\.fightRoundCost\(state\.level\)/);
+  assert.match(script, /currentFightClearance=\(\)=>currentFightRoundCost\(\)\*FIGHT_ROUNDS/);
+  assert.match(script, /LOGIC\.bookFight\(state,o\.key,roundCost,Date\.now\(\),clearance\)/);
+  assert.match(script, /fight\.roundCost=roundCost/);
+  assert.match(script, /\$\('#tapeEnergy'\)\.textContent=`\$\{clearance\} ENERGY CLEARANCE · \$\{roundCost\} PER ROUND`/);
+  assert.match(readme, /Levels 1–2 cost\s+6 energy per started round, Levels 3–4 cost 7/);
   assert.match(script, /LOGIC\.chargePendingFightEnergy/);
   assert.match(script, /LOGIC\.availableFightEnergy/);
   assert.match(script, /type:'lastChance',round:3,clock:'0:10'/);

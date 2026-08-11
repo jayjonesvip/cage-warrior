@@ -283,7 +283,9 @@
     {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12},
     {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25}
   ];
-  const FIGHT_ROUND_COST=10,FIGHT_ROUNDS=3,FIGHT_CLEARANCE_ENERGY=FIGHT_ROUND_COST*FIGHT_ROUNDS,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
+  const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
+  const currentFightRoundCost=()=>LOGIC.fightRoundCost(state.level);
+  const currentFightClearance=()=>currentFightRoundCost()*FIGHT_ROUNDS;
 
   const publicityDefs = [
     {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
@@ -734,7 +736,7 @@
         </div>
       </article>`;
     };
-    const groups=[['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'],['current','AVAILABLE · YOUR LEVEL','FULL PURSE · 10 ENERGY / ROUND'],['passed','AVAILABLE · PAST LEVELS','HALF PURSE · 10 ENERGY / ROUND'],['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'],['former','FORMER CHAMPIONS','TITLE HISTORY'],['locked','LOCKED · UPCOMING','NEXT LEVEL PREVIEW']];
+    const roundCost=currentFightRoundCost(),groups=[['title','TITLE FIGHTS','BEAT THE CHAMPION · WIN THE BELT'],['current','AVAILABLE · YOUR LEVEL',`FULL PURSE · ${roundCost} ENERGY / ROUND`],['passed','AVAILABLE · PAST LEVELS',`HALF PURSE · ${roundCost} ENERGY / ROUND`],['rival','PAST RIVALS','TAUNT THEM INTO A REMATCH'],['former','FORMER CHAMPIONS','TITLE HISTORY'],['locked','LOCKED · UPCOMING','NEXT LEVEL PREVIEW']];
     $('#opponentList').innerHTML=groups.map(([status,label,meta])=>{const cards=opponents.filter(o=>opponentGroup(o)===status),expanded=openRosterGroups.has(status);return cards.length?`<section class="roster-section" data-roster-section="${status}"><button class="roster-group" type="button" data-roster-toggle="${status}" aria-expanded="${expanded}"><span>${label}<b class="roster-count">${cards.length}</b></span><small>${meta}<i class="roster-chevron" aria-hidden="true">${expanded?'−':'+'}</i></small></button><div class="opponent-grid" ${expanded?'':'hidden'}>${cards.map(renderCard).join('')}</div></section>`:''}).join('');
   }
   function toggleRosterGroup(button){if(!button)return;const status=button.dataset.rosterToggle,section=button.closest('[data-roster-section]'),grid=section?.querySelector('.opponent-grid'),expanded=button.getAttribute('aria-expanded')==='true',next=!expanded;if(!grid)return;if(next)openRosterGroups.add(status);else openRosterGroups.delete(status);button.setAttribute('aria-expanded',String(next));grid.hidden=!next;const chevron=button.querySelector('.roster-chevron');if(chevron)chevron.textContent=next?'−':'+';sfx.tap()}
@@ -1050,11 +1052,11 @@
   function settleFightDecision(sim){const score=LOGIC.fightScore(sim.rounds),margin=Math.abs(score.player-score.opponent);sim.winner=score.player>=score.opponent?'player':'opp';sim.method=margin<=1&&Math.random()<.45?'SPLIT DECISION':'UNANIMOUS DECISION';sim.finishRound=3;sim.finishClock='0:00';sim.finalDecisionPending=false}
 
   function fillTape(f){
-    const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),cleared=fightsLeft>0&&state.energy>=FIGHT_CLEARANCE_ENERGY&&state.health>=20;
+    const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),roundCost=currentFightRoundCost(),clearance=roundCost*FIGHT_ROUNDS,cleared=fightsLeft>0&&state.energy>=clearance&&state.health>=20;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);$('#tapeOppSprite').classList.toggle('network-portrait',!!f.o.network);
     $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:f.o.network?'CAGE NETWORK · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<FIGHT_CLEARANCE_ENERGY?`YOU NEED ${FIGHT_CLEARANCE_ENERGY} ENERGY FOR THREE-ROUND CLEARANCE`:state.energy<FIGHT_CLEARANCE_ENERGY+HAYMAKER_ENERGY?`CLEARED · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:'';
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeEnergy').textContent=`${clearance} ENERGY CLEARANCE · ${roundCost} PER ROUND`;$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:f.o.network?'CAGE NETWORK · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<clearance?`YOU NEED ${clearance} ENERGY FOR THREE-ROUND CLEARANCE · ${roundCost} PER ROUND`:state.energy<clearance+HAYMAKER_ENERGY?`CLEARED · ${roundCost} PER ROUND · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:`CLEARED · ${roundCost} ENERGY PER STARTED ROUND`;
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio);
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.',networkNote=f.o.network?" This is an AI-controlled snapshot; the real fighter's public record is unaffected.":'';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.${networkNote}`;
   }
@@ -1075,8 +1077,8 @@
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
     if(sessionsLeft('fight',DAILY_FIGHT_LIMIT)<1){toast('Daily fight limit reached. New fights unlock at local midnight.','#ff766d');fillTape(fight);return}
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
-    const booking=LOGIC.bookFight(state,o.key,FIGHT_ROUND_COST,Date.now(),FIGHT_CLEARANCE_ENERGY);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${FIGHT_CLEARANCE_ENERGY} energy for three-round clearance.`,'#ff766d');return}
-    initAudio();clearFightTimers();fight=createFight(o);combatLocked=true;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_started',{player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship,energy_reserved:FIGHT_CLEARANCE_ENERGY});
+    const roundCost=currentFightRoundCost(),clearance=currentFightClearance(),booking=LOGIC.bookFight(state,o.key,roundCost,Date.now(),clearance);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${clearance} energy for three-round clearance.`,'#ff766d');return}
+    initAudio();clearFightTimers();fight=createFight(o);fight.roundCost=roundCost;combatLocked=true;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_started',{player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship,energy_reserved:clearance,energy_per_round:roundCost});
     $('#fightOverlay').classList.add('active');showFightStage('openingStage');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.remove('active');$('#speedBtn').textContent='FAST ×2';$('#speedBtn').disabled=true;$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();
   }
 
@@ -1093,7 +1095,7 @@
   }
   function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.15,.68)}
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
-  function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,FIGHT_ROUND_COST)>=HAYMAKER_ENERGY}
+  function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
   }
@@ -1108,7 +1110,7 @@
     const style=fighterStyles.find(item=>item.id===fight.o.tendency),fightState=cornerFightState(fight.rounds),stateCopy=STRINGS.corner.states[fightState],matchup=STRINGS.corner.matchups[fight.o.tendency]||STRINGS.corner.matchups.pressure,roundLabel=next===3?'FINAL ROUND':'ROUND 2',readLabel=fight.deepRead?'DEEP READ':'OPPONENT READ';
     box.innerHTML=`<div class="corner-panel coach-corner"><h3>${roundLabel} — ${stateCopy.label}</h3><div class="corner-readline">${readLabel} · ${style?.name||fight.o.tag}</div><div class="corner-coach-quote"><b>COACH'S CORNER</b><p>“${stateCopy.advice} ${matchup.advice}”</p></div><div class="corner-plan-list" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
-  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(FIGHT_ROUND_COST)){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
+  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(fight.roundCost||currentFightRoundCost())){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
     if(!fight||fight.winner||fight.crisisUsed||fight.playerCondition>25)return;
     const next=fight.rounds.length+1,startIndex=fightTimelineIndex,roundsToReserve=FIGHT_ROUNDS-next+1;if(choice==='haymaker'&&!haymakerEnergyAvailable(roundsToReserve))return;
@@ -1116,7 +1118,7 @@
     if(choice==='towel'){
       trackEvent('fight_crisis_choice',{round_number:next,choice:'towel',outcome:'tko_loss'});fight.cornerTowel=true;fight.winner='opp';fight.method='TKO';fight.finishRound=next;fight.finishClock='5:00';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'ko',round:next,clock:'5:00',text:`The towel is in. ${state.name}'s corner stops the fight and ${fight.o.name} wins by TKO.`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
-    if(!chargeFightEnergy(FIGHT_ROUND_COST+HAYMAKER_ENERGY)){fight.crisisUsed=false;showCornerChoice();return}const chance=haymakerChance(fight),landed=Math.random()<chance;trackEvent('fight_crisis_choice',{round_number:next,choice:'haymaker',outcome:landed?'landed':'missed'});
+    if(!chargeFightEnergy((fight.roundCost||currentFightRoundCost())+HAYMAKER_ENERGY)){fight.crisisUsed=false;showCornerChoice();return}const chance=haymakerChance(fight),landed=Math.random()<chance;trackEvent('fight_crisis_choice',{round_number:next,choice:'haymaker',outcome:landed?'landed':'missed'});
     if(!landed){
       const damage=Math.max(12,Math.round(16+fight.opp.power*.65)),playerRound=emptyFightStats(),oppRound=emptyFightStats();playerRound.attempted=1;oppRound.attempted=1;oppRound.landed=1;oppRound.sig=1;oppRound.kd=1;oppRound.damage=damage;addFightStats(fight.totals.player,playerRound);addFightStats(fight.totals.opp,oppRound);fight.rounds.push({round:next,plan:'haymaker',player:playerRound,opp:oppRound,scoreP:8,scoreO:10});fight.haymakerMiss=true;fight.playerCondition=0;fight.winner='opp';fight.method='KO';fight.finishRound=next;fight.finishClock='4:55';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'action',round:next,clock:'4:57',text:`${state.name} loads up on the haymaker—but ${fight.o.name} sees it coming.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp'},{type:'ko',round:next,clock:'4:55',text:`COUNTER SHOT! ${state.name} is knocked out cold.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
