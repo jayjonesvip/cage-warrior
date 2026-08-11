@@ -26,7 +26,7 @@
   let careerSaveKnown = false;
 
   const defaultState = {
-    version:18,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:19,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
@@ -329,7 +329,7 @@
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland','seattle','new-orleans','hawaii'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
       const coreReady=!!(s.fighterStyle&&s.fighterCity&&s.fighterAvatar&&validFighterAllocation(s.fighterBaseStats)),legacyHandle=normalizeIdentityName(source.socialHandle),legacyName=normalizeIdentityName(source.name);s.nameLocked=coreReady&&(source.nameLocked===undefined?true:source.nameLocked===true);s.name=s.nameLocked?(legacyHandle||legacyName||'cagefighter'):'ROOKIE';delete s.socialHandle;
-      s.version=18;
+      s.version=19;
       return s;
   }
   function loadState(){
@@ -375,15 +375,15 @@
   function currentCity(){return fighterCities.find(c=>c.id===state.fighterCity)||null}
   function currentAvatar(){return fighterAvatars.find(a=>a.id===state.fighterAvatar)||null}
   function normalizeFighterName(value){const name=typeof value==='string'?value.trim().replace(/\s+/g,' '):'';return name.length>=2&&name.length<=24&&/^[\p{L}\p{N} .'-]+$/u.test(name)?name:''}
-  function normalizeIdentityName(value){const name=String(value||'').toLowerCase().replace(/[^a-z0-9_]+/g,'').slice(0,32);return /^[a-z][a-z0-9_]{2,31}$/.test(name)?name:''}
-  function identityPools(){const pools=STRINGS.fighterIdentity||{};return {city:pools.cities?.[state.fighterCity]||[],style:pools.styles?.[state.fighterStyle]||[],modifiers:pools.modifiers||[]}}
-  function canonicalIdentitySuggestion(){const pools=identityPools();return normalizeIdentityName(`${pools.city[0]||'cage'}${pools.style[0]||'fighter'}`)||'cagefighter'}
-  function randomIdentitySuggestion(){const pools=identityPools(),pick=list=>list[Math.floor(Math.random()*list.length)]||'',wildcard=Math.random()<.33?pick(pools.modifiers):'';return normalizeIdentityName(`${wildcard}${pick(pools.city)}${pick(pools.style)}`)||canonicalIdentitySuggestion()}
+  function normalizeIdentityName(value){return LOGIC.normalizeFighterIdentity(value)}
+  function identityPools(){const pools=STRINGS.fighterIdentity||{};return {colors:pools.colors||[],descriptors:[...(pools.weather||[]),...(pools.animals||[])],cityCode:pools.cityCodes?.[state.fighterCity]||''}}
+  function canonicalIdentitySuggestion(){const pools=identityPools();return LOGIC.buildFighterIdentity(pools.colors[0]||'White',pools.descriptors[0]||'Drizzle',pools.cityCode||'PHX')||'WhiteDrizzlePHX'}
+  function randomIdentitySuggestion(){const pools=identityPools(),pick=list=>list[Math.floor(Math.random()*list.length)]||'';return LOGIC.buildFighterIdentity(pick(pools.colors),pick(pools.descriptors),pools.cityCode)||canonicalIdentitySuggestion()}
   function identityClaimCandidates(preferred){
     const pools=identityPools(),names=[],add=value=>{const name=normalizeIdentityName(value);if(name&&!names.includes(name))names.push(name)};add(preferred);add(canonicalIdentitySuggestion());
-    for(let i=0;i<180;i++){const modifier=i>110?pools.modifiers[i%Math.max(1,pools.modifiers.length)]||'':i>55&&i%5===0?pools.modifiers[i%Math.max(1,pools.modifiers.length)]||'':'';add(`${modifier}${pools.city[(i*5+3)%Math.max(1,pools.city.length)]||'cage'}${pools.style[(i*7+5)%Math.max(1,pools.style.length)]||'fighter'}`)}
-    for(let i=0;i<80;i++)add(`${pools.modifiers[i%Math.max(1,pools.modifiers.length)]||'iron'}${pools.modifiers[(i*7+3)%Math.max(1,pools.modifiers.length)]||'wild'}${pools.city[(i*5+1)%Math.max(1,pools.city.length)]||'cage'}${pools.style[(i*11+2)%Math.max(1,pools.style.length)]||'fighter'}`);
-    return names;
+    const combinations=pools.colors.flatMap(color=>pools.descriptors.map(descriptor=>LOGIC.buildFighterIdentity(color,descriptor,pools.cityCode))).filter(Boolean),total=combinations.length,start=total?hashSeed(`${preferred}|${state.fighterAvatar}|${state.fighterStyle}`)%total:0;
+    for(let i=0;i<total&&names.length<300;i++)add(combinations[(start+i*37)%total]);
+    return names.slice(0,300);
   }
   function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
   function validFighterAllocation(stats){const keys=['power','speed','chin','cardio'];return !!stats&&keys.every(k=>Number.isInteger(stats[k])&&stats[k]>=2&&stats[k]<=8)&&keys.reduce((sum,k)=>sum+stats[k],0)===20}

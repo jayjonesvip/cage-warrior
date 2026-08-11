@@ -21,6 +21,7 @@ const cageInteractionMigration = fs.readFileSync('supabase/migrations/2026080920
 const cageProfileCountMigration = fs.readFileSync('supabase/migrations/20260809210000_cage_profile_count.sql', 'utf8');
 const cageOpponentMigration = fs.readFileSync('supabase/migrations/20260809220000_cage_opponent_candidates.sql', 'utf8');
 const cageIdentityMigration = fs.readFileSync('supabase/migrations/20260810120000_permanent_fighter_identity.sql', 'utf8');
+const capitalIdentityMigration = fs.readFileSync('supabase/migrations/20260810150000_capitalcase_fighter_identity.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -409,7 +410,7 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.match(html, /id="newFighterNameBtn"[^>]*>[\s\S]*data-icon-name="shuffle-name"[\s\S]*<span>NEW NAME<\/span><\/button>/);
   assert.match(html, /id="lockFighterNameBtn"[^>]*>READY<\/button>/);
   assert.match(html, /cannot be edited after you press Ready/i);
-  assert.match(script, /version:18,name:'ROOKIE',nameLocked:false/);
+  assert.match(script, /version:19,name:'ROOKIE',nameLocked:false/);
   assert.match(script, /function randomIdentitySuggestion\(\)/);
   assert.match(script, /function identityClaimCandidates\(preferred\)/);
   assert.match(script, /state\.nameLocked=true;state\.socialProfileId=profile\.id/);
@@ -417,22 +418,35 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.match(cageIdentityMigration, /on conflict \(name\) do nothing/i);
   assert.match(cageIdentityMigration, /create or replace function public\.claim_cage_identity/i);
   assert.match(cageIdentityMigration, /retired_at timestamptz/i);
+  assert.match(capitalIdentityMigration, /create unique index[^;]+lower\(name\)/i);
+  assert.match(capitalIdentityMigration, /v_candidate := trim\(v_candidate\)/i);
+  assert.doesNotMatch(capitalIdentityMigration, /v_candidate := lower\(trim\(v_candidate\)\)/i);
+  assert.match(capitalIdentityMigration, /PHX\|LAX\|CHI\|NYC\|MIA\|HOU\|CLE\|SEA\|NOLA\|HNL/);
+  assert.match(capitalIdentityMigration, /v_city_code := case p_city[\s\S]*when 'los-angeles' then 'LAX'/i);
+  assert.match(capitalIdentityMigration, /right\(v_candidate,length\(v_city_code\)\)<>v_city_code/i);
+  assert.match(capitalIdentityMigration, /name ~ '\^\[a-z\]\[a-z0-9_\]\{2,31\}\$'/i);
   assert.doesNotMatch(supabaseClient, /fighter_name|author_name|target_name/);
   assert.match(script, /handle=normalizeIdentityName\(profile\?\.handle\)[\s\S]{0,700}\|\|!handle\|\|!name\|\|!avatar\|\|!arch/);
   assert.doesNotMatch(script, /\[A-Za-z0-9\]\{2,31\}_\[0-9\]/);
   assert.match(script, /\$\('#careerFollowersText'\)\.textContent=fmt\(state\.fans\)/);
 });
 
-test('identity word pools cover ten hometowns and retain wildcard exhaustion fallbacks', () => {
-  assert.equal(Object.keys(stringsData.fighterIdentity.cities).length, 10);
-  assert.equal(Object.keys(stringsData.fighterIdentity.styles).length, 7);
-  for (const words of Object.values(stringsData.fighterIdentity.cities)) assert.ok(words.length >= 12);
-  for (const words of Object.values(stringsData.fighterIdentity.styles)) assert.ok(words.length >= 12);
-  assert.ok(stringsData.fighterIdentity.modifiers.length >= 36);
-  assert.match(script, /Math\.random\(\)<\.33\?pick\(pools\.modifiers\)/);
+test('identity names share substantial CapitalCase color and descriptor pools', () => {
+  const pools = stringsData.fighterIdentity;
+  assert.ok(pools.colors.length >= 20);
+  assert.ok(pools.weather.length >= 20);
+  assert.ok(pools.animals.length >= 20);
+  assert.ok(pools.colors.includes('Dark'));
+  assert.ok(pools.colors.includes('Light'));
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(pools.cityCodes)),
+    {phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL'}
+  );
+  assert.equal(pools.colors.length * (pools.weather.length + pools.animals.length), 960);
+  assert.match(script, /LOGIC\.buildFighterIdentity\(pools\.colors\[0\]\|\|'White',pools\.descriptors\[0\]\|\|'Drizzle',pools\.cityCode\|\|'PHX'\)/);
+  assert.match(script, /return names\.slice\(0,300\)/);
   assert.match(script, /identityShufflePending=true[\s\S]*classList\.add\('shuffling'\)[\s\S]*setTimeout\([\s\S]*classList\.remove\('shuffling'\)/);
   assert.match(css, /#newFighterNameBtn\.shuffling \.name-shuffle-icon\{animation:nameShuffleSpin/);
-  assert.match(script, /for\(let i=0;i<80;i\+\+\)add\(`\$\{pools\.modifiers/);
 });
 
 test('retirement is warned, reported, and clears only Cage Grind career saves', () => {
