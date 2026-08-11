@@ -96,7 +96,7 @@ test('Google Analytics is configured and gameplay tracking is validated and non-
 });
 
 test('generated Cage Grind branding and navigation icons are wired into the interface', () => {
-  assert.match(page, /<title>Cage Grind — Free MMA Career Browser Game<\/title>/);
+  assert.match(page, /<title>Cage Grind: Free MMA Career Browser Game<\/title>/);
   assert.match(page, /<img class="logo" src="assets\/cage-grind-logo\.png" alt="Cage Grind">/);
   assert.match(css, /\.logo\{[^}]*object-fit:contain/);
   const brandedAssets = [
@@ -114,14 +114,24 @@ test('generated Cage Grind branding and navigation icons are wired into the inte
 test('the branded landing page gates the game and offers the correct career entry paths', () => {
   assert.match(page, /<body class="landing-active">/);
   assert.match(page, /<section class="landing-page" id="landingPage"/);
+  assert.equal((page.match(/<h1\b/g) || []).length, 1, 'the document should expose one clear primary heading');
+  assert.match(page, /<h1 id="landingTitle"><span id="landingTitleLead">CAGE GRIND<\/span><br><span class="accent" id="landingTitleAccent">FREE MMA CAREER GAME<\/span><\/h1>/);
+  assert.match(page, /<div class="hero-copy"><h2>FROM NOBODY/);
   assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER<\/button>/);
-  assert.match(page, /assets\/home-fight\.png/);
+  assert.match(page, /<img class="landing-octagon" src="assets\/cage-grind-octagon-transparent\.png" alt="">/);
+  assert.doesNotMatch(page, /class="landing-(?:cage|fighters)"/);
+  assert.ok(fs.existsSync('assets/cage-grind-octagon-transparent.png'));
+  const landingArt = fs.readFileSync('assets/cage-grind-octagon-transparent.png');
+  assert.equal(landingArt.subarray(1, 4).toString(), 'PNG');
+  assert.equal(landingArt[25], 6, 'landing octagon must retain RGBA transparency');
+  assert.match(serviceWorker, /'\.\/assets\/cage-grind-octagon-transparent\.png'/);
   assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
   assert.match(script, /LOGIC\.careerLandingMode\(state\)/);
   assert.match(script, /KEEP GRINDING/);
   assert.match(script, /CONTINUE YOUR BUILD/);
   assert.match(script, /trackEvent\('landing_view'/);
   assert.match(script, /trackEvent\('landing_enter'/);
+  assert.match(css, /@media \(max-width:767px\) and \(max-height:740px\)/);
 });
 
 test('canonical SEO metadata consistently points crawlers and social previews to cagegrind.com', () => {
@@ -129,11 +139,20 @@ test('canonical SEO metadata consistently points crawlers and social previews to
   assert.match(page, /<meta name="description" content="[^"]*MMA fighter[^"]*" \/>/);
   assert.match(page, /<meta property="og:url" content="https:\/\/cagegrind\.com\/" \/>/);
   assert.match(page, /<meta property="og:image" content="https:\/\/cagegrind\.com\/assets\/cage-grind-social-card\.png" \/>/);
+  assert.match(page, /<meta property="og:image:type" content="image\/png" \/>/);
   assert.match(page, /<meta name="twitter:card" content="summary_large_image" \/>/);
-  const structuredData = JSON.parse(page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] || '{}');
-  assert.equal(structuredData['@type'], 'VideoGame');
+  assert.match(page, /<meta name="twitter:image:alt" content="Cage Grind: Build the fighter\. Live the career\." \/>/);
+  const structuredBlocks = [...page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(match => JSON.parse(match[1]));
+  const structuredData = structuredBlocks.find(block => block['@type'] === 'SoftwareApplication') || {};
+  const websiteData = structuredBlocks.find(block => block['@type'] === 'WebSite') || {};
+  assert.equal(structuredData['@type'], 'SoftwareApplication');
+  assert.equal(structuredData.additionalType, 'https://schema.org/VideoGame');
   assert.equal(structuredData.url, 'https://cagegrind.com/');
+  assert.equal(structuredData.applicationCategory, 'GameApplication');
+  assert.equal(structuredData.isAccessibleForFree, true);
   assert.equal(structuredData.offers.price, '0');
+  assert.equal(websiteData.name, 'Cage Grind');
+  assert.equal(websiteData.url, 'https://cagegrind.com/');
   assert.equal(fs.readFileSync('CNAME', 'utf8').trim(), 'cagegrind.com');
   assert.match(fs.readFileSync('robots.txt', 'utf8'), /Sitemap: https:\/\/cagegrind\.com\/sitemap\.xml/);
   assert.match(fs.readFileSync('sitemap.xml', 'utf8'), /<loc>https:\/\/cagegrind\.com\/<\/loc>/);
@@ -668,6 +687,8 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   }
   assert.match(html, /\.avatar-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.avatar-card\{[^}]*aspect-ratio:2\/3/);
+  assert.match(css, /\.avatar-card img\{[^}]*background:radial-gradient/);
+  assert.match(css, /\.avatar-card:hover,\.avatar-card:focus-visible\{/);
   assert.match(script, /function validFighterAllocation\(stats\)/);
   assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
   assert.match(script, /===20/);
@@ -692,6 +713,9 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.match(html, /<article class="choice"><h3>GUARANTEED GROWTH<\/h3>[\s\S]*?src="assets\/home-training\.png"[\s\S]*?<button class="choice-action" data-go="train">HIT THE GYM<\/button><\/article>/);
   assert.match(html, /<article class="choice hustle"><h3>FUND THE DREAM<\/h3>[\s\S]*?src="assets\/home-hustle\.png"[\s\S]*?<button class="choice-action" data-go="hustle">HUSTLE<\/button><\/article>/);
   assert.match(html, /<article class="choice legacy"><h3>BUILD YOUR LEGACY<\/h3>[\s\S]*?src="assets\/home-gear\.png"[\s\S]*?<button class="choice-action" data-go="gear">VIEW GEAR<\/button><\/article>/);
+  assert.ok(html.indexOf('data-go="train"') < html.indexOf('data-go="fight"'), 'Hit the Gym should be the first home choice');
+  assert.doesNotMatch(html, /class="hero-cage"/);
+  assert.doesNotMatch(css, /\.hero-cage/);
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
@@ -1074,6 +1098,11 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(script, /const lootText=lootNotes\.map\(note=>note\.text\)\.join\(' · '\)/);
   assert.match(script, /pendingResultDrop=gearDrop\?Object\.assign\(\{extras:lootText\},gearDrop\):null/);
   assert.doesNotMatch(script, /Object\.assign\(\{extras:loot\},gearDrop\)/);
+  assert.match(script, /resultTitle'\)\.textContent='YOU WIN'/);
+  assert.match(script, /resultTitle'\)\.textContent='YOU LOST'/);
+  assert.match(script, /card\.classList\.add\(win\?'fight-win':'fight-loss'\)/);
+  assert.match(css, /\.result-card\.fight-loss\{[^}]*border-color:#c84a4a/);
+  assert.match(css, /\.result-method\{[^}]*font-size:13px/);
 });
 
 test('fighters, opponents, and round plans share the seven MMA archetypes', () => {
@@ -1116,8 +1145,8 @@ test('submission hunters can produce tap-out finishes', () => {
   assert.match(script, /signatureBoost=side==='player'&&state\.fighterStyle==='submission'\?\.05:0/);
   assert.match(script, /sim\.method='SUBMISSION'/);
   assert.match(script, /TAP!/);
-  assert.match(script, /SUBMISSION WIN!/);
-  assert.match(script, /SUBMITTED\./);
+  assert.match(script, /fight\.method==='SUBMISSION'\?`\$\{o\.name\} taps out/);
+  assert.match(script, /fight\.method==='SUBMISSION'\?`\$\{o\.name\} forced the tap/);
   assert.match(readme, /finish a fight by tap/);
 });
 
@@ -1151,5 +1180,5 @@ test('fights charge a level-based rate per started round and pause for a trailin
   assert.match(script, /data-last-chance="discipline"/);
   assert.match(script, /data-last-chance="haymaker"/);
   assert.match(script, /function resolveLastChance\(choice\)/);
-  assert.match(script, /LAST-SECOND KNOCKOUT!/);
+  assert.match(script, /fight\.lastChanceLanded\?`Ten seconds left, behind on the cards, and one haymaker changed everything\.`/);
 });
