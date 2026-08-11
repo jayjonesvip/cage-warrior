@@ -1,5 +1,7 @@
 # Cage Grind
 
+The in-round Sim+ trigger and choice rules are documented in [FIGHT-DECISION-MATRIX.md](FIGHT-DECISION-MATRIX.md).
+
 [![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
 
 [Play Cage Grind](https://cagegrind.com/)
