@@ -80,12 +80,14 @@ generated league.
   CageReporter publishes the retirement, the name remains permanently reserved,
   and the game returns to the first fighter-creation step. If the public
   retirement cannot be recorded, the local career is kept safe.
-- Home presents Take a Fight, Hit the Gym, Hustle, and Gear as illustrated
+- Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
   obvious. Enabled primary actions use consistent blue fills and bold white
   labels; secondary controls use slate, special opportunities use amber, and
   disabled or locked controls remain visibly subdued.
+- Fighter selection places each transparent portrait over a blue arena-light
+  gradient, with a brighter keyboard-focus and hover treatment around the card.
 - An active endorsement appears in the Home hero directly beneath Cage Rank,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,
@@ -147,6 +149,8 @@ generated league.
   missing leaves the fighter open to an immediate counter knockout.
 - Watch fights normally or use 2× speed. There is no result skip: every
   surviving round requires its corner decision.
+- Fight results lead with a large **YOU WIN** or red **YOU LOST** outcome, then
+  show the finish method, round, and clock beneath it before the full scorecard.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
   become notable Cage Feed headlines after every additional win.
 - Progress through a hometown title, its regional title, the U.S. Title, and

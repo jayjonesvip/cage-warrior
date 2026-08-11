@@ -687,6 +687,8 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   }
   assert.match(html, /\.avatar-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /\.avatar-card\{[^}]*aspect-ratio:2\/3/);
+  assert.match(css, /\.avatar-card img\{[^}]*background:radial-gradient/);
+  assert.match(css, /\.avatar-card:hover,\.avatar-card:focus-visible\{/);
   assert.match(script, /function validFighterAllocation\(stats\)/);
   assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
   assert.match(script, /===20/);
@@ -711,6 +713,9 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
   assert.match(html, /<article class="choice"><h3>GUARANTEED GROWTH<\/h3>[\s\S]*?src="assets\/home-training\.png"[\s\S]*?<button class="choice-action" data-go="train">HIT THE GYM<\/button><\/article>/);
   assert.match(html, /<article class="choice hustle"><h3>FUND THE DREAM<\/h3>[\s\S]*?src="assets\/home-hustle\.png"[\s\S]*?<button class="choice-action" data-go="hustle">HUSTLE<\/button><\/article>/);
   assert.match(html, /<article class="choice legacy"><h3>BUILD YOUR LEGACY<\/h3>[\s\S]*?src="assets\/home-gear\.png"[\s\S]*?<button class="choice-action" data-go="gear">VIEW GEAR<\/button><\/article>/);
+  assert.ok(html.indexOf('data-go="train"') < html.indexOf('data-go="fight"'), 'Hit the Gym should be the first home choice');
+  assert.doesNotMatch(html, /class="hero-cage"/);
+  assert.doesNotMatch(css, /\.hero-cage/);
   assert.doesNotMatch(html, /<button class="choice(?:\s|")/);
   assert.doesNotMatch(html, /class="bigicon"/);
   assert.match(html, /\.choice-action\{[^}]*margin-top:auto/);
@@ -1093,6 +1098,11 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(script, /const lootText=lootNotes\.map\(note=>note\.text\)\.join\(' · '\)/);
   assert.match(script, /pendingResultDrop=gearDrop\?Object\.assign\(\{extras:lootText\},gearDrop\):null/);
   assert.doesNotMatch(script, /Object\.assign\(\{extras:loot\},gearDrop\)/);
+  assert.match(script, /resultTitle'\)\.textContent='YOU WIN'/);
+  assert.match(script, /resultTitle'\)\.textContent='YOU LOST'/);
+  assert.match(script, /card\.classList\.add\(win\?'fight-win':'fight-loss'\)/);
+  assert.match(css, /\.result-card\.fight-loss\{[^}]*border-color:#c84a4a/);
+  assert.match(css, /\.result-method\{[^}]*font-size:13px/);
 });
 
 test('fighters, opponents, and round plans share the seven MMA archetypes', () => {
@@ -1135,8 +1145,8 @@ test('submission hunters can produce tap-out finishes', () => {
   assert.match(script, /signatureBoost=side==='player'&&state\.fighterStyle==='submission'\?\.05:0/);
   assert.match(script, /sim\.method='SUBMISSION'/);
   assert.match(script, /TAP!/);
-  assert.match(script, /SUBMISSION WIN!/);
-  assert.match(script, /SUBMITTED\./);
+  assert.match(script, /fight\.method==='SUBMISSION'\?`\$\{o\.name\} taps out/);
+  assert.match(script, /fight\.method==='SUBMISSION'\?`\$\{o\.name\} forced the tap/);
   assert.match(readme, /finish a fight by tap/);
 });
 
@@ -1170,5 +1180,5 @@ test('fights charge a level-based rate per started round and pause for a trailin
   assert.match(script, /data-last-chance="discipline"/);
   assert.match(script, /data-last-chance="haymaker"/);
   assert.match(script, /function resolveLastChance\(choice\)/);
-  assert.match(script, /LAST-SECOND KNOCKOUT!/);
+  assert.match(script, /fight\.lastChanceLanded\?`Ten seconds left, behind on the cards, and one haymaker changed everything\.`/);
 });
