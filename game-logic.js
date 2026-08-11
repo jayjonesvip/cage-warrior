@@ -57,8 +57,8 @@
     const primary=parseStoredState(rawSaves.primary,normalize);
     const backup=parseStoredState(rawSaves.backup,normalize);
     const legacy=parseStoredState(rawSaves.legacy,normalize);
-    if(primary&&isBlankCareer(primary)&&backup&&!isBlankCareer(backup))return backup;
-    return primary||backup||legacy||structuredClone(fallback);
+    const candidate=[primary,backup,legacy].find(state=>state&&!isBlankCareer(state));
+    return candidate||structuredClone(fallback);
   }
 
   function shouldBackupRaw(raw,normalize){

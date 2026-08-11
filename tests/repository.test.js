@@ -456,6 +456,12 @@ test('career identity includes a permanent hometown and a fight-earned title lad
   assert.match(readme, /belt is awarded only after that fighter is defeated/);
 });
 
+test('title challengers ramp harder near the next unlock to make the ladder feel earned', () => {
+  assert.match(script, /function titlePressureBonus\(m\)/);
+  assert.match(script, /state\.level\s*>=\s*m\.level\s*-\s*1/);
+  assert.match(script, /Math\.max\(/);
+});
+
 test('fighter identity is globally unique, permanent, and locked before the career starts', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
   assert.doesNotMatch(html, /homeAvatarText|<small>Fighter Avatar<\/small>/);

@@ -179,8 +179,17 @@
     const stat=k=>Math.max(3,Math.round(base+difficulty+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.45));
     return {key:`cw-${tier}-${serial}`,name:identity.name,country:identity.country,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(1,tier*2+Math.abs(seed%7)),losses:Math.abs((seed>>>5)%Math.max(2,tier+2)),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
   }
+  function titlePressureBonus(m){
+    const target=Number(m&&m.level)||1;
+    return Math.max(
+      1,
+      state.level >= target - 1 ? 1.2 : 1,
+      state.level >= target - 2 ? 1.1 : 1,
+      state.level >= target - 3 ? 1.04 : 1
+    );
+  }
   function generateTitleChampion(m){
-    const city=currentCity(),seed=hashSeed(`cage-warrior-champion-v1|${city.id}|${m.id}`),arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),base=4+(m.level-1)*1.9+1.4;
+    const city=currentCity(),seed=hashSeed(`cage-warrior-champion-v1|${city.id}|${m.id}`),arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),pressure=titlePressureBonus(m),base=(4+(m.level-1)*1.9+1.4)*pressure;
     const stat=k=>Math.max(5,Math.round(base+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.35));
     return {key:`champ-${city.id}-${m.id}`,name:identity.name,country:identity.country,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier:m.level,min:m.level,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,m.level-1)*2),fans:Math.round(22*Math.pow(1.48,m.level-1)*2.25),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(12,m.level*3+Math.abs(seed%8)),losses:Math.abs((seed>>>5)%Math.max(2,Math.ceil(m.level/3))),winsVsPlayer:0,lossesToPlayer:0,meetings:0,championship:true,titleId:m.id,titleDefeated:state.milestones.includes(m.id),recordInitialized:true,createdAt:Date.now()};
   }
