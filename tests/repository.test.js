@@ -22,6 +22,7 @@ const cageProfileCountMigration = fs.readFileSync('supabase/migrations/202608092
 const cageOpponentMigration = fs.readFileSync('supabase/migrations/20260809220000_cage_opponent_candidates.sql', 'utf8');
 const cageIdentityMigration = fs.readFileSync('supabase/migrations/20260810120000_permanent_fighter_identity.sql', 'utf8');
 const capitalIdentityMigration = fs.readFileSync('supabase/migrations/20260810150000_capitalcase_fighter_identity.sql', 'utf8');
+const expandedAvatarMigration = fs.readFileSync('supabase/migrations/20260810170000_expand_fighter_avatars.sql', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
 const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -186,6 +187,14 @@ test('real Cage Feed fighters expose validated avatars and public bios', () => {
   assert.match(script, /profile\.id===state\.socialProfileId/);
   assert.match(script, /REAL CAGE GRIND FIGHTER|fighterBioAvatar/);
   assert.match(css, /\.feed-avatar\.fighter-photo/);
+});
+
+test('Supabase accepts all forty permanent fighter avatars', () => {
+  assert.match(expandedAvatarMigration, /add constraint cage_profiles_fighter_avatar/i);
+  assert.match(expandedAvatarMigration, /fighter-\(0\[1-9\]\|\[123\]\[0-9\]\|40\)/);
+  assert.match(expandedAvatarMigration, /create or replace function public\.claim_cage_identity/i);
+  assert.match(expandedAvatarMigration, /create or replace function public\.sync_cage_profile/i);
+  assert.equal((expandedAvatarMigration.match(/\[123\]\[0-9\]/g)||[]).length,3);
 });
 
 test('completed careers receive a native install offer and one verified collectible reward', async () => {
@@ -618,8 +627,9 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   const avatarSource = script.match(/const fighterAvatars = (\[[\s\S]*?\n\s*\]);/)?.[1];
   assert.ok(avatarSource, 'fighter avatar definitions should be present');
   const avatars = new Function(`return ${avatarSource}`)();
-  assert.equal(avatars.length, 20);
-  assert.equal(new Set(avatars.map(avatar => avatar.asset)).size, 20);
+  assert.equal(avatars.length, 40);
+  assert.equal(new Set(avatars.map(avatar => avatar.asset)).size, 40);
+  assert.equal(new Set(avatars.map(avatar => JSON.stringify(avatar.stats))).size, 40);
   for (const avatar of avatars) {
     const values = ['power', 'speed', 'chin', 'cardio'].map(key => avatar.stats[key]);
     assert.ok(values.every(value => Number.isInteger(value) && value >= 2 && value <= 8));
@@ -631,7 +641,7 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   assert.match(script, /function validFighterAllocation\(stats\)/);
   assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
   assert.match(script, /===20/);
-  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 20);
+  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 40);
   assert.equal(fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name)).length, 14);
   assert.equal(fs.readdirSync('assets').filter(name => /^grok_image_/i.test(name)).length, 0);
   assert.match(script, /<span class="avatar-total">SELECT<\/span>/);
