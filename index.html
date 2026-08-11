@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.15" />
+<meta name="app-version" content="2.5.16" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.15">
+<link rel="stylesheet" href="styles.css?v=2.5.16">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -67,7 +67,7 @@
     <div class="money"><b id="cashText">$0</b><small class="audience-counts"><span id="fansText">0</span> FOLLOWERS <i aria-hidden="true">&middot;</i> <span id="followingText">0</span> FOLLOWING</small><div class="top-progress"><span>HYPE</span><b id="hypeText">0%</b></div></div>
   </header>
 
-  <section class="resource-hud" aria-label="Current fighter condition and attributes">
+  <section class="resource-hud" aria-label="Current fighter condition and attributes" hidden>
     <div class="hud-condition-row">
       <div class="hud-resource energy-hud" id="energyHud">
         <span>ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
@@ -94,7 +94,9 @@
         <button id="installGameBtn" type="button">INSTALL GAME · FREE DROP</button>
       </section>
 
-      <div class="card build-card" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">INCOMPLETE</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token career-after-setup"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token career-after-setup"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token career-after-setup"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
+      <div class="card build-card fighter-builder-intro identity-setup" id="fighterBuilderIntro"><div class="card-title">Build Your Fighter <small>New Career</small></div><div class="fighter-builder-progress"><div class="builder-progress-copy"><span id="builderProgressStep">0 OF 4 COMPLETE</span><b id="builderProgressPercent">0%</b></div><div class="builder-progress-track" id="builderProgressTrack" role="progressbar" aria-label="Fighter build progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="builderProgressFill"></i></div></div><p class="fighter-builder-copy"><b>NO ACTIVE FIGHTER FOUND.</b> This may be your first visit, a retired career, or cleared browser data. Lock in four permanent choices to begin a new climb.</p></div>
+
+      <div class="card build-card career-after-setup" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">LOCKED IN</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token"><small>Followers</small><b id="careerFollowersText">0</b></div><div class="career-token"><small>Career Earnings</small><b id="careerEarningsText">$0</b></div><div class="career-token"><small>Next Milestone</small><b id="nextMilestoneText">City Title</b></div></div></div>
 
       <div class="card build-card identity-setup" id="citySetup"><div class="card-title">Choose Fighting Out Of <small>Permanent</small></div><div class="city-grid" id="cityChoices"></div><div class="loadout-note" id="cityDescription">Choose your hometown. It defines the opening rungs of your title journey.</div></div>
 
@@ -159,7 +161,7 @@
     </section>
   </main>
 
-  <nav class="bottomnav">
+  <nav class="bottomnav" hidden>
     <button class="navbtn active" data-nav="home"><span class="ni" data-icon-name="nav-home" data-icon-fallback="⌂">⌂</span>Home</button>
     <button class="navbtn" data-nav="train"><span class="ni" data-icon-name="nav-train" data-icon-fallback="🏋">🏋</span>Train</button>
     <button class="navbtn" data-nav="fight"><span class="ni" data-icon-name="nav-fight" data-icon-fallback="🥊">🥊</span>Fight</button>
@@ -322,12 +324,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.15"></script>
-<script src="strings.js?v=2.5.15"></script>
-<script src="analytics.js?v=2.5.15"></script>
-<script src="supabase-client.js?v=2.5.15"></script>
-<script src="cage-social.js?v=2.5.15"></script>
-<script src="game.js?v=2.5.15"></script>
-<script src="pwa.js?v=2.5.15"></script>
+<script src="game-logic.js?v=2.5.16"></script>
+<script src="strings.js?v=2.5.16"></script>
+<script src="analytics.js?v=2.5.16"></script>
+<script src="supabase-client.js?v=2.5.16"></script>
+<script src="cage-social.js?v=2.5.16"></script>
+<script src="game.js?v=2.5.16"></script>
+<script src="pwa.js?v=2.5.16"></script>
 </body>
 </html>
