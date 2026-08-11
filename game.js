@@ -116,7 +116,27 @@
     {id:'fighter-17',asset:'assets/fighter-avatar-17.jpg',stats:{power:6,speed:5,chin:4,cardio:5}},
     {id:'fighter-18',asset:'assets/fighter-avatar-18.jpg',stats:{power:7,speed:4,chin:3,cardio:6}},
     {id:'fighter-19',asset:'assets/fighter-avatar-19.jpg',stats:{power:6,speed:3,chin:4,cardio:7}},
-    {id:'fighter-20',asset:'assets/fighter-avatar-20.jpg',stats:{power:5,speed:2,chin:5,cardio:8}}
+    {id:'fighter-20',asset:'assets/fighter-avatar-20.jpg',stats:{power:5,speed:2,chin:5,cardio:8}},
+    {id:'fighter-21',asset:'assets/fighter-avatar-21.jpg',stats:{power:8,speed:3,chin:6,cardio:3}},
+    {id:'fighter-22',asset:'assets/fighter-avatar-22.jpg',stats:{power:7,speed:4,chin:6,cardio:3}},
+    {id:'fighter-23',asset:'assets/fighter-avatar-23.jpg',stats:{power:6,speed:7,chin:4,cardio:3}},
+    {id:'fighter-24',asset:'assets/fighter-avatar-24.jpg',stats:{power:8,speed:2,chin:8,cardio:2}},
+    {id:'fighter-25',asset:'assets/fighter-avatar-25.jpg',stats:{power:8,speed:2,chin:7,cardio:3}},
+    {id:'fighter-26',asset:'assets/fighter-avatar-26.jpg',stats:{power:7,speed:5,chin:6,cardio:2}},
+    {id:'fighter-27',asset:'assets/fighter-avatar-27.jpg',stats:{power:4,speed:8,chin:3,cardio:5}},
+    {id:'fighter-28',asset:'assets/fighter-avatar-28.jpg',stats:{power:3,speed:6,chin:5,cardio:6}},
+    {id:'fighter-29',asset:'assets/fighter-avatar-29.jpg',stats:{power:7,speed:7,chin:4,cardio:2}},
+    {id:'fighter-30',asset:'assets/fighter-avatar-30.jpg',stats:{power:3,speed:8,chin:4,cardio:5}},
+    {id:'fighter-31',asset:'assets/fighter-avatar-31.jpg',stats:{power:4,speed:7,chin:3,cardio:6}},
+    {id:'fighter-32',asset:'assets/fighter-avatar-32.jpg',stats:{power:8,speed:3,chin:7,cardio:2}},
+    {id:'fighter-33',asset:'assets/fighter-avatar-33.jpg',stats:{power:7,speed:6,chin:5,cardio:2}},
+    {id:'fighter-34',asset:'assets/fighter-avatar-34.jpg',stats:{power:6,speed:6,chin:3,cardio:5}},
+    {id:'fighter-35',asset:'assets/fighter-avatar-35.jpg',stats:{power:6,speed:4,chin:7,cardio:3}},
+    {id:'fighter-36',asset:'assets/fighter-avatar-36.jpg',stats:{power:7,speed:3,chin:5,cardio:5}},
+    {id:'fighter-37',asset:'assets/fighter-avatar-37.jpg',stats:{power:8,speed:2,chin:6,cardio:4}},
+    {id:'fighter-38',asset:'assets/fighter-avatar-38.jpg',stats:{power:6,speed:6,chin:5,cardio:3}},
+    {id:'fighter-39',asset:'assets/fighter-avatar-39.jpg',stats:{power:5,speed:5,chin:8,cardio:2}},
+    {id:'fighter-40',asset:'assets/fighter-avatar-40.jpg',stats:{power:8,speed:4,chin:6,cardio:2}}
   ];
   state = loadState();
   const fighterCities = [

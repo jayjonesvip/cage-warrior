@@ -36,7 +36,7 @@ generated league.
 - New careers complete four permanent Home-screen choices in order. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
   Miami, Houston, Cleveland, Seattle, New Orleans, or Hawaii. Next, choose one of
-  20 fighter avatar cards. New Orleans belongs to the Deep South title region;
+  40 fighter avatar cards. New Orleans belongs to the Deep South title region;
   Hawaii belongs to the Pacific Islands.
   Finally, choose one of seven permanent MMA archetypes: Pressure Fighter,
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
