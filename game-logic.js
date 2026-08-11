@@ -37,6 +37,13 @@
       (!Array.isArray(state.gear)||state.gear.length===0);
   }
 
+  function careerLandingMode(state){
+    if(!state||typeof state!=='object')return 'new';
+    const complete=!!(state.fighterCity&&state.fighterAvatar&&state.fighterStyle&&state.nameLocked);
+    if(complete)return 'returning';
+    return state.fighterCity||state.fighterAvatar||state.fighterStyle||state.nameLocked?'building':'new';
+  }
+
   function parseStoredState(raw,normalize){
     if(typeof raw!=='string'||!raw.trim())return null;
     try{
@@ -298,5 +305,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

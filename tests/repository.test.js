@@ -111,6 +111,19 @@ test('generated Cage Grind branding and navigation icons are wired into the inte
   }
 });
 
+test('the branded landing page gates the game and offers the correct career entry paths', () => {
+  assert.match(page, /<body class="landing-active">/);
+  assert.match(page, /<section class="landing-page" id="landingPage"/);
+  assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER<\/button>/);
+  assert.match(page, /assets\/home-fight\.png/);
+  assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
+  assert.match(script, /LOGIC\.careerLandingMode\(state\)/);
+  assert.match(script, /KEEP GRINDING/);
+  assert.match(script, /CONTINUE YOUR BUILD/);
+  assert.match(script, /trackEvent\('landing_view'/);
+  assert.match(script, /trackEvent\('landing_enter'/);
+});
+
 test('canonical SEO metadata consistently points crawlers and social previews to cagegrind.com', () => {
   assert.match(page, /<link rel="canonical" href="https:\/\/cagegrind\.com\/" \/>/);
   assert.match(page, /<meta name="description" content="[^"]*MMA fighter[^"]*" \/>/);

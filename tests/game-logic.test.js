@@ -24,6 +24,14 @@ test('a new game loads with valid default resources',()=>{
   assert.deepEqual(state.stats,{power:5,speed:5,chin:5,cardio:5});
 });
 
+test('landing mode distinguishes new, unfinished, and completed careers',()=>{
+  assert.equal(logic.careerLandingMode(null),'new');
+  assert.equal(logic.careerLandingMode({}),'new');
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix'}),'building');
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:false}),'building');
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
+});
+
 test('an older save keeps progression and fills newer resource fields',()=>{
   const state=normalize({version:4,name:'OLD SAVE',level:4,wins:7,losses:2,cash:900,stats:{power:11}});
   assert.equal(state.level,4);

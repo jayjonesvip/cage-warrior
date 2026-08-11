@@ -43,6 +43,8 @@
     return ANALYTICS.track(eventName,Object.assign({fighter_level:state?.level||1},parameters));
   }
   let recoveryReport = null;
+  let landingMode = 'new';
+  let landingEntered = false;
   let audioCtx = null;
   let currentScreen = 'home';
   let fight = null;
@@ -384,6 +386,22 @@
     if(state.level>=4)return 'PROSPECT';
     if(state.level>=2)return 'CLUB FIGHTER';
     return 'UNRANKED';
+  }
+  function renderLanding(){
+    landingMode=LOGIC.careerLandingMode(state);const returning=landingMode==='returning',building=landingMode==='building',page=$('#landingPage');page.dataset.mode=landingMode;
+    $('#landingEyebrow').textContent=returning?'YOUR CAREER IS WAITING':building?'FIGHTER BUILD IN PROGRESS':'YOUR FIGHT STARTS HERE';
+    $('#landingTitleLead').textContent=returning?'WELCOME BACK,':building?'FINISH YOUR':'FROM NOBODY';
+    $('#landingTitleAccent').textContent=returning?state.name:building?'FIGHTER BUILD':'TO MAIN EVENT';
+    $('#landingDescription').textContent=returning?'Your corner is ready and your rivals are waiting. Pick up the climb exactly where you left it.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Create your fighter, call the tactics between rounds, and grind from local cards to the world title.';
+    $('#landingEnterBtn').textContent=returning?'KEEP GRINDING':building?'CONTINUE YOUR BUILD':'START YOUR CAREER';
+    const stats=$('#landingCareerStats');stats.hidden=!returning;if(returning){$('#landingRank').textContent=`LVL ${state.level}`;$('#landingRecord').textContent=`${state.wins}-${state.losses}`;$('#landingFollowers').textContent=fmt(state.fans)}
+  }
+  function showRecoveryReport(){
+    if(!recoveryReport)return;const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push('fight booking refunded');recoveryReport=null;toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff');
+  }
+  function enterGameFromLanding(){
+    if(landingEntered)return;landingEntered=true;const page=$('#landingPage'),button=$('#landingEnterBtn'),mode=landingMode;button.disabled=true;trackEvent('landing_enter',{career_state:mode});sfx.tap();page.classList.add('leaving');
+    setTimeout(()=>{page.hidden=true;page.classList.remove('leaving');document.body.classList.remove('landing-active');$('#app').removeAttribute('aria-hidden');$('.screen[data-screen="home"]').scrollTop=0;trackEvent('game_screen_view',{screen_name:'home',entry_point:'landing'});setTimeout(showRecoveryReport,180)},230);
   }
   function cageRank(){return Math.max(1,999-state.wins*37-state.level*19)}
   function xpNeed(){return 80+state.level*40}
@@ -1287,6 +1305,7 @@
   document.addEventListener('cagegrind:installchange',()=>updateUI());
   document.addEventListener('cagegrind:installed',()=>{const firstDetection=!state.installDetected;state.installDetected=true;if(firstDetection)trackEvent('game_installed');saveState();updateUI()});
   $('#installGameBtn').addEventListener('click',requestGameInstall);
+  $('#landingEnterBtn').addEventListener('click',enterGameFromLanding);
   $('#dailyBtn').addEventListener('click',claimDaily);$('#continueBtn').addEventListener('click',handleResultAction);$('#levelUpContinue').addEventListener('click',closeLevelUp);
   $('#tapeBackBtn').addEventListener('click',closeFightPreview);$('#tapeFightBtn').addEventListener('click',()=>commitFight());
   $('#speedBtn').addEventListener('click',toggleFightSpeed);$('#detailsToggle').addEventListener('click',()=>{const details=$('#resultDetails'),open=!details.classList.contains('open');details.classList.toggle('open',open);$('#detailsToggle').textContent=open?'HIDE STATS':'SCORECARD'});
@@ -1319,7 +1338,7 @@
   hydrateStaticIcons();ensureLoadout();ensureRoster();
   recoveryReport=applyOfflineRecovery();
   updateUI();
+  renderLanding();
   if(state.socialAccountCreated)connectSharedSocial(true);
-  trackEvent('game_open',{returning_career:(state.wins+state.losses)>0,setup_complete:!!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&state.nameLocked)});trackEvent('game_screen_view',{screen_name:'home'});
-  if(recoveryReport)setTimeout(()=>{const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push(`fight booking refunded`);toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff')},350);
+  trackEvent('game_open',{returning_career:landingMode==='returning',setup_complete:landingMode==='returning'});trackEvent('landing_view',{career_state:landingMode});
 })();
