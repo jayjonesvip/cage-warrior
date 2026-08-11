@@ -432,6 +432,9 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.match(html, /cannot be edited after you press Ready/i);
   assert.match(script, /version:19,name:'ROOKIE',nameLocked:false/);
   assert.match(script, /function randomIdentitySuggestion\(\)/);
+  assert.match(script, /LOGIC\.randomFighterIdentity\(pools\.openers,pools\.descriptors,pools\.cityCode\)/);
+  assert.match(script, /if\(coreReady&&!state\.nameLocked&&!identitySuggestion\)identitySuggestion=randomIdentitySuggestion\(\)/);
+  assert.match(script, /state\.fighterStyle=id;identitySuggestion=randomIdentitySuggestion\(\)/);
   assert.match(script, /function identityClaimCandidates\(preferred\)/);
   assert.match(script, /state\.nameLocked=true;state\.socialProfileId=profile\.id/);
   assert.match(cageIdentityMigration, /create table if not exists public\.cage_name_registry/i);
@@ -487,7 +490,7 @@ test('identity names share substantial CapitalCase color and descriptor pools', 
   const openers = [...pools.colors, ...pools.origins];
   const descriptors = [...pools.weather, ...pools.animals, ...pools.combat];
   assert.equal(openers.reduce((total, opener) => total + descriptors.filter(descriptor => descriptor !== opener).length, 0), 6534);
-  assert.match(script, /pools\.descriptors\.filter\(word=>word!==opener\)/);
+  assert.match(logic, /second\.filter\(word=>word!==opener\)/);
   assert.match(script, /LOGIC\.buildFighterIdentity\(pools\.openers\[0\]\|\|'White',pools\.descriptors\[0\]\|\|'Drizzle',pools\.cityCode\|\|'PHX'\)/);
   assert.match(script, /return names\.slice\(0,300\)/);
   assert.match(script, /identityShufflePending=true[\s\S]*classList\.add\('shuffling'\)[\s\S]*setTimeout\([\s\S]*classList\.remove\('shuffling'\)/);
