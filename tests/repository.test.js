@@ -131,6 +131,11 @@ test('the branded landing page gates the game and offers the correct career entr
   assert.match(script, /CONTINUE YOUR BUILD/);
   assert.match(script, /trackEvent\('landing_view'/);
   assert.match(script, /trackEvent\('landing_enter'/);
+  assert.match(css, /@media \(max-width:699px\)/);
+  assert.match(css, /\.landing-page\{min-height:100svh/);
+  assert.match(css, /\.landing-content\{display:contents\}/);
+  assert.match(css, /\.landing-enter\{order:6;[^}]*min-height:50px/);
+  assert.match(css, /\.landing-visual\{order:8;/);
   assert.match(css, /@media \(max-width:767px\) and \(max-height:740px\)/);
 });
 

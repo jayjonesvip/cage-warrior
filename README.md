@@ -22,6 +22,9 @@ interactions from `game.js`.
   hustles, drops, sponsors, and the title climb before choosing **Start Your
   Career**. Choosing an entry action never resets or replaces the recovered
   local save.
+- On phones, the personalized headline and entry action appear before the
+  octagon artwork and longer feature pitch. The landing shell uses the safe
+  viewport and device inset so the full action remains above the browser fold.
 
 ### Responsive desktop interface
 
