@@ -1197,3 +1197,22 @@ test('fights charge a level-based rate per started round and pause for a trailin
   assert.match(script, /function resolveLastChance\(choice\)/);
   assert.match(script, /fight\.lastChanceLanded\?`Ten seconds left, behind on the cards, and one haymaker changed everything\.`/);
 });
+
+test('surviving rounds pause for one contextual Sim+ decision at the midpoint', () => {
+  assert.match(script, /const fightMomentDefs=\{/);
+  assert.match(script, /opponentHurt:\{title:'YOU HAVE THEM HURT'/);
+  assert.match(script, /playerHurt:\{title:'YOU ARE BADLY HURT'/);
+  assert.match(script, /opponentShot:\{title:'THEY SHOOT ON YOUR HIPS'/);
+  assert.match(script, /topControl:\{title:'YOU SECURE TOP POSITION'/);
+  assert.match(script, /underPressure:\{title:'YOUR BACK HITS THE FENCE'/);
+  assert.match(script, /tactical:\{title:'THE ROUND IS IN THE BALANCE'/);
+  assert.match(script, /!stopped&&ex===Math\.ceil\(exchanges\/2\)/);
+  assert.match(script, /type:'fightMoment'/);
+  assert.match(script, /data-fight-moment="\$\{choice\.id\}"/);
+  assert.match(script, /function resolveFightMoment\(choiceId\)/);
+  assert.match(script, /scoreRoundState\(round\)/);
+  assert.match(script, /fight_moment_selected/);
+  assert.match(script, /fight\.deepRead\?` · \$\{chance\}% read`/);
+  assert.match(html, /\.fight-moment-panel\{/);
+  assert.match(readme, /FIGHT-DECISION-MATRIX\.md/);
+});

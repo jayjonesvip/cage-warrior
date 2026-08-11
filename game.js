@@ -1014,7 +1014,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false};
+    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[]};
   }
 
   function planFamiliarity(styleId,planId){
@@ -1047,6 +1047,51 @@
     if(archetype==='submission')return roll<.50?'takedown':roll<.65?'jab':roll<.79?'cross':roll<.89?'hook':'kick';
     if(archetype==='wrestleBox')return roll<.28?'takedown':roll<.49?'jab':roll<.72?'cross':roll<.88?'hook':'kick';
     return roll<.28?'jab':roll<.51?'cross':roll<.69?'hook':roll<.87?'kick':'takedown';
+  }
+
+  const fightMomentDefs={
+    opponentHurt:{title:'YOU HAVE THEM HURT',prompt:'Your opponent is retreating with their guard broken.',choices:[
+      {id:'swarm',label:'SWARM FOR THE FINISH',risk:'HIGH RISK',stat:'power',base:.54,styles:['pressure','brawler'],success:{damage:14},fail:{selfDamage:8}},
+      {id:'pick',label:'PICK YOUR SHOTS',risk:'SAFE',stat:'speed',base:.78,styles:['counter','trickster'],success:{damage:8},fail:{selfDamage:2}},
+      {id:'level',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.65,styles:['control','wrestleBox'],success:{damage:4,control:38,takedown:1},fail:{selfDamage:3}}
+    ]},
+    playerHurt:{title:'YOU ARE BADLY HURT',prompt:'Your opponent closes in, looking for the finish.',choices:[
+      {id:'shell',label:'SHELL UP & RECOVER',risk:'SAFE',stat:'chin',base:.80,styles:['counter','control'],success:{control:12},fail:{selfDamage:4}},
+      {id:'clinch',label:'FORCE THE CLINCH',risk:'CONTROL',stat:'cardio',base:.66,styles:['control','wrestleBox'],success:{control:32,takedown:1},fail:{selfDamage:6}},
+      {id:'fire',label:'FIRE BACK',risk:'HIGH RISK',stat:'power',base:.48,styles:['pressure','brawler'],success:{damage:13},fail:{selfDamage:11}}
+    ]},
+    opponentShot:{title:'THEY SHOOT ON YOUR HIPS',prompt:'The takedown is coming. Make the read now.',choices:[
+      {id:'sprawl',label:'SPRAWL & RESET',risk:'SAFE',stat:'cardio',base:.76,styles:['wrestleBox','control'],success:{control:18},fail:{oppControl:18}},
+      {id:'guillotine',label:'ATTACK THE GUILLOTINE',risk:'FINISH HUNT',stat:'speed',base:.50,styles:['submission'],success:{damage:10,control:34},fail:{oppControl:34}},
+      {id:'knee',label:'MEET THEM WITH A KNEE',risk:'HIGH RISK',stat:'power',base:.46,styles:['brawler','trickster'],success:{damage:15},fail:{selfDamage:7,oppControl:24}}
+    ]},
+    topControl:{title:'YOU SECURE TOP POSITION',prompt:'Your opponent is pinned beneath you. Choose the priority.',choices:[
+      {id:'ground',label:'GROUND-AND-POUND',risk:'DAMAGE',stat:'power',base:.63,styles:['pressure','brawler'],success:{damage:11,control:18},fail:{control:8}},
+      {id:'advance',label:'ADVANCE POSITION',risk:'CONTROL',stat:'speed',base:.70,styles:['submission','control'],success:{damage:5,control:42},fail:{control:14}},
+      {id:'stand',label:'LET THEM UP',risk:'SAFE RESET',stat:'cardio',base:.88,styles:['counter','trickster'],success:{damage:5},fail:{}}
+    ]},
+    underPressure:{title:'YOUR BACK HITS THE FENCE',prompt:'Your opponent is taking away the space to escape.',choices:[
+      {id:'circle',label:'CIRCLE INTO OPEN SPACE',risk:'SAFE',stat:'speed',base:.76,styles:['counter','trickster'],success:{damage:4},fail:{selfDamage:3}},
+      {id:'reverse',label:'FIGHT FOR THE REVERSAL',risk:'CONTROL',stat:'cardio',base:.61,styles:['control','wrestleBox'],success:{control:30},fail:{oppControl:22}},
+      {id:'trade',label:'BITE DOWN & TRADE',risk:'HIGH RISK',stat:'chin',base:.50,styles:['pressure','brawler'],success:{damage:12},fail:{selfDamage:10}}
+    ]},
+    tactical:{title:'THE ROUND IS IN THE BALANCE',prompt:'The pace settles near the midpoint. Choose where to take the fight.',choices:[
+      {id:'pressure',label:'RAISE THE PRESSURE',risk:'DAMAGE',stat:'power',base:.61,styles:['pressure','brawler'],success:{damage:9},fail:{selfDamage:5}},
+      {id:'counter',label:'DRAW OUT A COUNTER',risk:'PRECISION',stat:'speed',base:.68,styles:['counter','trickster'],success:{damage:8},fail:{selfDamage:3}},
+      {id:'grapple',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.63,styles:['control','submission','wrestleBox'],success:{damage:3,control:34,takedown:1},fail:{oppControl:14}}
+    ]}
+  };
+  function selectFightMoment({side,type,landed,kd,playerCondition,oppCondition}){
+    if(side==='player'&&kd||oppCondition<=38)return 'opponentHurt';
+    if(side==='opp'&&kd||playerCondition<=38)return 'playerHurt';
+    if(side==='opp'&&landed&&type==='takedown')return 'opponentShot';
+    if(side==='player'&&landed&&type==='takedown')return 'topControl';
+    if(side==='opp'&&landed)return 'underPressure';
+    return 'tactical';
+  }
+  function scoreRoundState(rs){
+    const metric=s=>s.damage*1.35+s.landed+s.takedowns*5+s.control/12+s.kd*14,pMetric=metric(rs.player),oMetric=metric(rs.opp);
+    if(pMetric>=oMetric){rs.scoreP=10;rs.scoreO=(pMetric-oMetric>20||rs.player.kd>rs.opp.kd)?8:9}else{rs.scoreO=10;rs.scoreP=(oMetric-pMetric>20||rs.opp.kd>rs.player.kd)?8:9}
   }
 
   function simulateRound(sim,round,planId,opening=null){
@@ -1089,11 +1134,14 @@
           if(Math.random()<subChance){sim.winner=side;sim.method='SUBMISSION';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'submission',round,clock,text:`TAP! ${A.name} locks in the submission and ${D.name} has nowhere to go!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true})}
         }
         if(!stopped){const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,koChance=targetCondition<=0?1:(kd&&targetCondition<22?.40:targetCondition<10?.24:0);if(koChance&&Math.random()<koChance){sim.winner=side;sim.method=targetCondition<=0?'KO':'TKO';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'ko',round,clock,text:`IT'S OVER! ${A.name} gets the stoppage!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}}
+        if(!stopped&&ex===Math.ceil(exchanges/2)){
+          const moment=selectFightMoment({side,type,landed,kd,playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
+          sim.timeline.push({type:'fightMoment',round,clock:fightClock(ex+.35,exchanges),moment,playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
+        }
       }
-      const pMetric=rs.player.damage*1.35+rs.player.landed+rs.player.takedowns*5+rs.player.control/12+rs.player.kd*14,oMetric=rs.opp.damage*1.35+rs.opp.landed+rs.opp.takedowns*5+rs.opp.control/12+rs.opp.kd*14;
-      if(pMetric>=oMetric){rs.scoreP=10;rs.scoreO=(pMetric-oMetric>20||rs.player.kd>rs.opp.kd)?8:9}else{rs.scoreO=10;rs.scoreP=(oMetric-pMetric>20||rs.opp.kd>rs.player.kd)?8:9}
+      scoreRoundState(rs);
       addFightStats(sim.totals.player,rs.player);addFightStats(sim.totals.opp,rs.opp);sim.rounds.push(rs);
-      if(!stopped&&round===3&&!sim.crisisUsed&&LOGIC.playerTrailing(sim.rounds)){sim.finalDecisionPending=true;sim.timeline.push({type:'lastChance',round:3,clock:'0:10'})}
+      if(!stopped&&round===3&&!sim.crisisUsed){sim.finalDecisionPending=true;sim.timeline.push({type:'lastChance',round:3,clock:'0:10'})}
       if(!stopped)sim.timeline.push({type:'roundEnd',round,clock:'0:00',text:`Round ${round} ends. The corner teams rush in.`,className:'round-end',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
     if(round===3&&!sim.winner&&!sim.finalDecisionPending)settleFightDecision(sim)
   }
@@ -1172,8 +1220,34 @@
     }
     const damage=Math.max(16,Math.round((18+fight.player.power*.72)*rand(.88,1.16)));simulateRound(fight,next,'pressure',{damage});playFightTimeline(startIndex);
   }
+  function fightMomentChance(choice){
+    const stat=choice.stat||'speed',styleBonus=choice.styles?.includes(state.fighterStyle)?.08:0,statEdge=(fight.player[stat]-fight.opp[stat])*.018;
+    return clamp(choice.base+styleBonus+statEdge,.22,.90);
+  }
+  function showFightMoment(item){
+    if(!fight||fight.resolvedMoments.includes(item.round)){playFightTimeline(fightTimelineIndex+1);return}
+    const def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,box=$('#cornerChoice');fight.pendingMoment=item;$('#speedBtn').disabled=true;
+    const choices=def.choices.map(choice=>{const chance=Math.round(fightMomentChance(choice)*100),read=fight.deepRead?` · ${chance}% read`:'';return `<button class="moment-choice" data-fight-moment="${choice.id}"><b>${choice.label}</b><small>${choice.risk}${read}</small></button>`}).join('');
+    box.innerHTML=`<div class="corner-panel fight-moment-panel"><div class="moment-kicker">${item.clock} · SIM+ DECISION</div><h3>${def.title}</h3><p>${def.prompt}</p><div class="moment-choice-list">${choices}</div></div>`;box.scrollTop=0;sfx.tap();
+  }
+  function addMomentStats(stats,totals,{damage=0,control=0,takedown=0}={}){
+    if(damage){stats.attempted++;stats.landed++;stats.sig++;stats.damage+=damage;totals.attempted++;totals.landed++;totals.sig++;totals.damage+=damage}
+    if(control){stats.control+=control;totals.control+=control}
+    if(takedown){stats.attempted++;stats.landed++;stats.takedowns+=takedown;totals.attempted++;totals.landed++;totals.takedowns+=takedown}
+  }
+  function resolveFightMoment(choiceId){
+    if(!fight?.pendingMoment)return;const item=fight.pendingMoment,def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,choice=def.choices.find(option=>option.id===choiceId);if(!choice)return;
+    const success=Math.random()<fightMomentChance(choice),effect=success?choice.success:choice.fail,round=fight.rounds.find(entry=>entry.round===item.round);if(!round)return;
+    const damage=Math.max(0,effect.damage||0),selfDamage=Math.max(0,effect.selfDamage||0),control=Math.max(0,effect.control||0),oppControl=Math.max(0,effect.oppControl||0),takedown=Math.max(0,effect.takedown||0);
+    addMomentStats(round.player,fight.totals.player,{damage,control,takedown});addMomentStats(round.opp,fight.totals.opp,{damage:selfDamage,control:oppControl});scoreRoundState(round);
+    fight.playerCondition=clamp(fight.playerCondition-selfDamage,0,100);fight.oppCondition=clamp(fight.oppCondition-damage,0,100);
+    for(let i=fightTimelineIndex+1;i<fight.timeline.length;i++){const future=fight.timeline[i];if(future.round!==item.round)break;if(future.playerCondition!=null){future.playerCondition=clamp(future.playerCondition-selfDamage,0,100);future.oppCondition=clamp(future.oppCondition-damage,0,100)}}
+    const outcome=success?(damage>=12?'The gamble pays off with a major momentum swing.':control>=30?'You take command of the position.':'The adjustment works and you win the exchange.'):(selfDamage>=8?'The gamble backfires and you eat a hard counter.':oppControl>=18?'The opponent reads it and takes control.':'The opening closes before you can capitalize.');
+    trackEvent('fight_moment_selected',{round_number:item.round,moment_id:item.moment,choice_id:choice.id,outcome:success?'success':'failure',player_archetype:state.fighterStyle});
+    fight.resolvedMoments.push(item.round);fight.pendingMoment=null;$('#cornerChoice').innerHTML='';$('#speedBtn').disabled=false;appendFightLine({clock:item.clock,text:`${choice.label}: ${outcome}`,className:success?'big':'opp',playerCondition:clamp(item.playerCondition-selfDamage,0,100),oppCondition:clamp(item.oppCondition-damage,0,100),big:success&&damage>=12,landed:success,side:success?'player':'opp'});playFightTimeline(fightTimelineIndex+1);
+  }
   function showLastChanceDecision(){
-    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');
+    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;if(!LOGIC.playerTrailing(fight.rounds)){settleFightDecision(fight);playFightTimeline(fightTimelineIndex+1);return}const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');
     box.innerHTML=`<div class="corner-panel last-chance-panel"><h3>0:10 LEFT · YOUR CORNER HAS YOU BEHIND</h3><p>The scorecards are slipping away. Stay disciplined and live with the decision, or spend extra energy on one final knockout swing.</p><div class="last-chance-score"><b>UNOFFICIAL SCORE</b> · YOU ${score.player} · ${fight.o.name.toUpperCase()} ${score.opponent}</div><div class="last-chance-actions"><button class="last-chance-btn discipline" data-last-chance="discipline">STAY DISCIPLINED</button><button class="last-chance-btn haymaker" data-last-chance="haymaker" ${canHaymaker?'':'disabled'}>${canHaymaker?`THROW THE HAYMAKER · ${HAYMAKER_ENERGY} ENERGY · ${chance}%`:`HAYMAKER LOCKED · NEED ${HAYMAKER_ENERGY} ENERGY`}</button></div></div>`;
   }
   function resolveLastChance(choice){
@@ -1195,7 +1269,7 @@
   function playFightTimeline(index){
     if(!fight)return;
     fightTimelineIndex=index;if(index>=fight.timeline.length){if(fight.winner||fight.rounds.length>=3)scheduleFight(()=>finishFightSimulation(),420);else showCornerChoice();return}
-    const item=fight.timeline[index];$('#liveRound').textContent=`ROUND ${item.round||1}`;$('#liveClock').textContent=item.clock||'5:00';if(item.type==='lastChance'){showLastChanceDecision();return}
+    const item=fight.timeline[index];$('#liveRound').textContent=`ROUND ${item.round||1}`;$('#liveClock').textContent=item.clock||'5:00';if(item.type==='fightMoment'){showFightMoment(item);return}if(item.type==='lastChance'){showLastChanceDecision();return}
     if(item.type==='roundStart')appendFightLine({clock:item.clock,text:`ROUND ${item.round} begins. Both fighters meet in the center.`,className:'round-end'});else appendFightLine(item);
     const delay=item.type==='roundStart'?430:item.type==='roundEnd'?560:item.type==='ko'?760:300;
     scheduleFight(()=>playFightTimeline(index+1),delay);
@@ -1288,6 +1362,7 @@
   document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-card-flip]')){e.preventDefault();toggleOpponentCard(e.target)}});
   document.addEventListener('click',e=>{
     const rosterToggle=e.target.closest('[data-roster-toggle]');if(rosterToggle){toggleRosterGroup(rosterToggle);return}
+    const fightMoment=e.target.closest('[data-fight-moment]');if(fightMoment){resolveFightMoment(fightMoment.dataset.fightMoment);return}
     const lastChance=e.target.closest('[data-last-chance]');if(lastChance){resolveLastChance(lastChance.dataset.lastChance);return}
     const crisis=e.target.closest('[data-crisis]');if(crisis){resolveFightCrisis(crisis.dataset.crisis);return}
     const opening=e.target.closest('[data-opening-approach]');if(opening){beginFightApproach(opening.dataset.openingApproach);return}
