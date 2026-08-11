@@ -227,7 +227,7 @@ generated league.
   current-level group starts open; all other groups start
   collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork
-  selected deterministically from 14 standalone transparent fighter
+  selected deterministically from 24 standalone transparent fighter
   silhouettes. Bright accent spotlights and subtle rim lighting keep the black
   silhouettes readable against every roster status and Tale of the Tape card.
   The front stays focused on identity and booking; tapping the card body flips
