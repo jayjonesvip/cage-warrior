@@ -101,6 +101,20 @@ test('resource warning state begins only below twenty-five percent',()=>{
   assert.equal(logic.resourceIsCritical(-20,100),true);
 });
 
+test('fight energy rises by career tier and caps at ten per round',()=>{
+  const expected=new Map([[1,6],[2,6],[3,7],[4,7],[5,8],[6,8],[7,9],[8,9],[9,10],[10,10],[15,10]]);
+  for(const [level,cost] of expected)assert.equal(logic.fightRoundCost(level),cost,`level ${level}`);
+  assert.equal(logic.fightRoundCost(0),6);
+  assert.equal(logic.fightRoundCost('bad'),6);
+
+  const rookie={energy:18,maxEnergy:100,pendingFight:null},rookieCost=logic.fightRoundCost(1);
+  assert.equal(logic.bookFight(rookie,'rookie-opponent',rookieCost,1000,rookieCost*3).ok,true);
+  assert.equal(logic.chargePendingFightEnergy(rookie,rookieCost),true);
+  assert.equal(logic.chargePendingFightEnergy(rookie,rookieCost),true);
+  assert.equal(rookie.energy,0);
+  assert.equal(rookie.pendingFight.cost,18);
+});
+
 test('fight and rematch payouts preserve existing formulas',()=>{
   const newOpponent={reward:200,tier:3,lossesToPlayer:0};
   const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};

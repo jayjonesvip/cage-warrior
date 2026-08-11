@@ -120,9 +120,10 @@ generated league.
   beyond the energy reserved for any rounds still to come. Its landing chance
   starts at 15%, then responds to attributes, condition, damage, and the
   Brawler archetype, with a 68% maximum.
-- Three-round fight clearance requires 30 energy. The game charges 10 energy
-  only when each round actually begins, so a first-round finish costs 10, a
-  second-round finish costs 20, and a fight that reaches Round 3 costs 30.
+- Fight energy scales with the player's current career level: Levels 1–2 cost
+  6 energy per started round, Levels 3–4 cost 7, Levels 5–6 cost 8, Levels
+  7–8 cost 9, and Level 9 onward costs 10. Three-round clearance therefore
+  ranges from 18 to 30 energy. Only rounds that actually begin are charged.
 - Fighters can complete up to 10 fights per local calendar day. The Fight page
   shows the remaining bouts and a live countdown to the local-midnight reset;
   energy and medical clearance remain the primary pacing limits.
@@ -205,7 +206,7 @@ generated league.
   immediately available.
 - Regular opponents never retire. Every defeated fighter persists in the
   **Past Rivals** collection. A free **Taunt for Rematch** guarantees that rival
-  accepts one more fight; the bout uses the normal 10-energy-per-started-round
+  accepts one more fight; the bout uses the player's current level-based round
   cost, pays half purse, and retains full fight XP. Winning closes the offer
   until another taunt, while losing keeps the rematch immediately available.
 - The Career Opponents roster shows available current and past opponents, past
@@ -222,7 +223,7 @@ generated league.
   a separate action and does not trigger the flip.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
-  spends no energy and explains the 30-energy clearance, 10-energy round cost,
+  spends no energy and explains the current level-based clearance, round cost,
   and optional 5-energy haymaker reserve directly beneath the purse. It then
   offers **Go Back** or **Fight!**; the first round's energy is charged only
   after Fight is confirmed and the cage-opening choice begins.

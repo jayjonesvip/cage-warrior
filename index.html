@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.13" />
+<meta name="app-version" content="2.5.14" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.13">
+<link rel="stylesheet" href="styles.css?v=2.5.14">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -86,7 +86,7 @@
 
   <main class="main">
     <section class="screen active" data-screen="home">
-      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: keep 30 energy ready. The cage takes 10 every round it needs.</span></div></div>
+      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: round costs climb with your career. Keep enough ready for all three.</span></div></div>
 
       <section class="card install-offer career-after-setup" id="installOffer" hidden aria-live="polite">
         <span class="install-offer-icon" data-icon-name="install-app" data-icon-fallback="↓">↓</span>
@@ -140,7 +140,7 @@
 
     <section class="screen" data-screen="fight">
       <div class="daily-reset-clock"><span>DAILY FIGHTS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily fight limit resets">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
-      <div class="card"><div class="card-title">Career Opponents <span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span><small id="rosterSummary">10 energy per round</small></div><div id="opponentList"></div></div>
+      <div class="card"><div class="card-title">Career Opponents <span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span><small id="rosterSummary">Level-based round cost</small></div><div id="opponentList"></div></div>
       <div class="section-note">Preview an opponent's Tale of the Tape, confirm the fight, then choose Aggressive or Feel Them Out for Round 1. Between rounds, listen to your corner and choose your signature game or a specific counter.</div>
     </section>
 
@@ -272,7 +272,7 @@
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
-          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy">30 ENERGY CLEARANCE · 10 PER ROUND</span><em class="tape-haymaker">KEEP 5 EXTRA FOR A HAYMAKER</em></div>
+          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-energy" id="tapeEnergy">18 ENERGY CLEARANCE · 6 PER ROUND</span><em class="tape-haymaker">KEEP 5 EXTRA FOR A HAYMAKER</em></div>
           <div class="tape-versus-cards">
             <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div><div class="tape-mini-stats"><span id="tapePPower">PWR 5</span><span id="tapePSpeed">SPD 5</span><span id="tapePChin">CHN 5</span><span id="tapePCardio">CAR 5</span></div></article>
             <div class="tape-vs-badge">VS</div>
@@ -322,12 +322,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.13"></script>
-<script src="strings.js?v=2.5.13"></script>
-<script src="analytics.js?v=2.5.13"></script>
-<script src="supabase-client.js?v=2.5.13"></script>
-<script src="cage-social.js?v=2.5.13"></script>
-<script src="game.js?v=2.5.13"></script>
-<script src="pwa.js?v=2.5.13"></script>
+<script src="game-logic.js?v=2.5.14"></script>
+<script src="strings.js?v=2.5.14"></script>
+<script src="analytics.js?v=2.5.14"></script>
+<script src="supabase-client.js?v=2.5.14"></script>
+<script src="cage-social.js?v=2.5.14"></script>
+<script src="game.js?v=2.5.14"></script>
+<script src="pwa.js?v=2.5.14"></script>
 </body>
 </html>
