@@ -353,7 +353,8 @@ can be added without editing simulation logic.
 The generated transparent header wordmark lives at
 `assets/cage-grind-logo.png`. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
-Fighter portraits, replaceable icons, and
+The 40 runtime fighter portraits use transparent `fighter-avatar-01.png`
+through `fighter-avatar-40.png` assets. Replaceable icons and
 standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and
