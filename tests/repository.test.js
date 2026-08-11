@@ -115,7 +115,13 @@ test('the branded landing page gates the game and offers the correct career entr
   assert.match(page, /<body class="landing-active">/);
   assert.match(page, /<section class="landing-page" id="landingPage"/);
   assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER<\/button>/);
-  assert.match(page, /assets\/home-fight\.png/);
+  assert.match(page, /<img class="landing-octagon" src="assets\/cage-grind-octagon-transparent\.png" alt="">/);
+  assert.doesNotMatch(page, /class="landing-(?:cage|fighters)"/);
+  assert.ok(fs.existsSync('assets/cage-grind-octagon-transparent.png'));
+  const landingArt = fs.readFileSync('assets/cage-grind-octagon-transparent.png');
+  assert.equal(landingArt.subarray(1, 4).toString(), 'PNG');
+  assert.equal(landingArt[25], 6, 'landing octagon must retain RGBA transparency');
+  assert.match(serviceWorker, /'\.\/assets\/cage-grind-octagon-transparent\.png'/);
   assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
   assert.match(script, /LOGIC\.careerLandingMode\(state\)/);
   assert.match(script, /KEEP GRINDING/);

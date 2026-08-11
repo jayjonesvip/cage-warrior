@@ -63,8 +63,7 @@
   .landing-brand img{width:118px;height:58px;object-fit:contain;filter:drop-shadow(0 3px 4px #000c) drop-shadow(0 0 9px #1678ff55)}
   .landing-brand span{color:#79dfff;font-size:8.5px;font-weight:950;letter-spacing:1.15px;text-align:right}
   .landing-visual{position:relative;height:210px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#238fe84d,transparent 38%),linear-gradient(180deg,#071525,#02060b)}
-  .landing-cage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7;mix-blend-mode:screen}
-  .landing-fighters{position:absolute;left:50%;bottom:-7%;width:min(92%,440px);height:112%;object-fit:contain;transform:translateX(-50%);opacity:.64;filter:invert(72%) sepia(84%) saturate(939%) hue-rotate(166deg) brightness(104%) contrast(102%) drop-shadow(0 12px 18px #000)}
+  .landing-octagon{position:absolute;left:50%;top:50%;width:min(112%,590px);height:112%;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(0 15px 22px #000d) drop-shadow(0 0 16px #1678ff42)}
   .landing-visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,#040912 98%)}
   .landing-visual-copy{position:absolute;z-index:2;left:18px;bottom:13px;display:flex;flex-direction:column;font-size:11px;font-weight:950;letter-spacing:1px;text-shadow:0 2px 4px #000}
   .landing-visual-copy b{color:#fff}.landing-visual-copy span{color:#70dcff}
@@ -279,7 +278,7 @@
     .landing-page{display:grid;place-items:center;padding:24px}.landing-shell{width:min(100%,1120px);min-height:min(720px,calc(100dvh - 48px));grid-template-columns:minmax(380px,.88fr) minmax(430px,1.12fr);grid-template-rows:90px 1fr}
     .landing-brand{grid-column:1/-1;height:90px;padding:13px 24px}.landing-brand img{width:145px;height:68px}.landing-brand span{font-size:10px}
     .landing-content{grid-column:1;grid-row:2;padding:clamp(35px,6vh,66px) clamp(28px,5vw,58px);align-self:center}.landing-content h1{font-size:clamp(43px,5vw,66px)}.landing-page[data-mode="returning"] .landing-content h1{font-size:clamp(32px,3.5vw,44px)}.landing-description{font-size:14px}.landing-eyebrow{font-size:10px}
-    .landing-visual{grid-column:2;grid-row:2;height:auto;min-height:500px}.landing-fighters{width:112%;height:103%;bottom:-2%}.landing-visual-copy{left:28px;bottom:25px;font-size:14px}
+    .landing-visual{grid-column:2;grid-row:2;height:auto;min-height:500px}.landing-octagon{width:118%;height:96%}.landing-visual-copy{left:28px;bottom:25px;font-size:14px}
     .landing-features{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.landing-features div{min-height:84px;padding:11px 10px;border-top:2px solid #278dd5;border-left:1px solid #183a59}.landing-features b{font-size:9px}.landing-features p{font-size:9px}
     .landing-enter{min-height:54px;font-size:14px}
   }
