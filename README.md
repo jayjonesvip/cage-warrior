@@ -368,7 +368,7 @@ equipment drops, reward reveals, and the Cash/Career Earnings economy.
 ## Deployment, search, and installation
 
 `cagegrind.com` is the canonical public URL. The repository includes the Pages
-`CNAME`, canonical and social-sharing metadata, structured game data,
+`CNAME`, canonical and social-sharing metadata, structured game and site data,
 `robots.txt`, `sitemap.xml`, and a 1200×630 social card. DNS still has to point
 the apex domain to GitHub Pages at the registrar; `onlinecagefighting.com`
 should redirect to the canonical URL rather than serve a second copy.

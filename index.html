@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#030914" />
 <meta name="color-scheme" content="dark" />
-<meta name="description" content="Build an MMA fighter from unknown rookie to world champion in Cage Grind, a free tactical combat-career browser game with training, rivals, gear, sponsors, and persistent saves." />
+<meta name="description" content="Build an MMA fighter from unknown rookie to world champion in Cage Grind, a free tactical browser game with training, rivals, gear, sponsors, and persistent saves." />
 <meta name="robots" content="index,follow,max-image-preview:large" />
 <meta name="application-name" content="Cage Grind" />
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.18" />
+<meta name="app-version" content="2.5.19" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -21,41 +21,60 @@
   gtag('config', 'G-LMT6RLVT5L');
 </script>
 <meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Cage Grind" />
-<meta property="og:title" content="Cage Grind — Free MMA Career Browser Game" />
+<meta property="og:title" content="Cage Grind: Free MMA Career Browser Game" />
 <meta property="og:description" content="Build your fighter, call every round, chase titles, collect gear, and turn a nobody into a main-event star." />
 <meta property="og:url" content="https://cagegrind.com/" />
 <meta property="og:image" content="https://cagegrind.com/assets/cage-grind-social-card.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Cage Grind — Build the fighter. Live the career." />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Cage Grind: Build the fighter. Live the career." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Cage Grind — Free MMA Career Browser Game" />
+<meta name="twitter:title" content="Cage Grind: Free MMA Career Browser Game" />
 <meta name="twitter:description" content="Build your fighter, call every round, chase titles, and turn a nobody into a main-event star." />
 <meta name="twitter:image" content="https://cagegrind.com/assets/cage-grind-social-card.png" />
-<title>Cage Grind — Free MMA Career Browser Game</title>
+<meta name="twitter:image:alt" content="Cage Grind: Build the fighter. Live the career." />
+<title>Cage Grind: Free MMA Career Browser Game</title>
 <link rel="canonical" href="https://cagegrind.com/" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.18">
+<link rel="stylesheet" href="styles.css?v=2.5.19">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "VideoGame",
+  "@type": "SoftwareApplication",
+  "additionalType": "https://schema.org/VideoGame",
+  "@id": "https://cagegrind.com/#game",
   "name": "Cage Grind",
   "url": "https://cagegrind.com/",
   "image": "https://cagegrind.com/assets/cage-grind-social-card.png",
-  "description": "A free tactical MMA career browser game about building a fighter from unknown rookie to world champion.",
+  "description": "Build an MMA fighter from unknown rookie to world champion in a free tactical career browser game.",
   "applicationCategory": "GameApplication",
+  "applicationSubCategory": "Sports game",
   "operatingSystem": "Any modern web browser",
+  "browserRequirements": "Requires JavaScript and a modern web browser",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
   "genre": ["Sports", "Simulation", "Strategy"],
-  "playMode": "SinglePlayer",
   "offers": {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://cagegrind.com/#website",
+  "url": "https://cagegrind.com/",
+  "name": "Cage Grind",
+  "alternateName": "Cage Grind MMA Career Game",
+  "inLanguage": "en-US"
 }
 </script>
 </head>
@@ -74,7 +93,7 @@
 
     <div class="landing-content">
       <p class="landing-eyebrow" id="landingEyebrow">YOUR FIGHT STARTS HERE</p>
-      <h1 id="landingTitle"><span id="landingTitleLead">FROM NOBODY</span><br><span class="accent" id="landingTitleAccent">TO MAIN EVENT</span></h1>
+      <h1 id="landingTitle"><span id="landingTitleLead">CAGE GRIND</span><br><span class="accent" id="landingTitleAccent">FREE MMA CAREER GAME</span></h1>
       <p class="landing-description" id="landingDescription">Create your fighter, call the tactics between rounds, and grind from local cards to the world title.</p>
 
       <div class="landing-career-stats" id="landingCareerStats" hidden aria-label="Saved career summary">
@@ -148,7 +167,7 @@
         <div class="rank-chip">CAGE RANK <strong id="cageRank">#999</strong></div>
         <div class="hero-sponsor" id="heroSponsor" hidden></div>
         <button class="daily" id="dailyBtn">DAILY DROP</button>
-        <div class="hero-copy"><h1>FROM NOBODY<br>TO <span>MAIN EVENT</span></h1><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
+        <div class="hero-copy"><h2>FROM NOBODY<br>TO <span>MAIN EVENT</span></h2><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
       </div>
 
       <div class="choice-grid">
@@ -359,12 +378,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.18"></script>
-<script src="strings.js?v=2.5.18"></script>
-<script src="analytics.js?v=2.5.18"></script>
-<script src="supabase-client.js?v=2.5.18"></script>
-<script src="cage-social.js?v=2.5.18"></script>
-<script src="game.js?v=2.5.18"></script>
-<script src="pwa.js?v=2.5.18"></script>
+<script src="game-logic.js?v=2.5.19"></script>
+<script src="strings.js?v=2.5.19"></script>
+<script src="analytics.js?v=2.5.19"></script>
+<script src="supabase-client.js?v=2.5.19"></script>
+<script src="cage-social.js?v=2.5.19"></script>
+<script src="game.js?v=2.5.19"></script>
+<script src="pwa.js?v=2.5.19"></script>
 </body>
 </html>

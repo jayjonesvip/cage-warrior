@@ -77,6 +77,17 @@
   .landing-features{display:grid;gap:7px;margin-bottom:17px}.landing-features div{padding:9px 10px;border-left:2px solid #278dd5;background:linear-gradient(90deg,#0b2034,#08111d)}.landing-features b{display:block;color:#dff6ff;font-size:9.5px;letter-spacing:.4px}.landing-features p{margin:2px 0 0;color:#8499ad;font-size:9px;line-height:1.35}
   .landing-enter{width:100%;min-height:50px;border:1px solid var(--button-primary-border);border-radius:10px;background:var(--button-primary);color:#fff;font-size:13px;font-weight:950;letter-spacing:.7px;text-shadow:var(--cta-shadow);box-shadow:var(--button-primary-shadow),0 0 22px #219aff35;cursor:pointer}.landing-enter:active{transform:translateY(3px);box-shadow:0 1px 0 #07346a}.landing-enter:focus-visible{outline:2px solid #fff;outline-offset:3px}
   .landing-fine-print{display:flex;align-items:center;justify-content:center;gap:6px;margin:13px 0 0;color:#62788e;font-size:8.5px;font-weight:900;letter-spacing:.45px;text-align:center}.landing-fine-print i{width:3px;height:3px;border-radius:50%;background:#3c769f}
+  @media (max-width:767px) and (max-height:740px){
+    .landing-page{padding:8px 10px 12px}.landing-shell{min-height:0}
+    .landing-brand{height:62px;padding:7px 13px}.landing-brand img{width:102px;height:48px}
+    .landing-visual{height:145px}.landing-octagon{height:120%}.landing-visual-copy{left:14px;bottom:9px;font-size:9px}
+    .landing-content{padding:11px 15px 12px}.landing-eyebrow{margin-bottom:5px}
+    .landing-content h1,.landing-page[data-mode="returning"] .landing-content h1{font-size:clamp(23px,7vw,29px)}
+    .landing-description{margin:8px 0 10px;line-height:1.35}
+    .landing-career-stats{margin-bottom:8px}.landing-career-stats div{padding:6px 5px}
+    .landing-features{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:9px}.landing-features div{padding:6px 5px;border-top:2px solid #278dd5;border-left:1px solid #183a59}.landing-features b{font-size:8.5px}.landing-features p{display:none}
+    .landing-enter{min-height:46px}.landing-fine-print{margin-top:8px}
+  }
   #app{
     position:relative;width:min(100vw,520px);height:100dvh;overflow:hidden;background:
       radial-gradient(circle at 50% -12%,rgba(34,124,255,.22),transparent 33%),
@@ -156,8 +167,8 @@
   @media (max-width:420px){.hero-art img{max-width:60%;height:107%}.hero-cage{opacity:.62}}
   #heroCanvas{display:none}
   .hero-copy{position:absolute;left:12px;right:12px;bottom:9px;z-index:5;display:flex;align-items:end;justify-content:space-between}
-  .hero-copy h1{font-size:27px;line-height:.92;margin:0;text-shadow:2px 2px 0 #000;text-transform:uppercase;max-width:54%}
-  .hero-copy h1 span{color:var(--gold)}
+  .hero-copy h2{font-size:27px;line-height:.92;margin:0;text-shadow:2px 2px 0 #000;text-transform:uppercase;max-width:54%}
+  .hero-copy h2 span{color:var(--gold)}
   .record{text-align:right;font-family:system-ui,sans-serif;font-weight:900}
   .record b{font-size:22px}.record small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px}
   .rank-chip{position:absolute;top:10px;left:10px;z-index:5;background:#0b0c0ecf;border:1px solid #555;padding:7px 9px;border-radius:8px;font-size:11px;letter-spacing:.8px;box-shadow:0 4px 10px #0008}.rank-chip strong{color:var(--gold)}
@@ -302,7 +313,7 @@
   .result-section-title{background:#0d1a2b;border-color:#243e60}
 
   /* Impact is display-only and never bold; functional UI stays highly readable. */
-  .logo,.hero-copy h1,.choice h3,.card-title,.opponent h3,.action h3,.gear h3,.trainer-card h3,.fight-plan h3,.corner-panel h3,.tape-title b,.live-title b,.tape-name b,.tape-purse strong,.tape-fighter-card h3,.tape-vs-badge,.opening-copy h2,.opening-choice b,.result-card h2,.gig-modal h2{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400}
+  .logo,.hero-copy h2,.choice h3,.card-title,.opponent h3,.action h3,.gear h3,.trainer-card h3,.fight-plan h3,.corner-panel h3,.tape-title b,.live-title b,.tape-name b,.tape-purse strong,.tape-fighter-card h3,.tape-vs-badge,.opening-copy h2,.opening-choice b,.result-card h2,.gig-modal h2{font-family:Impact,"Arial Narrow",sans-serif;font-weight:400}
   button,.rank-chip,.record,.stat,.rewardbox,.result-method,.result-section-title,.streak-pill,.objective-copy,.objective-progress,.opp-badge,.fight-btn,.level-tag,.limit-pill{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 
   /* Career publicity and endorsements */
@@ -399,7 +410,7 @@
     .screen[data-screen="home"] #careerIdentityCard .career-strip{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:12px}.screen[data-screen="home"] #careerIdentityCard .career-token:last-child{grid-column:auto}
     .career-token{padding:11px}.career-token small{font-size:9px}.career-token b{font-size:14px}
     #careerGameContent{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(440px,1fr);gap:16px;align-items:stretch}#careerGameContent .retirement-card{grid-column:1/-1}
-    #careerGameContent .hero{height:auto;min-height:500px;margin:0}.hero-art img{height:108%;max-width:72%}.hero-copy{left:20px;right:20px;bottom:18px}.hero-copy h1{font-size:38px}.record b{font-size:31px}
+    #careerGameContent .hero{height:auto;min-height:500px;margin:0}.hero-art img{height:108%;max-width:72%}.hero-copy{left:20px;right:20px;bottom:18px}.hero-copy h2{font-size:38px}.record b{font-size:31px}
     .rank-chip{top:18px;left:18px}.daily{top:18px;right:18px;padding:10px 14px;font-size:13px}.hero-sponsor{top:58px;left:18px}
     .choice-grid{height:100%;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;margin:0}.choice{min-height:238px;padding:16px}.choice h3{font-size:24px}.choice p{font-size:12.5px}.choice-art{top:48px;height:142px}.choice-action{min-height:39px;font-size:12px}
     .install-offer{max-width:780px}.city-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.avatar-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:12px}.build-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px}
