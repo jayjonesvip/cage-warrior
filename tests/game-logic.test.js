@@ -32,6 +32,24 @@ test('landing mode distinguishes new, unfinished, and completed careers',()=>{
   assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
 });
 
+test('partial careers stay building until the full identity is locked and complete',()=>{
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',nameLocked:true}),'building');
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:false}),'building');
+  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
+});
+
+test('selectStoredState falls back to the last useful legacy save when all newer slots are blank',()=>{
+  const raw={
+    primary:'{}',
+    backup:'{"fighterCity":"","fighterAvatar":""}',
+    legacy:JSON.stringify({name:'LEGACY FIGHTER',fighterCity:'phoenix',fighterAvatar:'fighter-07',fighterStyle:'counter',nameLocked:true})
+  };
+  const state=logic.selectStoredState(raw,normalize,defaults);
+  assert.equal(state.name,'LEGACY FIGHTER');
+  assert.equal(state.fighterCity,'phoenix');
+  assert.equal(state.fighterStyle,'counter');
+});
+
 test('an older save keeps progression and fills newer resource fields',()=>{
   const state=normalize({version:4,name:'OLD SAVE',level:4,wins:7,losses:2,cash:900,stats:{power:11}});
   assert.equal(state.level,4);
