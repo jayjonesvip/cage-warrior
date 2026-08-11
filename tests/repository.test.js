@@ -530,7 +530,7 @@ test('career opponent roster uses proportional two-across collectible fighter ca
   assert.match(html, /\.opp-face\{[^}]*color-mix\(in srgb,var\(--fighter-accent\) 72%,#d9f4ff\)/);
   assert.match(html, /\.opp-sprite\{[^}]*filter:invert\(\.1\)[^}]*drop-shadow/);
   assert.match(html, /\.opponent-card \.tape-card-portrait\{background:radial-gradient\(ellipse at 50% 42%,#ffad9d/);
-  assert.match(script, /const fighterSilhouettes=Array\.from\(\{length:14\},\(_,i\)=>`assets\/fighter-silhouette-\$\{i\+1\}\.png`\)/);
+  assert.match(script, /const fighterSilhouettes=Array\.from\(\{length:24\},\(_,i\)=>`assets\/fighter-silhouette-\$\{i\+1\}\.png`\)/);
   assert.match(script, /function silhouetteForOpponent\(o\)/);
   assert.match(script, /<img class="opp-sprite" src="\$\{silhouette\}"/);
   assert.match(script, /\$\('#tapeOppSprite'\)\.src=silhouetteForOpponent\(f\.o\)/);
@@ -668,7 +668,11 @@ test('fighter avatar cards enforce a valid permanent 20-point allocation', () =>
   assert.match(script, /every\(k=>Number\.isInteger\(stats\[k\]\)&&stats\[k\]>=2&&stats\[k\]<=8\)/);
   assert.match(script, /===20/);
   assert.equal(fs.readdirSync('assets').filter(name => /^fighter-avatar-\d{2}\.jpg$/.test(name)).length, 40);
-  assert.equal(fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name)).length, 14);
+  const silhouetteAssets = fs.readdirSync('assets').filter(name => /^fighter-silhouette-\d+\.png$/.test(name));
+  assert.equal(silhouetteAssets.length, 24);
+  for (let index = 1; index <= 24; index += 1) {
+    assert.ok(fs.existsSync(`assets/fighter-silhouette-${index}.png`), `fighter silhouette ${index} should exist`);
+  }
   assert.equal(fs.readdirSync('assets').filter(name => /^grok_image_/i.test(name)).length, 0);
   assert.match(script, /<span class="avatar-total">SELECT<\/span>/);
   assert.doesNotMatch(script, /SELECT · 20 POINTS/);
