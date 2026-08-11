@@ -351,7 +351,8 @@ opponent names, fight commentary, Cage Feed
 copy, generated social usernames, and promoter ticker lines so new variations
 can be added without editing simulation logic.
 The generated transparent header wordmark lives at
-`assets/cage-grind-logo.png`. The six bottom-navigation icons live under
+`assets/cage-grind-logo.png`, and the landing hero uses the transparent
+`assets/cage-grind-octagon-transparent.png` artwork. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
 The 40 runtime fighter portraits use transparent `fighter-avatar-01.png`
 through `fighter-avatar-40.png` assets. Replaceable icons and

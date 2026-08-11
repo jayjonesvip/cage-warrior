@@ -19,6 +19,7 @@ const CORE_ASSETS=[
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
+  './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
   './assets/home-training.png',
