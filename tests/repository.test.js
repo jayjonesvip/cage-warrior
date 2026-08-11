@@ -849,6 +849,14 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(script, /if\(screen==='feed'&&!ensureSocialFeed\(\)\)createSocialAccount\(\)/);
   assert.match(script, /\(Number\(s\.fans\)\|\|0\)>0/);
   assert.match(script, /function openSocialCycle\(type,data=\{\}\)/);
+  assert.match(script, /socialHeadlineCounts:\{\}/);
+  assert.match(script, /function drawSocialHeadline\(key,entries\)/);
+  assert.match(script, /reporter-posts\|\$\{state\.socialProfileId\|\|state\.name\}\|\$\{key\}\|\$\{batch\}/);
+  assert.match(script, /return deck\[count%deck\.length\]/);
+  for (const key of ['fightWin','fightLoss','appearance','viralAppearance','autographFree','autographStandard','autographExpensive','sponsor']) {
+    assert.ok(stringsData.social.cycles[key].filter(entry=>entry.profile==='media').length>=3,`${key} should have a reporter headline deck`);
+  }
+  assert.ok(stringsData.social.cycles.fightStreakHeadline.length>=3);
   assert.match(script, /openSocialCycle\('fight'/);
   assert.match(script, /openSocialCycle\('appearance'/);
   assert.match(script, /openSocialCycle\('autograph'/);
@@ -856,7 +864,7 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(page, /Tap a real fighter's avatar/);
   assert.match(page, /id="fighterBioInteractions"/);
   assert.match(script, /function fighterInteractionChoices\(profile\)/);
-  assert.match(script, /pool\.slice\(0,3\)/);
+  assert.match(script, /pool\.slice\(dealt,dealt\+3\)/);
   assert.match(script, /sharedSocialInteractionsRemaining/);
   assert.match(script, /data-fighter-interaction/);
   assert.match(script, /function handleFighterInteraction\(choiceId,target\)/);
@@ -885,6 +893,15 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.doesNotMatch(publicityDefs, /social-post|Influencer Brand Post/);
   assert.doesNotMatch(html, />FANS<|>Fans</);
   assert.match(readme, /five direct\s+fighter interactions per UTC day/i);
+});
+
+test('canned fighter posts use one non-repeating shuffled daily deck', () => {
+  const choices=script.match(/function fighterInteractionChoices\(profile\)\{[\s\S]*?\n  \}/)?.[0]||'';
+  assert.match(choices, /dailyDeckSeed=hashSeed\(`fighter-posts\|\$\{state\.socialProfileId\|\|state\.name\}\|\$\{todayKey\(\)\}`\)/);
+  assert.match(choices, /seededRandom\(dailyDeckSeed\)/);
+  assert.match(choices, /dealt=Math\.max\(0,5-sharedSocialInteractionsRemaining\)\*3/);
+  assert.match(choices, /pool\.slice\(dealt,dealt\+3\)/);
+  assert.doesNotMatch(choices, /profile\.id.*dailyDeckSeed|dailyDeckSeed.*profile\.id/);
 });
 
 test('bottom navigation opens every destination at the top', () => {
@@ -954,11 +971,19 @@ test('cash pays the scaling coach fee while career earnings remain cumulative', 
   assert.match(script, /LOGIC\.normalizeCoreState/);
 });
 
-test('active sponsor appears beneath Cage Rank in the Home hero', () => {
+test('Cage Status reflects the title ladder and the active sponsor appears beneath it', () => {
   const rankPosition = html.indexOf('class="rank-chip"');
   const sponsorPosition = html.indexOf('id="heroSponsor"');
   const dailyPosition = html.indexOf('id="dailyBtn"');
   assert.ok(rankPosition >= 0 && sponsorPosition > rankPosition && sponsorPosition < dailyPosition);
+  assert.match(html, /CAGE STATUS <strong id="cageStatus">PROSPECT<\/strong>/);
+  assert.doesNotMatch(html, /CAGE RANK|id="cageRank"/);
+  assert.doesNotMatch(script, /function cageRank\(/);
+  assert.match(script, /function cageStatus\(\)/);
+  assert.match(script, /return milestoneName\(championship\)\.replace\(\/ TITLE\$\/,' CHAMPION'\)/);
+  assert.match(script, /return 'TITLE CHALLENGER'/);
+  assert.match(script, /return 'CONTENDER'/);
+  assert.match(script, /return 'PROSPECT'/);
   assert.match(html, /\.hero-sponsor\{position:absolute;top:48px;left:10px/);
   assert.match(html, /\.hero-sponsor\[hidden\]\{display:none\}/);
   assert.match(script, /sponsorBadge\.hidden=!sponsor/);
@@ -1217,7 +1242,7 @@ test('surviving rounds pause for one contextual Sim+ decision at the midpoint', 
   assert.match(script, /pulseFightCondition\('player'\)/);
   assert.match(script, /scoreRoundState\(round\)/);
   assert.match(script, /fight_moment_selected/);
-  assert.match(script, /fight\.deepRead\?` · \$\{chance\}% read`/);
+  assert.match(script, /fight\.deepRead\?` · \$\{chance\}% SUCCESS`/);
   assert.match(html, /\.fight-moment-panel\{/);
   assert.match(html, /\.fight-moment-result\.success\{/);
   assert.match(html, /\.fight-moment-result\.failure\{/);

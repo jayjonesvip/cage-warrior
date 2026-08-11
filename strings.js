@@ -66,42 +66,65 @@ globalThis.CAGE_STRINGS = {
     ],
     cycles: {
       fightWin: [
+        {profile:'media',text:'RESULT: {name} gets past {opponent} by {finish}.{titleSuffix}'},
+        {profile:'media',text:'{name} leaves the cage with the win after defeating {opponent} by {finish}.{titleSuffix}'},
+        {profile:'media',text:'OFFICIAL: {name} adds another victory over {opponent} by {finish}.{titleSuffix}'},
         {profile:'media',text:'{name} defeats {opponent} by {finish}.{titleSuffix}'},
         {profile:'rival',author:'{opponent}',text:'Enjoy the win, {name}. If they book it again, I know what changes.'},
         {profile:'fan',text:'That was the kind of performance that turns a prospect into must-watch television. {name} showed up.'}
       ],
       fightWinHater: {profile:'hater',text:'Everybody relax. One win does not make {name} unbeatable. Book the rematch.'},
-      fightStreakHeadline: {profile:'media',text:'WIN STREAK: {name} has now won {winStreak} straight fights. The division has to pay attention.'},
+      fightStreakHeadline: [
+        {profile:'media',text:'WIN STREAK: {name} has now won {winStreak} straight fights. The division has to pay attention.'},
+        {profile:'media',text:'{winStreak} IN A ROW: {name} keeps rolling and the rest of the division is officially on notice.'},
+        {profile:'media',text:'The run continues: {name} has pushed the winning streak to {winStreak}.'}
+      ],
       fightStreakHater: {profile:'hater',text:'{winStreak} straight? Wake me up when {name} beats someone I picked.'},
       fightLoss: [
+        {profile:'media',text:'RESULT: {name} falls to {opponent} by {finish}. Attention now turns to the next camp.'},
+        {profile:'media',text:'{name} comes up short as {opponent} earns the {finish} victory.'},
+        {profile:'media',text:'OFFICIAL: {opponent} defeats {name} by {finish}.'},
         {profile:'media',text:'{opponent} hands {name} a loss by {finish}. The comeback starts with the response.'},
         {profile:'rival',author:'{opponent}',text:'Respect for taking the fight, {name}. But tonight belonged to me.'},
         {profile:'hater',text:'The hype train needed brakes. {name} just found them.'},
         {profile:'fan',text:'Losses happen. Still here, still following, and waiting for the comeback.'}
       ],
       appearance: [
+        {profile:'media',text:'OUTSIDE THE CAGE: {name} stopped by {title} as the profile continues to grow.'},
+        {profile:'media',text:'{title} welcomed {name} today for a break from fight-camp business.'},
         {profile:'media',text:'{name} made an appearance on {title}. The fight world is starting to notice.'},
         {profile:'fan',text:'Saw {name} making the rounds today. Good energy and no fake superstar routine.'},
         {profile:'hater',text:'Another appearance? I would rather see {name} book a fight.'}
       ],
       viralAppearance: [
+        {profile:'media',text:'TRENDING: The {name} appearance on {title} is taking over the fight timeline.'},
+        {profile:'media',text:'{name} went from cage prospect to viral name after a huge moment on {title}.'},
         {profile:'media',text:'{name} made an appearance on {title}. The fight world is starting to notice.'},
         {profile:'fan',text:'That {name} clip is everywhere. The timeline belongs to a cage fighter today.'},
         {profile:'hater',text:'Another appearance? I would rather see {name} book a fight.'}
       ],
       autographFree: [
+        {profile:'media',text:'FAN REPORT: {name} met the crowd and signed {signatures} autographs free of charge.'},
+        {profile:'media',text:'{name} stayed for the fans today, finishing a free signing with {signatures} autographs.'},
         {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
         {profile:'fan',text:'{name} signed for free and stayed until the line was done. That is how you build real followers.'}
       ],
       autographStandard: [
+        {profile:'media',text:'{name} met supporters and completed {signatures} autographs at today\'s signing.'},
+        {profile:'media',text:'APPEARANCE REPORT: {signatures} fans left with an autograph from {name}.'},
         {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
         {profile:'fan',text:'Met {name} today. Worth the wait and actually talked to the fans.'}
       ],
       autographExpensive: [
+        {profile:'media',text:'The premium ${price} signing from {name} drew {signatures} autograph buyers today.'},
+        {profile:'media',text:'BUSINESS OUTSIDE THE CAGE: {name} completed {signatures} autographs at ${price} each.'},
         {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
         {profile:'hater',text:'Charging ${price} for an autograph? {name} is speed-running the unfollow button.'}
       ],
       sponsor: [
+        {profile:'media',text:'SIGNED: {name} welcomes {brand} as the latest sponsor backing the climb.'},
+        {profile:'media',text:'{brand} has struck a new sponsorship deal with rising fighter {name}.'},
+        {profile:'media',text:'PARTNERSHIP NEWS: {name} and {brand} make their fight sponsorship official.'},
         {profile:'media',text:'{brand} signs {name} to a new fight contract.'},
         {profile:'fan',text:'From unknown rookie to sponsored fighter. {name} is building something.'},
         {profile:'hater',text:'A sponsor check does not improve your takedown defense, {name}.'}
