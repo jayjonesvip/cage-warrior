@@ -3,16 +3,32 @@ globalThis.CAGE_STRINGS = {
     colors: ['White','Golden','Blue','Red','Black','Silver','Green','Orange','Purple','Crimson','Scarlet','Gray','Bronze','Copper','Indigo','Violet','Azure','Emerald','Dark','Light','Iron','Rogue','Wild','Prime','Lucky','Heavy','Silent','Midnight','Cold','Savage','Wicked','True','Rapid','Mad','Electric','Thunder','Neon','Steel','Shadow','Storm','Venom','Outlaw','Gritty','Relentless','Blazing','Phantom','Cosmic','Fearless','Turbo','Brutal','Atomic','Rebel'],
     origins: ['American','Mexican','Russian','Brazilian','Canadian','Irish','British','Scottish','French','German','Italian','Spanish','Portuguese','Japanese','Korean','Chinese','Thai','Filipino','Nigerian','Cuban','Jamaican','Australian','Dutch','Polish'],
     weather: ['Drizzle','Wind','Pressure','Tornado','Storm','Thunder','Lightning','Blizzard','Cyclone','Hurricane','Tempest','Monsoon','Wildfire','Avalanche','Typhoon','Hail','Frost','Downpour','Heatwave','Duststorm','Cloudburst','Whirlwind','Firestorm'],
-    animals: ['Viper','Cobra','Mamba','Python','Tiger','Lion','Panther','Jaguar','Leopard','Wolf','Bear','Shark','Orca','Hawk','Falcon','Eagle','Raven','Scorpion','Rhino','Bull','Boar','Crocodile','Alligator','Wolverine','Barracuda','Piranha','Dog','Cat','Raptor','Mastodon','Jackal','Coyote','Raccoon'],
-    combat: ['Hammer','Bomber','Fist','Claw','Crusher','Puncher','Slugger','Bruiser','Haymaker','Knuckle','Mauler','Wrecker','Grinder','Striker','Kicker','Choker','Grappler','Hunter','Warrior','Gladiator','Cannon','Blade','Anvil','Breaker'],
+    animals: ['Viper','Cobra','Mamba','Python','Tiger','Lion','Panther','Jaguar','Leopard','Wolf','Bear','Shark','Orca','Hawk','Falcon','Eagle','Raven','Scorpion','Rhino','Bull','Boar','Crocodile','Alligator','Wolverine','Barracuda','Piranha','Dog','Cat','Raptor','Mastodon','Jackal','Coyote','Raccoon','Dragon','Goat'],
+    combat: ['Hammer','Bomber','Fist','Claw','Crusher','Puncher','Slugger','Bruiser','Haymaker','Knuckle','Mauler','Wrecker','Grinder','Striker','Kicker','Choker','Grappler','Hunter','Warrior','Gladiator','Cannon','Blade','Anvil','Breaker','Monster','Demon','Devil','Destroyer'],
     cityCodes: {
       phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL'
     }
   },
 
   opponentNames: {
-    first: ['AARON','ACE','ADAM','ALEKSEI','ANDRE','ANTON','AXEL','BOONE','BRYCE','CALEB','CARLOS','CHRIS','CRUZ','DAMON','DANTE','DARIUS','DIEGO','DMITRI','DOM','ELI','ENZO','ERIK','FINN','GABE','HECTOR','ISAAC','IVAN','JACE','JAMAL','JAVIER','JONAH','JULIAN','KAI','LEO','MALIK','MARCUS','MATEO','MIKHAIL','NICO','NIKOLAI','OMAR','PAVEL','RAFA','ROMAN','RYAN','SERGEI','SILAS','TATE','TOMAS','TY','VANCE','VIKTOR','YURI','ZANE'],
-    last: ['ANDERSON','BISHOP','BLACK','BLAZE','BROWN','CARTER','CASTILLO','COLE','CROW','DAVIS','DIAZ','DRAKE','FEDOROV','FROST','GARCIA','GONZALEZ','GRAVES','HALE','HAYES','HERNANDEZ','IVANOV','JACKSON','JOHNSON','JONES','KARPOV','KNOX','KOZLOV','KUZNETSOV','LEBEDEV','MARTINEZ','MERCER','MILLER','MOROZOV','NASH','ORLOV','PETROV','PIKE','POPOV','QUINN','REYES','RODRIGUEZ','ROOK','SANTOS','SHAW','SMIRNOV','SMITH','SOKOLOV','STEEL','STONE','THOMPSON','VALE','VOLKOV','WARD','WILLIAMS','WOLFE','YOUNG','ZAITSEV']
+    countries: [
+      {code:'USA',first:['Randy','Aaron','Caleb','Bryce','Marcus','Damon','Darius','Jonah','Silas','Tate'],last:['Jones','Anderson','Carter','Brown','Davis','Jackson','Johnson','Miller','Smith','Williams']},
+      {code:'MX',first:['Mario','Carlos','Diego','Javier','Mateo','Rafael','Tomas','Hector','Cruz','Nico'],last:['Lopez','Garcia','Hernandez','Martinez','Rodriguez','Gonzalez','Castillo','Reyes','Santos','Diaz']},
+      {code:'RUS',first:['Aleksei','Anton','Dmitri','Ivan','Mikhail','Nikolai','Pavel','Roman','Sergei','Viktor','Yuri'],last:['Ivanov','Petrov','Smirnov','Volkov','Kuznetsov','Fedorov','Kozlov','Lebedev','Morozov','Orlov','Popov','Sokolov','Zaitsev','Karpov']},
+      {code:'BRA',first:['Adriano','Anderson','Bruno','Caio','Edson','Fabricio','Joao','Jose','Rafael','Thiago'],last:['Silva','Souza','Oliveira','Pereira','Almeida','Costa','Nunes','Santos','Ferreira','Ribeiro']},
+      {code:'CAN',first:['Adam','Alex','Brandon','Cole','Elias','Marc','Patrick','Rory','Tristan','Xavier'],last:['Campbell','Fraser','Martin','Tremblay','Roy','Gagnon','Wilson','Clarke','Bennett','Foster']},
+      {code:'IRL',first:['Aidan','Cian','Conor','Declan','Eamon','Finn','Liam','Niall','Ronan','Sean'],last:['Murphy','Kelly','Byrne','Doyle','Gallagher','Kennedy','Walsh','Brennan','Quinn','OConnor']},
+      {code:'GBR',first:['Alfie','Callum','Elliot','George','Harry','Jack','Lewis','Oliver','Reece','Theo'],last:['Baker','Clarke','Cooper','Davies','Evans','Fletcher','Harris','Morgan','Taylor','Walker']},
+      {code:'JPN',first:['Akira','Daichi','Haruto','Hiro','Kenji','Kenta','Riku','Satoshi','Takumi','Yuto'],last:['Sato','Suzuki','Takahashi','Tanaka','Watanabe','Ito','Yamamoto','Nakamura','Kobayashi','Kato']},
+      {code:'KOR',first:['DongHyun','JiHoon','JunSeo','MinHo','MinJun','SangMin','SeoJun','TaeHyun','WooJin','YoungHo'],last:['Kim','Lee','Park','Choi','Jung','Kang','Cho','Yoon','Jang','Lim']},
+      {code:'NGA',first:['Ade','Chidi','Emeka','Kelechi','Kunle','Nnamdi','Obinna','Tayo','Uche','Victor'],last:['Okafor','Adeyemi','Balogun','Eze','Nwosu','Obi','Okoye','Adebayo','Chukwu','Ojo']},
+      {code:'THA',first:['Anan','Arthit','Chai','Kiet','Niran','Preecha','Sakda','Somchai','Surin','Wichai'],last:['Boonmee','Chaiya','Khamla','Prasert','Rattanak','Saelim','Somsak','Srisai','Thongchai','Wongsa']},
+      {code:'PHI',first:['Angelo','Carlo','Dante','Enzo','Gabriel','Jose','Marco','Paolo','Ramon','Rico'],last:['Aquino','Bautista','Castillo','Cruz','DelaRosa','Mendoza','Navarro','Ramos','Reyes','Santos']},
+      {code:'CUB',first:['Alejandro','Camilo','Ernesto','Jorge','Luis','Miguel','Orlando','Raul','Rene','Yordan'],last:['Alvarez','Cabrera','Diaz','Fernandez','Gomez','Hernandez','Martinez','Perez','Rodriguez','Suarez']},
+      {code:'PR',first:['Adrian','Angel','Emilio','Felix','Julio','Luis','Marcos','Ramon','Ricardo','Xavier'],last:['Colon','Delgado','Figueroa','Flores','Morales','Ortiz','Rivera','Rosario','Santiago','Vega']},
+      {code:'AUS',first:['Blake','Callan','Cooper','Dylan','Ethan','Harrison','Lachlan','Mason','Nate','Tyson'],last:['Bailey','Collins','Dawson','Fisher','Gray','Mitchell','Parker','Reid','Turner','Wright']},
+      {code:'POL',first:['Adam','Bartosz','Dawid','Jakub','Kamil','Lukasz','Marcin','Mateusz','Pawel','Tomasz'],last:['Kowalski','Nowak','Wisniewski','Wojcik','Kowalczyk','Kaminski','Lewandowski','Zielinski','Szymanski','Dabrowski']}
+    ]
   },
 
   fightCommentary: {

@@ -57,9 +57,9 @@ generated league.
   **Ready**. New names use CapitalCase without a numeric suffix, such as
   `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Every hometown uses
   the same 76 opening words (colors, former wildcard modifiers, and 24
-  nationality/origin terms), plus 23 weather/force, 33 animal, and 24 combat
-  terms. Exact repeated words are excluded, producing 6,078 combinations per
-  city and 60,780 across all ten
+  nationality/origin terms), plus 23 weather/force, 35 animal, and 28 combat
+  terms. Exact repeated words are excluded, producing 6,534 combinations per
+  city and 65,340 across all ten
   hometowns. City endings are PHX, LAX, CHI,
   NYC, MIA, HOU, CLE, SEA, NOLA, and HNL.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
@@ -183,9 +183,10 @@ generated league.
 
 ### Career opponents
 
-- Opponents are generated locally with persistent names drawn from a broad
-  international pool, plus attributes, archetypes, professional records, and
-  head-to-head history.
+- Opponents are generated locally with persistent, country-aware identities such
+  as `MarioLopezMX` or `RandyJonesUSA`, plus attributes, archetypes,
+  professional records, and head-to-head history. First and last names come
+  from the same country group, so an unrelated suffix is never attached.
 - The **Cage Network** can add up to two recently active, exact-level real
   fighter profiles beside the three locally generated contenders. These are
   clearly labeled AI-controlled snapshots that use the fighter's public

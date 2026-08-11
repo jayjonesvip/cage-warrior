@@ -349,17 +349,28 @@ test('opponents have pro records, persistent rival history, and consent-aware re
   assert.match(script, /cash=LOGIC\.winFightCash/);
 });
 
-test('generated fighters draw from broad independently mixed name pools', () => {
-  const firstNames = stringsData.opponentNames.first;
-  const lastNames = stringsData.opponentNames.last;
-  assert.ok(firstNames.length >= 50);
-  assert.ok(lastNames.length >= 50);
-  for (const name of ['GARCIA', 'JONES', 'IVANOV', 'PETROV', 'SMIRNOV', 'VOLKOV', 'KUZNETSOV']) assert.ok(lastNames.includes(name));
-  assert.match(script, /const firstNames=STRINGS\.opponentNames\.first/);
-  assert.match(script, /const lastNames=STRINGS\.opponentNames\.last/);
-  assert.match(script, /rosterPick\(firstNames,hashSeed\(`first\|\$\{seed\}`\)\)/);
-  assert.match(script, /rosterPick\(lastNames,hashSeed\(`last\|\$\{seed\}`\)\)/);
-  assert.doesNotMatch(script, /rosterPick\(lastNames,seed\*5\+11\)/);
+test('generated fighters use country-aware CapitalCase identities', () => {
+  const countries = stringsData.opponentNames.countries;
+  assert.ok(countries.length >= 16);
+  for (const country of countries) {
+    assert.match(country.code, /^[A-Z]{2,3}$/);
+    assert.ok(country.first.length >= 10);
+    assert.ok(country.last.length >= 10);
+    for (const first of country.first) assert.match(first, /^[A-Z][A-Za-z]+$/);
+    for (const last of country.last) assert.match(last, /^[A-Z][A-Za-z]+$/);
+  }
+  const mexico = countries.find(country => country.code === 'MX');
+  const russia = countries.find(country => country.code === 'RUS');
+  const usa = countries.find(country => country.code === 'USA');
+  assert.ok(mexico.first.includes('Mario') && mexico.last.includes('Lopez'));
+  assert.ok(usa.first.includes('Randy') && usa.last.includes('Jones'));
+  for (const name of ['Ivanov','Petrov','Smirnov','Volkov','Kuznetsov']) assert.ok(russia.last.includes(name));
+  for (const name of ['Lopez','Garcia','Hernandez','Martinez','Rodriguez']) assert.ok(!russia.last.includes(name));
+  assert.match(script, /const opponentNameCountries=STRINGS\.opponentNames\.countries/);
+  assert.match(script, /function generatedOpponentIdentity\(seed\)/);
+  assert.match(script, /name:`\$\{first\}\$\{last\}\$\{country\.code\}`/);
+  assert.match(script, /country:identity\.country/);
+  assert.doesNotMatch(script, /STRINGS\.opponentNames\.(?:first|last)/);
 });
 
 test('scalable copy pools are separated from gameplay logic', () => {
@@ -436,8 +447,8 @@ test('identity names share substantial CapitalCase color and descriptor pools', 
   assert.equal(pools.colors.length, 52);
   assert.equal(pools.origins.length, 24);
   assert.equal(pools.weather.length, 23);
-  assert.equal(pools.animals.length, 33);
-  assert.equal(pools.combat.length, 24);
+  assert.equal(pools.animals.length, 35);
+  assert.equal(pools.combat.length, 28);
   assert.ok(pools.colors.includes('Dark'));
   assert.ok(pools.colors.includes('Light'));
   assert.ok(pools.colors.includes('Turbo'));
@@ -449,10 +460,16 @@ test('identity names share substantial CapitalCase color and descriptor pools', 
   assert.ok(pools.weather.includes('Pressure'));
   assert.ok(pools.animals.includes('Mastodon'));
   assert.ok(pools.animals.includes('Raccoon'));
+  assert.ok(pools.animals.includes('Dragon'));
+  assert.ok(pools.animals.includes('Goat'));
   assert.ok(pools.combat.includes('Hammer'));
   assert.ok(pools.combat.includes('Bomber'));
   assert.ok(pools.combat.includes('Fist'));
   assert.ok(pools.combat.includes('Claw'));
+  assert.ok(pools.combat.includes('Monster'));
+  assert.ok(pools.combat.includes('Demon'));
+  assert.ok(pools.combat.includes('Devil'));
+  assert.ok(pools.combat.includes('Destroyer'));
   assert.ok(!pools.weather.includes('Gale'));
   assert.deepEqual(
     JSON.parse(JSON.stringify(pools.cityCodes)),
@@ -460,7 +477,7 @@ test('identity names share substantial CapitalCase color and descriptor pools', 
   );
   const openers = [...pools.colors, ...pools.origins];
   const descriptors = [...pools.weather, ...pools.animals, ...pools.combat];
-  assert.equal(openers.reduce((total, opener) => total + descriptors.filter(descriptor => descriptor !== opener).length, 0), 6078);
+  assert.equal(openers.reduce((total, opener) => total + descriptors.filter(descriptor => descriptor !== opener).length, 0), 6534);
   assert.match(script, /pools\.descriptors\.filter\(word=>word!==opener\)/);
   assert.match(script, /LOGIC\.buildFighterIdentity\(pools\.openers\[0\]\|\|'White',pools\.descriptors\[0\]\|\|'Drizzle',pools\.cityCode\|\|'PHX'\)/);
   assert.match(script, /return names\.slice\(0,300\)/);

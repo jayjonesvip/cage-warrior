@@ -139,8 +139,7 @@
   ];
 
   let opponents=[];
-  const firstNames=STRINGS.opponentNames.first;
-  const lastNames=STRINGS.opponentNames.last;
+  const opponentNameCountries=STRINGS.opponentNames.countries;
   const opponentArchetypes=[
     {id:'pressure',tag:'PRESSURE FIGHTER',tendency:'pressure',scout:'Counter the march or control the pace before the volume builds.',mods:{power:0,speed:0,chin:0,cardio:2}},
     {id:'counter',tag:'COUNTER-STRIKER',tendency:'counter',scout:'Feints and takedown threats deny the clean counter window.',mods:{power:0,speed:2,chin:0,cardio:0}},
@@ -152,15 +151,16 @@
   ];
   const rosterColors=['#b94a35','#377ea6','#7c5836','#9f2c43','#8052a6','#267ca8','#566b85','#2e6aa8','#326f63','#8a6a2e'];
   function rosterPick(list,seed){return list[Math.abs(seed)%list.length]}
+  function generatedOpponentIdentity(seed){const country=rosterPick(opponentNameCountries,hashSeed(`country|${seed}`)),first=rosterPick(country.first,hashSeed(`first|${seed}|${country.code}`)),last=rosterPick(country.last,hashSeed(`last|${seed}|${country.code}`));return {name:`${first}${last}${country.code}`,country:country.code}}
   function generateOpponent(tier){
-    const serial=++state.rosterSerial,seed=serial*7919+tier*104729,arch=rosterPick(opponentArchetypes,seed),first=rosterPick(firstNames,hashSeed(`first|${seed}`)),last=rosterPick(lastNames,hashSeed(`last|${seed}`)),name=`${first} ${last}`,base=4+(tier-1)*1.9,difficulty=((serial%3)-1)*.7;
+    const serial=++state.rosterSerial,seed=serial*7919+tier*104729,arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),base=4+(tier-1)*1.9,difficulty=((serial%3)-1)*.7;
     const stat=k=>Math.max(3,Math.round(base+difficulty+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.45));
-    return {key:`cw-${tier}-${serial}`,name,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(1,tier*2+Math.abs(seed%7)),losses:Math.abs((seed>>>5)%Math.max(2,tier+2)),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
+    return {key:`cw-${tier}-${serial}`,name:identity.name,country:identity.country,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(1,tier*2+Math.abs(seed%7)),losses:Math.abs((seed>>>5)%Math.max(2,tier+2)),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
   }
   function generateTitleChampion(m){
-    const city=currentCity(),seed=hashSeed(`cage-warrior-champion-v1|${city.id}|${m.id}`),arch=rosterPick(opponentArchetypes,seed),first=rosterPick(firstNames,hashSeed(`first|${seed}`)),last=rosterPick(lastNames,hashSeed(`last|${seed}`)),base=4+(m.level-1)*1.9+1.4;
+    const city=currentCity(),seed=hashSeed(`cage-warrior-champion-v1|${city.id}|${m.id}`),arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),base=4+(m.level-1)*1.9+1.4;
     const stat=k=>Math.max(5,Math.round(base+(arch.mods[k]||0)+(((seed>>(k.length%8))%3)-1)*.35));
-    return {key:`champ-${city.id}-${m.id}`,name:`${first} ${last}`,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier:m.level,min:m.level,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,m.level-1)*2),fans:Math.round(22*Math.pow(1.48,m.level-1)*2.25),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(12,m.level*3+Math.abs(seed%8)),losses:Math.abs((seed>>>5)%Math.max(2,Math.ceil(m.level/3))),winsVsPlayer:0,lossesToPlayer:0,meetings:0,championship:true,titleId:m.id,titleDefeated:state.milestones.includes(m.id),recordInitialized:true,createdAt:Date.now()};
+    return {key:`champ-${city.id}-${m.id}`,name:identity.name,country:identity.country,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier:m.level,min:m.level,max:99,power:stat('power'),speed:stat('speed'),chin:stat('chin'),cardio:stat('cardio'),reward:Math.round(125*Math.pow(1.55,m.level-1)*2),fans:Math.round(22*Math.pow(1.48,m.level-1)*2.25),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(12,m.level*3+Math.abs(seed%8)),losses:Math.abs((seed>>>5)%Math.max(2,Math.ceil(m.level/3))),winsVsPlayer:0,lossesToPlayer:0,meetings:0,championship:true,titleId:m.id,titleDefeated:state.milestones.includes(m.id),recordInitialized:true,createdAt:Date.now()};
   }
   function hashSeed(text){let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return hash>>>0}
   function seededRandom(seed){let value=seed>>>0;return ()=>{value+=0x6D2B79F5;let n=value;n=Math.imul(n^n>>>15,n|1);n^=n+Math.imul(n^n>>>7,n|61);return ((n^n>>>14)>>>0)/4294967296}}
