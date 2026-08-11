@@ -187,6 +187,14 @@ test('fighter identities preserve CapitalCase and use color descriptor city form
   assert.equal(logic.buildFighterIdentity('Blue','Viper','too-long'),'');
 });
 
+test('fighter identity randomizer uses the full pools and supports deterministic tests',()=>{
+  assert.equal(logic.randomFighterIdentity(['White','Golden'],['Drizzle','Viper'],'SEA',()=>0),'WhiteDrizzleSEA');
+  const values=[0.75,0.5];
+  assert.equal(logic.randomFighterIdentity(['White','Golden'],['Drizzle','Viper'],'NYC',()=>values.shift()),'GoldenViperNYC');
+  assert.equal(logic.randomFighterIdentity([],['Drizzle'],'PHX',()=>0),'');
+  assert.equal(logic.randomFighterIdentity(['White'],[],'PHX',()=>0),'');
+});
+
 test('training quote enforces daily, cash, and energy costs before rewards',()=>{
   const action={cost:20,sessions:2,gain:2};
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');
