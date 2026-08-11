@@ -606,13 +606,23 @@ test('gear collection shows owned quantities and rarity above icons', () => {
 test('permanent identity onboarding gates the career and removes completed selectors', () => {
   const homeStart = html.indexOf('<section class="screen active" data-screen="home">');
   const trainStart = html.indexOf('<section class="screen" data-screen="train">');
-  for (const id of ['careerIdentityCard', 'citySetup', 'fighterSetup', 'archetypeSetup', 'fighterNameSetup', 'careerGameContent']) {
+  for (const id of ['fighterBuilderIntro', 'careerIdentityCard', 'citySetup', 'fighterSetup', 'archetypeSetup', 'fighterNameSetup', 'careerGameContent']) {
     const position = html.indexOf(`id="${id}"`);
     assert.ok(position > homeStart && position < trainStart, `${id} should be on the Home screen`);
   }
   assert.match(html, /#app\.career-setup #careerGameContent,#app\.career-setup \.career-after-setup\{display:none\}/);
-  assert.match(html, /#app\.career-setup \.resource-hud,#app\.career-setup \.bottomnav\{display:none\}/);
+  assert.match(html, /id="fighterBuilderIntro"[\s\S]*Build Your Fighter[\s\S]*NO ACTIVE FIGHTER FOUND/);
+  assert.match(html, /class="card build-card career-after-setup" id="careerIdentityCard"/);
+  assert.match(html, /id="builderProgressTrack"[^>]*role="progressbar"[^>]*aria-valuenow="0"/);
+  assert.match(html, /\.builder-progress-track i\{[^}]*transition:width \.35s ease/);
+  assert.match(html, /class="resource-hud"[^>]*hidden/);
+  assert.match(html, /class="bottomnav"[^>]*hidden/);
+  assert.match(html, /\.resource-hud\[hidden\],\.bottomnav\[hidden\]\{display:none\}/);
+  assert.match(script, /\$\('\.resource-hud'\)\.hidden=!ready;\$\('\.bottomnav'\)\.hidden=!ready/);
   assert.match(script, /\$\('#app'\)\.classList\.toggle\('career-setup',!ready\)/);
+  assert.match(script, /completed=Number\(!!city\)\+Number\(!!avatar&&allocationValid\)\+Number\(!!style\)\+Number\(state\.nameLocked\),progress=completed\*25/);
+  assert.match(script, /\$\('#fighterBuilderIntro'\)\.hidden=ready/);
+  assert.match(script, /\$\('#builderProgressFill'\)\.style\.width=`\$\{progress\}%`/);
   assert.match(script, /\$\('#fighterSetup'\)\.hidden=!city\|\|!!avatar/);
   assert.match(script, /\$\('#archetypeSetup'\)\.hidden=!city\|\|!avatar\|\|!!style/);
   assert.match(script, /\$\('#fighterNameSetup'\)\.hidden=!coreReady\|\|state\.nameLocked/);
@@ -726,7 +736,7 @@ test('archetype presentation uses clean text labels without decorative icons', (
 
 test('fighter attributes share the persistent condition HUD across game screens', () => {
   assert.match(html, /\.hud-attributes-row\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(html, /<section class="resource-hud" aria-label="Current fighter condition and attributes">[\s\S]*class="hud-condition-row"[\s\S]*class="hud-attributes-row"/);
+  assert.match(html, /<section class="resource-hud" aria-label="Current fighter condition and attributes" hidden>[\s\S]*class="hud-condition-row"[\s\S]*class="hud-attributes-row"/);
   const hudStart = html.indexOf('<section class="resource-hud"');
   const mainStart = html.indexOf('<main class="main">');
   for (const id of ['powerStat', 'speedStat', 'chinStat', 'cardioStat']) {
@@ -734,7 +744,7 @@ test('fighter attributes share the persistent condition HUD across game screens'
     assert.ok(position > hudStart && position < mainStart, `${id} should live in the persistent HUD`);
   }
   assert.match(html, /\.main\{[^}]*top:calc\(150px \+ var\(--safe-top\)\)/);
-  assert.match(html, /#app\.career-setup \.resource-hud,#app\.career-setup \.bottomnav\{display:none\}/);
+  assert.match(html, /\.resource-hud\[hidden\],\.bottomnav\[hidden\]\{display:none\}/);
   assert.doesNotMatch(html, /homeAttributes|trainStatGrid/);
 });
 
