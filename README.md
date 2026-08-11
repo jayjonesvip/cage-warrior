@@ -10,6 +10,19 @@ The page loads its presentation from `styles.css`, scalable copy pools from
 `strings.js`, testable gameplay rules from `game-logic.js`, and browser
 interactions from `game.js`.
 
+### Landing page
+
+- Every browser visit opens on a branded, responsive Cage Grind front door
+  before revealing the game interface.
+- A completed local career receives a personalized **Welcome Back** message,
+  current level, record, Followers, and a **Keep Grinding** action. A partially
+  completed fighter receives **Continue Your Build** instead of being mistaken
+  for a new or finished career.
+- New players see a concise career pitch covering tactical rounds, training,
+  hustles, drops, sponsors, and the title climb before choosing **Start Your
+  Career**. Choosing an entry action never resets or replaces the recovered
+  local save.
+
 ### Responsive desktop interface
 
 - Phone and installed-mobile layouts remain unchanged below 1100px.

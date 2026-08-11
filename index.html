@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.16" />
+<meta name="app-version" content="2.5.17" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -38,7 +38,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.16">
+<link rel="stylesheet" href="styles.css?v=2.5.17">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -59,8 +59,44 @@
 }
 </script>
 </head>
-<body>
-<div id="app" class="career-setup">
+<body class="landing-active">
+<section class="landing-page" id="landingPage" aria-labelledby="landingTitle">
+  <div class="landing-shell">
+    <header class="landing-brand">
+      <img src="assets/cage-grind-logo.png" alt="Cage Grind">
+      <span>FREE MMA CAREER GAME</span>
+    </header>
+
+    <div class="landing-visual" aria-hidden="true">
+      <img class="landing-cage" src="assets/cage-overlay.png" alt="">
+      <img class="landing-fighters" src="assets/home-fight.png" alt="">
+      <div class="landing-visual-copy"><b>BUILD THE FIGHTER.</b><span>LIVE THE CAREER.</span></div>
+    </div>
+
+    <div class="landing-content">
+      <p class="landing-eyebrow" id="landingEyebrow">YOUR FIGHT STARTS HERE</p>
+      <h1 id="landingTitle"><span id="landingTitleLead">FROM NOBODY</span><br><span class="accent" id="landingTitleAccent">TO MAIN EVENT</span></h1>
+      <p class="landing-description" id="landingDescription">Create your fighter, call the tactics between rounds, and grind from local cards to the world title.</p>
+
+      <div class="landing-career-stats" id="landingCareerStats" hidden aria-label="Saved career summary">
+        <div><small>RANK</small><b id="landingRank">LVL 1</b></div>
+        <div><small>RECORD</small><b id="landingRecord">0-0</b></div>
+        <div><small>FOLLOWERS</small><b id="landingFollowers">0</b></div>
+      </div>
+
+      <div class="landing-features" id="landingFeatures">
+        <div><b>CALL EVERY ROUND</b><p>Read the fight and make the corner decisions.</p></div>
+        <div><b>BUILD A REAL CAREER</b><p>Train, hustle, earn drops, and land sponsors.</p></div>
+        <div><b>CHASE EVERY BELT</b><p>Climb from city champion to the world stage.</p></div>
+      </div>
+
+      <button class="landing-enter" id="landingEnterBtn" type="button">START YOUR CAREER</button>
+      <p class="landing-fine-print">FREE TO PLAY <i></i> NO SIGN-UP <i></i> SAVES IN THIS BROWSER</p>
+    </div>
+  </div>
+</section>
+
+<div id="app" class="career-setup" aria-hidden="true">
   <header class="topbar">
     <img class="logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <div class="identity"><div class="identity-name-row"><div class="name" id="fighterName">ROOKIE</div></div><div class="sub"><span id="levelText">LVL 1</span> · <span id="rankText">UNRANKED</span></div><div class="top-progress"><span>XP</span><b id="xpText">0/100</b></div></div>
@@ -324,12 +360,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.16"></script>
-<script src="strings.js?v=2.5.16"></script>
-<script src="analytics.js?v=2.5.16"></script>
-<script src="supabase-client.js?v=2.5.16"></script>
-<script src="cage-social.js?v=2.5.16"></script>
-<script src="game.js?v=2.5.16"></script>
-<script src="pwa.js?v=2.5.16"></script>
+<script src="game-logic.js?v=2.5.17"></script>
+<script src="strings.js?v=2.5.17"></script>
+<script src="analytics.js?v=2.5.17"></script>
+<script src="supabase-client.js?v=2.5.17"></script>
+<script src="cage-social.js?v=2.5.17"></script>
+<script src="game.js?v=2.5.17"></script>
+<script src="pwa.js?v=2.5.17"></script>
 </body>
 </html>
