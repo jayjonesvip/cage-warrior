@@ -40,8 +40,9 @@ generated league.
   Hawaii belongs to the Pacific Islands.
   Finally, choose one of seven permanent MMA archetypes: Pressure Fighter,
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
-  Submission Hunter, or Wrestle-Boxer. The last step suggests a city-and-style
-  fighter name. **New Name** rerolls it, while **Ready** checks the global roster,
+  Submission Hunter, or Wrestle-Boxer. The last step suggests a fighter identity
+  from shared color and weather/dangerous-animal pools, followed by the hometown
+  abbreviation. **New Name** rerolls it, while **Ready** checks the global roster,
   permanently reserves the unique identity, and starts the career.
 - Every avatar has a unique base allocation across Power, Speed, Chin, and
   Cardio. Each value is a whole number from 2 through 8 and the four values
@@ -53,9 +54,11 @@ generated league.
   beside Followers, career earnings, and the next milestone; the selected
   avatar remains visible in the Home hero without a duplicate identity row.
   The fighter name is also the Cage Feed username and cannot be edited after
-  **Ready**. Names normally combine hometown and archetype words without a
-  numeric suffix; the animated shuffle reroll has a 33% chance to add one of
-  the expanded wildcard modifiers.
+  **Ready**. New names use CapitalCase without a numeric suffix, such as
+  `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Every hometown uses
+  the same 20 colors, 22 weather terms, and 26 dangerous animals, producing 960
+  combinations per city. City endings are PHX, LAX, CHI, NYC, MIA, HOU, CLE,
+  SEA, NOLA, and HNL.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,
@@ -152,10 +155,10 @@ generated league.
   remains in `localStorage`. A connection is required only when **Ready**
   reserves a new globally unique identity and when a retirement is published;
   an established career and its local gameplay remain available offline.
-- Fighter name and Cage Feed username are one lowercase value, such as
-  `sunnypuncher`, `cactusfist`, or the wildcard `roguecactushammer`. The database
+- Fighter name and Cage Feed username are one case-preserved value. The database
   claims it atomically, silently tries another generated combination on a
-  collision, and never releases claimed or retired names for reuse.
+  collision, and never releases claimed or retired names for reuse. Legacy
+  lowercase identities remain valid and permanently reserved.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The top-bar audience line shows both Followers and Following. Following is the
@@ -300,7 +303,9 @@ also clamps resources to their valid ranges, discards malformed roster entries,
 and repairs interrupted-fight booking data before play resumes. Daily rewards
 and activity limits reset on the player's local calendar date.
 Version 18 save migration merges legacy fighter names and Cage Feed handles into
-one locked identity without discarding career progress. Only Cage Grind's
+one locked identity without discarding career progress. Version 19 preserves the
+CapitalCase format for new identities while retaining existing lowercase names.
+Only Cage Grind's
 primary, backup, and legacy career keys are removed on retirement; the browser's
 Supabase session and unrelated site storage are left intact.
 

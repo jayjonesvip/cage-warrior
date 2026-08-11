@@ -161,6 +161,16 @@ test('confirmed fighter interactions award bounded deterministic social rewards'
   assert.deepEqual(logic.socialInteractionReward(-50),{followers:5,hype:1});
 });
 
+test('fighter identities preserve CapitalCase and use color descriptor city format',()=>{
+  assert.equal(logic.buildFighterIdentity('white','drizzle','phx'),'WhiteDrizzlePHX');
+  assert.equal(logic.buildFighterIdentity('Golden','Tornado','NYC'),'GoldenTornadoNYC');
+  assert.equal(logic.buildFighterIdentity('blue','viper','cle'),'BlueViperCLE');
+  assert.equal(logic.normalizeFighterIdentity('DarkCobraLAX'),'DarkCobraLAX');
+  assert.equal(logic.normalizeFighterIdentity('legacyfighter'),'legacyfighter');
+  assert.equal(logic.normalizeFighterIdentity('phxbrawler_01'),'phxbrawler_01');
+  assert.equal(logic.buildFighterIdentity('Blue','Viper','too-long'),'');
+});
+
 test('training quote enforces daily, cash, and energy costs before rewards',()=>{
   const action={cost:20,sessions:2,gain:2};
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');

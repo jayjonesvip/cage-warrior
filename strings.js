@@ -1,27 +1,11 @@
 globalThis.CAGE_STRINGS = {
   fighterIdentity: {
-    cities: {
-      phoenix: ['phx','sun','sunny','cactus','desert','mesa','valley','copper','saguaro','heat','ember','dust'],
-      'los-angeles': ['la','socal','sunset','venice','angel','pacific','palm','coast','westside','freeway','hollywood','boulevard'],
-      chicago: ['chi','windy','loop','midway','lake','stockyard','southside','skyline','frost','steel','city','lakeshore'],
-      'new-york': ['nyc','empire','borough','bronx','brooklyn','queens','uptown','downtown','subway','hudson','liberty','concrete'],
-      miami: ['mia','vice','neon','beach','southbeach','ocean','palm','tropic','bay','surf','flamingo','sunrise'],
-      houston: ['hou','htown','bayou','space','orbit','mission','gulf','lonestar','oil','magnolia','humid','star'],
-      cleveland: ['cle','erie','lake','northcoast','rock','river','rustbelt','terminal','shore','factory','frost','steel'],
-      seattle: ['sea','emerald','sound','rain','cascade','northwest','puget','needle','evergreen','harbor','ferry','coffee'],
-      'new-orleans': ['nola','crescent','jazz','bourbon','voodoo','delta','brass','mardi','frenchquarter','gulf','swamp','bayou'],
-      hawaii: ['hi','aloha','island','kona','maui','oahu','wave','volcano','reef','trade','lava','pacific']
-    },
-    styles: {
-      pressure: ['pressure','swarm','pace','storm','wave','rush','surge','grinder','march','volume','engine','tsunami'],
-      counter: ['counter','sniper','trap','timing','read','razor','recoil','answer','intercept','precision','ghost','laser'],
-      brawler: ['brawler','puncher','fist','hammer','bruiser','slugger','knuckle','haymaker','scrapper','mauler','crusher','wreck'],
-      trickster: ['trickster','phantom','feint','spin','shuffle','chaos','glitch','switch','riddle','mischief','smoke','angle'],
-      control: ['grappler','clamp','chain','anchor','lock','vise','smother','mat','grip','drag','cradle','ride'],
-      submission: ['hunter','choke','tap','snare','triangle','armbar','guillotine','heelhook','necktie','limb','squeeze','catch'],
-      wrestleBox: ['wrestleboxer','hybrid','boxer','shooter','clinch','level','doubleleg','sprawl','mixer','cross','chainbox','switchhit']
-    },
-    modifiers: ['iron','rogue','wild','prime','lucky','heavy','silent','midnight','red','black','cold','golden','savage','wicked','true','dark','rapid','mad','electric','thunder','neon','steel','shadow','storm','venom','outlaw','gritty','relentless','blazing','phantom','cosmic','fearless','turbo','brutal','atomic','rebel']
+    colors: ['White','Golden','Blue','Red','Black','Silver','Green','Orange','Purple','Crimson','Scarlet','Gray','Bronze','Copper','Indigo','Violet','Azure','Emerald','Dark','Light'],
+    weather: ['Drizzle','Tornado','Storm','Thunder','Lightning','Blizzard','Cyclone','Hurricane','Tempest','Monsoon','Wildfire','Avalanche','Typhoon','Hail','Frost','Gale','Downpour','Heatwave','Duststorm','Cloudburst','Whirlwind','Firestorm'],
+    animals: ['Viper','Cobra','Mamba','Python','Tiger','Lion','Panther','Jaguar','Leopard','Wolf','Bear','Shark','Orca','Hawk','Falcon','Eagle','Raven','Scorpion','Rhino','Bull','Boar','Crocodile','Alligator','Wolverine','Barracuda','Piranha'],
+    cityCodes: {
+      phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL'
+    }
   },
 
   opponentNames: {
