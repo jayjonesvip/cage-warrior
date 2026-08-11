@@ -574,6 +574,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(script, /class="corner-plan-btn \$\{isSignature\?'signature':'response'\}"/);
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
+  assert.match(css, /\.live-card>#cornerChoice:not\(:empty\)\{[^}]*max-height:58%;[^}]*overflow-y:auto/);
   assert.match(css, /\.corner-plan-btn\.signature\{[^}]*background:linear-gradient\(#42b8f3,#1160b8\)/);
   assert.match(css, /\.corner-plan-btn\.response\{[^}]*background:linear-gradient\(#3b4856,#18212b\)/);
   assert.match(script, /OPPONENT READ/);
@@ -1025,6 +1026,9 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(script, /DROP SAVED · OPEN GEAR TO VIEW IT/);
   assert.match(script, /BONUS GEAR DROP READY/);
   assert.match(script, /drop-icon/);
+  assert.match(script, /const lootText=lootNotes\.map\(note=>note\.text\)\.join\(' · '\)/);
+  assert.match(script, /pendingResultDrop=gearDrop\?Object\.assign\(\{extras:lootText\},gearDrop\):null/);
+  assert.doesNotMatch(script, /Object\.assign\(\{extras:loot\},gearDrop\)/);
 });
 
 test('fighters, opponents, and round plans share the seven MMA archetypes', () => {
