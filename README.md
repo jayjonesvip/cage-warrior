@@ -79,6 +79,8 @@ generated league.
   fight agent.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
+- Energy and Health meter lines turn red whenever the resource falls below 25%
+  so a dangerous condition is visible at a glance.
 - XP sits beneath level and rank in the top-left identity block, while Hype
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
