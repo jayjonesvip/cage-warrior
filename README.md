@@ -209,7 +209,9 @@ generated league.
   fighter profiles beside the three locally generated contenders. These are
   clearly labeled AI-controlled snapshots that use the fighter's public
   identity, portrait, archetype, and record. Their combat ratings are derived
-  deterministically from level, avatar allocation, and archetype.
+  deterministically from level, avatar allocation, and archetype. Roster cards
+  preserve CapitalCase identity display even for legacy all-caps profiles,
+  without rewriting the fighter's stored Cage Feed handle.
 - Cage Network snapshots persist in the local career and remain playable
   offline. Fighting one never changes the real fighter's public record, never
   creates a misleading shared CageReporter result, and can never award a title.

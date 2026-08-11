@@ -190,11 +190,12 @@
     if(!o)return;const legacy={wrestle:'control',wrestler:'control',tank:'brawler',cardio:'pressure'},id=legacy[o.archetype]||legacy[o.tendency]||o.archetype||o.tendency,arch=opponentArchetypes.find(a=>a.id===id)||opponentArchetypes[0];o.archetype=arch.id;o.tendency=arch.id;o.tag=arch.tag;o.scout=arch.scout;
   }
   function ensureProfessionalRecord(o){if(!o||o.recordInitialized)return;const seed=hashSeed(o.key||`${o.name}|${o.tier}`);o.wins=(Number(o.wins)||0)+Math.max(1,(Number(o.tier)||1)*2+(seed%7));o.losses=(Number(o.losses)||0)+((seed>>>5)%Math.max(2,(Number(o.tier)||1)+2));o.recordInitialized=true}
+  function networkOpponentDisplayName(value){const identity=STRINGS.fighterIdentity||{};return LOGIC.displayFighterIdentity(normalizeIdentityName(value),[...(identity.colors||[]),...(identity.origins||[])],[...(identity.weather||[]),...(identity.animals||[]),...(identity.combat||[])],Object.values(identity.cityCodes||{}))}
   function payoutForOpponent(o){return LOGIC.payoutForOpponent(o,state.level)}
   function ensureTitleChampions(){if(!currentCity())return;for(const m of milestoneDefs){let champ=state.roster.find(o=>o.championship&&o.titleId===m.id);if(!champ){champ=generateTitleChampion(m);state.roster.push(champ)}champ.titleName=milestoneName(m);if(state.milestones.includes(m.id))champ.titleDefeated=true}}
   function ensureRoster(){
     if(!Array.isArray(state.roster))state.roster=[];if(!Number.isFinite(state.rosterSerial))state.rosterSerial=0;const bootstrapPast=!state.leagueInitialized&&state.roster.length===0;
-    state.roster.forEach(o=>{normalizeOpponentArchetype(o);if(!o.championship&&o.retired){o.retired=false;delete o.retiredAt}});
+    state.roster.forEach(o=>{normalizeOpponentArchetype(o);if(o.network&&o.networkHandle)o.name=networkOpponentDisplayName(o.networkHandle);if(!o.championship&&o.retired){o.retired=false;delete o.retiredAt}});
     for(let tier=1;tier<=state.level+1;tier++){const active=state.roster.filter(o=>o.tier===tier&&!o.championship&&!o.network&&(o.lossesToPlayer||0)===0).length,target=tier<state.level?0:3;for(let i=active;i<target;i++)state.roster.push(generateOpponent(tier))}
     if(bootstrapPast){for(let tier=1;tier<state.level;tier++)for(let i=0;i<2;i++)state.roster.push(generateOpponent(tier))}
     ensureTitleChampions();
@@ -203,7 +204,7 @@
     refreshOpponents();
   }
   function networkOpponentFromProfile(profile,tier){
-    const id=String(profile?.id||''),handle=normalizeIdentityName(profile?.handle),name=handle.toUpperCase(),avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),arch=opponentArchetypes.find(item=>item.id===profile?.archetype);
+    const id=String(profile?.id||''),handle=normalizeIdentityName(profile?.handle),name=networkOpponentDisplayName(handle),avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),arch=opponentArchetypes.find(item=>item.id===profile?.archetype);
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)||!handle||!name||!avatar||!arch||Number(profile?.level)!==tier)return null;
     const seed=hashSeed(`cage-network-v1|${id}|${tier}`),difficulty=((seed%3)-1)*.7,ratings=LOGIC.networkOpponentRatings(tier,avatar.stats,arch.mods,difficulty);
     return {key:`network-${id}`,network:true,sourceProfileId:id,networkHandle:handle,networkCity:String(profile.city||''),networkPortrait:avatar.asset,fighterAvatar:avatar.id,name,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,...ratings,reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(0,Math.floor(Number(profile.wins))||0),losses:Math.max(0,Math.floor(Number(profile.losses))||0),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
