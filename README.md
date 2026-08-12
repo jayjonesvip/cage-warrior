@@ -97,10 +97,11 @@ generated league.
   Contender, Title Challenger, or the fighter's current championship.
 - An active endorsement appears in the Home hero directly beneath Cage Status,
   showing the sponsor brand and the number of contracted fights remaining.
-- Endorsements form a sequential sponsor ladder at 2,500, 10,000, 30,000,
-  80,000, and 200,000 Followers. Only the next brand may offer a contract, so
-  crossing several milestones at once never produces competing offers. Older
-  saves repair incomplete sponsor history before rendering or accepting deals.
+- Endorsements form a sequential sponsor ladder beginning with Bob's Auto Shop
+  at Level 2, followed by larger brands at 2,500, 10,000, 30,000, 80,000, and
+  200,000 Followers. Only the next brand may offer a contract, so crossing
+  several milestones at once never produces competing offers. Older saves
+  repair incomplete sponsor history before rendering or accepting deals.
 - A rotating promoter ticker leads the unlocked Home screen and teaches the
   active rules—fight costs, medical clearance, purses, rematches, tactics,
   drops, coaching, and titles—in the voice of a suspiciously well-informed
@@ -315,6 +316,9 @@ generated league.
 ### Economy and training
 
 - **Cash** is the spendable balance shown in the header.
+- New careers begin with $0 Cash. Early training upgrades must be earned through
+  fight purses, side shifts, and the first small sponsorship instead of being
+  affordable immediately.
 - **Career Earnings** is a permanent prestige total. Professional fight pay,
   career bonuses, sponsors, and appearances increase both values.
 - Side jobs, underground winnings, and daily cash increase Cash without
@@ -329,7 +333,7 @@ generated league.
   one random skill without health damage, while Heavy Sparring costs 20 energy,
   improves two random skills, and risks 3–9 health.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
-  better perfect-session chance. His fee is `$35 + ($20 × fighter level)` per
+  better perfect-session chance. His fee is `$250 + ($75 × fighter level)` per
   session, including each Light or Heavy Sparring session.
 - The Training page also has a Recovery Room with one paid treatment per local
   day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.

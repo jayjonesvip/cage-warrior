@@ -85,6 +85,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 
 | Filename | Current fallback | Used for |
 | --- | --- | --- |
+| `bobs-auto.png` | 🔧 | Bob's Auto Shop |
 | `volt.png` | ⚡ | Volt Energy |
 | `ironhide.png` | 🥊 | Ironhide Athletics |
 | `apex-wireless.png` | 📡 | Apex Wireless |

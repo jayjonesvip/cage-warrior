@@ -20,13 +20,13 @@
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
   const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
-  const ENDORSEMENT_FIGHTS = {volt:4,ironhide:5,'apex-wireless':6,'northline-auto':7,'titan-global':8};
+  const ENDORSEMENT_FIGHTS = {'bobs-auto':3,volt:4,ironhide:5,'apex-wireless':6,'northline-auto':7,'titan-global':8};
   const ENDORSEMENT_IDS = Object.keys(ENDORSEMENT_FIGHTS);
   let saveWarningShown = false;
   let careerSaveKnown = false;
 
   const defaultState = {
-    version:20,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:20,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
@@ -343,6 +343,7 @@
   ];
 
   const endorsementDefs = [
+    {id:'bobs-auto',icon:'🔧',brand:"Bob's Auto Shop",product:'Local mechanic and hometown fight sponsor',minLevel:2,minFans:0,signing:100,perFight:40,fansPerFight:5,fights:3},
     {id:'volt',icon:'⚡',brand:'Volt Energy',product:'Energy drink',minLevel:4,minFans:2500,signing:1200,perFight:350,fansPerFight:35,fights:4},
     {id:'ironhide',icon:'🥊',brand:'Ironhide Athletics',product:'Gloves and training apparel',minLevel:6,minFans:10000,signing:5500,perFight:1100,fansPerFight:95,fights:5},
     {id:'apex-wireless',icon:'📡',brand:'Apex Wireless',product:'Phones and wireless service',minLevel:8,minFans:30000,signing:18000,perFight:3200,fansPerFight:240,fights:6},
@@ -500,7 +501,7 @@
   }
   function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
-  function coachFee(){return 35+state.level*20}
+  function coachFee(){return 250+state.level*75}
   function recoveryFee(){return 40+state.level*15}
   function updateDailyResetClocks(){
     const date=todayKey(),clocks=$$('[data-daily-reset-clock]');
@@ -765,7 +766,7 @@
       return `<button class="action future ${unlocked?'':'locked-opportunity'} ${unavailable}" data-publicity="${i}" ${!unlocked||limited||energyLow?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p><span class="unlock-copy">${availability}</span></div><div class="cost"><b>${a.payout}</b><small>-${a.cost} energy</small></div></button>`;
     }).join('');
     const active=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,nextOffer=nextEndorsementOffer(),history=new Set(Array.isArray(state.endorsementHistory)?state.endorsementHistory:[]);
-    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} followers after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · BUILD FOLLOWERS TO UNLOCK CONTRACT OFFERS</div>`;
+    $('#activeEndorsement').innerHTML=active?`<div class="active-deal"><div class="deal-top"><b>${gameIcon(active.id,active.icon)} ${active.brand}</b><strong>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</strong></div><p>+$${fmt(active.perFight)} and +${fmt(active.fansPerFight)} followers after every fight.</p></div>`:`<div class="deal-empty">NO ACTIVE SPONSOR · LEVEL UP TO UNLOCK CONTRACT OFFERS</div>`;
     $('#endorsementActions').innerHTML=endorsementDefs.map((d,i)=>{
       const qualified=state.level>=d.minLevel&&state.fans>=d.minFans,isActive=!!active&&active.id===d.id,isPast=history.has(d.id)&&!isActive,isNext=!!nextOffer&&nextOffer.id===d.id,unlocked=!active&&isNext&&qualified;
       const req=[];if(state.level<d.minLevel)req.push(`LVL ${d.minLevel}`);if(state.fans<d.minFans)req.push(`${fmt(d.minFans)} FOLLOWERS`);
