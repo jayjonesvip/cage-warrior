@@ -296,10 +296,10 @@ generated league.
   saved and the result dialog recovers instead of blocking the career.
 - Owned items appear as fixed 2:3 collectible cards, two across on mobile,
   with full-card Common, Rare, Epic, and Legendary treatments.
-- Fight Gear uses a four-slot active loadout. Attempting to equip a fifth item
-  opens a focused Loadout Full dialog explaining that an equipped item must be
-  removed first. Bling, Lifestyle, Property, and Rides provide passive career
-  bonuses.
+- Fight Gear starts with a two-slot active loadout and expands to four slots at
+  Level 8. Attempting to exceed the current limit opens a focused Loadout Full
+  dialog explaining the limit and unlock. Bling, Lifestyle, Property, and Rides
+  provide passive career bonuses.
 - The collectible pool also includes early-career and status drops such as a
   used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
   shoes, and a full-length fur coat. Small Gym Dog is a separate Common card

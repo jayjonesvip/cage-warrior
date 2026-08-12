@@ -319,7 +319,14 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
   assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,hustle:3,risk:1,blackjack:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,blackjack:1,publicity:2,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,blackjack:1,publicity:1,recovery:1});
+});
+
+test('fight gear loadout expands from two slots to four at level eight', () => {
+  assert.equal(logic.gearLoadoutLimit(1),2);
+  assert.equal(logic.gearLoadoutLimit(7),2);
+  assert.equal(logic.gearLoadoutLimit(8),4);
+  assert.equal(logic.gearLoadoutLimit(15),4);
 });
 
 test('daily reset countdown targets the next local midnight',()=>{

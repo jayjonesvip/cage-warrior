@@ -687,7 +687,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.28b"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.30"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -695,7 +695,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
   assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.28b/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.30/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -1009,13 +1009,22 @@ test('a full fight-gear loadout opens an accessible styled dialog', () => {
   assert.match(page, /id="loadoutFullOk" type="button">OK<\/button>/);
   assert.match(css, /\.loadout-dialog\{text-align:center/);
   assert.match(css, /\.loadout-dialog \.modal-actions\.single-action\{grid-template-columns:1fr\}/);
-  assert.match(script, /if\(state\.equippedGear\.length>=4\)\{openLoadoutFullDialog\(trigger\);return\}/);
+  assert.match(script, /if\(state\.equippedGear\.length>=LOGIC\.gearLoadoutLimit\(state\.level\)\)\{openLoadoutFullDialog\(trigger\);return\}/);
+  assert.match(script, /4 SLOTS UNLOCK AT LVL 8/);
+  assert.match(script, /Four-slot Fight Gear loadout unlocked/);
   assert.doesNotMatch(script, /toast\('Loadout full\./);
   assert.match(script, /function openLoadoutFullDialog\(trigger\)/);
   assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#loadoutFullOk'\)\.focus\(\)\)/);
   assert.match(script, /function closeLoadoutFullDialog\(\)/);
   assert.match(script, /\$\('#loadoutFullOk'\)\.addEventListener\('click',closeLoadoutFullDialog\)/);
   assert.match(script, /e\.key==='Escape'/);
+});
+
+test('Hype bonuses are visible on the matchup and publicity is limited to one daily gig', () => {
+  assert.match(page, /id="tapeHypeBonus">0% HYPE · WIN BONUS \+0% PURSE · \+0% FOLLOWERS<\/span>/);
+  assert.match(script, /\$\('#tapeHypeBonus'\)\.textContent=`\$\{Math\.floor\(state\.hype\)\}% HYPE · WIN BONUS \+\$\{Math\.round\(state\.hype\/1\.3\)\}% PURSE · \+\$\{Math\.floor\(state\.hype\)\}% FOLLOWERS`/);
+  assert.match(page, /id="publicityLimitText">1 GIG LEFT<\/span>/);
+  assert.doesNotMatch(script, /sessionsLeft\('publicity',2\)/);
 });
 
 test('cash pays the scaling coach fee while career earnings remain cumulative', () => {
@@ -1031,12 +1040,13 @@ test('cash pays the scaling coach fee while career earnings remain cumulative', 
   assert.match(script, /LOGIC\.normalizeCoreState/);
 });
 
-test('Cage Status reflects the title ladder and the active sponsor appears beneath it', () => {
+test('career status reflects the title ladder and the active sponsor appears beneath it', () => {
   const rankPosition = html.indexOf('class="rank-chip"');
   const sponsorPosition = html.indexOf('id="heroSponsor"');
   const dailyPosition = html.indexOf('id="dailyBtn"');
   assert.ok(rankPosition >= 0 && sponsorPosition > rankPosition && sponsorPosition < dailyPosition);
-  assert.match(html, /CAGE STATUS <strong id="cageStatus">PROSPECT<\/strong>/);
+  assert.match(html, /<div class="rank-chip"><strong id="cageStatus">PROSPECT<\/strong><\/div>/);
+  assert.doesNotMatch(html, /CAGE STATUS/);
   assert.doesNotMatch(html, /CAGE RANK|id="cageRank"/);
   assert.doesNotMatch(script, /function cageRank\(/);
   assert.match(script, /function cageStatus\(\)/);
@@ -1302,6 +1312,11 @@ test('surviving rounds pause for one contextual Sim+ decision at the midpoint', 
   assert.match(script, /pulseFightCondition\('player'\)/);
   assert.match(script, /scoreRoundState\(round\)/);
   assert.match(script, /fight_moment_selected/);
+  assert.match(script, /function setFightDecisionFocus\(active\)/);
+  assert.match(script, /setFightDecisionFocus\(true\)/);
+  assert.match(script, /setFightDecisionFocus\(false\)/);
+  assert.match(css, /\.live-card\.decision-active \.action-feed\{[^}]*opacity:\.22[^}]*filter:saturate\(\.2\) brightness\(\.62\)/);
+  assert.match(css, /\.live-card\.decision-active>#cornerChoice \.corner-panel\{[^}]*border-color:#d5a53f/);
   assert.match(script, /fight\.deepRead\?` · \$\{chance\}% SUCCESS`/);
   assert.match(html, /\.fight-moment-panel\{/);
   assert.match(html, /\.fight-moment-result\.success\{/);
