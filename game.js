@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.47';
+  const ICON_ASSET_VERSION = '2.5.48';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -81,6 +81,7 @@
   let identityPending=false;
   let identityShufflePending=false;
   let retirementPending=false;
+  const HISTORY_KEY='cageGrind';
 
   const planDefs = [
     {id:'pressure',icon:'🌊',name:'PRESSURE FIGHTER',text:'Drown them with pace and volume. Vulnerable to clean counters.'},
@@ -726,13 +727,30 @@
     finally{fighterInteractionPending=false;if(activeBioProfileId)renderFighterBioInteractions(target)}
   }
 
+  function historyLayer(layer='screen'){return {[HISTORY_KEY]:true,screen:currentScreen,layer}}
+  function writeHistory(layer='screen',mode='push'){
+    const entry=historyLayer(layer);if(mode==='replace')history.replaceState(entry,'');else if(mode==='push')history.pushState(entry,'');
+  }
   function navTo(screen){
+    const historyMode=arguments[1]||'push';
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
     const changed=currentScreen!==screen;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
+    if(changed&&historyMode!=='none')writeHistory('screen',historyMode);
     if(screen==='feed')connectSharedSocial(true);else{clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null}
     sfx.tap();updateUI();if(screen==='fight')queueMicrotask(syncNetworkOpponents);const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
+
+  function fightExitGuarded(){return !!(fight&&combatLocked&&!fight.ended&&state.pendingFight)}
+  function openForfeitFightDialog(){const modal=$('#forfeitFightModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');$('#keepFightingBtn').focus()}
+  function closeForfeitFightDialog(){const modal=$('#forfeitFightModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
+  function handleHistoryNavigation(event){
+    if(fightExitGuarded()){writeHistory('fight','push');openForfeitFightDialog();return}
+    if(fight?.ended&&$('#resultModal').style.display==='flex'){writeHistory('result','push');toast('FINISH THE FIGHT RESULT TO CONTINUE','#ffcf78');return}
+    if(fight&&!combatLocked&&$('#fightOverlay').classList.contains('active'))closeFightPreview(true);
+    const destination=event.state?.[HISTORY_KEY]?event.state.screen:null;if(destination)navTo(destination,'none');
+  }
+  function handleFightBeforeUnload(event){if(!fightExitGuarded())return;saveState();event.preventDefault();event.returnValue=''}
 
   function renderTrain(){
     ensureDailyCounters();
@@ -1233,9 +1251,9 @@
   }
   function openTaleOfTape(o){
     if(!opponentAvailable(o)){toast(`${o.name} has not accepted another fight. Taunt them first.`,'#ffb157');return}
-    clearFightTimers();fight=createFight(o);combatLocked=false;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_matchup_viewed',{opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship});$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#fightControls').classList.add('hidden');fillTape(fight);sfx.tap();
+    clearFightTimers();fight=createFight(o);combatLocked=false;fightSpeed=1;fightTimelineIndex=0;trackEvent('fight_matchup_viewed',{opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship});$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#fightControls').classList.add('hidden');fillTape(fight);writeHistory('preview','push');sfx.tap();
   }
-  function closeFightPreview(){if(combatLocked)return;clearFightTimers();$('#fightOverlay').classList.remove('active');fight=null;sfx.tap()}
+  function closeFightPreview(){const fromHistory=arguments[0]===true;if(combatLocked)return;if(!fromHistory&&history.state?.[HISTORY_KEY]&&history.state.layer==='preview'){history.back();return}clearFightTimers();$('#fightOverlay').classList.remove('active');fight=null;sfx.tap()}
   function commitFight(mode,o=fight?.o){
     if(!['sim-plus','quick'].includes(mode))return;
     if(!o)return;
@@ -1245,7 +1263,11 @@
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
     const roundCost=currentFightRoundCost(),clearance=currentFightClearance(),booking=LOGIC.bookFight(state,o.key,roundCost,Date.now(),clearance);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${clearance} energy for three-round clearance.`,'#ff766d');return}
     initAudio();clearFightTimers();fight=createFight(o);fight.mode=mode;fight.roundCost=roundCost;combatLocked=true;fightSpeed=mode==='quick'?2:1;fightTimelineIndex=0;trackEvent('fight_started',{fight_mode:mode,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship,energy_reserved:clearance,energy_per_round:roundCost});
-    $('#fightOverlay').classList.add('active');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.toggle('active',mode==='quick');$('#speedBtn').textContent=mode==='quick'?'NORMAL ×1':'FAST ×2';$('#speedBtn').disabled=mode!=='quick';$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();beginFocusSequence();
+    $('#fightOverlay').classList.add('active');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.toggle('active',mode==='quick');$('#speedBtn').textContent=mode==='quick'?'NORMAL ×1':'FAST ×2';$('#speedBtn').disabled=mode!=='quick';$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;writeHistory('fight','replace');sfx.tap();saveState();updateUI();beginFocusSequence();
+  }
+
+  function forfeitFight(){
+    if(!fightExitGuarded())return;closeForfeitFightDialog();fight.forfeited=true;fight.winner='opp';fight.method='FORFEIT';fight.finishRound=Math.max(1,fight.rounds.length||1);fight.finishClock='5:00';trackEvent('fight_forfeited',{round_number:fight.finishRound,opponent_archetype:fight.o.tendency,is_title:!!fight.o.championship});finishFightSimulation();
   }
 
   function cornerFightState(rounds){const score=LOGIC.fightScore(rounds);return score.player>score.opponent?'ahead':score.player<score.opponent?'behind':'even'}
@@ -1391,11 +1413,11 @@
       if(titleWon){const title=milestoneDefs.find(m=>m.id===o.titleId);lootNotes.push({iconName:title.iconName,icon:title.icon,text:`NEW ${milestoneName(title)} CHAMPION`})}if(upset)lootNotes.push({iconName:'upset-bonus',icon:'⚡',text:'UPSET BONUS +25%'});if(rivalry)lootNotes.push({iconName:'rivalry-bonus',icon:'🔥',text:'RIVALRY FIGHT BONUS +15%'});if(state.winStreak>1)lootNotes.push({iconName:'win-streak',icon:'🔥',text:`${state.winStreak}-FIGHT WIN STREAK`});if(!o.championship)ensureRoster()
       $('#resultTitle').textContent='YOU WIN';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
-      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype-7,0,100);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp);sfx.lose();
-      $('#resultTitle').textContent='YOU LOST';$('#resultTitle').className='loss';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.';
+      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;if(!fight.forfeited){cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);state.health=clamp(state.health-Math.max(10,Math.round(fight.totals.opp.damage*.22)),1,state.maxHealth);gainXp(xp)}state.hype=clamp(state.hype-7,0,100);sfx.lose();
+      if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
     if(coachCut)lootNotes.push({text:`COACH SHARE: -$${fmt(coachCut)} · 10% OF WINNINGS`});
-    if(state.activeEndorsement){
+    if(state.activeEndorsement&&!fight.forfeited){
       const deal=endorsementDefs.find(d=>d.id===state.activeEndorsement.id);
       if(deal){
         const sponsorFollowers=changeFollowers(deal.fansPerFight);cash+=deal.perFight;fans+=sponsorFollowers;receiveMoney(deal.perFight,true);state.activeEndorsement.fightsLeft--;
@@ -1407,7 +1429,7 @@
     }
     if(!o.network)openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
     renderResultBonuses(lootNotes);
-    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:fight.mode||'sim-plus',fight_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_'),coach_cut:coachCut,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:fight.mode||'sim-plus',fight_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_'),coach_cut:coachCut,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;writeHistory('result','replace');saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function armResultAction(label){
@@ -1443,7 +1465,7 @@
   }
 
   function closeResult(){
-    clearTimeout(resultActionTimer);resultActionTimer=null;stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home');
+    clearTimeout(resultActionTimer);resultActionTimer=null;stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home','replace');
   }
 
   function stopConfetti(){
@@ -1512,6 +1534,8 @@
   $('#loadoutFullOk').addEventListener('click',closeLoadoutFullDialog);
   $('#loadoutFullModal').addEventListener('click',e=>{if(e.target===$('#loadoutFullModal'))closeLoadoutFullDialog()});
   $('#loadoutFullModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeLoadoutFullDialog()});
+  $('#keepFightingBtn').addEventListener('click',closeForfeitFightDialog);$('#confirmForfeitBtn').addEventListener('click',forfeitFight);
+  $('#forfeitFightModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeForfeitFightDialog()});
 
   // passive regen and healing
   setInterval(()=>{
@@ -1522,11 +1546,14 @@
   setInterval(updateDailyResetClocks,1000);
 
   window.addEventListener('resize',drawHero);
+  window.addEventListener('popstate',handleHistoryNavigation);
   window.addEventListener('beforeunload',saveState);
+  window.addEventListener('beforeunload',handleFightBeforeUnload);
   hydrateStaticIcons();ensureLoadout();ensureRoster();
   recoveryReport=applyOfflineRecovery();
   updateUI();
   renderLanding();
+  writeHistory('screen','replace');
   if(state.socialAccountCreated)connectSharedSocial(true);
   trackEvent('game_open',{returning_career:landingMode==='returning',setup_complete:landingMode==='returning'});trackEvent('landing_view',{career_state:landingMode});
 })();

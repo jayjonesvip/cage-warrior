@@ -646,8 +646,8 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
   assert.match(css, /\.live-card>#cornerChoice:not\(:empty\)\{[^}]*max-height:58%;[^}]*overflow-y:auto/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.47"\)[^}]*background-position:center 62%/);
-  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.47"\)[^}]*background-position:center,center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.48"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.48"\)[^}]*background-position:center,center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
   assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
   assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
@@ -728,7 +728,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.47"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.48"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -738,9 +738,9 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-text-bubble\{/);
   assert.match(script, /resultKicker=isQuiet\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.47/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.47/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.47/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.48/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.48/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.48/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -854,7 +854,7 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.47'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.48'/);
   assert.match(script, /function gameIcon\(name,fallback\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
@@ -1328,6 +1328,21 @@ test('fight result action celebrates wins without labeling losses as reward clai
   assert.match(css, /\.result-method\{[^}]*font-size:13px/);
 });
 
+test('browser history follows tabs and protects committed fights', () => {
+  assert.match(script, /history\.pushState\(entry,''\)/);
+  assert.match(script, /window\.addEventListener\('popstate',handleHistoryNavigation\)/);
+  assert.match(script, /if\(fightExitGuarded\(\)\)\{writeHistory\('fight','push'\);openForfeitFightDialog\(\);return\}/);
+  assert.match(script, /function closeFightPreview\(\)[\s\S]*history\.back\(\)/);
+  assert.match(page, /id="forfeitFightModal"[\s\S]*FORFEIT · TAKE THE LOSS/);
+});
+
+test('forfeiting a committed fight records a loss without rewards', () => {
+  assert.match(script, /fight\.forfeited=true;fight\.winner='opp';fight\.method='FORFEIT'/);
+  assert.match(script, /state\.losses\+\+;state\.winStreak=0;if\(!fight\.forfeited\)/);
+  assert.match(script, /if\(state\.activeEndorsement&&!fight\.forfeited\)/);
+  assert.match(script, /fight\.forfeited\)\{\$\('#resultTitle'\)\.textContent='FIGHT FORFEITED'/);
+});
+
 test('fight presentation identifies the favorite and shows unofficial and official scorecards', () => {
   assert.match(page, /class="tape-favorite" id="tapePlayerFavorite" hidden>FAVORITE/);
   assert.match(page, /class="tape-favorite" id="tapeOppFavorite" hidden>FAVORITE/);
@@ -1362,7 +1377,7 @@ test('each round starts behind a timed fallback interstitial', () => {
   assert.match(css, /\.round-interstitial-card:has\(\.round-interstitial-icon \.asset-ready\)>small/);
   for (const round of [1, 2, 3]) {
     assert.ok(fs.existsSync(`assets/icons/round-intro-${round}.png`), `round ${round} artwork should exist`);
-    assert.match(serviceWorker, new RegExp(`\\./assets/icons/round-intro-${round}\\.png\\?v=2\\.5\\.47`));
+    assert.match(serviceWorker, new RegExp(`\\./assets/icons/round-intro-${round}\\.png\\?v=2\\.5\\.48`));
   }
 });
 

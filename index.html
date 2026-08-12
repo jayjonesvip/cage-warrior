@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.47" />
+<meta name="app-version" content="2.5.48" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.47">
+<link rel="stylesheet" href="styles.css?v=2.5.48">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -296,6 +296,16 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="forfeitFightModal" aria-hidden="true">
+    <div class="gig-modal retirement-dialog forfeit-dialog" role="dialog" aria-modal="true" aria-labelledby="forfeitFightTitle" aria-describedby="forfeitFightWarning">
+      <span class="retirement-kicker">ACTIVE FIGHT</span>
+      <h2 id="forfeitFightTitle">Forfeit this <span>fight?</span></h2>
+      <p id="forfeitFightWarning">Leaving now ends the fight immediately. It will count as a loss on your professional record and use one of today's fights.</p>
+      <div class="retirement-warning">FORFEITING CANNOT BE UNDONE</div>
+      <div class="modal-actions"><button class="modal-cancel" id="keepFightingBtn" type="button">KEEP FIGHTING</button><button class="retire-confirm" id="confirmForfeitBtn" type="button">FORFEIT · TAKE THE LOSS</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="appUpdateModal" aria-hidden="true">
     <div class="gig-modal app-update-dialog" role="dialog" aria-modal="true" aria-labelledby="appUpdateTitle" aria-describedby="appUpdateDescription">
       <span class="loadout-dialog-kicker">NEW VERSION READY</span>
@@ -347,7 +357,7 @@
           <small class="focus-tier" id="focusTier">COMPOSED</small>
         </div>
         <div class="focus-locker-room">
-          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.47" alt="Fight-night locker room prepared for the fighter">
+          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.48" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MINUTES BEFORE THE WALKOUT</small></div>
           <div class="focus-encounter" id="focusEncounter"></div>
         </div>
@@ -394,12 +404,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.47"></script>
-<script src="strings.js?v=2.5.47"></script>
-<script src="analytics.js?v=2.5.47"></script>
-<script src="supabase-client.js?v=2.5.47"></script>
-<script src="cage-social.js?v=2.5.47"></script>
-<script src="game.js?v=2.5.47"></script>
-<script src="pwa.js?v=2.5.47"></script>
+<script src="game-logic.js?v=2.5.48"></script>
+<script src="strings.js?v=2.5.48"></script>
+<script src="analytics.js?v=2.5.48"></script>
+<script src="supabase-client.js?v=2.5.48"></script>
+<script src="cage-social.js?v=2.5.48"></script>
+<script src="game.js?v=2.5.48"></script>
+<script src="pwa.js?v=2.5.48"></script>
 </body>
 </html>
