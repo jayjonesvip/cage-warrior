@@ -666,6 +666,29 @@ test('fight launch remembers a win-paid Sim+ coach or automatic Quick Sim toggle
   assert.match(css, /\.fight-mode-toggle-btn\[aria-pressed="true"\]/);
 });
 
+test('booked fights resolve a 50-50 locker-room Focus encounter before either fight mode', () => {
+  const focusEvents = contentContext.CAGE_STRINGS.fightFocus.interruptions;
+  assert.equal(focusEvents.length, 15);
+  assert.ok(focusEvents.every(event => event.id && event.engage && event.ignore && event.outcomes.length === 2 && event.ignoreResult));
+  assert.match(page, /id="focusStage"/);
+  assert.match(page, /id="focusMeterFill"/);
+  assert.match(page, /id="liveFocusText"/);
+  assert.match(script, /fight\.focusBase=rint\(75,90\)/);
+  assert.match(script, /quiet=Math\.random\(\)<\.5/);
+  assert.match(script, /data-focus-choice="music"/);
+  assert.match(script, /Math\.random\(\)<\.20/);
+  assert.match(script, /fight\.focus\+=rint\(4,10\)/);
+  assert.match(script, /fight\.focus=Math\.max\(fight\.focus,92\)/);
+  assert.match(script, /fight\.focus=clamp\(Math\.round\(fight\.focus\),50,100\)/);
+  assert.match(script, /function fightFocusModifier\(sim=fight\)/);
+  assert.match(script, /chance\+=edge\*\.72\+focusMod/);
+  assert.match(script, /fightFocusModifier\(fight\)/);
+  assert.match(script, /beginFocusSequence\(\)/);
+  assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
+  assert.match(css, /\.focus-card\{/);
+  assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
+});
+
 test('gear collection shows owned quantities and rarity above icons', () => {
   assert.match(script, /owned=gearItems\.filter\(g=>gearCount\(g\.id\)>0\)/);
   assert.match(html, /\.gear\.collectible-card\{[^}]*aspect-ratio:2\/3[^}]*grid-template-rows:/);

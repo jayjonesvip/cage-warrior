@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.26';
+const APP_VERSION='2.5.27';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,14 +8,14 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.26',
-  './game-logic.js?v=2.5.26',
-  './strings.js?v=2.5.26',
-  './analytics.js?v=2.5.26',
-  './supabase-client.js?v=2.5.26',
-  './cage-social.js?v=2.5.26',
-  './game.js?v=2.5.26',
-  './pwa.js?v=2.5.26',
+  './styles.css?v=2.5.27',
+  './game-logic.js?v=2.5.27',
+  './strings.js?v=2.5.27',
+  './analytics.js?v=2.5.27',
+  './supabase-client.js?v=2.5.27',
+  './cage-social.js?v=2.5.27',
+  './game.js?v=2.5.27',
+  './pwa.js?v=2.5.27',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
