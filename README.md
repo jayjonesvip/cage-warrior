@@ -302,9 +302,11 @@ generated league.
   provide passive career bonuses.
 - The collectible pool also includes early-career and status drops such as a
   used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
-  shoes, and a full-length fur coat. Small Gym Dog is a separate Common card
-  from the existing Rare Gym Dog. Each supports an optional same-name PNG
-  override in `assets/` through its stable item ID.
+  shoes, a full-length fur coat, motorcycles, a scooter, camp food and
+  supplements, a flagship phone, a diamond grill, and a concert grand piano.
+  Small Gym Dog is a separate Common card from the existing Rare Gym Dog.
+  Collectibles support same-name PNG artwork in `assets/icons/` through their
+  stable item IDs.
 
 ### Economy and training
 
@@ -313,15 +315,18 @@ generated league.
   career bonuses, sponsors, and appearances increase both values.
 - Side jobs, underground winnings, and daily cash increase Cash without
   inflating Career Earnings.
-- Underground Buzz keeps Backroom Spar and adds Backroom Blackjack as a
-  separate once-per-local-day game. The player chooses a whole-dollar wager up
+- Underground Buzz offers Backroom Blackjack as a once-per-local-day game.
+  The player chooses a whole-dollar wager up
   to 25% of available Cash, then plays a persisted hand with Hit or Stand.
   Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
   wager. There are no splits, doubles, or insurance.
-- Basic training costs energy and daily sessions, not Cash.
+- Basic training costs energy and allows four daily sessions. Sparring is a
+  separate two-session daily track: Light Sparring costs 10 energy and improves
+  one random skill without health damage, while Heavy Sparring costs 20 energy,
+  improves two random skills, and risks 3–9 health.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
   better perfect-session chance. His fee is `$35 + ($20 × fighter level)` per
-  session; two-session sparring pays twice the fee.
+  session, including each Light or Heavy Sparring session.
 - The Training page also has a Recovery Room with one paid treatment per local
   day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.
   A Sports Massage restores 5 energy and 25 health.

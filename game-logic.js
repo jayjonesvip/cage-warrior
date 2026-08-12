@@ -101,13 +101,13 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0};
     return {
       date:today,
       fight:clamp(nonNegativeWhole(counters.fight),0,10),
       train:clamp(nonNegativeWhole(counters.train),0,4),
+      sparring:clamp(nonNegativeWhole(counters.sparring),0,2),
       hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
-      risk:clamp(nonNegativeWhole(counters.risk),0,1),
       blackjack:clamp(nonNegativeWhole(counters.blackjack),0,1),
       publicity:clamp(nonNegativeWhole(counters.publicity),0,1),
       recovery:clamp(nonNegativeWhole(counters.recovery),0,1)

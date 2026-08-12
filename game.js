@@ -26,10 +26,10 @@
   let careerSaveKnown = false;
 
   const defaultState = {
-    version:19,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:20,name:'ROOKIE',nameLocked:false,cash:250,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},
     pendingFight:null,fightModePreference:'sim-plus',
@@ -271,6 +271,7 @@
     {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+5% followers from fight wins.',prestige:5},
     {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'EPIC',minLevel:5,desc:'+8% followers from fight wins.',prestige:8},
     {id:'fur-coat',category:'Bling',name:'Full-Length Fur Coat',icon:'🧥',rarity:'EPIC',minLevel:7,desc:'+10% followers from fight wins. Every entrance becomes a photo op.',prestige:10},
+    {id:'diamond-grill',category:'Bling',name:'Diamond Grill',icon:'😁',rarity:'EPIC',minLevel:6,desc:'+10% followers from fight wins. Smile for the face-off cameras.',prestige:10},
     {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% followers from fight wins.',prestige:12},
     {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% followers from fight wins.',prestige:18},
     {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
@@ -278,15 +279,22 @@
     // Lifestyle — improves passive recovery
     {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. Roadwork hurts a little less.',energyRegen:.02},
     {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
+    {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
+    {id:'fight-fuel-protein',category:'Lifestyle',name:'Fight Fuel Protein',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Camp nutrition on demand. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
+    {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
     {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
     {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
     {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 energy every recovery tick.',energyRegen:.15},
+    {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +0.12 energy and +0.06 health per tick.',energyRegen:.12,healthRegen:.06},
     {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.20 energy and +0.10 health per tick.',energyRegen:.20,healthRegen:.10},
 
     // Property & rides — money and prestige
     {id:'used-car',category:'Property & Rides',name:'Used Car',icon:'🚗',rarity:'COMMON',minLevel:1,desc:'+1% fight money. It starts most of the time.',cashBonus:1},
+    {id:'sky-blue-scooter',category:'Property & Rides',name:'Sky Blue Scooter',icon:'🛵',rarity:'COMMON',minLevel:2,desc:'+1% fight money and +1% fight followers. Cheap wheels, loud arrival.',cashBonus:1,prestige:1},
+    {id:'midnight-cruiser',category:'Property & Rides',name:'Midnight Cruiser',icon:'🏍️',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Built for the long road.',cashBonus:2,prestige:3},
     {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'EPIC',minLevel:5,desc:'+3% fight money. You finally leave the gym couch.',cashBonus:3},
+    {id:'redline-superbike',category:'Property & Rides',name:'Redline Superbike',icon:'🏍️',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. The parking lot hears you coming.',cashBonus:5,prestige:6},
     {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
     {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better recovery.',cashBonus:10,energyRegen:.10,healthRegen:.05},
     {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight followers.',cashBonus:15,prestige:12},
@@ -297,8 +305,12 @@
     {id:'heavy-bag-rounds',icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,xp:9,sessions:1},
     {id:'slip-rope-drill',icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,xp:9,sessions:1},
     {id:'body-conditioning',icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,xp:11,sessions:1},
-    {id:'roadwork-at-dawn',icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1},
-    {id:'hard-sparring',icon:'🤼',title:'Hard Sparring',text:'Live rounds against a gym killer. Improves two random skills, but costs health.',stat:'spar',cost:20,gain:2,xp:28,sessions:2,damage:[3,9]}
+    {id:'roadwork-at-dawn',icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1}
+  ];
+
+  const sparringDefs = [
+    {id:'light-sparring',icon:'🥋',title:'Light Sparring',text:'Technical rounds at a controlled pace. Improve one random skill without taking damage.',cost:10,gain:1,xp:14,skills:1},
+    {id:'heavy-sparring',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills, but expect to absorb some damage.',cost:20,gain:1,xp:28,skills:2,damage:[3,9]}
   ];
 
   const hustleDefs = [
@@ -307,9 +319,6 @@
     {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],xp:3}
   ];
 
-  const riskDefs = [
-    {id:'backroom-spar',icon:'🎲',title:'Backroom Spar',text:'60% chance to win cash. Failure costs health.',cost:10,success:.60,cash:[170,290],damage:[10,22]}
-  ];
   const recoveryDefs = [
     {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0},
     {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12},
@@ -364,7 +373,7 @@
       const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
       s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland','seattle','new-orleans','hawaii'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;s.milestones=Array.isArray(s.milestones)?s.milestones:[];if(s.milestones.includes('district'))s.milestones.push('city');if(s.milestones.includes('national'))s.milestones.push('city','regional','us');if(s.milestones.includes('world'))s.milestones.push('city','regional','us');s.milestones=[...new Set(s.milestones.filter(id=>['city','regional','us','world'].includes(id)))];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
       const coreReady=!!(s.fighterStyle&&s.fighterCity&&s.fighterAvatar&&validFighterAllocation(s.fighterBaseStats)),legacyHandle=normalizeIdentityName(source.socialHandle),legacyName=normalizeIdentityName(source.name);s.nameLocked=coreReady&&(source.nameLocked===undefined?true:source.nameLocked===true);s.name=s.nameLocked?(legacyHandle||legacyName||'cagefighter'):'ROOKIE';delete s.socialHandle;
-      s.version=19;
+      s.version=20;
       return s;
   }
   function loadState(){
@@ -718,10 +727,12 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',4),coach=state.trainerOn,fee=coachFee(),recoveryLeft=sessionsLeft('recovery',1),treatmentFee=recoveryFee();
+    const left=sessionsLeft('train',4),sparringLeft=sessionsLeft('sparring',2),coach=state.trainerOn,fee=coachFee(),recoveryLeft=sessionsLeft('recovery',1),treatmentFee=recoveryFee();
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
     const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
-    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee*a.sessions:0,locked=state.energy<a.cost||state.cash<coachCost||left<a.sessions;const gainLabel=a.stat==='spar'?`+${a.gain+(coach?1:0)} TO 2 SKILLS`:`+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainLabel}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}${a.sessions>1?` · ${a.sessions} sessions`:''}</small></div></button>`}).join('');
+    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const coachCost=coach?fee:0,locked=state.energy<a.cost||state.cash<coachCost||left<1;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>+${a.gain+(coach?1:0)} ${a.stat.toUpperCase()}</b><small>-${a.cost} energy${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
+    $('#sparringLimitText').textContent=`${sparringLeft} SESSION${sparringLeft===1?'':'S'} LEFT`;
+    $('#sparringActions').innerHTML=sparringDefs.map((a,i)=>{const coachCost=coach?fee:0,locked=state.energy<a.cost||state.cash<coachCost||sparringLeft<1,gain=a.gain+(coach?1:0),skillLabel=a.skills===1?`+${gain} RANDOM SKILL`:`+${gain} TO 2 RANDOM SKILLS`,risk=a.damage?` · ${a.damage[0]}–${a.damage[1]} health risk`:' · no health damage';return `<button class="action sparring-${a.skills===1?'light':'heavy'}" data-sparring="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${skillLabel}</b><small>-${a.cost} energy${risk}${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
     $('#recoveryLimitText').textContent=`${recoveryLeft} TREATMENT${recoveryLeft===1?'':'S'} LEFT`;
     $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const quote=LOGIC.recoveryQuote(state,a,treatmentFee,recoveryLeft<1),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'USED TODAY':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
     updateDailyResetClocks();
@@ -736,14 +747,13 @@
   }
   function renderHustle(){
     ensureDailyCounters();
-    const hustleLeft=sessionsLeft('hustle',3),riskLeft=sessionsLeft('risk',1),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',1),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
+    const hustleLeft=sessionsLeft('hustle',3),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',1),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
     $('#hustleLimitText').textContent=`${hustleLeft} SHIFT${hustleLeft===1?'':'S'} LEFT`;
-    $('#riskLimitText').textContent=`SPAR ${riskLeft} · CARDS ${blackjackLeft}`;
+    $('#undergroundLimitText').textContent=`${blackjackLeft} HAND${blackjackLeft===1?'':'S'} LEFT`;
     $('#publicityLimitText').textContent=`${publicityLeft} GIG${publicityLeft===1?'':'S'} LEFT`;$('#publicityLimitText').classList.toggle('exhausted',publicityLeft<1);
     $('#hustleActions').innerHTML=hustleDefs.map((a,i)=>`<button class="action" data-hustle="${i}" ${state.energy<a.cost||hustleLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>$${a.cash[0]}–${a.cash[1]}</b><small>-${a.cost} energy</small></div></button>`).join('');
-    const sparActions=riskDefs.map((a,i)=>`<button class="action" data-risk="${i}" ${state.energy<a.cost||riskLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>-${a.cost} energy</b><small>${Math.round(a.success*100)}% success</small></div></button>`).join('');
     const blackjackLocked=!blackjackActive&&(blackjackLeft<1||maxBlackjackBet<1),blackjackStatus=blackjackActive?'HAND IN PROGRESS':blackjackLeft<1?'PLAYED TODAY':maxBlackjackBet<1?'NEED $4 CASH':`MAX BET $${fmt(maxBlackjackBet)}`;
-    $('#riskActions').innerHTML=sparActions+`<button class="action blackjack-action" data-blackjack-open ${blackjackLocked?'disabled':''}><div class="ico">${gameIcon('blackjack','🂡')}</div><div><h3>Backroom Blackjack</h3><p>Play one real hand against the dealer. Wager up to 25% of your available cash.</p></div><div class="cost"><b>${blackjackActive?'RESUME HAND':'HIT OR STAND'}</b><small>${blackjackStatus}</small></div></button>`;
+    $('#undergroundActions').innerHTML=`<button class="action blackjack-action" data-blackjack-open ${blackjackLocked?'disabled':''}><div class="ico">${gameIcon('blackjack','🂡')}</div><div><h3>Backroom Blackjack</h3><p>Play one real hand against the dealer. Wager up to 25% of your available cash.</p></div><div class="cost"><b>${blackjackActive?'RESUME HAND':'HIT OR STAND'}</b><small>${blackjackStatus}</small></div></button>`;
     $('#publicityActions').innerHTML=publicityDefs.map((a,i)=>{
       const unlocked=opportunityUnlocked(a),limited=publicityLeft<1,energyLow=state.energy<a.cost;
       const unavailable=limited&&unlocked?'gig-unavailable':'',availability=!unlocked?requirementText(a):limited?'NO GIGS LEFT':energyLow?`NEEDS ${a.cost} ENERGY`:'AVAILABLE NOW';
@@ -869,12 +879,15 @@
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
     const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect);
-    if(a.stat==='spar'){
-      const skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,2);skills.forEach(k=>state.stats[k]+=gain);const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));sfx.crit();shake(true);toast(`${perfect?'ELITE SPAR! ':'SPAR COMPLETE! '}+${gain} ${skills[0].toUpperCase()} & ${skills[1].toUpperCase()} · -${d} health`,perfect?'#f4c34a':'#77d13e');
-    }else{
-      state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
-    }
+    state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
     trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
+  }
+  function handleSparring(i){
+    ensureDailyCounters();const a=sparringDefs[i],coach=state.trainerOn;if(!a)return;const quote=LOGIC.trainingQuote(state,a,coach,coachFee(),sessionsLeft('sparring',2));
+    if(quote.reason==='limit'){toast('No sparring sessions left today.','#ff766d');return}
+    if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
+    if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.sparring+=quote.sessions;
+    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills);skills.forEach(k=>state.stats[k]+=gain);const damage=a.damage?rint(...a.damage):0;if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));if(a.skills>1){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` · -${damage} health`:'';toast(`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
     ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(),quote=LOGIC.recoveryQuote(state,treatment,fee,sessionsLeft('recovery',1)<1);
@@ -992,16 +1005,6 @@
   }
   function hitBlackjack(){
     const hand=state.blackjackHand;if(!hand||hand.status!=='playing'||!hand.deck.length)return;hand.player.push(hand.deck.pop());saveState();sfx.tap();const value=LOGIC.blackjackHandValue(hand.player);if(value.bust)settleBlackjack();else if(value.total===21)playBlackjackDealer();else renderBlackjackDialog();
-  }
-  function handleRisk(i){
-    ensureDailyCounters();const a=riskDefs[i];initAudio();
-    if(sessionsLeft('risk',1)<1){toast('You already used today’s underground risk.','#ff766d');return}
-    if(!spendEnergy(a.cost))return;state.dailyCounters.risk++;
-    if(Math.random()<a.success){
-      if(a.cash){const c=rint(...a.cash);receiveMoney(c);trackEvent('underground_spar_completed',{outcome:'win',cash_earned:c,energy_spent:a.cost,health_lost:0});sfx.coin();toast(`YOU WON $${c}`,'#f4c34a');confettiBurst()}
-    }else{
-      if(a.damage){const d=rint(...a.damage);state.health=clamp(state.health-d,1,state.maxHealth);trackEvent('underground_spar_completed',{outcome:'loss',cash_earned:0,energy_spent:a.cost,health_lost:d});sfx.hit();shake(true);toast(`ROUGH NIGHT. -${d} health`,'#ff6157')}
-    }updateUI();
   }
   async function requestGameInstall(){
     const pwa=globalThis.CAGE_PWA;if(!pwa){toast('USE YOUR BROWSER MENU TO INSTALL CAGE GRIND','#78dfff');return}
@@ -1445,12 +1448,12 @@
     const go=e.target.closest('[data-go]');if(go){navTo(go.dataset.go);return}
     const tt=e.target.closest('#trainerToggle');if(tt){state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
     const tr=e.target.closest('[data-train]');if(tr){handleTrain(+tr.dataset.train);return}
+    const sparring=e.target.closest('[data-sparring]');if(sparring){handleSparring(+sparring.dataset.sparring);return}
     const recovery=e.target.closest('[data-recovery]');if(recovery){handleRecovery(+recovery.dataset.recovery);return}
     const hu=e.target.closest('[data-hustle]');if(hu){handleHustle(+hu.dataset.hustle);return}
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}
     const blackjack=e.target.closest('[data-blackjack-open]');if(blackjack){openBlackjack();return}
-    const ri=e.target.closest('[data-risk]');if(ri){handleRisk(+ri.dataset.risk);return}
     const fighterInteraction=e.target.closest('[data-fighter-interaction]');if(fighterInteraction){const profile=sharedSocialProfiles.find(item=>item.id===fighterInteraction.dataset.targetProfile);if(profile)handleFighterInteraction(fighterInteraction.dataset.fighterInteraction,profile);return}
     const feedProfile=e.target.closest('[data-feed-profile]');if(feedProfile){openFighterBio(sharedSocialProfiles.find(item=>item.id===feedProfile.dataset.feedProfile));return}
     const eq=e.target.closest('[data-equip]');if(eq){toggleEquip(eq.dataset.equip,eq);return}

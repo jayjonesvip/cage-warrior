@@ -137,3 +137,16 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `house.png` | 🏠 | Modern Fighter House |
 | `supercar.png` | 🏁 | Midnight Supercar |
 | `mansion.png` | 🏰 | Champion Mansion |
+
+## Added lifestyle collection artwork
+
+| Filename | Item |
+| --- | --- |
+| `victory-bucket.png` | Victory Chicken Bucket |
+| `fight-fuel-protein.png` | Fight Fuel Protein |
+| `flagship-phone.png` | Flagship Phone |
+| `concert-grand.png` | Concert Grand Piano |
+| `sky-blue-scooter.png` | Sky Blue Scooter |
+| `midnight-cruiser.png` | Midnight Cruiser |
+| `redline-superbike.png` | Redline Superbike |
+| `diamond-grill.png` | Diamond Grill |
