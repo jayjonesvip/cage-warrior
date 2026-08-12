@@ -473,7 +473,7 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.match(html, /id="newFighterNameBtn"[^>]*>[\s\S]*data-icon-name="shuffle-name"[\s\S]*<span>NEW NAME<\/span><\/button>/);
   assert.match(html, /id="lockFighterNameBtn"[^>]*>READY<\/button>/);
   assert.match(html, /cannot be edited after you press Ready/i);
-  assert.match(script, /version:19,name:'ROOKIE',nameLocked:false/);
+  assert.match(script, /version:20,name:'ROOKIE',nameLocked:false/);
   assert.match(script, /function randomIdentitySuggestion\(\)/);
   assert.match(script, /LOGIC\.randomFighterIdentity\(pools\.openers,pools\.descriptors,pools\.cityCode\)/);
   assert.match(script, /if\(coreReady&&!state\.nameLocked&&!identitySuggestion\)identitySuggestion=randomIdentitySuggestion\(\)/);
@@ -687,7 +687,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.30"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.31"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -695,7 +695,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
   assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.30/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.31/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -1062,7 +1062,16 @@ test('career status reflects the title ladder and the active sponsor appears ben
   assert.match(script, /state\.activeEndorsement\.fightsLeft\} FIGHTS LEFT/);
 });
 
-test('training includes three paid options sharing one daily recovery treatment', () => {
+test('training separates two daily sparring sessions from drills and recovery', () => {
+  assert.match(page, /<div class="card sparring-card">/);
+  assert.match(page, /id="sparringLimitText">2 SESSIONS LEFT/);
+  assert.match(page, /id="sparringActions"/);
+  assert.match(script, /id:'light-sparring'.*cost:10,gain:1,xp:14,skills:1/);
+  assert.match(script, /id:'heavy-sparring'.*cost:20,gain:1,xp:28,skills:2,damage:\[3,9\]/);
+  assert.match(script, /sessionsLeft\('sparring',2\)/);
+  assert.match(script, /state\.dailyCounters\.sparring\+=quote\.sessions/);
+  assert.match(script, /const sparring=e\.target\.closest\('\[data-sparring\]'\)/);
+  assert.doesNotMatch(script, /id:'hard-sparring'/);
   assert.match(page, /Recovery Room/);
   assert.match(page, /id="recoveryLimitText"/);
   assert.match(page, /id="recoveryActions"/);
@@ -1075,9 +1084,10 @@ test('training includes three paid options sharing one daily recovery treatment'
   assert.match(script, /state\.dailyCounters\.recovery=1/);
 });
 
-test('Underground Buzz keeps backroom spar and adds persistent once-daily blackjack', () => {
-  assert.match(script, /id:'backroom-spar'/);
-  assert.match(script, /sessionsLeft\('risk',1\)/);
+test('Underground Buzz removes backroom spar and keeps persistent once-daily blackjack', () => {
+  assert.doesNotMatch(script, /id:'backroom-spar'|function handleRisk\(|data-risk|underground_spar_completed/);
+  assert.match(page, /id="undergroundLimitText">1 HAND LEFT/);
+  assert.match(page, /id="undergroundActions"/);
   assert.match(page, /id="blackjackModal"/);
   assert.match(page, /blackjack pays 3:2/);
   assert.match(page, /id="blackjackHit"[^>]*>HIT<\/button>/);
@@ -1173,7 +1183,15 @@ test('the collectible drop pool includes early-career and status cards', () => {
     ['dog', 'Gym Dog'],
     ['cuban-cigars', 'Cuban Cigars'],
     ['tennis-shoes', 'Fresh Tennis Shoes'],
-    ['fur-coat', 'Full-Length Fur Coat']
+    ['fur-coat', 'Full-Length Fur Coat'],
+    ['victory-bucket', 'Victory Chicken Bucket'],
+    ['fight-fuel-protein', 'Fight Fuel Protein'],
+    ['flagship-phone', 'Flagship Phone'],
+    ['concert-grand', 'Concert Grand Piano'],
+    ['sky-blue-scooter', 'Sky Blue Scooter'],
+    ['midnight-cruiser', 'Midnight Cruiser'],
+    ['redline-superbike', 'Redline Superbike'],
+    ['diamond-grill', 'Diamond Grill']
   ]) {
     assert.match(script, new RegExp(`id:'${item[0]}'.*name:'${item[1]}'`));
   }
@@ -1181,6 +1199,17 @@ test('the collectible drop pool includes early-career and status cards', () => {
   assert.match(script, /id:'fur-coat'.*rarity:'EPIC'.*minLevel:7/);
   assert.match(script, /id:'small-gym-dog'.*name:'Small Gym Dog'.*rarity:'COMMON'.*minLevel:1/);
   assert.match(script, /id:'dog'.*name:'Gym Dog'.*rarity:'RARE'.*minLevel:3/);
+  assert.match(script, /id:'victory-bucket'.*category:'Lifestyle'.*rarity:'COMMON'.*minLevel:1/);
+  assert.match(script, /id:'fight-fuel-protein'.*category:'Lifestyle'.*rarity:'COMMON'.*minLevel:2/);
+  assert.match(script, /id:'flagship-phone'.*category:'Lifestyle'.*rarity:'RARE'.*minLevel:3/);
+  assert.match(script, /id:'concert-grand'.*category:'Lifestyle'.*rarity:'LEGENDARY'.*minLevel:10/);
+  assert.match(script, /id:'sky-blue-scooter'.*category:'Property & Rides'.*rarity:'COMMON'.*minLevel:2/);
+  assert.match(script, /id:'midnight-cruiser'.*category:'Property & Rides'.*rarity:'RARE'.*minLevel:4/);
+  assert.match(script, /id:'redline-superbike'.*category:'Property & Rides'.*rarity:'EPIC'.*minLevel:7/);
+  assert.match(script, /id:'diamond-grill'.*category:'Bling'.*rarity:'EPIC'.*minLevel:6/);
+  for (const asset of ['victory-bucket','fight-fuel-protein','flagship-phone','concert-grand','sky-blue-scooter','midnight-cruiser','redline-superbike','diamond-grill']) {
+    assert.equal(fs.existsSync(`assets/icons/${asset}.png`), true, `${asset} artwork should exist`);
+  }
   assert.ok(fs.existsSync('assets/icons/small-gym-dog.png'));
   assert.ok(fs.existsSync('assets/icons/dog.png'));
   assert.match(readme, /used car, small-batch bourbon, a small gym dog, Cuban cigars/);

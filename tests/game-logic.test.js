@@ -318,8 +318,8 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,hustle:3,risk:1,blackjack:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,hustle:0,risk:0,blackjack:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,hustle:-4,risk:8,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,hustle:0,risk:1,blackjack:1,publicity:1,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,publicity:1,recovery:1});
 });
 
 test('fight gear loadout expands from two slots to four at level eight', () => {
