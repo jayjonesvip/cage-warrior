@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const logic = require('../game-logic.js');
 
 const defaults = {
-  level:1,xp:0,cash:250,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+  level:1,xp:0,cash:0,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
   energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
   stats:{power:5,speed:5,chin:5,cardio:5},roster:[],pendingFight:null,lastSave:0,lastDaily:'',
   fighterCity:'',fighterAvatar:'',fighterStyle:'',gear:[]
@@ -17,7 +17,7 @@ function normalize(raw={}){
 test('a new game loads with valid default resources',()=>{
   const state=logic.selectStoredState({primary:null,backup:null,legacy:null},normalize,defaults);
   assert.equal(state.level,1);
-  assert.equal(state.cash,250);
+  assert.equal(state.cash,0);
   assert.equal(state.careerEarnings,0);
   assert.equal(state.energy,100);
   assert.equal(state.health,100);
@@ -308,10 +308,11 @@ test('invalid or stale gear drop data is rejected before the result UI renders i
 });
 
 test('endorsement progression exposes only the next unsigned deal',()=>{
-  const ids=['volt','ironhide','apex'];
-  assert.equal(logic.nextEndorsementId(ids,[]),'volt');
-  assert.equal(logic.nextEndorsementId(ids,['volt']),'ironhide');
-  assert.equal(logic.nextEndorsementId(ids,['volt','ironhide','apex']),'');
+  const ids=['bobs-auto','volt','ironhide','apex'];
+  assert.equal(logic.nextEndorsementId(ids,[]),'bobs-auto');
+  assert.equal(logic.nextEndorsementId(ids,['bobs-auto']),'volt');
+  assert.equal(logic.nextEndorsementId(ids,['bobs-auto','volt']),'ironhide');
+  assert.equal(logic.nextEndorsementId(ids,['bobs-auto','volt','ironhide','apex']),'');
 });
 
 test('daily counters use local calendar dates, reset once, and clamp tampered limits',()=>{

@@ -458,7 +458,7 @@ test('career identity includes a permanent hometown and a fight-earned title lad
 
 test('title challengers ramp harder near the next unlock to make the ladder feel earned', () => {
   assert.match(script, /function titlePressureBonus\(m\)/);
-  assert.match(script, /state\.level\s*>=\s*m\.level\s*-\s*1/);
+  assert.match(script, /state\.level\s*>=\s*target\s*-\s*1/);
   assert.match(script, /Math\.max\(/);
 });
 
@@ -687,7 +687,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.31"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.32"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -695,7 +695,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
   assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.31/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.32/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -1032,11 +1032,12 @@ test('Hype bonuses are visible on the matchup and publicity is limited to one da
   assert.doesNotMatch(script, /sessionsLeft\('publicity',2\)/);
 });
 
-test('cash pays the scaling coach fee while career earnings remain cumulative', () => {
+test('cash starts empty and pays the premium scaling coach fee while career earnings remain cumulative', () => {
   assert.doesNotMatch(html, /Coach's Board|id="coachTip"/);
   assert.doesNotMatch(script, /\$\('#coachTip'\)/);
   assert.match(html, /id="careerEarningsText"/);
-  assert.match(script, /function coachFee\(\)\{return 35\+state\.level\*20\}/);
+  assert.match(script, /version:20,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0/);
+  assert.match(script, /function coachFee\(\)\{return 250\+state\.level\*75\}/);
   assert.match(script, /LOGIC\.trainingQuote/);
   assert.match(script, /state\.cash-=quote\.cashCost/);
   assert.match(script, /function receiveMoney\(amount,career=false\)/);
@@ -1131,6 +1132,8 @@ test('career fights have a ten-fight daily cap', () => {
 });
 
 test('endorsements unlock as one crash-safe sequential offer', () => {
+  assert.match(script, /id:'bobs-auto'.*brand:"Bob's Auto Shop".*minLevel:2,minFans:0,signing:100,perFight:40,fansPerFight:5,fights:3/);
+  assert.match(script, /const ENDORSEMENT_FIGHTS = \{'bobs-auto':3,volt:4/);
   for (const threshold of [2500, 10000, 30000, 80000, 200000]) assert.match(script, new RegExp(`minFans:${threshold}`));
   assert.match(script, /function nextEndorsementOffer\(\)/);
   assert.match(script, /LOGIC\.nextEndorsementId/);
