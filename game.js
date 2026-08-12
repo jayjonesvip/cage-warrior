@@ -1032,7 +1032,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'',plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[]};
+    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'',focus:0,focusBase:0,focusEncounter:null,focusResult:null,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[]};
   }
 
   function planFamiliarity(styleId,planId){
@@ -1056,6 +1056,8 @@
     };return matrix[planId]?.[opponentId]||0;
   }
   function strategyEdge(planId,tendency){return clamp(matchupEdge(planId,tendency)+planFamiliarity(state.fighterStyle,planId),-.26,.24)}
+  function focusTier(value){return value>=95?'LOCKED IN':value>=85?'SHARP':value>=70?'COMPOSED':value>=60?'DISTRACTED':'SHAKEN'}
+  function fightFocusModifier(sim=fight){const value=Number(sim?.focus)||80;return value>=95?.05:value>=85?.025:value>=70?0:value>=60?-.025:-.06}
   function techniqueFor(archetype,roll){
     if(archetype==='pressure')return roll<.31?'jab':roll<.55?'cross':roll<.78?'hook':roll<.92?'kick':'takedown';
     if(archetype==='counter')return roll<.22?'jab':roll<.55?'cross':roll<.77?'hook':roll<.94?'kick':'takedown';
@@ -1113,7 +1115,7 @@
   }
 
   function simulateRound(sim,round,planId,opening=null){
-      if(sim.winner||round>3)return;const plan=planDefs.find(p=>p.id===planId)||planDefs[0],edge=opening?.mode==='feel'?0:strategyEdge(plan.id,sim.o.tendency),familiarity=opening?.mode==='feel'?0:planFamiliarity(state.fighterStyle,plan.id);sim.lastPlan=plan.id;sim.plans.push(plan.id);
+      if(sim.winner||round>3)return;const plan=planDefs.find(p=>p.id===planId)||planDefs[0],edge=opening?.mode==='feel'?0:strategyEdge(plan.id,sim.o.tendency),familiarity=opening?.mode==='feel'?0:planFamiliarity(state.fighterStyle,plan.id),focusMod=fightFocusModifier(sim);sim.lastPlan=plan.id;sim.plans.push(plan.id);
       const P=sim.player,O=sim.opp,rs={round,plan:plan.id,player:emptyFightStats(),opp:emptyFightStats(),scoreP:0,scoreO:0};let stopped=false;
       sim.timeline.push({type:'roundStart',round,clock:'5:00'});
       if(opening?.damage){const damage=opening.damage,knockdown=damage>=26||sim.oppCondition-damage<32;rs.player.attempted++;rs.player.landed++;rs.player.sig++;rs.player.damage+=damage;if(knockdown)rs.player.kd++;sim.oppCondition=clamp(sim.oppCondition-damage,0,100);sim.timeline.push({type:'action',round,clock:'4:56',text:`HAYMAKER LANDS! ${P.name} detonates a desperate right hand${knockdown?` and drops ${O.name}`:''}!`,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,landed:true,side:'player'});const finishChance=sim.oppCondition<=0?1:sim.oppCondition<18?.42:0;if(finishChance&&Math.random()<finishChance){sim.winner='player';sim.method='KO';sim.finishRound=round;sim.finishClock='4:54';stopped=true;sim.timeline.push({type:'ko',round,clock:'4:54',text:`IT'S OVER! ${P.name} came back from the brink!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}}
@@ -1123,16 +1125,16 @@
         const initiativeMod={pressure:.12,counter:-.05,brawler:.06,trickster:.03,control:.02,submission:-.01,wrestleBox:.04}[plan.id]||0;
         const tendencyInitiative={pressure:-.09,counter:.04,brawler:-.05,trickster:.01,control:-.04,submission:-.02,wrestleBox:-.03}[sim.o.tendency]||0;
         const openingInitiative=round===1&&opening?.mode==='aggressive'?.08:round===1&&opening?.mode==='feel'?-.07:0;
-        const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative+openingInitiative,.14,.86);
+        const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative+openingInitiative+focusMod*.7,.14,.86);
         const side=Math.random()<pInitiative?'player':'opp',A=side==='player'?P:O,D=side==='player'?O:P,aStats=rs[side],attackingStyle=side==='player'?plan.id:sim.o.tendency;
         const type=techniqueFor(attackingStyle,Math.random());aStats.attempted++;
         const roundFatigue=(round-1)*.025+ex*Math.max(0,10-A.cardio)*.0018;
         let chance=.53+(A.speed-D.speed)*.018+(A.cardio-D.cardio)*.006-roundFatigue+rand(-.11,.11);
         if(type==='takedown')chance=.43+(A.power+A.speed-D.chin-D.cardio)*.012+rand(-.10,.10);
         if(side==='player'){
-          chance+=edge*.72;if(plan.id==='pressure')chance+=.035;if(plan.id==='counter')chance+=.065;if(plan.id==='brawler')chance-=.015;if(plan.id==='trickster'&&type==='kick')chance+=.10;if(plan.id==='control'&&type==='takedown')chance+=.16;if(plan.id==='submission'&&type==='takedown')chance+=.10;if(plan.id==='wrestleBox')chance+=type==='takedown'?.08:.025;
+          chance+=edge*.72+focusMod;if(plan.id==='pressure')chance+=.035;if(plan.id==='counter')chance+=.065;if(plan.id==='brawler')chance-=.015;if(plan.id==='trickster'&&type==='kick')chance+=.10;if(plan.id==='control'&&type==='takedown')chance+=.16;if(plan.id==='submission'&&type==='takedown')chance+=.10;if(plan.id==='wrestleBox')chance+=type==='takedown'?.08:.025;
         }else{
-          chance-=edge*.45;if(sim.o.tendency==='counter')chance+=.05;if(sim.o.tendency==='brawler')chance-=.03;if(sim.o.tendency==='trickster'&&type==='kick')chance+=.08;if(sim.o.tendency==='control'&&type==='takedown')chance+=.15;if(sim.o.tendency==='submission'&&type==='takedown')chance+=.10;if(sim.o.tendency==='wrestleBox'&&type==='takedown')chance+=.07;if(plan.id==='pressure'||plan.id==='brawler')chance+=.05;if(plan.id==='counter')chance-=.075;if(plan.id==='trickster')chance-=.03;
+          chance-=edge*.45+focusMod*.35;if(sim.o.tendency==='counter')chance+=.05;if(sim.o.tendency==='brawler')chance-=.03;if(sim.o.tendency==='trickster'&&type==='kick')chance+=.08;if(sim.o.tendency==='control'&&type==='takedown')chance+=.15;if(sim.o.tendency==='submission'&&type==='takedown')chance+=.10;if(sim.o.tendency==='wrestleBox'&&type==='takedown')chance+=.07;if(plan.id==='pressure'||plan.id==='brawler')chance+=.05;if(plan.id==='counter')chance-=.075;if(plan.id==='trickster')chance-=.03;
         }
         chance=clamp(chance,.22,.84);const landed=Math.random()<chance;let damage=0,kd=false,control=0;
         if(landed){
@@ -1179,7 +1181,32 @@
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.',networkNote=f.o.network?" This is an AI-controlled snapshot; the real fighter's public record is unaffected.":'';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.${networkNote}`;renderFightModeToggle();
   }
 
-  function showFightStage(stage){['tapeStage','openingStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
+  function showFightStage(stage){['tapeStage','focusStage','openingStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
+  function updateFocusDisplay(){
+    if(!fight)return;const value=clamp(Math.round(fight.focus||fight.focusBase||80),50,100),tier=focusTier(value);fight.focus=value;$('#focusValue').textContent=`${value}%`;$('#focusMeterFill').style.width=`${value}%`;$('#focusTier').textContent=tier;$('#liveFocusText').textContent=`${value}% FOCUS · ${tier}`;
+  }
+  function renderFocusEncounter(){
+    if(!fight?.focusEncounter)return;updateFocusDisplay();const encounter=fight.focusEncounter,box=$('#focusEncounter');
+    if(encounter.type==='quiet')box.innerHTML=`<span class="focus-kicker">THE LOCKER ROOM IS YOURS</span><h2>HOW DO YOU PREPARE?</h2><p>No interruptions. Choose how to use the final minutes before the walkout.</p><div class="focus-options"><button class="focus-choice risk" data-focus-choice="music"><b>LISTEN TO MUSIC</b><small>Gain 4–10 Focus · 20% chance to hit 100%</small></button><button class="focus-choice safe" data-focus-choice="meditate"><b>MEDITATE</b><small>Reliable · raises Focus to at least 92%</small></button></div>`;
+    else{const event=encounter.event;box.innerHTML=`<span class="focus-kicker">${event.kicker}</span><h2>${event.title}</h2><p>${event.prompt}</p><div class="focus-options"><button class="focus-choice risk" data-focus-choice="engage"><b>${event.engage}</b><small>Deal with it · outcome unknown</small></button><button class="focus-choice safe" data-focus-choice="ignore"><b>${event.ignore}</b><small>Protect the routine · it may stay on your mind</small></button></div>`}
+  }
+  function beginFocusSequence(){
+    if(!fight)return;fight.focusBase=rint(75,90);fight.focus=fight.focusBase;fight.focusResult=null;const interruptions=STRINGS.fightFocus?.interruptions||[],quiet=Math.random()<.5||!interruptions.length;fight.focusEncounter=quiet?{type:'quiet'}:{type:'interruption',event:interruptions[rint(0,interruptions.length-1)]};showFightStage('focusStage');$('#fightControls').classList.add('hidden');renderFocusEncounter();trackEvent('fight_focus_presented',{fight_mode:fight.mode,encounter_type:quiet?'quiet':'interruption',event_id:fight.focusEncounter.event?.id||'routine',starting_focus:fight.focusBase});
+  }
+  function resolveFocusChoice(choice){
+    if(!fight?.focusEncounter||fight.focusResult)return;const before=fight.focus,encounter=fight.focusEncounter;let text='',outcomeType='steady';
+    if(encounter.type==='quiet'){
+      if(choice==='music'){if(Math.random()<.20){fight.focus=100;text='The perfect song hits at the perfect moment. Every doubt disappears.';outcomeType='perfect'}else{fight.focus+=rint(4,10);text='The music raises the pulse and pulls your attention toward the cage.';outcomeType='boost'}}
+      else if(choice==='meditate'){fight.focus=Math.max(fight.focus,92);text='Your breathing slows. The noise outside the room loses its grip.';outcomeType='steady'}else return;
+    }else{
+      const event=encounter.event;if(choice==='engage'){const first=event.outcomes[0],outcome=Math.random()<first.chance?first:event.outcomes[1];fight.focus=outcome.focus??fight.focus+(outcome.delta||0);text=outcome.text;outcomeType=(outcome.focus??before+(outcome.delta||0))>=before?'boost':'hit'}
+      else if(choice==='ignore'){const outcome=event.ignoreResult;fight.focus=outcome.focus??fight.focus+(outcome.delta||0);text=outcome.text;outcomeType=(outcome.focus??before+(outcome.delta||0))>=before?'steady':'doubt'}else return;
+    }
+    fight.focus=clamp(Math.round(fight.focus),50,100);fight.focusResult={choice,before,after:fight.focus,text,outcomeType};updateFocusDisplay();const delta=fight.focus-before,change=delta===0?'FOCUS HOLDS':`${delta>0?'+':''}${delta} FOCUS`,box=$('#focusEncounter');box.innerHTML=`<div class="focus-result"><span class="focus-kicker">${focusTier(fight.focus)}</span><h2>${fight.focus}% FOCUS</h2><div class="focus-message">${text}</div><b class="focus-change ${delta<0?'loss':''}">${change}</b><p>This Focus carries into initiative, execution, and tactical decisions for this fight.</p><button class="focus-continue" data-focus-continue type="button">WALK TO THE CAGE</button></div>`;trackEvent('fight_focus_resolved',{fight_mode:fight.mode,encounter_type:encounter.type,event_id:encounter.event?.id||'routine',choice,starting_focus:before,final_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_')});sfx.tap();saveState();
+  }
+  function continueAfterFocus(){
+    if(!fight?.focusResult)return;if(fight.mode==='quick'){showFightStage('liveStage');$('#fightControls').classList.remove('hidden');beginQuickFight()}else{showFightStage('openingStage');$('#fightControls').classList.add('hidden')}sfx.tap();
+  }
   function tauntOpponent(key){
     const o=state.roster.find(f=>f.key===key);if(!o||o.championship||(o.lossesToPlayer||0)<1||o.rematchAccepted)return;
     o.rematchAccepted=true;state.hype=clamp(state.hype+3,0,100);trackEvent('rival_taunted',{prior_meetings:o.meetings||0});initAudio();sfx.rage();shake(true);updateUI();toast(`${o.name} TOOK THE BAIT · REMATCH ACCEPTED!`,'#ffb157');
@@ -1198,7 +1225,7 @@
     if(state.health<20){toast('You need at least 20 health to be cleared.','#ff766d');return}
     const roundCost=currentFightRoundCost(),clearance=currentFightClearance(),booking=LOGIC.bookFight(state,o.key,roundCost,Date.now(),clearance);if(!booking.ok){if(booking.reason==='energy')toast(`You need ${clearance} energy for three-round clearance.`,'#ff766d');return}
     initAudio();clearFightTimers();fight=createFight(o);fight.mode=mode;fight.roundCost=roundCost;combatLocked=true;fightSpeed=mode==='quick'?2:1;fightTimelineIndex=0;trackEvent('fight_started',{fight_mode:mode,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.championship,energy_reserved:clearance,energy_per_round:roundCost});
-    $('#fightOverlay').classList.add('active');showFightStage(mode==='sim-plus'?'openingStage':'liveStage');$('#fightControls').classList.toggle('hidden',mode!=='quick');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.toggle('active',mode==='quick');$('#speedBtn').textContent=mode==='quick'?'NORMAL ×1':'FAST ×2';$('#speedBtn').disabled=mode!=='quick';$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();if(mode==='quick')beginQuickFight();
+    $('#fightOverlay').classList.add('active');$('#fightControls').classList.add('hidden');$('#actionFeed').innerHTML='';$('#cornerChoice').innerHTML='';$('#speedBtn').classList.toggle('active',mode==='quick');$('#speedBtn').textContent=mode==='quick'?'NORMAL ×1':'FAST ×2';$('#speedBtn').disabled=mode!=='quick';$('#openingSignature').textContent=`AGGRESSIVE USES ${currentStyle()?.name||'YOUR SIGNATURE'} · FEEL THEM OUT EARNS A DEEP READ`;sfx.tap();saveState();updateUI();beginFocusSequence();
   }
 
   function cornerFightState(rounds){const score=LOGIC.fightScore(rounds);return score.player>score.opponent?'ahead':score.player<score.opponent?'behind':'even'}
@@ -1212,11 +1239,11 @@
     }
     container.innerHTML=choices.map(({plan,isSignature,label,description})=>`<button class="corner-plan-btn ${isSignature?'signature':'response'}" data-fight-plan="${plan.id}" data-plan-context="corner"><b>${label}</b><small>${description}</small></button>`).join('');
   }
-  function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0),.15,.68)}
+  function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0)+fightFocusModifier(sim),.15,.68)}
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
   function prepareLiveFight(){
-    showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width='100%';$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent='100% CONDITION';$('#liveOppConditionText').textContent='100% CONDITION';
+    showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width='100%';$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent='100% CONDITION';$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
   }
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
@@ -1253,7 +1280,7 @@
   }
   function fightMomentChance(choice){
     const stat=choice.stat||'speed',styleBonus=choice.styles?.includes(state.fighterStyle)?.08:0,statEdge=(fight.player[stat]-fight.opp[stat])*.018;
-    return clamp(choice.base+styleBonus+statEdge,.22,.90);
+    return clamp(choice.base+styleBonus+statEdge+fightFocusModifier(fight),.22,.90);
   }
   function showFightMoment(item){
     if(!fight||fight.resolvedMoments.includes(item.round)){playFightTimeline(fightTimelineIndex+1);return}
@@ -1316,7 +1343,7 @@
 
   function buildResultDetails(f){
     $('#resultMethod').textContent=`${f.method} · ROUND ${f.finishRound} · ${f.finishClock}`;
-    $('#resultTape').innerHTML=`<div class="rt-name">${f.player.name}</div><div class="rt-vs">VS</div><div class="rt-name">${f.opp.name}</div><div class="rt-stats"><div><b>${f.player.power}/${f.player.speed}/${f.player.chin}/${f.player.cardio}</b><br><small>PWR · SPD · CHN · CAR</small></div><div class="rt-vs">RATINGS</div><div><b>${f.opp.power}/${f.opp.speed}/${f.opp.chin}/${f.opp.cardio}</b><br><small>PWR · SPD · CHN · CAR</small></div></div>`;
+    $('#resultTape').innerHTML=`<div class="rt-name">${f.player.name}</div><div class="rt-vs">VS</div><div class="rt-name">${f.opp.name}</div><div class="rt-stats"><div><b>${f.player.power}/${f.player.speed}/${f.player.chin}/${f.player.cardio}</b><br><small>PWR · SPD · CHN · CAR</small></div><div class="rt-vs">RATINGS</div><div><b>${f.opp.power}/${f.opp.speed}/${f.opp.chin}/${f.opp.cardio}</b><br><small>PWR · SPD · CHN · CAR</small></div></div><div class="rt-focus">FIGHT FOCUS · <b>${f.focus}% ${focusTier(f.focus)}</b></div>`;
     $('#roundStats').innerHTML=`<table class="round-table"><thead><tr><th>RD</th><th>${f.player.name}<br>LAND/DAMAGE</th><th>SCORE</th><th>${f.opp.name}<br>LAND/DAMAGE</th></tr></thead><tbody>${f.rounds.map(r=>`<tr><td>${r.round}</td><td class="${r.scoreP>r.scoreO?'winner-cell':'loser-cell'}">${r.player.landed}/${r.player.attempted} · ${r.player.damage}</td><td>${r.scoreP}-${r.scoreO}</td><td class="${r.scoreO>r.scoreP?'winner-cell':'loser-cell'}">${r.opp.landed}/${r.opp.attempted} · ${r.opp.damage}</td></tr>`).join('')}</tbody></table>`;
     const p=f.totals.player,o=f.totals.opp;
     $('#fightTotals').innerHTML=`<div class="totals-grid"><div><b>${p.landed}/${p.attempted}</b></div><div class="label">Strikes</div><div><b>${o.landed}/${o.attempted}</b></div><div><b>${p.sig}</b></div><div class="label">Significant</div><div><b>${o.sig}</b></div><div><b>${p.takedowns}</b></div><div class="label">Takedowns</div><div><b>${o.takedowns}</b></div><div><b>${p.control}s</b></div><div class="label">Control</div><div><b>${o.control}s</b></div><div><b>${p.kd}</b></div><div class="label">Knockdowns</div><div><b>${o.kd}</b></div><div><b>${p.damage}</b></div><div class="label">Damage</div><div><b>${o.damage}</b></div></div>`;
@@ -1347,7 +1374,7 @@
     }
     if(!o.network)openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:titleWon?milestoneName(milestoneDefs.find(m=>m.id===o.titleId)):''});
     const lootText=lootNotes.map(note=>note.text).join(' · '),lootHtml=lootNotes.map(note=>`${note.iconName?`${gameIcon(note.iconName,note.icon)} `:''}${escapeHtml(note.text)}`).join(' · ');
-    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:fight.mode||'sim-plus',coach_cut:coachCut,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:lootText},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop||lootNotes.length?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=lootHtml;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:fight.mode||'sim-plus',fight_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_'),coach_cut:coachCut,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.championship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,opening_approach:fight.openingApproach||'none',corner_towel:!!fight.cornerTowel,haymaker_used:!!(fight.haymakerMiss||fight.lastChanceLanded||(fight.crisisUsed&&!fight.cornerTowel)),gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});state.pendingFight=null;pendingResultDrop=gearDrop?Object.assign({extras:lootText},gearDrop):null;resultDropRevealed=false;buildResultDetails(fight);$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop||lootNotes.length?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} BONUS GEAR DROP READY<small>Claim rewards to reveal your item</small></span>`;else lootBox.innerHTML=lootHtml;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;saveState();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function armResultAction(label){
@@ -1405,6 +1432,8 @@
     const fightMoment=e.target.closest('[data-fight-moment]');if(fightMoment){resolveFightMoment(fightMoment.dataset.fightMoment);return}
     const lastChance=e.target.closest('[data-last-chance]');if(lastChance){resolveLastChance(lastChance.dataset.lastChance);return}
     const crisis=e.target.closest('[data-crisis]');if(crisis){resolveFightCrisis(crisis.dataset.crisis);return}
+    const focusChoice=e.target.closest('[data-focus-choice]');if(focusChoice){resolveFocusChoice(focusChoice.dataset.focusChoice);return}
+    const focusContinue=e.target.closest('[data-focus-continue]');if(focusContinue){continueAfterFocus();return}
     const opening=e.target.closest('[data-opening-approach]');if(opening){beginFightApproach(opening.dataset.openingApproach);return}
     const fightModeToggle=e.target.closest('[data-fight-mode-toggle]');if(fightModeToggle){selectFightMode(fightModeToggle.dataset.fightModeToggle);return}
     const fp=e.target.closest('[data-fight-plan]');if(fp){chooseCornerPlan(fp.dataset.fightPlan);return}

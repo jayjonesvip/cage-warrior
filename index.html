@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.26" />
+<meta name="app-version" content="2.5.27" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.26">
+<link rel="stylesheet" href="styles.css?v=2.5.27">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -196,7 +196,7 @@
     <section class="screen" data-screen="fight">
       <div class="daily-reset-clock"><span>DAILY FIGHTS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily fight limit resets">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Career Opponents <span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span><small id="rosterSummary">Level-based round cost</small></div><div id="opponentList"></div></div>
-      <div class="section-note">Preview the Tale of the Tape, then hire a coach for outcome-shaping Sim+ decisions or keep the full purse and trust your fighter in Quick Sim.</div>
+      <div class="section-note">Preview the Tale of the Tape, then hire a coach for outcome-shaping Sim+ decisions or keep the full purse and trust your fighter in Quick Sim. Every booked fight begins with a fight-only Focus decision in the locker room.</div>
     </section>
 
     <section class="screen" data-screen="hustle">
@@ -339,6 +339,15 @@
         </div>
       </div>
 
+      <div class="sim-stage hidden" id="focusStage">
+        <div class="focus-card">
+          <div class="focus-meter-head"><span>FIGHT-ONLY STAT</span><b id="focusValue">82%</b></div>
+          <div class="focus-meter"><i id="focusMeterFill"></i></div>
+          <small class="focus-tier" id="focusTier">COMPOSED</small>
+          <div class="focus-encounter" id="focusEncounter"></div>
+        </div>
+      </div>
+
       <div class="sim-stage hidden" id="openingStage">
         <div class="opening-card">
           <div class="opening-copy"><span class="opening-kicker">ROUND 1 · OPENING CALL</span><h2>HOW DO YOU ENTER THE CAGE?</h2><p>This choice applies only to the first round. Both approaches use your signature style and reveal their tendency after the bell.</p></div>
@@ -351,7 +360,7 @@
         <div class="live-card">
           <div class="live-title"><b>Live Cage-Side</b><span class="round-live" id="liveRound">ROUND 1</span><span class="clock-live" id="liveClock">5:00</span></div>
           <div class="live-score">
-            <div class="live-fighter"><b id="livePlayerName">ROOKIE</b><small id="livePlayerConditionText">100% CONDITION</small><div class="condition"><i id="livePlayerCondition"></i></div></div>
+            <div class="live-fighter"><b id="livePlayerName">ROOKIE</b><span class="live-focus" id="liveFocusText">82% FOCUS · COMPOSED</span><small id="livePlayerConditionText">100% CONDITION</small><div class="condition"><i id="livePlayerCondition"></i></div></div>
             <div class="live-vs">AUTO<br>SIM</div>
             <div class="live-fighter right"><b id="liveOppName">OPPONENT</b><small id="liveOppConditionText">100% CONDITION</small><div class="condition"><i id="liveOppCondition"></i></div></div>
           </div>
@@ -378,12 +387,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.26"></script>
-<script src="strings.js?v=2.5.26"></script>
-<script src="analytics.js?v=2.5.26"></script>
-<script src="supabase-client.js?v=2.5.26"></script>
-<script src="cage-social.js?v=2.5.26"></script>
-<script src="game.js?v=2.5.26"></script>
-<script src="pwa.js?v=2.5.26"></script>
+<script src="game-logic.js?v=2.5.27"></script>
+<script src="strings.js?v=2.5.27"></script>
+<script src="analytics.js?v=2.5.27"></script>
+<script src="supabase-client.js?v=2.5.27"></script>
+<script src="cage-social.js?v=2.5.27"></script>
+<script src="game.js?v=2.5.27"></script>
+<script src="pwa.js?v=2.5.27"></script>
 </body>
 </html>
