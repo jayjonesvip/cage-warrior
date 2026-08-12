@@ -276,6 +276,9 @@ generated league.
   and optional 5-energy haymaker reserve directly beneath the purse. It then
   offers **Go Back** or **Fight!**; the first round's energy is charged only
   after Fight is confirmed and the cage-opening choice begins.
+- When the ten-fight daily allowance is exhausted, otherwise available fighter
+  cards take on the locked presentation and replace **See Matchup** with
+  **Daily Limit Reached — New Fights at Local Midnight** until the reset.
 - Title champions are persistent named fighters with professional records and
   attributes. A failed title challenge leaves the champion available for
   another attempt; a win archives the defeated former champion.

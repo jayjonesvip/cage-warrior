@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.48';
+  const ICON_ASSET_VERSION = '2.5.49';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -810,14 +810,15 @@
     const renderCard=o=>{
       const status=opponentGroup(o);
       const available=opponentAvailable(o);
+      const dailyExhausted=fightsLeft<1&&available;
       const stars=clamp(Math.ceil((o.power+o.speed+o.chin+o.cardio)/18),1,5);
       const silhouette=silhouetteForOpponent(o);
       const badge=o.network&&status==='current'?'CAGE NETWORK':o.championship?(status==='title'?'TITLE FIGHT':status==='former'?'FORMER CHAMP':'TITLE LOCKED'):status==='locked'?`LVL ${o.tier}`:status==='passed'?`PAST LVL ${o.tier}`:status==='rival'?`PAST RIVAL · LVL ${o.tier}`:'YOUR LEVEL';
       const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rematch=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),networkLocation=o.network?networkOpponentLocation(o):null,note=o.championship?(status==='title'?`Beat the reigning champion for the ${o.titleName}`:status==='former'?`You defeated ${o.name} for the ${o.titleName}`:`Reigning ${o.titleName} champion · not yet unlocked`):status==='locked'?`Next level challenger · unlocks at level ${o.tier}`:status==='rival'?(available?`Rematch accepted · half purse $${fmt(purse)}`:`You beat ${o.name} · taunt them into another fight`):status==='passed'?(hasHistory?`Past level ${o.tier} · rematch pays half`:`Past level ${o.tier} · first meeting pays half`):(hasHistory?`Current level ${o.tier} · rematch payout $${fmt(purse)}`:`Current level ${o.tier} opponent · payout $${fmt(purse)}`),cardInfo=o.network?`<div class="opp-note network-card-meta"><small>FIGHTING OUT OF</small><b>${networkLocation?`${networkLocation.name} · ${networkLocation.region}`:'CAGE NETWORK'}</b><span>FULL PURSE · $${fmt(purse)}</span></div>`:`<div class="opp-note">${note}</div>`;
-      const btn=status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='former'?`DEFEATED<br><small>FORMER CHAMP</small>`:'SEE MATCHUP';
-      const action=tauntable?`<button class="fight-btn taunt" data-taunt-key="${o.key}">TAUNT<br><small>FOR REMATCH</small></button>`:`<button class="fight-btn ${status}" data-fight-key="${o.key}" ${!available?'disabled':''}>${btn}</button>`;
+      const btn=dailyExhausted?'DAILY LIMIT REACHED<br><small>NEW FIGHTS AT LOCAL MIDNIGHT</small>':status==='locked'?`LOCKED<br><small>${o.championship?'CHAMPION':`LVL ${o.tier}`}</small>`:status==='former'?`DEFEATED<br><small>FORMER CHAMP</small>`:'SEE MATCHUP';
+      const action=tauntable?`<button class="fight-btn taunt" data-taunt-key="${o.key}">TAUNT<br><small>FOR REMATCH</small></button>`:dailyExhausted?`<button class="fight-btn locked daily-limit" disabled>${btn}</button>`:`<button class="fight-btn ${status}" data-fight-key="${o.key}" ${!available?'disabled':''}>${btn}</button>`;
       const safeName=escapeHtml(o.name),networkHandle=o.network?escapeHtml(o.networkHandle):'';
-      return `<article class="opponent ${status} ${o.championship?'champion':''} ${o.network?'network':''} ${rematch?'rematch':''}" data-card-flip="true" data-card-name="${safeName}" tabindex="0" aria-label="${safeName} fighter card${rematch?', rematch available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
+      return `<article class="opponent ${status} ${o.championship?'champion':''} ${o.network?'network':''} ${rematch?'rematch':''} ${dailyExhausted?'daily-exhausted':''}" data-card-flip="true" data-card-name="${safeName}" tabindex="0" aria-label="${safeName} fighter card${dailyExhausted?', daily fight limit reached':rematch?', rematch available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
         <div class="opponent-flip">
           <div class="opponent-side opponent-front" aria-hidden="false">
             <div class="opp-card-top"><span class="opp-badge">${badge}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
