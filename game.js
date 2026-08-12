@@ -428,7 +428,7 @@
     for(const id of state.equippedGear){const g=gearItems.find(x=>x.id===id);if(g&&g.stat===key)v+=g.bonus}
     return v;
   }
-  function ensureLoadout(){const ownedFight=state.gear.filter(id=>{const g=gearItems.find(x=>x.id===id);return g&&g.category==='Fight Gear'});state.equippedGear=state.equippedGear.filter(id=>ownedFight.includes(id)).slice(0,4);if(!state.equippedGear.length&&ownedFight.length)state.equippedGear=ownedFight.slice(0,4)}
+  function ensureLoadout(){const limit=LOGIC.gearLoadoutLimit(state.level),ownedFight=state.gear.filter(id=>{const g=gearItems.find(x=>x.id===id);return g&&g.category==='Fight Gear'});state.equippedGear=state.equippedGear.filter(id=>ownedFight.includes(id)).slice(0,limit);if(!state.equippedGear.length&&ownedFight.length)state.equippedGear=ownedFight.slice(0,limit)}
   function currentStyle(){return fighterStyles.find(s=>s.id===state.fighterStyle)||null}
   function currentCity(){return fighterCities.find(c=>c.id===state.fighterCity)||null}
   function currentAvatar(){return fighterAvatars.find(a=>a.id===state.fighterAvatar)||null}
@@ -555,7 +555,7 @@
     }
     if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus,titleRestore:!!previous?.titleRestore||titleRestore};trackEvent('level_up',{from_level:startingLevel,to_level:state.level,levels_gained:state.level-startingLevel});ensureRoster();showLevelUp(levelUpSummary)}
   }
-  function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id)),recovery=summary.titleRestore?'Title milestone reached — energy and health fully restored.':'Your corner restored up to 30 energy and 25 health per level.';$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`${recovery} ${newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
+  function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,newTitles=milestoneDefs.filter(m=>m.level>summary.fromLevel&&m.level<=summary.toLevel&&!state.milestones.includes(m.id)),recovery=summary.titleRestore?'Title milestone reached — energy and health fully restored.':'Your corner restored up to 30 energy and 25 health per level.',loadoutUnlocked=summary.fromLevel<8&&summary.toLevel>=8;$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`${recovery} ${loadoutUnlocked?'Four-slot Fight Gear loadout unlocked.':newTitles.length?`${newTitles.map(m=>milestoneName(m)).join(' and ')} challenge unlocked.`:'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
   function closeLevelUp(){const modal=$('#levelUpModal');clearTimeout(modal._burstTimer);modal._burstTimer=null;stopConfetti();modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI()}
   function spendEnergy(n){if(!LOGIC.spendEnergy(state,n)){toast('Not enough energy. It refills over time.','#ff766d');return false}return true}
 
@@ -736,7 +736,7 @@
   }
   function renderHustle(){
     ensureDailyCounters();
-    const hustleLeft=sessionsLeft('hustle',3),riskLeft=sessionsLeft('risk',1),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',2),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
+    const hustleLeft=sessionsLeft('hustle',3),riskLeft=sessionsLeft('risk',1),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',1),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
     $('#hustleLimitText').textContent=`${hustleLeft} SHIFT${hustleLeft===1?'':'S'} LEFT`;
     $('#riskLimitText').textContent=`SPAR ${riskLeft} · CARDS ${blackjackLeft}`;
     $('#publicityLimitText').textContent=`${publicityLeft} GIG${publicityLeft===1?'':'S'} LEFT`;$('#publicityLimitText').classList.toggle('exhausted',publicityLeft<1);
@@ -762,11 +762,12 @@
     const order=['Fight Gear','Bling','Lifestyle','Property & Rides'],owned=gearItems.filter(g=>gearCount(g.id)>0);
     const subtitles={'Fight Gear':'Equippable combat upgrades','Bling':'Passive follower bonuses','Lifestyle':'Passive recovery bonuses','Property & Rides':'Passive career bonuses'};
     if(!owned.length){$('#gearShop').innerHTML='<div class="gear-empty"><b>NO GEAR YET</b><span>Win fights to earn deterministic drops. Your fourth win without a drop is guaranteed to produce one.</span></div>';return}
-    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/4 · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.iconName||g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
+    const loadoutLimit=LOGIC.gearLoadoutLimit(state.level),loadoutProgress=loadoutLimit<4?' · 4 SLOTS UNLOCK AT LVL 8':'';
+    $('#gearShop').innerHTML=order.map(cat=>{const items=owned.filter(g=>g.category===cat);if(!items.length)return '';return `<div class="shop-section"><div class="shop-head"><b>${cat}</b><small>${subtitles[cat]}</small></div>${cat==='Fight Gear'?`<div class="loadout-note">ACTIVE LOADOUT ${state.equippedGear.length}/${loadoutLimit}${loadoutProgress} · One copy powers the perk; duplicates do not stack.</div>`:''}<div class="gear-grid">${items.map(g=>{const equipped=state.equippedGear.includes(g.id),rarity=g.rarity||'COMMON',action=cat==='Fight Gear'?`<button class="equip-btn" data-equip="${g.id}">${equipped?'UNEQUIP':'EQUIP'}</button>`:'<div class="gear-status">PERK ACTIVE</div>';return `<div class="gear collectible-card owned rarity-card-${rarity.toLowerCase()} ${equipped?'equipped':''}"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(g.id)}</span></div><div class="gear-hero"><span class="gear-flair"></span><span class="equip-burst"></span><div class="gear-icon">${gameIcon(g.iconName||g.id,g.icon)}</div></div><div class="gear-copy"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="gear-footer"><span class="level-tag">MIN LVL ${g.minLevel||1}</span>${action}</div></div>`}).join('')}</div></div>`}).join('');
   }
-  function openLoadoutFullDialog(trigger){const modal=$('#loadoutFullModal');loadoutDialogReturnFocus=trigger&&typeof trigger.focus==='function'?trigger:null;modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.lose();requestAnimationFrame(()=>$('#loadoutFullOk').focus())}
+  function openLoadoutFullDialog(trigger){const modal=$('#loadoutFullModal'),limit=LOGIC.gearLoadoutLimit(state.level);loadoutDialogReturnFocus=trigger&&typeof trigger.focus==='function'?trigger:null;$('#loadoutFullKicker').textContent=`FIGHT GEAR · ${limit}/${limit} SLOTS`;$('#loadoutFullDescription').textContent=limit<4?'Your rookie loadout has two active slots. Unequip one item to make room, or reach Level 8 to unlock four slots.':'Unequip one Fight Gear item before equipping another. Duplicate items still count as one active perk.';modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.lose();requestAnimationFrame(()=>$('#loadoutFullOk').focus())}
   function closeLoadoutFullDialog(){const modal=$('#loadoutFullModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();const returnFocus=loadoutDialogReturnFocus;loadoutDialogReturnFocus=null;if(returnFocus&&returnFocus.isConnected)requestAnimationFrame(()=>returnFocus.focus())}
-  function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);trackEvent('gear_unequipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});sfx.tap();updateUI();return}if(state.equippedGear.length>=4){openLoadoutFullDialog(trigger);return}state.equippedGear.push(id);trackEvent('gear_equipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
+  function toggleEquip(id,trigger){const g=gearItems.find(x=>x.id===id);if(!g||g.category!=='Fight Gear'||!state.gear.includes(id))return;const at=state.equippedGear.indexOf(id);if(at>=0){state.equippedGear.splice(at,1);trackEvent('gear_unequipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});sfx.tap();updateUI();return}if(state.equippedGear.length>=LOGIC.gearLoadoutLimit(state.level)){openLoadoutFullDialog(trigger);return}state.equippedGear.push(id);trackEvent('gear_equipped',{gear_id:id,gear_rarity:g.rarity.toLowerCase()});initAudio();sfx.crit();const card=trigger&&trigger.closest('.gear');if(card){card.classList.add('equip-bursting');trigger.textContent='EQUIPPED!';trigger.disabled=true;saveState();setTimeout(updateUI,680)}else updateUI()}
   function renderOpponents(){
     refreshOpponents();const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),activeCount=opponents.filter(opponentAvailable).length,rivalCount=state.roster.filter(o=>opponentGroup(o)==='rival').length;$('#fightLimitText').textContent=`${fightsLeft} ${fightsLeft===1?'FIGHT':'FIGHTS'} LEFT`;$('#rosterSummary').textContent=`${activeCount} ACTIVE · ${rivalCount} RIVALS`;
     const renderCard=o=>{
@@ -888,7 +889,7 @@
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
     if(!opportunityUnlocked(a)){toast(requirementText(a),'#75cfff');return}
-    if(sessionsLeft('publicity',2)<1){toast('No publicity gigs left today.','#ff766d');return}
+    if(sessionsLeft('publicity',1)<1){toast('No publicity gigs left today.','#ff766d');return}
     if(a.autograph){openAutographModal();return}
     if(!spendEnergy(a.cost))return;
     initAudio();state.dailyCounters.publicity++;
@@ -902,7 +903,7 @@
   }
   function openAutographModal(){
     const a=publicityDefs.find(x=>x.autograph);if(!a||!opportunityUnlocked(a)){toast(requirementText(a),'#75cfff');return}
-    if(sessionsLeft('publicity',2)<1){toast('No publicity gigs left today.','#ff766d');return}
+    if(sessionsLeft('publicity',1)<1){toast('No publicity gigs left today.','#ff766d');return}
     const slider=$('#autographPrice');slider.value=state.lastAutographPrice||0;
     $('#autographResult').classList.remove('show');$('#autographResult').innerHTML='';
     $('#autographRun').style.display='block';$('#autographRun').disabled=state.energy<a.cost;
@@ -922,7 +923,7 @@
     else{box.classList.add('danger');box.textContent='Danger zone. You may make money, but people could call you greedy and unfollow.'}
   }
   function runAutographSigning(){
-    const a=publicityDefs.find(x=>x.autograph);if(!a||sessionsLeft('publicity',2)<1)return;
+    const a=publicityDefs.find(x=>x.autograph);if(!a||sessionsLeft('publicity',1)<1)return;
     const price=clamp(Number($('#autographPrice').value)||0,0,50);state.lastAutographPrice=price;
     if(!spendEnergy(a.cost))return;
     initAudio();state.dailyCounters.publicity++;
@@ -1173,6 +1174,7 @@
   function selectFightMode(mode){if(!['sim-plus','quick'].includes(mode)||combatLocked)return;state.fightModePreference=mode;renderFightModeToggle();saveState();sfx.tap()}
   function fillTape(f){
     const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),roundCost=currentFightRoundCost(),clearance=roundCost*FIGHT_ROUNDS,cleared=fightsLeft>0&&state.energy>=clearance&&state.health>=20;
+    $('#tapeHypeBonus').textContent=`${Math.floor(state.hype)}% HYPE · WIN BONUS +${Math.round(state.hype/1.3)}% PURSE · +${Math.floor(state.hype)}% FOLLOWERS`;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);$('#tapeOppSprite').classList.toggle('network-portrait',!!f.o.network);
     $('#tapePPower').textContent=`PWR ${f.player.power}`;$('#tapeOPower').textContent=`PWR ${f.opp.power}`;$('#tapePSpeed').textContent=`SPD ${f.player.speed}`;$('#tapeOSpeed').textContent=`SPD ${f.opp.speed}`;$('#tapePChin').textContent=`CHN ${f.player.chin}`;$('#tapeOChin').textContent=`CHN ${f.opp.chin}`;$('#tapePCardio').textContent=`CAR ${f.player.cardio}`;$('#tapeOCardio').textContent=`CAR ${f.opp.cardio}`;
@@ -1243,7 +1245,7 @@
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
   function prepareLiveFight(){
-    showFightStage('liveStage');$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width='100%';$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent='100% CONDITION';$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
+    showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width='100%';$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent='100% CONDITION';$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
   }
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
@@ -1253,9 +1255,10 @@
     for(let round=2;round<=FIGHT_ROUNDS&&!fight.winner;round++){if(!chargeFightEnergy(fight.roundCost||currentFightRoundCost()))break;simulateRound(fight,round,signature)}
     fight.finalDecisionPending=false;if(!fight.winner&&fight.rounds.length>=FIGHT_ROUNDS)settleFightDecision(fight);fight.timeline=fight.timeline.filter(item=>item.type!=='fightMoment'&&item.type!=='lastChance');prepareLiveFight();$('#speedBtn').disabled=false;trackEvent('fight_quick_sim_started',{player_archetype:signature,rounds_simulated:fight.rounds.length});fightTimelineIndex=0;playFightTimeline(0);
   }
+  function setFightDecisionFocus(active){const card=$('#liveStage .live-card');if(card)card.classList.toggle('decision-active',!!active)}
   function showCornerChoice(){
     if(!fight||fight.winner||fight.rounds.length>=3){finishFightSimulation();return}
-    const next=fight.rounds.length+1,box=$('#cornerChoice'),crisisThreshold=25;box.scrollTop=0;
+    const next=fight.rounds.length+1,box=$('#cornerChoice'),crisisThreshold=25;setFightDecisionFocus(true);box.scrollTop=0;
     if(fight.playerCondition<=crisisThreshold&&!fight.crisisUsed){
       const chance=Math.round(haymakerChance(fight)*100),roundsToReserve=FIGHT_ROUNDS-next+1,canHaymaker=haymakerEnergyAvailable(roundsToReserve);
       box.innerHTML=`<div class="corner-panel crisis-panel"><h3>${gameIcon('corner-danger','🚨')} ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>${gameIcon('corner-towel','🏳️')} THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker" ${canHaymaker?'':'disabled'}><b>${gameIcon('corner-haymaker','💥')} THROW A HAYMAKER</b><small>${canHaymaker?`${chance}% chance · ${HAYMAKER_ENERGY} extra energy. Miss and you are knocked out.`:`Need ${HAYMAKER_ENERGY} energy beyond the remaining round reserve.`}</small></button></div></div>`;
@@ -1264,11 +1267,11 @@
     const style=fighterStyles.find(item=>item.id===fight.o.tendency),fightState=cornerFightState(fight.rounds),stateCopy=STRINGS.corner.states[fightState],matchup=STRINGS.corner.matchups[fight.o.tendency]||STRINGS.corner.matchups.pressure,roundLabel=next===3?'FINAL ROUND':'ROUND 2',readLabel=fight.deepRead?'DEEP READ':'OPPONENT READ';
     box.innerHTML=`<div class="corner-panel coach-corner"><h3>${roundLabel} — ${stateCopy.label}</h3><div class="corner-readline">${readLabel} · ${style?.name||fight.o.tag}</div><div class="corner-coach-quote"><b>COACH'S CORNER</b><p>“${stateCopy.advice} ${matchup.advice}”</p></div><div class="corner-plan-list" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
-  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(fight.roundCost||currentFightRoundCost())){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
+  function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(fight.roundCost||currentFightRoundCost())){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});setFightDecisionFocus(false);$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
   function resolveFightCrisis(choice){
     if(!fight||fight.winner||fight.crisisUsed||fight.playerCondition>25)return;
     const next=fight.rounds.length+1,startIndex=fightTimelineIndex,roundsToReserve=FIGHT_ROUNDS-next+1;if(choice==='haymaker'&&!haymakerEnergyAvailable(roundsToReserve))return;
-    fight.crisisUsed=true;$('#cornerChoice').innerHTML='';
+    fight.crisisUsed=true;setFightDecisionFocus(false);$('#cornerChoice').innerHTML='';
     if(choice==='towel'){
       trackEvent('fight_crisis_choice',{round_number:next,choice:'towel',outcome:'tko_loss'});fight.cornerTowel=true;fight.winner='opp';fight.method='TKO';fight.finishRound=next;fight.finishClock='5:00';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'ko',round:next,clock:'5:00',text:`The towel is in. ${state.name}'s corner stops the fight and ${fight.o.name} wins by TKO.`,className:'ko',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition});playFightTimeline(startIndex);return;
     }
@@ -1284,7 +1287,7 @@
   }
   function showFightMoment(item){
     if(!fight||fight.resolvedMoments.includes(item.round)){playFightTimeline(fightTimelineIndex+1);return}
-    const def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,box=$('#cornerChoice');fight.pendingMoment=item;$('#speedBtn').disabled=true;
+    const def=fightMomentDefs[item.moment]||fightMomentDefs.tactical,box=$('#cornerChoice');fight.pendingMoment=item;setFightDecisionFocus(true);$('#speedBtn').disabled=true;
     const choices=def.choices.map(choice=>{const chance=Math.round(fightMomentChance(choice)*100),successLabel=fight.deepRead?` · ${chance}% SUCCESS`:'';return `<button class="moment-choice" data-fight-moment="${choice.id}"><b>${choice.label}</b><small>${choice.risk}${successLabel}</small></button>`}).join('');
     box.innerHTML=`<div class="corner-panel fight-moment-panel"><div class="moment-kicker">${item.clock} · SIM+ DECISION</div><h3>${def.title}</h3><p>${def.prompt}</p><div class="moment-choice-list">${choices}</div></div>`;box.scrollTop=0;sfx.tap();
   }
@@ -1310,14 +1313,14 @@
     trackEvent('fight_moment_selected',{round_number:item.round,moment_id:item.moment,choice_id:choice.id,outcome:success?'success':'failure',player_archetype:state.fighterStyle});
     const chips=fightMomentEffectChips({damage,selfDamage,control,oppControl,takedown}),resultTitle=success?`${choice.label} WORKED`:`${choice.label} COUNTERED`,box=$('#cornerChoice');
     fight.resolvedMoments.push(item.round);fight.pendingMoment=null;box.innerHTML=`<div class="corner-panel fight-moment-result ${success?'success':'failure'}"><div class="moment-result-mark">${success?'✓':'✕'}</div><div><h3>${resultTitle}</h3><div class="moment-effect-chips">${chips.map(chip=>`<span>${chip}</span>`).join('')}</div><p>${outcome}</p></div></div>`;box.scrollTop=0;if(damage)pulseFightCondition('opponent');if(selfDamage)pulseFightCondition('player');
-    scheduleFight(()=>{box.innerHTML='';$('#livePlayerCondition').classList.remove('moment-impact');$('#liveOppCondition').classList.remove('moment-impact');$('#speedBtn').disabled=false;appendFightLine({clock:item.clock,text:`${choice.label}: ${outcome}`,className:success?'big':'opp',playerCondition:clamp(item.playerCondition-selfDamage,0,100),oppCondition:clamp(item.oppCondition-damage,0,100),big:success&&damage>=12,landed:success,side:success?'player':'opp'});playFightTimeline(fightTimelineIndex+1)},900*fightSpeed);
+    scheduleFight(()=>{setFightDecisionFocus(false);box.innerHTML='';$('#livePlayerCondition').classList.remove('moment-impact');$('#liveOppCondition').classList.remove('moment-impact');$('#speedBtn').disabled=false;appendFightLine({clock:item.clock,text:`${choice.label}: ${outcome}`,className:success?'big':'opp',playerCondition:clamp(item.playerCondition-selfDamage,0,100),oppCondition:clamp(item.oppCondition-damage,0,100),big:success&&damage>=12,landed:success,side:success?'player':'opp'});playFightTimeline(fightTimelineIndex+1)},900*fightSpeed);
   }
   function showLastChanceDecision(){
-    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;if(!LOGIC.playerTrailing(fight.rounds)){settleFightDecision(fight);playFightTimeline(fightTimelineIndex+1);return}const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');
+    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved)return;if(!LOGIC.playerTrailing(fight.rounds)){settleFightDecision(fight);playFightTimeline(fightTimelineIndex+1);return}const score=LOGIC.fightScore(fight.rounds),chance=Math.round(haymakerChance(fight)*100),canHaymaker=haymakerEnergyAvailable(),box=$('#cornerChoice');setFightDecisionFocus(true);
     box.innerHTML=`<div class="corner-panel last-chance-panel"><h3>0:10 LEFT · YOUR CORNER HAS YOU BEHIND</h3><p>The scorecards are slipping away. Stay disciplined and live with the decision, or spend extra energy on one final knockout swing.</p><div class="last-chance-score"><b>UNOFFICIAL SCORE</b> · YOU ${score.player} · ${fight.o.name.toUpperCase()} ${score.opponent}</div><div class="last-chance-actions"><button class="last-chance-btn discipline" data-last-chance="discipline">STAY DISCIPLINED</button><button class="last-chance-btn haymaker" data-last-chance="haymaker" ${canHaymaker?'':'disabled'}>${canHaymaker?`THROW THE HAYMAKER · ${HAYMAKER_ENERGY} ENERGY · ${chance}%`:`HAYMAKER LOCKED · NEED ${HAYMAKER_ENERGY} ENERGY`}</button></div></div>`;
   }
   function resolveLastChance(choice){
-    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved||!['discipline','haymaker'].includes(choice))return;const startIndex=fightTimelineIndex;fight.lastChanceResolved=true;$('#cornerChoice').innerHTML='';
+    if(!fight||!fight.finalDecisionPending||fight.lastChanceResolved||!['discipline','haymaker'].includes(choice))return;const startIndex=fightTimelineIndex;fight.lastChanceResolved=true;setFightDecisionFocus(false);$('#cornerChoice').innerHTML='';
     if(choice==='discipline'){trackEvent('fight_last_chance_choice',{choice:'discipline',outcome:'decision'});settleFightDecision(fight);playFightTimeline(startIndex+1);return}
     if(!haymakerEnergyAvailable()||!chargeFightEnergy(HAYMAKER_ENERGY)){fight.lastChanceResolved=false;showLastChanceDecision();return}
     fight.crisisUsed=true;const landed=Math.random()<haymakerChance(fight),round=fight.rounds[fight.rounds.length-1];trackEvent('fight_last_chance_choice',{choice:'haymaker',outcome:landed?'landed':'missed'});round.player.attempted++;fight.totals.player.attempted++;
