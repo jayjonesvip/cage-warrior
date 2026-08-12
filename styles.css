@@ -88,6 +88,8 @@
     .landing-visual{order:8;height:clamp(125px,25svh,190px);margin-top:14px}
     .landing-features{order:9;margin:12px 15px 15px}
   }
+
+.focus-phone,.focus-thread{margin-top:10px;padding:10px;border:1px solid #35495e;border-radius:13px;background:linear-gradient(180deg,#101820,#060a0f);box-shadow:inset 0 1px #ffffff12;text-align:left}.focus-contact{display:flex;align-items:center;gap:9px}.focus-contact img{width:40px;height:40px;flex:0 0 40px;border:2px solid #6ecfff;border-radius:50%;object-fit:cover;box-shadow:0 0 13px #43bfff42}.focus-contact b{display:block;color:#f4f8ff;font-family:system-ui,sans-serif;font-size:11px;font-weight:1000;letter-spacing:.7px}.focus-contact small{display:block;margin-top:1px;color:#8ca1b3;font-family:system-ui,sans-serif;font-size:8.5px}.focus-notification{margin-top:9px;padding:9px 11px;border-radius:11px;background:#202b36;color:#f3f7fb;font-family:system-ui,sans-serif}.focus-notification b{display:block;font-size:10px}.focus-notification span{display:block;margin-top:2px;color:#aebdca;font-size:8.5px}.focus-text-bubble{position:relative;margin:10px 0 1px 48px;padding:10px 11px;border-radius:13px 13px 4px 13px;background:linear-gradient(145deg,#2b9cf0,#176cc5);color:#fff;font-family:system-ui,sans-serif;font-size:10px;line-height:1.42;box-shadow:0 4px 12px #0006}.focus-unread{margin:10px 0;padding:10px;border:1px dashed #526678;border-radius:10px;background:#080d12;color:#bac8d3;font-family:system-ui,sans-serif;font-size:9.5px;line-height:1.4;text-align:left}
   @media (max-width:767px) and (max-height:740px){
     .landing-page{padding:8px 10px 12px}.landing-shell{min-height:0}
     .landing-brand{height:62px;padding:7px 13px}.landing-brand img{width:102px;height:48px}

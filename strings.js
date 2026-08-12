@@ -49,22 +49,43 @@ globalThis.CAGE_STRINGS = {
   },
 
   fightFocus: {
-    interruptions: [
-      {id:'mom-text',kicker:'TEXT FROM MOM',title:'MOM TEXTED YOU',prompt:'The message arrived just before your gloves went on.',engage:'READ IT',ignore:'LEAVE IT UNREAD',outcomes:[{chance:.55,focus:100,text:'“We are proud of you. Go show them who you are.” Everything else falls away.'},{focus:50,text:'“Dad fell and broke his shoulder. Come after the fight.” The room suddenly feels very far away.'}],ignoreResult:{delta:-5,text:'You turn the phone over, but keep wondering why she texted tonight.'}},
-      {id:'girlfriend-voicemail',kicker:'MISSED VOICEMAIL',title:'SHE LEFT A MESSAGE',prompt:'Your girlfriend called twice and left a voicemail.',engage:'LISTEN NOW',ignore:'SILENCE THE PHONE',outcomes:[{chance:.60,delta:12,text:'“Go handle business. I love you.” Her voice settles the entire room.'},{delta:-22,text:'She says you need to have a serious conversation when you get home.'}],ignoreResult:{delta:-6,text:'The red notification stays in the back of your mind.'}},
-      {id:'kid-autograph',kicker:'KNOCK AT THE DOOR',title:'A KID WANTS YOUR AUTOGRAPH',prompt:'Security says a young fan is waiting outside in your shirt.',engage:'SIGN IT',ignore:'STAY IN THE ROOM',outcomes:[{chance:.70,delta:10,text:'The kid calls you their hero. You remember exactly why you fight.'},{delta:-8,text:'Security loses track of time and your warmup gets cut short.'}],ignoreResult:{delta:-4,text:'You hear the kid being led away and try not to picture their face.'}},
-      {id:'coach-news',kicker:'COACH LOOKS UNEASY',title:'COACH HAS BAD NEWS',prompt:'Your coach asks whether you really want to hear it before the walkout.',engage:'TELL ME',ignore:'AFTER THE FIGHT',outcomes:[{chance:.50,delta:8,text:'The opponent looked compromised during inspection. Your target becomes clear.'},{delta:-18,text:'Your best training partner was taken to the hospital after a crash.'}],ignoreResult:{delta:-3,text:'You choose the fight, but his expression follows you.'}},
-      {id:'opponent-trash-talk',kicker:'HALLWAY COLLISION',title:'THE OPPONENT WALKS PAST',prompt:'They stop at your door and make the insult personal.',engage:'ANSWER THEM',ignore:'LOOK THROUGH THEM',outcomes:[{chance:.55,delta:7,text:'They break eye contact first. The cage already feels like yours.'},{delta:-10,text:'The words land closer to home than you want to admit.'}],ignoreResult:{delta:3,text:'You refuse the bait. Discipline wins the first exchange.'}},
-      {id:'unknown-call',kicker:'UNKNOWN NUMBER',title:'YOUR PHONE IS RINGING',prompt:'The same unknown number has called three times.',engage:'ANSWER IT',ignore:'DECLINE',outcomes:[{chance:.45,delta:14,text:'A former coach gives you one perfect reminder: “First move, no hesitation.”'},{delta:-12,text:'A collector demands an answer about a debt you forgot was due.'}],ignoreResult:{delta:-4,text:'The calls stop, but the reason remains unanswered.'}},
-      {id:'sponsor-video',kicker:'SPONSOR REQUEST',title:'THEY NEED A VIDEO NOW',prompt:'Your sponsor wants a ten-second clip before you walk.',engage:'RECORD IT',ignore:'NOT TONIGHT',outcomes:[{chance:.65,delta:6,text:'One take. The room erupts when you nail the final line.'},{delta:-9,text:'Six takes later, nobody can remember what sounded natural.'}],ignoreResult:{delta:2,text:'The phone goes away. Tonight is about the fight.'}},
-      {id:'partner-warning',kicker:'LAST-SECOND READ',title:'A TRAINING PARTNER HAS A WARNING',prompt:'They noticed something during the opponent’s warmup.',engage:'HEAR THEM OUT',ignore:'TRUST THE CAMP',outcomes:[{chance:.60,delta:9,text:'The observation fits the game plan perfectly. You know where the opening is.'},{delta:-11,text:'Their warning contradicts everything the camp prepared.'}],ignoreResult:{delta:2,text:'You trust the work already done and keep the plan simple.'}},
-      {id:'old-loss',kicker:'ARENA MONITOR',title:'YOUR OLD LOSS IS PLAYING',prompt:'The broadcast is replaying the finish that still bothers you.',engage:'WATCH IT',ignore:'TURN IT OFF',outcomes:[{chance:.50,delta:12,text:'For the first time, you see the exact mistake. It will not happen again.'},{delta:-14,text:'The memory feels current again—the lights, the noise, the count.'}],ignoreResult:{delta:3,text:'The screen goes dark. That version of you is not fighting tonight.'}},
-      {id:'family-chat',kicker:'PHONE BUZZING',title:'THE FAMILY CHAT EXPLODES',prompt:'Thirty-two unread messages appear in less than a minute.',engage:'CHECK THE CHAT',ignore:'MUTE IT',outcomes:[{chance:.65,delta:8,text:'Everyone is sending photos from a loud family watch party.'},{delta:-15,text:'A family argument has swallowed the chat, and now they want you to choose a side.'}],ignoreResult:{delta:-3,text:'You mute the noise, though a piece of it stays with you.'}},
-      {id:'old-friend',kicker:'VISITOR OUTSIDE',title:'AN OLD FRIEND SHOWED UP',prompt:'Someone from before the career is asking for one minute.',engage:'LET THEM IN',ignore:'SEND THEM HOME',outcomes:[{chance:.60,delta:11,text:'They remind you how impossible this once seemed. You feel ten feet tall.'},{delta:-13,text:'They need money and say you are the only person who can help.'}],ignoreResult:{delta:-4,text:'You protect the routine, but wonder what brought them here.'}},
-      {id:'injury-rumor',kicker:'LOCKER-ROOM RUMOR',title:'THE OPPONENT MAY BE HURT',prompt:'A familiar face claims the opponent injured a rib in camp.',engage:'CHANGE THE PLAN',ignore:'TRUST YOUR PREP',outcomes:[{chance:.50,delta:10,text:'The source is solid. You know exactly where to apply pressure.'},{delta:-9,text:'Your coach calls it nonsense, and now two game plans are competing in your head.'}],ignoreResult:{delta:2,text:'Rumors do not get a vote. You stay with the work.'}},
-      {id:'bank-alert',kicker:'URGENT ALERT',title:'YOUR BANK NEEDS ATTENTION',prompt:'A red notification says an important transaction failed.',engage:'OPEN THE ALERT',ignore:'HANDLE IT LATER',outcomes:[{chance:.55,delta:5,text:'It is a harmless security check. Relief hits like a clean breath.'},{delta:-16,text:'A major payment bounced. The problem will still be waiting after the bell.'}],ignoreResult:{delta:-7,text:'You pocket the phone, but your mind starts counting money.'}},
-      {id:'brother-video',kicker:'VIDEO FROM YOUR BROTHER',title:'HE SAYS YOU HAVE TO SEE THIS',prompt:'The preview shows your whole family crowded around a television.',engage:'PLAY THE VIDEO',ignore:'SAVE IT FOR LATER',outcomes:[{chance:.65,delta:10,text:'The room chants your name. You carry all of them toward the cage.'},{delta:-9,text:'The camera catches your father looking more worried than proud.'}],ignoreResult:{delta:-3,text:'You save it, then keep imagining what everyone wanted to say.'}},
-      {id:'walkout-song',kicker:'PRODUCTION PROBLEM',title:'YOUR WALKOUT SONG WILL NOT PLAY',prompt:'The arena needs an answer: choose a backup or walk out in silence.',engage:'PICK A BACKUP',ignore:'WALK IN SILENCE',outcomes:[{chance:.50,delta:8,text:'The backup track hits harder than the original ever did.'},{delta:-6,text:'Every option sounds wrong. The ritual feels incomplete.'}],ignoreResult:{delta:4,text:'No music. No distraction. Just your footsteps toward the cage.'}}
+    contacts: [
+      {id:'mom',name:'MOM',avatar:'assets/contact-mom.jpg?v=2.5.37',ignoreDelta:-4,ignoreText:'You leave Mom’s message unread, but keep wondering why she texted tonight.',messages:[
+        {id:'mom-proud',text:'We are so proud of you. Go show them who you are. ❤️',focus:100},
+        {id:'mom-watch-party',text:'The whole family is here in your shirts. This house is LOUD. We love you!',delta:12},
+        {id:'mom-dad-advice',text:'Dad says keep your hands up, breathe, and call us after you win.',delta:7},
+        {id:'mom-first-gloves',text:'Found the photo of your first gloves. You have wanted this since you were little.',delta:10},
+        {id:'mom-prayer',text:'I said a prayer for you. You are covered. Fight free tonight.',delta:8},
+        {id:'mom-dinner',text:'Your favorite meal is waiting here. Handle business and come home hungry.',delta:4},
+        {id:'mom-first-coach',text:'Your first coach called. He said you look ready for this moment.',delta:9},
+        {id:'mom-unconditional',text:'Win or lose, nothing changes here. We love you more than any result.',minimum:95},
+        {id:'mom-dad-fell',text:'Dad fell and broke his shoulder. He is okay, but come by after the fight.',focus:50},
+        {id:'mom-grandma-er',text:'Grandma is in the emergency room. We do not know much yet. I am sorry.',delta:-20},
+        {id:'mom-test-results',text:'The doctor called about my tests. We need to talk when you are done.',delta:-22},
+        {id:'mom-sister-accident',text:'Your sister was in a car accident. She is awake. Focus on your fight for now.',delta:-16},
+        {id:'mom-dog-missing',text:'The dog got out and we cannot find him anywhere. Everyone is looking.',delta:-14},
+        {id:'mom-family-fight',text:'Your brother and Dad are fighting again. They both expect me to fix it.',delta:-11},
+        {id:'mom-pipe-burst',text:'A pipe burst at the house. There is water everywhere, but we are handling it.',delta:-7},
+        {id:'mom-urgent-call',text:'Call me as soon as you can. It is important. I do not want to put it in a text.',delta:-12}
+      ]},
+      {id:'wife',name:'WIFE',avatar:'assets/contact-wife.jpg?v=2.5.37',ignoreDelta:-5,ignoreText:'You leave your wife’s message unread, and the notification follows you toward the cage.',messages:[
+        {id:'wife-good-luck',text:'Good luck, baby. Trust your work. We love you and we are already proud. ❤️',delta:10},
+        {id:'wife-sexy-photo',text:'[Photo] Win fast. I have plans for you when you get home. 😘',delta:12},
+        {id:'wife-kids-video',text:'The kids made you a video. They keep yelling “BRING HOME THE WIN!”',delta:15},
+        {id:'wife-pregnant-happy',text:'I took three tests. I’m pregnant. We are having another baby. ❤️',delta:18},
+        {id:'wife-food',text:'Can you pick up tacos on the way home? Champion duties. 🌮',delta:3},
+        {id:'wife-kids-love',text:'The kids said you are the toughest person in the whole world. No pressure.',delta:10},
+        {id:'wife-vacation',text:'Finish this and I am booking us two days where nobody can call you.',delta:8},
+        {id:'wife-believes',text:'I have seen every hard day that got you here. You belong in that cage.',minimum:95},
+        {id:'wife-cheating',text:'I saw the messages. Do not lie to me again. We are dealing with this tonight.',delta:-25},
+        {id:'wife-kids-crying',text:'Both kids are crying because you are not here. I cannot calm them down.',delta:-9},
+        {id:'wife-pregnant-scared',text:'The test is positive. I am pregnant, and honestly I am scared.',delta:-16},
+        {id:'wife-cannot-attend',text:'I am not going to make it to the fight. I am so sorry. Please do not be mad.',delta:-10},
+        {id:'wife-bill',text:'The mortgage payment bounced. We are short again, and I do not know what to do.',delta:-12},
+        {id:'wife-child-fever',text:'Our youngest has a high fever. I may need to take them to urgent care.',delta:-18},
+        {id:'wife-talk',text:'We need to talk when you get home. This cannot keep going the way it has.',delta:-20},
+        {id:'wife-car',text:'The car will not start. If you are able, I need you to pick us up afterward.',delta:-6}
+      ]}
     ]
   },
 

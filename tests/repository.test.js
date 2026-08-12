@@ -683,14 +683,30 @@ test('fight launch remembers a win-paid Sim+ coach or automatic Quick Sim toggle
 });
 
 test('booked fights resolve a 50-50 locker-room Focus encounter before either fight mode', () => {
-  const focusEvents = contentContext.CAGE_STRINGS.fightFocus.interruptions;
-  assert.equal(focusEvents.length, 15);
-  assert.ok(focusEvents.every(event => event.id && event.engage && event.ignore && event.outcomes.length === 2 && event.ignoreResult));
+  const focusContacts = contentContext.CAGE_STRINGS.fightFocus.contacts;
+  assert.deepEqual(Array.from(focusContacts, contact => contact.id), ['mom', 'wife']);
+  for (const contact of focusContacts) {
+    assert.equal(contact.messages.length, 16, `${contact.id} should have 16 possible texts`);
+    assert.ok(contact.avatar && contact.ignoreDelta < 0 && contact.ignoreText);
+    assert.equal(contact.messages.filter(message => message.delta > 0 || message.focus >= 95 || message.minimum >= 95).length, 8);
+    assert.equal(contact.messages.filter(message => message.delta < 0 || message.focus <= 50).length, 8);
+  }
+  const focusMessages = focusContacts.flatMap(contact => Array.from(contact.messages));
+  assert.equal(new Set(Array.from(focusMessages, message => message.id)).size, 32);
+  assert.ok(fs.existsSync('assets/contact-mom.jpg'));
+  assert.ok(fs.existsSync('assets/contact-wife.jpg'));
   assert.match(page, /id="focusStage"/);
   assert.match(page, /id="focusMeterFill"/);
   assert.match(page, /id="liveFocusText"/);
   assert.match(script, /fight\.focusBase=rint\(75,90\)/);
   assert.match(script, /quiet=Math\.random\(\)<\.5/);
+  assert.match(script, /function focusTextMessages\(\)/);
+  assert.match(script, /function drawFocusText\(messages\)/);
+  assert.match(script, /state\.focusTextDeck=deck/);
+  assert.match(script, /state\.lastFocusTextId=id/);
+  assert.match(script, /message:drawFocusText\(messages\)/);
+  assert.match(script, /data-focus-choice="read"/);
+  assert.match(script, /data-focus-choice="ignore"/);
   assert.match(script, /data-focus-choice="music"/);
   assert.match(script, /Math\.random\(\)<\.20/);
   assert.match(script, /fight\.focus\+=rint\(4,10\)/);
@@ -703,15 +719,19 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.33"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.37"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
   assert.match(css, /\.focus-choice\.risk\{[^}]*#ff766d[^}]*#d84d46/);
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
-  assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
+  assert.match(css, /\.focus-phone,\.focus-thread\{/);
+  assert.match(css, /\.focus-text-bubble\{/);
+  assert.match(script, /resultKicker=isQuiet\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.33/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.37/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.37/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.37/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -825,7 +845,7 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.33'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.37'/);
   assert.match(script, /function gameIcon\(name,fallback\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);

@@ -133,13 +133,16 @@ generated league.
   and signature style without decision prompts. The Tale of the Tape toggle
   remembers the last selected mode for the next fight.
 - Every booked fight generates a fight-only **Focus** rating from 75–90%. Half
-  of walkouts are interrupted by a locker-room message, visitor, rumor, or
-  demand: engaging can deliver a major boost or a serious distraction, while
-  ignoring it has a smaller, known consequence. The other half offer quiet
-  preparation: music gains 4–10 Focus with a 20% chance to reach 100%, while
-  meditation reliably raises Focus to at least 92%. Focus is capped at 50–100%
-  and affects initiative, strike execution, tactical decision odds, and final
-  haymaker execution for that fight only.
+  of walkouts receive an unread text from Mom or the fighter's wife. Reading it
+  reveals one of 32 messages with a meaningful boost or distraction; ignoring
+  it leaves the message hidden and applies a smaller known Focus cost. The
+  other half offer quiet preparation: music gains 4–10 Focus with a 20% chance
+  to reach 100%, while meditation reliably raises Focus to at least 92%.
+  Focus is capped at 50–100% and affects initiative, strike execution,
+  tactical decision odds, and final haymaker execution for that fight only.
+- Mom and Wife each have 16 possible texts, evenly split between positive and
+  negative outcomes. Messages come from a shuffled, saved 32-card deck, so
+  every text appears once before any repeats, including after a reload.
 - Between rounds, the corner gives an unofficial **Protect the Lead**, **Too
   Close to Call**, or **You're Behind** read, followed by natural matchup
   advice. The grounded tactical choices are **Fight Your Way** with the
