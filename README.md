@@ -237,6 +237,10 @@ generated league.
 - Cage Network snapshots persist in the local career and remain playable
   offline. Fighting one never changes the real fighter's public record, never
   creates a misleading shared CageReporter result, and can never award a title.
+- A Cage Network card uses the fighter's stored city or identity suffix to show
+  where they fight out of, their region, and the available purse. A fighter with
+  no prior player matchup is labeled **First Meeting** instead of showing an
+  empty head-to-head message.
 - Pre-fight roster and Tale of the Tape cards conceal the opponent's
   tendency and scouting report until the first round has been completed.
 - The current level always replenishes to three fresh contenders, so the fight

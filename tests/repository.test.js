@@ -383,7 +383,7 @@ test('opponents have pro records, persistent rival history, and consent-aware re
   assert.match(script, /function payoutForOpponent\(o\)\{return LOGIC\.payoutForOpponent\(o,state\.level\)\}/);
   assert.match(script, /recordInitialized:true/);
   assert.match(script, /<span class="opp-record">PRO \$\{o\.wins\}-\$\{o\.losses\}<\/span>/);
-  assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:'<div class="opp-history">NO HEAD-TO-HEAD HISTORY<\/div>'/);
+  assert.match(script, /hasHistory\?`<div class="opp-history">H2H YOU \$\{o\.lossesToPlayer\|\|0\}-\$\{o\.winsVsPlayer\|\|0\}<\/div>`:'<div class="opp-history">FIRST MEETING<\/div>'/);
   assert.doesNotMatch(script, /<h3>\$\{o\.name\}<\/h3><p>\$\{o\.tag\}<\/p>/);
   assert.match(script, /function opponentGroup\(o\)\{return LOGIC\.opponentGroup/);
   assert.match(script, /function opponentAvailable\(o\)/);
@@ -984,6 +984,11 @@ test('Cage Network profiles become safe local AI opponent snapshots', () => {
   assert.match(script, /o\.network&&o\.networkHandle\)o\.name=networkOpponentDisplayName\(o\.networkHandle\)/);
   assert.doesNotMatch(script, /name=handle\.toUpperCase\(\)/);
   assert.match(script, /network:true,sourceProfileId:id/);
+  assert.match(script, /function networkOpponentLocation\(o\)/);
+  assert.match(script, /class="opp-note network-card-meta"><small>FIGHTING OUT OF<\/small>/);
+  assert.match(script, /\$\{networkLocation\.name\} · \$\{networkLocation\.region\}/);
+  assert.match(script, /FULL PURSE · \$\$\{fmt\(purse\)\}/);
+  assert.match(css, /\.network-card-meta\{display:grid;justify-items:center/);
   assert.match(script, /LOGIC\.networkOpponentRatings/);
   assert.match(script, /if\(screen==='fight'\)queueMicrotask\(syncNetworkOpponents\)/);
   assert.match(script, /existing\.length>=2/);
@@ -1068,10 +1073,14 @@ test('training separates two daily sparring sessions from drills and recovery', 
   assert.match(page, /id="sparringActions"/);
   assert.match(script, /id:'light-sparring'.*cost:10,gain:1,xp:14,skills:1/);
   assert.match(script, /id:'heavy-sparring'.*cost:20,gain:1,xp:28,skills:2,damage:\[3,9\]/);
+  assert.equal(fs.existsSync('assets/icons/light-sparring.png'), true);
+  assert.equal(fs.existsSync('assets/icons/heavy-sparring.png'), true);
   assert.match(script, /sessionsLeft\('sparring',2\)/);
   assert.match(script, /state\.dailyCounters\.sparring\+=quote\.sessions/);
   assert.match(script, /const sparring=e\.target\.closest\('\[data-sparring\]'\)/);
   assert.doesNotMatch(script, /id:'hard-sparring'/);
+  assert.match(css, /\.action h3\{[^}]*white-space:nowrap;overflow:hidden;text-overflow:ellipsis/);
+  assert.match(css, /\.action \.cost small\{[^}]*white-space:normal;overflow-wrap:anywhere/);
   assert.match(page, /Recovery Room/);
   assert.match(page, /id="recoveryLimitText"/);
   assert.match(page, /id="recoveryActions"/);

@@ -53,6 +53,8 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `slip-rope-drill.png` | ⚡ | Slip Rope Drill |
 | `body-conditioning.png` | 🧱 | Body Conditioning |
 | `roadwork-at-dawn.png` | 🫁 | Roadwork at Dawn |
+| `light-sparring.png` | 🥋 | Light Sparring |
+| `heavy-sparring.png` | 🤼 | Heavy Sparring |
 | `hard-sparring.png` | 🤼 | Hard Sparring |
 | `ice-bath.png` | 🧊 | Ice Bath recovery treatment |
 | `sauna.png` | ♨️ | Sauna recovery treatment |
