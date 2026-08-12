@@ -243,6 +243,15 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingGain(2,true,true),6);
 });
 
+test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
+  assert.equal(logic.trainingCost({cost:8},0),8);
+  assert.equal(logic.trainingCost({cost:8},2),12);
+  assert.equal(logic.trainingGain(1,false,false,0),1);
+  assert.ok(logic.trainingGain(1,false,false,2)<1);
+  assert.equal(logic.sparringDamage(3,0),3);
+  assert.ok(logic.sparringDamage(3,2)>3);
+});
+
 test('recovery treatments share one daily use and clamp restored resources',()=>{
   const ice={energy:25,health:0},sauna={energy:15,health:12},massage={energy:5,health:25},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
   assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');

@@ -169,7 +169,20 @@
     return {ok:true,reason:'',sessions,cashCost,energyCost};
   }
 
-  function trainingGain(baseGain,coach,perfect){return (finite(baseGain)+(coach?1:0))*(perfect?2:1)}
+  function trainingCost(action,repeatCount=0){
+    const base=Math.max(0,finite(action&&action.cost,0));
+    return Math.max(1,Math.ceil(base+Math.max(0,nonNegativeWhole(repeatCount))*2));
+  }
+
+  function trainingGain(baseGain,coach,perfect,repeatCount=0){
+    const repeated=Math.max(0,nonNegativeWhole(repeatCount));
+    const fatigue=Math.max(0.45,1-repeated*.18);
+    return (finite(baseGain)+(coach?1:0))*fatigue*(perfect?2:1);
+  }
+
+  function sparringDamage(baseDamage,repeatCount=0){
+    return Math.max(0,finite(baseDamage)+Math.max(0,nonNegativeWhole(repeatCount))*2);
+  }
 
   function recoveryQuote(state,treatment,fee,used){
     const cashCost=Math.max(0,whole(fee)),energyGain=Math.max(0,finite(treatment.energy)),healthGain=Math.max(0,finite(treatment.health));
@@ -326,5 +339,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingGain,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,sparringDamage,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
