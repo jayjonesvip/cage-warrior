@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.27" />
+<meta name="app-version" content="2.5.28" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.27">
+<link rel="stylesheet" href="styles.css?v=2.5.28">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -340,10 +340,14 @@
       </div>
 
       <div class="sim-stage hidden" id="focusStage">
-        <div class="focus-card">
-          <div class="focus-meter-head"><span>FIGHT-ONLY STAT</span><b id="focusValue">82%</b></div>
+        <div class="focus-hud">
+          <div class="focus-meter-head"><span>FOCUS</span><b id="focusValue">82%</b></div>
           <div class="focus-meter"><i id="focusMeterFill"></i></div>
           <small class="focus-tier" id="focusTier">COMPOSED</small>
+        </div>
+        <div class="focus-locker-room">
+          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.28b" alt="Fight-night locker room prepared for the fighter">
+          <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MINUTES BEFORE THE WALKOUT</small></div>
           <div class="focus-encounter" id="focusEncounter"></div>
         </div>
       </div>
@@ -387,12 +391,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.27"></script>
-<script src="strings.js?v=2.5.27"></script>
-<script src="analytics.js?v=2.5.27"></script>
-<script src="supabase-client.js?v=2.5.27"></script>
-<script src="cage-social.js?v=2.5.27"></script>
-<script src="game.js?v=2.5.27"></script>
-<script src="pwa.js?v=2.5.27"></script>
+<script src="game-logic.js?v=2.5.28"></script>
+<script src="strings.js?v=2.5.28"></script>
+<script src="analytics.js?v=2.5.28"></script>
+<script src="supabase-client.js?v=2.5.28"></script>
+<script src="cage-social.js?v=2.5.28"></script>
+<script src="game.js?v=2.5.28"></script>
+<script src="pwa.js?v=2.5.28"></script>
 </body>
 </html>

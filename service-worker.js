@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.27';
+const APP_VERSION='2.5.28';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,17 +8,18 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.27',
-  './game-logic.js?v=2.5.27',
-  './strings.js?v=2.5.27',
-  './analytics.js?v=2.5.27',
-  './supabase-client.js?v=2.5.27',
-  './cage-social.js?v=2.5.27',
-  './game.js?v=2.5.27',
-  './pwa.js?v=2.5.27',
+  './styles.css?v=2.5.28',
+  './game-logic.js?v=2.5.28',
+  './strings.js?v=2.5.28',
+  './analytics.js?v=2.5.28',
+  './supabase-client.js?v=2.5.28',
+  './cage-social.js?v=2.5.28',
+  './game.js?v=2.5.28',
+  './pwa.js?v=2.5.28',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
+  './assets/focus-locker-room.jpg?v=2.5.28b',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',

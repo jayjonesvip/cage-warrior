@@ -685,7 +685,17 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /fightFocusModifier\(fight\)/);
   assert.match(script, /beginFocusSequence\(\)/);
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
-  assert.match(css, /\.focus-card\{/);
+  assert.match(page, /<span>FOCUS<\/span>/);
+  assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.28b"/);
+  assert.match(page, /<span>LOCKER ROOM<\/span>/);
+  assert.match(css, /\.focus-hud\{/);
+  assert.match(css, /\.focus-locker-room\{/);
+  assert.match(css, /\.focus-choice\.risk\{[^}]*#ff766d[^}]*#d84d46/);
+  assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
+  assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
+  assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.28b/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
