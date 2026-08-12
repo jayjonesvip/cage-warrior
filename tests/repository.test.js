@@ -616,7 +616,7 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /class="tape-energy" id="tapeEnergy">18 ENERGY CLEARANCE · 6 PER ROUND/);
   assert.match(html, /KEEP 5 EXTRA FOR A HAYMAKER/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
-  assert.match(html, /id="tapeFightBtn"[^>]*>FIGHT WITH COACH<\/button>/);
+  assert.match(html, /id="tapeFightBtn"[^>]*>START TACTICAL FIGHT<\/button>/);
   assert.match(script, /function openTaleOfTape\(o\)/);
   assert.match(script, /function closeFightPreview\(\)/);
   assert.match(script, /function commitFight\(mode,o=fight\?\.o\)/);
@@ -646,8 +646,10 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
   assert.match(css, /\.live-card>#cornerChoice:not\(:empty\)\{[^}]*max-height:58%;[^}]*overflow-y:auto/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.39"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.41"\)[^}]*background-position:center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
+  assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
+  assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
   assert.match(css, /@media \(min-width:1100px\)\{[\s\S]*?\.live-card>#cornerChoice:not\(:empty\)\{[^}]*align-self:stretch;[^}]*height:100%;[^}]*max-height:none/);
   assert.match(css, /@media \(min-width:1100px\)\{[\s\S]*?\.live-card>#cornerChoice \.corner-panel\{[^}]*box-sizing:border-box;[^}]*height:100%;[^}]*min-height:100%/);
   assert.match(css, /\.corner-plan-btn\.signature\{[^}]*background:linear-gradient\(#42b8f3,#1160b8\)/);
@@ -663,11 +665,13 @@ test('fight launch remembers a win-paid Sim+ coach or automatic Quick Sim toggle
   assert.doesNotMatch(page, /id="modeStage"/);
   assert.match(page, /class="fight-mode-toggle"/);
   assert.match(page, /data-fight-mode-toggle="sim-plus"/);
-  assert.match(page, /HIRE COACH/);
-  assert.match(page, /SIM\+ · 10% ON WINS/);
+  assert.match(page, /TACTICAL FIGHT/);
+  assert.match(page, /COACH · 10% ON WINS/);
   assert.match(page, /data-fight-mode-toggle="quick"/);
-  assert.match(page, /TRUST FIGHTER/);
-  assert.match(page, /QUICK · KEEP 100%/);
+  assert.match(page, /FULL SIMULATION/);
+  assert.match(page, /HANDS-OFF · KEEP 100%/);
+  assert.match(script, /mode==='quick'\?'START FULL SIMULATION':'START TACTICAL FIGHT'/);
+  assert.doesNotMatch(`${page}\n${script}`, /FIGHT WITH COACH|START QUICK SIM/);
   assert.match(script, /fightModePreference:'sim-plus'/);
   assert.match(script, /source\.fightModePreference==='quick'\?'quick':'sim-plus'/);
   assert.match(script, /function renderFightModeToggle\(\)/);
@@ -723,7 +727,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.39"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.41"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -733,9 +737,9 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-text-bubble\{/);
   assert.match(script, /resultKicker=isQuiet\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.39/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.39/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.39/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.41/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.41/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.41/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -849,7 +853,7 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.39'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.41'/);
   assert.match(script, /function gameIcon\(name,fallback\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
