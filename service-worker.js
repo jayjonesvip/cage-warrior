@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.41';
+const APP_VERSION='2.5.42';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,20 +8,20 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.41',
-  './game-logic.js?v=2.5.41',
-  './strings.js?v=2.5.41',
-  './analytics.js?v=2.5.41',
-  './supabase-client.js?v=2.5.41',
-  './cage-social.js?v=2.5.41',
-  './game.js?v=2.5.41',
-  './pwa.js?v=2.5.41',
+  './styles.css?v=2.5.42',
+  './game-logic.js?v=2.5.42',
+  './strings.js?v=2.5.42',
+  './analytics.js?v=2.5.42',
+  './supabase-client.js?v=2.5.42',
+  './cage-social.js?v=2.5.42',
+  './game.js?v=2.5.42',
+  './pwa.js?v=2.5.42',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
-  './assets/focus-locker-room.jpg?v=2.5.41',
-  './assets/contact-mom.jpg?v=2.5.41',
-  './assets/contact-wife.jpg?v=2.5.41',
+  './assets/focus-locker-room.jpg?v=2.5.42',
+  './assets/contact-mom.jpg?v=2.5.42',
+  './assets/contact-wife.jpg?v=2.5.42',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
