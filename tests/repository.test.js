@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const zlib = require('node:zlib');
 const vm = require('node:vm');
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -29,6 +30,21 @@ const packageVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).versi
 const contentContext = {};
 vm.runInNewContext(strings, contentContext);
 const stringsData = contentContext.CAGE_STRINGS;
+
+function pngTopLeftAlpha(file) {
+  const png = fs.readFileSync(file);
+  assert.equal(png.readUInt8(24), 8, `${file} should use 8-bit PNG channels`);
+  assert.equal(png.readUInt8(25), 6, `${file} should use RGBA PNG color`);
+  const idat = [];
+  for (let offset = 8; offset < png.length;) {
+    const length = png.readUInt32BE(offset);
+    const type = png.toString('ascii', offset + 4, offset + 8);
+    if (type === 'IDAT') idat.push(png.subarray(offset + 8, offset + 8 + length));
+    offset += length + 12;
+  }
+  const firstScanline = zlib.inflateSync(Buffer.concat(idat));
+  return firstScanline.readUInt8(4);
+}
 
 test('external game assets are linked and the game script parses', () => {
   const releaseVersionPattern = appVersion.replaceAll('.', '\\.');
@@ -687,7 +703,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.32"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.33"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -695,7 +711,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
   assert.match(script, /resultKicker=encounter\.type==='quiet'\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.32/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.33/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -809,8 +825,9 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.33'/);
   assert.match(script, /function gameIcon\(name,fallback\)/);
-  assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png"/);
+  assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
   assert.match(script, /onerror="this\.remove\(\)"/);
   assert.match(script, /gameIcon\(a\.id,a\.icon\)/);
@@ -1074,8 +1091,11 @@ test('training separates two daily sparring sessions from drills and recovery', 
   assert.match(page, /id="sparringActions"/);
   assert.match(script, /id:'light-sparring'.*cost:10,gain:1,xp:14,skills:1/);
   assert.match(script, /id:'heavy-sparring'.*cost:20,gain:1,xp:28,skills:2,damage:\[3,9\]/);
-  assert.equal(fs.existsSync('assets/icons/light-sparring.png'), true);
-  assert.equal(fs.existsSync('assets/icons/heavy-sparring.png'), true);
+  for (const asset of ['light-sparring', 'heavy-sparring']) {
+    const file = `assets/icons/${asset}.png`;
+    assert.equal(fs.existsSync(file), true);
+    assert.equal(pngTopLeftAlpha(file), 0, `${asset} artwork should have a transparent background`);
+  }
   assert.match(script, /sessionsLeft\('sparring',2\)/);
   assert.match(script, /state\.dailyCounters\.sparring\+=quote\.sessions/);
   assert.match(script, /const sparring=e\.target\.closest\('\[data-sparring\]'\)/);
@@ -1220,7 +1240,9 @@ test('the collectible drop pool includes early-career and status cards', () => {
   assert.match(script, /id:'redline-superbike'.*category:'Property & Rides'.*rarity:'EPIC'.*minLevel:7/);
   assert.match(script, /id:'diamond-grill'.*category:'Bling'.*rarity:'EPIC'.*minLevel:6/);
   for (const asset of ['victory-bucket','fight-fuel-protein','flagship-phone','concert-grand','sky-blue-scooter','midnight-cruiser','redline-superbike','diamond-grill']) {
-    assert.equal(fs.existsSync(`assets/icons/${asset}.png`), true, `${asset} artwork should exist`);
+    const file = `assets/icons/${asset}.png`;
+    assert.equal(fs.existsSync(file), true, `${asset} artwork should exist`);
+    assert.equal(pngTopLeftAlpha(file), 0, `${asset} artwork should have a transparent background`);
   }
   assert.ok(fs.existsSync('assets/icons/small-gym-dog.png'));
   assert.ok(fs.existsSync('assets/icons/dog.png'));
