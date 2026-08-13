@@ -222,6 +222,9 @@ generated league.
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
   career, title opportunities, championship wins, and the first exceptional
   performance bonus without allowing arbitrary client-authored CEO copy.
+- Tapping the CEO portrait opens his verified public profile with executive bio,
+  Cage Grind role, headquarters, and 2,000,000-follower audience. The official
+  account does not accept fighter-message interactions.
 - Title opportunities open a full-photo message from the CEO's office after the
   level-up celebration. Winning the World Title adds the CEO's championship
   presentation directly to the fight result. Qualifying upsets, finishes, and
