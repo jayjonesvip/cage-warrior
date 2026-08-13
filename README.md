@@ -91,6 +91,14 @@ generated league.
   obvious. Enabled primary actions use consistent blue fills and bold white
   labels; secondary controls use slate, special opportunities use amber, and
   disabled or locked controls remain visibly subdued.
+- `Make Ends Meet` side jobs are early-career work only. At Level 5 the section
+  is replaced by a full-time fighter milestone note, while publicity,
+  endorsements, and Underground Buzz remain available.
+- Underground Buzz previews its locked games as future opportunities. Backroom
+  Blackjack unlocks at Level 2, and Cage Dice unlocks at Level 4 with one daily
+  roll on under seven, over seven, exactly seven, or doubles. Both games cap a
+  wager at 25% of available Cash. Cage Dice uses `assets/cage-dice.jpg`, with a
+  built-in dice fallback if the artwork cannot load.
 - Fighter selection places each transparent portrait over a blue arena-light
   gradient, with a brighter keyboard-focus and hover treatment around the card.
 - The Home hero shows a Cage Status tied to the real title ladder: Prospect,
@@ -222,9 +230,8 @@ generated league.
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
   career, title opportunities, championship wins, and the first exceptional
   performance bonus without allowing arbitrary client-authored CEO copy.
-- Tapping the CEO portrait opens his verified public profile with executive bio,
-  Cage Grind role, headquarters, and 2,000,000-follower audience. The official
-  account does not accept fighter-message interactions.
+- Tapping the CEO portrait opens his verified public profile with his executive
+  bio. The official account does not accept fighter-message interactions.
 - Title opportunities open a full-photo message from the CEO's office after the
   level-up celebration. Winning the World Title adds the CEO's championship
   presentation directly to the fight result. Qualifying upsets, finishes, and

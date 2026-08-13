@@ -276,6 +276,15 @@ test('blackjack values aces correctly, caps bets, and pays standard outcomes',()
   assert.equal(logic.blackjackOutcome(['TS','8H'],['KS','QH'],20).result,'loss');
 });
 
+test('Cage Dice caps wagers and settles every supported bet',()=>{
+  assert.equal(logic.cageDiceBetLimit(403),100);
+  assert.deepEqual(logic.cageDiceOutcome(2,3,'under',20),{die1:2,die2:3,total:5,doubles:false,choice:'under',multiplier:2,won:true,payout:40,profit:20});
+  assert.equal(logic.cageDiceOutcome(5,4,'over',20).payout,40);
+  assert.equal(logic.cageDiceOutcome(3,4,'seven',20).payout,100);
+  assert.equal(logic.cageDiceOutcome(6,6,'doubles',20).payout,120);
+  assert.equal(logic.cageDiceOutcome(3,4,'doubles',20).payout,0);
+});
+
 test('score helpers expose a trailing player for the final-ten-second decision',()=>{
   const rounds=[{scoreP:9,scoreO:10},{scoreP:10,scoreO:9},{scoreP:9,scoreO:10}];
   assert.deepEqual(logic.fightScore(rounds),{player:28,opponent:29});
@@ -328,8 +337,8 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,publicity:1,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,cageDice:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,cageDice:7,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,cageDice:1,publicity:1,recovery:1});
 });
 
 test('fight gear loadout expands from two slots to four at level eight', () => {

@@ -101,7 +101,7 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0};
     return {
       date:today,
       fight:clamp(nonNegativeWhole(counters.fight),0,10),
@@ -109,6 +109,7 @@
       sparring:clamp(nonNegativeWhole(counters.sparring),0,2),
       hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
       blackjack:clamp(nonNegativeWhole(counters.blackjack),0,1),
+      cageDice:clamp(nonNegativeWhole(counters.cageDice),0,1),
       publicity:clamp(nonNegativeWhole(counters.publicity),0,1),
       recovery:clamp(nonNegativeWhole(counters.recovery),0,1)
     };
@@ -229,6 +230,15 @@
     return {result,payout,profit:payout-wager,player,dealer};
   }
 
+  function cageDiceBetLimit(cash){return Math.floor(Math.max(0,finite(cash))*.25)}
+
+  function cageDiceOutcome(die1,die2,choice,bet){
+    const first=clamp(whole(die1,1),1,6),second=clamp(whole(die2,1),1,6),total=first+second,doubles=first===second,wager=Math.max(0,whole(bet));
+    const selected=['under','over','seven','doubles'].includes(choice)?choice:'under',multiplier={under:2,over:2,seven:5,doubles:6}[selected];
+    const won=selected==='under'?total<7:selected==='over'?total>7:selected==='seven'?total===7:doubles,payout=won?wager*multiplier:0;
+    return {die1:first,die2:second,total,doubles,choice:selected,multiplier,won,payout,profit:payout-wager};
+  }
+
   function payoutForOpponent(opponent,level){
     const reward=Math.max(0,finite(opponent&&opponent.reward));
     const tier=Math.max(1,whole(opponent&&opponent.tier,1));
@@ -339,5 +349,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,sparringDamage,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,sparringDamage,recoveryQuote,applyRecovery,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

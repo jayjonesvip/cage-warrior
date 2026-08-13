@@ -17,8 +17,9 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.53';
+  const ICON_ASSET_VERSION = '2.5.55';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
+  function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
   const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
@@ -31,7 +32,7 @@
     version:20,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,publicity:0,recovery:0},blackjackHand:null,
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',
     pendingFight:null,fightModePreference:'sim-plus',focusTextDeck:[],lastFocusTextId:'',
@@ -82,6 +83,7 @@
   let identityShufflePending=false;
   let retirementPending=false;
   let pendingCeoPresentation=null;
+  let cageDiceChoice='under';
   const HISTORY_KEY='cageGrind';
 
   const planDefs = [
@@ -365,6 +367,10 @@
     return {date:hand.date,bet,deck,player,dealer,status,result:status==='settled'?result:'',payout:status==='settled'?Math.max(0,Math.floor(Number(hand.payout))||0):0};
   }
 
+  function normalizeCageDiceResult(result){
+    if(!result||typeof result!=='object'||result.date!==LOGIC.localDateKey())return null;const bet=clamp(Math.floor(Number(result.bet))||0,1,1000000000),outcome=LOGIC.cageDiceOutcome(result.die1,result.die2,result.choice,bet);return {date:result.date,bet,...outcome};
+  }
+
   function normalizeState(parsed){
       const source=parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
       const s = Object.assign(structuredClone(defaultState),source);
@@ -373,7 +379,7 @@
       const savedCounts=s.gearCounts&&typeof s.gearCounts==='object'&&!Array.isArray(s.gearCounts)?s.gearCounts:{};
       s.gear=[...new Set(legacyGear)];s.gearCounts={};for(const id of s.gear){const legacyCount=legacyGear.filter(x=>x===id).length;s.gearCounts[id]=Math.max(1,legacyCount,Math.floor(Number(savedCounts[id]))||0)}
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
-      s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;
+      s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;s.cageDiceResult=normalizeCageDiceResult(source.cageDiceResult);if(s.cageDiceResult)s.dailyCounters.cageDice=1;
       s.trainerOn = !!s.trainerOn;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
@@ -503,7 +509,7 @@
     if(!pool.length)return null;const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
   }
   function ensureDailyCounters(){
-    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;
+    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;if(state.cageDiceResult&&state.cageDiceResult.date!==today)state.cageDiceResult=null;
   }
   function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
@@ -726,7 +732,7 @@
     const dealt=Math.max(0,5-sharedSocialInteractionsRemaining)*3;return pool.slice(dealt,dealt+3).map(choice=>({id:choice.id,kind:choice.kind,text:copyText(choice.message,{name:state.name,handle:profile.handle,targetName:profile.handle})}))
   }
   function renderFighterBioInteractions(profile){const container=$('#fighterBioInteractions');if(!profile||profile.id===state.socialProfileId){container.innerHTML='<div class="fighter-bio-limit">THIS IS YOUR PUBLIC FIGHTER PROFILE</div>';return}if(sharedSocialStatus!=='ready'){container.innerHTML='<div class="fighter-bio-limit">GLOBAL FEED CONNECTION REQUIRED</div>';return}if(sharedSocialInteractionsRemaining<1){container.innerHTML='<div class="fighter-bio-limit">DAILY LIMIT REACHED · 0 OF 5 POSTS LEFT</div>';return}container.innerHTML=`<div class="fighter-bio-limit">${sharedSocialInteractionsRemaining} OF 5 FIGHTER POSTS LEFT TODAY</div>${fighterInteractionChoices(profile).map(choice=>`<div class="fighter-message-composer"><div class="fighter-message-text" role="textbox" aria-readonly="true">${escapeHtml(choice.text)}</div><button class="fighter-message-send" type="button" data-fighter-interaction="${choice.id}" data-target-profile="${escapeHtml(profile.id)}" ${fighterInteractionPending?'disabled':''} aria-label="Send this message to @${escapeHtml(profile.handle)}">SEND</button></div>`).join('')}<div class="fighter-message-reward">EACH POST EARNS FOLLOWERS + HYPE</div>`}
-  function renderCeoBioDetails(){const profile=STRINGS.social.profiles.ceo;$('#fighterBioInteractions').innerHTML=`<div class="ceo-bio-stats"><div><b>${fmt(profile.followers)}</b><small>FOLLOWERS</small></div><div><b>${fmt(profile.following)}</b><small>FOLLOWING</small></div></div><div class="ceo-bio-role"><b>${escapeHtml(profile.role)}</b><span>${escapeHtml(profile.location)}</span></div><div class="fighter-bio-limit ceo-bio-official">VERIFIED OFFICIAL ACCOUNT · MESSAGES CLOSED</div>`}
+  function renderCeoBioDetails(){$('#fighterBioInteractions').innerHTML='<div class="fighter-bio-limit ceo-bio-official">VERIFIED OFFICIAL ACCOUNT · MESSAGES CLOSED</div>'}
   function openCeoBio(){const profile=STRINGS.social.profiles.ceo;activeBioProfileId='official-ceo';$('#fighterBioModal').classList.add('ceo-profile');$('#fighterBioKicker').textContent='VERIFIED OFFICIAL ACCOUNT';$('#fighterBioAvatar').innerHTML=`<img src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(profile.author)}">`;$('#fighterBioHandle').textContent=profile.handle;$('#fighterBioTitle').textContent=profile.author;$('#fighterBioText').textContent=profile.bio;renderCeoBioDetails();$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
   function openFighterBio(profile){if(!profile)return;activeBioProfileId=profile.id;$('#fighterBioModal').classList.remove('ceo-profile');$('#fighterBioKicker').textContent='REAL CAGE GRIND FIGHTER';const avatar=fighterAvatars.find(item=>item.id===profile.fighter_avatar);$('#fighterBioAvatar').innerHTML=avatar?`<img src="${escapeHtml(avatar.asset)}" alt="${escapeHtml(profile.handle)}">`:'<span>CG</span>';$('#fighterBioHandle').textContent=`@${profile.handle}`;$('#fighterBioTitle').textContent=profile.handle;$('#fighterBioText').textContent=fighterBioSentence(profile);renderFighterBioInteractions(profile);$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
   function closeFighterBio(){activeBioProfileId='';$('#fighterBioModal').classList.remove('open','ceo-profile');$('#fighterBioModal').setAttribute('aria-hidden','true')}
@@ -790,13 +796,14 @@
   }
   function renderHustle(){
     ensureDailyCounters();
-    const hustleLeft=sessionsLeft('hustle',3),blackjackLeft=sessionsLeft('blackjack',1),publicityLeft=sessionsLeft('publicity',1),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash);
+    const fullTimeFighter=state.level>=5,blackjackUnlocked=state.level>=2,diceUnlocked=state.level>=4,hustleLeft=sessionsLeft('hustle',3),blackjackLeft=sessionsLeft('blackjack',1),diceLeft=sessionsLeft('cageDice',1),publicityLeft=sessionsLeft('publicity',1),blackjackActive=state.blackjackHand?.status==='playing',maxBlackjackBet=LOGIC.blackjackBetLimit(state.cash),maxDiceBet=LOGIC.cageDiceBetLimit(state.cash);
+    $('#makeEndsMeetCard').hidden=fullTimeFighter;$('#fullTimeFighterNote').hidden=!fullTimeFighter;
     $('#hustleLimitText').textContent=`${hustleLeft} SHIFT${hustleLeft===1?'':'S'} LEFT`;
-    $('#undergroundLimitText').textContent=`${blackjackLeft} HAND${blackjackLeft===1?'':'S'} LEFT`;
+    const undergroundLeft=(blackjackUnlocked?blackjackLeft:0)+(diceUnlocked?diceLeft:0);$('#undergroundLimitText').textContent=`${undergroundLeft} PLAY${undergroundLeft===1?'':'S'} LEFT`;
     $('#publicityLimitText').textContent=`${publicityLeft} GIG${publicityLeft===1?'':'S'} LEFT`;$('#publicityLimitText').classList.toggle('exhausted',publicityLeft<1);
     $('#hustleActions').innerHTML=hustleDefs.map((a,i)=>`<button class="action" data-hustle="${i}" ${state.energy<a.cost||hustleLeft<1?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>$${a.cash[0]}–${a.cash[1]}</b><small>-${a.cost} energy</small></div></button>`).join('');
-    const blackjackLocked=!blackjackActive&&(blackjackLeft<1||maxBlackjackBet<1),blackjackStatus=blackjackActive?'HAND IN PROGRESS':blackjackLeft<1?'PLAYED TODAY':maxBlackjackBet<1?'NEED $4 CASH':`MAX BET $${fmt(maxBlackjackBet)}`;
-    $('#undergroundActions').innerHTML=`<button class="action blackjack-action" data-blackjack-open ${blackjackLocked?'disabled':''}><div class="ico">${gameIcon('blackjack','🂡')}</div><div><h3>Backroom Blackjack</h3><p>Play one real hand against the dealer. Wager up to 25% of your available cash.</p></div><div class="cost"><b>${blackjackActive?'RESUME HAND':'HIT OR STAND'}</b><small>${blackjackStatus}</small></div></button>`;
+    const blackjackLocked=!blackjackUnlocked||(!blackjackActive&&(blackjackLeft<1||maxBlackjackBet<1)),blackjackStatus=!blackjackUnlocked?'UNLOCKS AT LVL 2':blackjackActive?'HAND IN PROGRESS':blackjackLeft<1?'PLAYED TODAY':maxBlackjackBet<1?'NEED $4 CASH':`MAX BET $${fmt(maxBlackjackBet)}`,diceResult=state.cageDiceResult,diceLocked=!diceUnlocked||(!diceResult&&(diceLeft<1||maxDiceBet<1)),diceStatus=!diceUnlocked?'UNLOCKS AT LVL 4':diceResult?`ROLLED ${diceResult.total}`:diceLeft<1?'PLAYED TODAY':maxDiceBet<1?'NEED $4 CASH':`MAX BET $${fmt(maxDiceBet)}`;
+    $('#undergroundActions').innerHTML=`<button class="action future blackjack-action ${blackjackUnlocked?'':'locked-opportunity'}" data-blackjack-open ${blackjackLocked?'disabled':''}><div class="ico">${gameIcon('blackjack','🂡')}</div><div><h3>Backroom Blackjack</h3><p>Play one real hand against the dealer. Wager up to 25% of your available cash.</p><span class="unlock-copy">${blackjackStatus}</span></div><div class="cost"><b>${blackjackActive?'RESUME HAND':'HIT OR STAND'}</b><small>${blackjackUnlocked?'ONE HAND DAILY':'LEVEL 2'}</small></div></button><button class="action future cage-dice-action ${diceUnlocked?'':'locked-opportunity'}" data-cage-dice-open ${diceLocked?'disabled':''}><div class="ico">${cageDiceIcon()}</div><div><h3>Cage Dice</h3><p>Pick under, over, seven, or doubles—then roll two dice against the house.</p><span class="unlock-copy">${diceStatus}</span></div><div class="cost"><b>${diceResult?'REVIEW ROLL':'PICK YOUR BET'}</b><small>${diceUnlocked?'ONE ROLL DAILY':'LEVEL 4'}</small></div></button>`;
     $('#publicityActions').innerHTML=publicityDefs.map((a,i)=>{
       const unlocked=opportunityUnlocked(a),limited=publicityLeft<1,energyLow=state.energy<a.cost;
       const unavailable=limited&&unlocked?'gig-unavailable':'',availability=!unlocked?requirementText(a):limited?'NO GIGS LEFT':energyLow?`NEEDS ${a.cost} ENERGY`:'AVAILABLE NOW';
@@ -941,7 +948,7 @@
     state.cash-=quote.cashCost;state.dailyCounters.recovery=1;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
   function handleHustle(i){
-    ensureDailyCounters();if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
+    ensureDailyCounters();if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
   }
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
@@ -1031,7 +1038,7 @@
     const result=$('#blackjackResult');result.textContent=settled?blackjackResultText(hand):`$${fmt(hand.bet)} ON THE TABLE`;result.className=`blackjack-result${settled?` ${hand.result}`:''}`;
   }
   function openBlackjack(){
-    ensureDailyCounters();if(!state.blackjackHand&&sessionsLeft('blackjack',1)<1){toast('You already played today’s blackjack hand.','#ff766d');return}if(!state.blackjackHand&&LOGIC.blackjackBetLimit(state.cash)<1){toast('You need at least $4 to make a legal wager.','#ffcf78');return}
+    ensureDailyCounters();if(state.level<2){toast('BACKROOM BLACKJACK UNLOCKS AT LEVEL 2','#78dfff');return}if(!state.blackjackHand&&sessionsLeft('blackjack',1)<1){toast('You already played today’s blackjack hand.','#ff766d');return}if(!state.blackjackHand&&LOGIC.blackjackBetLimit(state.cash)<1){toast('You need at least $4 to make a legal wager.','#ffcf78');return}
     initAudio();const modal=$('#blackjackModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');renderBlackjackDialog();sfx.tap();requestAnimationFrame(()=>(state.blackjackHand?$('#blackjackHit'):$('#blackjackBet')).focus());
   }
   function closeBlackjack(){const modal=$('#blackjackModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
@@ -1043,13 +1050,20 @@
     const hand=state.blackjackHand;if(!hand||hand.status!=='playing')return;while(LOGIC.blackjackHandValue(hand.dealer).total<17&&hand.deck.length)hand.dealer.push(hand.deck.pop());settleBlackjack();
   }
   function dealBlackjack(){
-    ensureDailyCounters();if(state.blackjackHand||sessionsLeft('blackjack',1)<1)return;const maxBet=LOGIC.blackjackBetLimit(state.cash),bet=Math.floor(Number($('#blackjackBet').value));if(!Number.isFinite(bet)||bet<1||bet>maxBet){toast(`Choose a whole-dollar bet from $1 to $${fmt(maxBet)}.`,'#ff766d');return}
+    ensureDailyCounters();if(state.level<2||state.blackjackHand||sessionsLeft('blackjack',1)<1)return;const maxBet=LOGIC.blackjackBetLimit(state.cash),bet=Math.floor(Number($('#blackjackBet').value));if(!Number.isFinite(bet)||bet<1||bet>maxBet){toast(`Choose a whole-dollar bet from $1 to $${fmt(maxBet)}.`,'#ff766d');return}
     initAudio();const deck=shuffledBlackjackDeck(),player=[deck.pop()],dealer=[deck.pop()];player.push(deck.pop());dealer.push(deck.pop());state.cash-=bet;state.dailyCounters.blackjack=1;state.blackjackHand={date:todayKey(),bet,deck,player,dealer,status:'playing',result:'',payout:0};trackEvent('blackjack_started',{bet,max_bet:maxBet});saveState();sfx.tap();
     const playerValue=LOGIC.blackjackHandValue(player),dealerValue=LOGIC.blackjackHandValue(dealer);if(playerValue.blackjack||dealerValue.blackjack)settleBlackjack();else{updateUI();renderBlackjackDialog()}
   }
   function hitBlackjack(){
     const hand=state.blackjackHand;if(!hand||hand.status!=='playing'||!hand.deck.length)return;hand.player.push(hand.deck.pop());saveState();sfx.tap();const value=LOGIC.blackjackHandValue(hand.player);if(value.bust)settleBlackjack();else if(value.total===21)playBlackjackDealer();else renderBlackjackDialog();
   }
+  function cageDieFace(value){return ['⚀','⚁','⚂','⚃','⚄','⚅'][clamp(Math.floor(Number(value))||1,1,6)-1]}
+  function cageDiceResultText(result){const label={under:'UNDER 7',over:'OVER 7',seven:'EXACTLY 7',doubles:'DOUBLES'}[result.choice];return result.won?`${label} HITS · YOU WIN $${fmt(result.profit)}`:`${label} MISSES · THE HOUSE TAKES $${fmt(result.bet)}`}
+  function renderCageDiceDialog(){const result=state.cageDiceResult,maxBet=LOGIC.cageDiceBetLimit(state.cash),stage=$('#cageDiceStage');$('#cageDiceCash').textContent='$'+fmt(state.cash);$('#cageDiceMaxBet').textContent=result?`$${fmt(result.bet)} WAGER`:'$'+fmt(maxBet);$('#cageDiceSetup').hidden=!!result;stage.hidden=!result;$('#cageDiceRoll').hidden=!!result;$('#cageDiceRoll').parentElement.classList.toggle('result-only',!!result);const input=$('#cageDiceBet');input.max=String(maxBet);if(!result){input.value=String(Math.max(1,Math.min(50,maxBet)));input.disabled=maxBet<1;$$('[data-dice-choice]').forEach(button=>{const active=button.dataset.diceChoice===cageDiceChoice;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});return}$('#cageDieOne').textContent=cageDieFace(result.die1);$('#cageDieTwo').textContent=cageDieFace(result.die2);$('#cageDiceTotal').textContent=`TOTAL ${result.total}${result.doubles?' · DOUBLES':''}`;const output=$('#cageDiceResult');output.textContent=cageDiceResultText(result);output.className=`blackjack-result ${result.won?'win':'loss'}`;stage.classList.remove('rolling');void stage.offsetWidth;stage.classList.add('rolling');setTimeout(()=>stage.classList.remove('rolling'),560)}
+  function openCageDice(){ensureDailyCounters();if(state.level<4){toast('CAGE DICE UNLOCKS AT LEVEL 4','#78dfff');return}if(!state.cageDiceResult&&sessionsLeft('cageDice',1)<1){toast('You already rolled Cage Dice today.','#ff766d');return}if(!state.cageDiceResult&&LOGIC.cageDiceBetLimit(state.cash)<1){toast('You need at least $4 to make a legal wager.','#ffcf78');return}initAudio();const modal=$('#cageDiceModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');renderCageDiceDialog();sfx.tap();requestAnimationFrame(()=>(state.cageDiceResult?$('#cageDiceClose'):$('#cageDiceBet')).focus())}
+  function closeCageDice(){const modal=$('#cageDiceModal');if(!modal.classList.contains('open'))return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
+  function chooseCageDiceBet(choice){if(!['under','over','seven','doubles'].includes(choice)||state.cageDiceResult)return;cageDiceChoice=choice;renderCageDiceDialog();sfx.tap()}
+  function rollCageDice(){ensureDailyCounters();if(state.level<4||state.cageDiceResult||sessionsLeft('cageDice',1)<1)return;const maxBet=LOGIC.cageDiceBetLimit(state.cash),bet=Math.floor(Number($('#cageDiceBet').value));if(!Number.isFinite(bet)||bet<1||bet>maxBet){toast(`Choose a whole-dollar bet from $1 to $${fmt(maxBet)}.`,'#ff766d');return}initAudio();const outcome=LOGIC.cageDiceOutcome(rint(1,6),rint(1,6),cageDiceChoice,bet);state.cash-=bet;state.cash+=outcome.payout;state.dailyCounters.cageDice=1;state.cageDiceResult={date:todayKey(),bet,...outcome};trackEvent('cage_dice_completed',{bet,choice:outcome.choice,total:outcome.total,doubles:outcome.doubles,won:outcome.won,payout:outcome.payout,profit:outcome.profit});saveState();if(outcome.won){sfx.coin();confettiBurst()}else{sfx.lose();shake()}updateUI();renderCageDiceDialog()}
   async function requestGameInstall(){
     const pwa=globalThis.CAGE_PWA;if(!pwa){toast('USE YOUR BROWSER MENU TO INSTALL CAGE GRIND','#78dfff');return}
     const result=await pwa.requestInstall();trackEvent('install_prompt_result',{outcome:result.status});
@@ -1521,6 +1535,8 @@
     const pu=e.target.closest('[data-publicity]');if(pu){handlePublicity(+pu.dataset.publicity);return}
     const en=e.target.closest('[data-endorsement]');if(en){handleEndorsement(+en.dataset.endorsement);return}
     const blackjack=e.target.closest('[data-blackjack-open]');if(blackjack){openBlackjack();return}
+    const cageDice=e.target.closest('[data-cage-dice-open]');if(cageDice){openCageDice();return}
+    const diceChoice=e.target.closest('[data-dice-choice]');if(diceChoice){chooseCageDiceBet(diceChoice.dataset.diceChoice);return}
     const fighterInteraction=e.target.closest('[data-fighter-interaction]');if(fighterInteraction){const profile=sharedSocialProfiles.find(item=>item.id===fighterInteraction.dataset.targetProfile);if(profile)handleFighterInteraction(fighterInteraction.dataset.fighterInteraction,profile);return}
     const ceoProfile=e.target.closest('[data-ceo-profile]');if(ceoProfile){openCeoBio();return}
     const feedProfile=e.target.closest('[data-feed-profile]');if(feedProfile){openFighterBio(sharedSocialProfiles.find(item=>item.id===feedProfile.dataset.feedProfile));return}
@@ -1544,6 +1560,7 @@
   $('#autographModal').addEventListener('click',e=>{if(e.target===$('#autographModal'))closeAutographModal()});
   $('#blackjackDeal').addEventListener('click',dealBlackjack);$('#blackjackHit').addEventListener('click',hitBlackjack);$('#blackjackStand').addEventListener('click',playBlackjackDealer);$('#blackjackClose').addEventListener('click',closeBlackjack);
   $('#blackjackModal').addEventListener('click',e=>{if(e.target===$('#blackjackModal'))closeBlackjack()});$('#blackjackModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeBlackjack()});
+  $('#cageDiceRoll').addEventListener('click',rollCageDice);$('#cageDiceClose').addEventListener('click',closeCageDice);$('#cageDiceModal').addEventListener('click',e=>{if(e.target===$('#cageDiceModal'))closeCageDice()});$('#cageDiceModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeCageDice()});
   $('#newFighterNameBtn').addEventListener('click',rerollFighterIdentity);$('#lockFighterNameBtn').addEventListener('click',lockFighterIdentity);
   $('#retireCareerBtn').addEventListener('click',openRetirementDialog);$('#cancelRetireBtn').addEventListener('click',closeRetirementDialog);$('#confirmRetireBtn').addEventListener('click',retireCareer);
   $('#retireCareerModal').addEventListener('click',e=>{if(e.target===$('#retireCareerModal'))closeRetirementDialog()});$('#retireCareerModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeRetirementDialog()});
