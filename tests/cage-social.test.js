@@ -101,6 +101,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
       if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
       if (url.endsWith('/rest/v1/rpc/publish_cage_post')) return jsonResponse({ id: 8 });
+      if (url.endsWith('/rest/v1/rpc/publish_cage_ceo_post')) return jsonResponse({ id: 9, post_kind: 'ceo' });
       return jsonResponse({ message: 'unexpected request' }, 500);
     },
   });
@@ -113,6 +114,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const opponents = await client.loadOpponentCandidates(4, 12);
   const remaining = await client.loadInteractionAllowance();
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
+  await client.publishCeoPost('city_offer');
   const retired = await client.retireProfile();
 
   assert.equal(claimed.handle, 'WhiteDrizzlePHX');
@@ -132,6 +134,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');
+  const ceoPostBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_ceo_post')).options.body);
+  assert.deepEqual(ceoPostBody, { p_event_key: 'city_offer' });
   const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
   assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
 });

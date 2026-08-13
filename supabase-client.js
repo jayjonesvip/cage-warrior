@@ -112,8 +112,9 @@
     async function selectCageOpponentCandidates(level,limit){return rpc('get_cage_opponent_candidates',{p_level:level,p_limit:limit})}
     async function getCageInteractionsRemaining(){return rpc('get_cage_interactions_remaining',{})}
     async function insertCagePost(values){return rpc('publish_cage_post',values)}
+    async function insertCageCeoPost(eventKey){return rpc('publish_cage_ceo_post',{p_event_key:eventKey})}
 
-    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,sessionUserId:()=>session?.user?.id||''};
+    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};

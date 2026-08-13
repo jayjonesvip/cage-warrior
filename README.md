@@ -218,6 +218,15 @@ generated league.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.
+- The verified `@CageGrindCEO` account uses the CEO's office portrait and a
+  distinct black-and-gold treatment. Server-authored CEO posts recognize a new
+  career, title opportunities, championship wins, and the first exceptional
+  performance bonus without allowing arbitrary client-authored CEO copy.
+- Title opportunities open a full-photo message from the CEO's office after the
+  level-up celebration. Winning the World Title adds the CEO's championship
+  presentation directly to the fight result. Qualifying upsets, finishes, and
+  win streaks have a deterministic 30% chance at one modest CEO cash and Hype
+  bonus per local day.
 - A fighter profile offers exactly three randomized, personalized message
   drafts presented as text-style composers with explicit **Send** buttons. The
   roughly 50-message pool covers callouts, props, welcomes, respect, and putting

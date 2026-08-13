@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.51';
+const APP_VERSION='2.5.52';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,22 +8,23 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.51',
-  './game-logic.js?v=2.5.51',
-  './strings.js?v=2.5.51',
-  './analytics.js?v=2.5.51',
-  './supabase-client.js?v=2.5.51',
-  './cage-social.js?v=2.5.51',
-  './game.js?v=2.5.51',
-  './pwa.js?v=2.5.51',
+  './styles.css?v=2.5.52',
+  './game-logic.js?v=2.5.52',
+  './strings.js?v=2.5.52',
+  './analytics.js?v=2.5.52',
+  './supabase-client.js?v=2.5.52',
+  './cage-social.js?v=2.5.52',
+  './game.js?v=2.5.52',
+  './pwa.js?v=2.5.52',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
-  './assets/focus-locker-room.jpg?v=2.5.51',
-  './assets/contact-mom.jpg?v=2.5.51',
-  './assets/contact-wife.jpg?v=2.5.51',
-  './assets/contact-brother-tommy.png?v=2.5.51',
-  './assets/contact-agent-carl.png?v=2.5.51',
+  './assets/focus-locker-room.jpg?v=2.5.52',
+  './assets/contact-mom.jpg?v=2.5.52',
+  './assets/contact-wife.jpg?v=2.5.52',
+  './assets/contact-brother-tommy.png?v=2.5.52',
+  './assets/contact-agent-carl.png?v=2.5.52',
+  './assets/cage-grind-ceo.jpg?v=2.5.52',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
@@ -38,9 +39,9 @@ const CORE_ASSETS=[
   './assets/icons/nav-hustle.png',
   './assets/icons/nav-gear.png',
   './assets/icons/nav-feed.png',
-  './assets/icons/round-intro-1.png?v=2.5.51',
-  './assets/icons/round-intro-2.png?v=2.5.51',
-  './assets/icons/round-intro-3.png?v=2.5.51'
+  './assets/icons/round-intro-1.png?v=2.5.52',
+  './assets/icons/round-intro-2.png?v=2.5.52',
+  './assets/icons/round-intro-3.png?v=2.5.52'
 ].map(path=>new URL(path,self.location.href).href);
 
 self.addEventListener('install',event=>{

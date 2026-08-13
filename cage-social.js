@@ -78,8 +78,9 @@
     async function publishPost({kind,body,targetProfileId=null}){
       return database.insertCagePost({p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
+    async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};
