@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.56';
+const APP_VERSION='2.5.57';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,24 +8,24 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.56',
-  './game-logic.js?v=2.5.56',
-  './strings.js?v=2.5.56',
-  './analytics.js?v=2.5.56',
-  './supabase-client.js?v=2.5.56',
-  './cage-social.js?v=2.5.56',
-  './game.js?v=2.5.56',
-  './pwa.js?v=2.5.56',
+  './styles.css?v=2.5.57',
+  './game-logic.js?v=2.5.57',
+  './strings.js?v=2.5.57',
+  './analytics.js?v=2.5.57',
+  './supabase-client.js?v=2.5.57',
+  './cage-social.js?v=2.5.57',
+  './game.js?v=2.5.57',
+  './pwa.js?v=2.5.57',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
-  './assets/focus-locker-room.jpg?v=2.5.56',
-  './assets/contact-mom.jpg?v=2.5.56',
-  './assets/contact-wife.jpg?v=2.5.56',
-  './assets/contact-brother-tommy.png?v=2.5.56',
-  './assets/contact-agent-carl.png?v=2.5.56',
-  './assets/cage-grind-ceo.jpg?v=2.5.56',
-  './assets/cage-dice.jpg?v=2.5.56',
+  './assets/focus-locker-room.jpg?v=2.5.57',
+  './assets/contact-mom.jpg?v=2.5.57',
+  './assets/contact-wife.jpg?v=2.5.57',
+  './assets/contact-brother-tommy.png?v=2.5.57',
+  './assets/contact-agent-carl.png?v=2.5.57',
+  './assets/cage-grind-ceo.jpg?v=2.5.57',
+  './assets/cage-dice.jpg?v=2.5.57',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
@@ -40,9 +40,9 @@ const CORE_ASSETS=[
   './assets/icons/nav-hustle.png',
   './assets/icons/nav-gear.png',
   './assets/icons/nav-feed.png',
-  './assets/icons/round-intro-1.png?v=2.5.56',
-  './assets/icons/round-intro-2.png?v=2.5.56',
-  './assets/icons/round-intro-3.png?v=2.5.56'
+  './assets/icons/round-intro-1.png?v=2.5.57',
+  './assets/icons/round-intro-2.png?v=2.5.57',
+  './assets/icons/round-intro-3.png?v=2.5.57'
 ].map(path=>new URL(path,self.location.href).href);
 
 self.addEventListener('install',event=>{
