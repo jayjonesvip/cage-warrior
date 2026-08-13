@@ -646,8 +646,8 @@ test('career fights use a reversible tale-of-the-tape preview and a two-choice r
   assert.match(html, /\.plan-grid\{display:grid;grid-template-columns:1fr;gap:7px\}/);
   assert.match(css, /\.corner-panel\{margin:0;border-right:0;border-bottom:0;border-left:0;border-radius:0\}/);
   assert.match(css, /\.live-card>#cornerChoice:not\(:empty\)\{[^}]*max-height:58%;[^}]*overflow-y:auto/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.49"\)[^}]*background-position:center 62%/);
-  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.49"\)[^}]*background-position:center,center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.51"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.51"\)[^}]*background-position:center,center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
   assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
   assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
@@ -693,17 +693,22 @@ test('fight launch remembers a win-paid Sim+ coach or automatic Quick Sim toggle
 
 test('booked fights resolve a 50-50 locker-room Focus encounter before either fight mode', () => {
   const focusContacts = contentContext.CAGE_STRINGS.fightFocus.contacts;
-  assert.deepEqual(Array.from(focusContacts, contact => contact.id), ['mom', 'wife']);
+  assert.deepEqual(Array.from(focusContacts, contact => contact.id), ['mom', 'wife', 'brother-tommy', 'agent-carl']);
   for (const contact of focusContacts) {
-    assert.equal(contact.messages.length, 16, `${contact.id} should have 16 possible texts`);
     assert.ok(contact.avatar && contact.ignoreDelta < 0 && contact.ignoreText);
-    assert.equal(contact.messages.filter(message => message.delta > 0 || message.focus >= 95 || message.minimum >= 95).length, 8);
-    assert.equal(contact.messages.filter(message => message.delta < 0 || message.focus <= 50).length, 8);
+  }
+  const expectedFocusBalance = {mom:[8,8],wife:[8,8],'brother-tommy':[5,5],'agent-carl':[2,2]};
+  for (const contact of focusContacts) {
+    const positive=contact.messages.filter(message => message.delta > 0 || message.focus >= 95 || message.minimum >= 95).length;
+    const negative=contact.messages.filter(message => message.delta < 0 || message.focus <= 50).length;
+    assert.deepEqual([positive,negative],expectedFocusBalance[contact.id]);
   }
   const focusMessages = focusContacts.flatMap(contact => Array.from(contact.messages));
-  assert.equal(new Set(Array.from(focusMessages, message => message.id)).size, 32);
+  assert.equal(new Set(Array.from(focusMessages, message => message.id)).size, 46);
   assert.ok(fs.existsSync('assets/contact-mom.jpg'));
   assert.ok(fs.existsSync('assets/contact-wife.jpg'));
+  assert.ok(fs.existsSync('assets/contact-brother-tommy.png'));
+  assert.ok(fs.existsSync('assets/contact-agent-carl.png'));
   assert.match(page, /id="focusStage"/);
   assert.match(page, /id="focusMeterFill"/);
   assert.match(page, /id="liveFocusText"/);
@@ -728,7 +733,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(script, /if\(fight\.mode==='quick'\).*beginQuickFight\(\)/);
   assert.match(page, /<span>FOCUS<\/span>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.49"/);
+  assert.match(page, /class="focus-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.51"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(css, /\.focus-hud\{/);
   assert.match(css, /\.focus-locker-room\{/);
@@ -736,11 +741,15 @@ test('booked fights resolve a 50-50 locker-room Focus encounter before either fi
   assert.match(css, /\.focus-choice\.safe\{[^}]*#69d8ff[^}]*#268ed8/);
   assert.match(css, /\.focus-phone,\.focus-thread\{/);
   assert.match(css, /\.focus-text-bubble\{/);
+  assert.match(css, /\.focus-contact img\{width:48px;height:48px;flex:0 0 48px/);
+  assert.match(css, /\.focus-text-bubble\{[^}]*font-size:12px/);
   assert.match(script, /resultKicker=isQuiet\?'LOCKER ROOM · FINAL PREPARATION'/);
   assert.match(script, /\$\{before\}% → \$\{fight\.focus\}% · \$\{change\}/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.49/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.49/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.49/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.51/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.51/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.51/);
+  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.51/);
+  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.51/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -854,7 +863,7 @@ test('home career choices use artwork cards with explicit bottom actions', () =>
 test('rendered icons support stable per-file PNG overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.49'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.51'/);
   assert.match(script, /function gameIcon\(name,fallback\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.png\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
@@ -940,6 +949,14 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
   assert.match(html, /id="fansText"[^>]*>0<\/span> FOLLOWERS[\s\S]*id="followingText"[^>]*>0<\/span> FOLLOWING<\/small><div class="top-progress"><span>HYPE<\/span><b id="hypeText"/);
   assert.doesNotMatch(html, /card bars|id="energyBar"|id="healthBar"|id="xpBar"|id="hypeBar"/);
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
+});
+
+test('top-bar identity, money, XP, and Hype rows share matching alignment', () => {
+  assert.match(css, /\.identity,\.money\{align-self:stretch;display:flex;flex-direction:column;justify-content:center\}/);
+  assert.match(css, /\.identity \.sub\{[^}]*margin-top:2px/);
+  assert.match(css, /\.money> b\{[^}]*font-size:13px/);
+  assert.match(css, /\.money \.audience-counts\{margin-top:2px/);
+  assert.match(css, /\.money\{margin-left:auto\}\.money>b\{font-size:18px\}/);
 });
 
 test('Cage Feed combines career reports with avatar-driven fighter interactions', () => {
@@ -1385,7 +1402,7 @@ test('each round starts behind a timed fallback interstitial', () => {
   assert.match(css, /\.round-interstitial-card:has\(\.round-interstitial-icon \.asset-ready\)>small/);
   for (const round of [1, 2, 3]) {
     assert.ok(fs.existsSync(`assets/icons/round-intro-${round}.png`), `round ${round} artwork should exist`);
-    assert.match(serviceWorker, new RegExp(`\\./assets/icons/round-intro-${round}\\.png\\?v=2\\.5\\.49`));
+    assert.match(serviceWorker, new RegExp(`\\./assets/icons/round-intro-${round}\\.png\\?v=2\\.5\\.51`));
   }
 });
 
