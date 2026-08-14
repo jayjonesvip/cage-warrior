@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.57';
+  const ICON_ASSET_VERSION = '2.5.58';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -32,7 +32,7 @@
     version:20,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,treatmentAvailable:true,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',
     pendingFight:null,fightModePreference:'sim-plus',focusTextDeck:[],lastFocusTextId:'',
@@ -333,7 +333,8 @@
   const recoveryDefs = [
     {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0},
     {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:12},
-    {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25}
+    {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25},
+    {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium whole-body recovery for a fast return to the cage.',energy:20,health:35,feeBase:250,feePerLevel:25}
   ];
   const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
   const currentFightRoundCost=()=>LOGIC.fightRoundCost(state.level);
@@ -380,7 +381,7 @@
       s.gear=[...new Set(legacyGear)];s.gearCounts={};for(const id of s.gear){const legacyCount=legacyGear.filter(x=>x===id).length;s.gearCounts[id]=Math.max(1,legacyCount,Math.floor(Number(savedCounts[id]))||0)}
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
       s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;s.cageDiceResult=normalizeCageDiceResult(source.cageDiceResult);if(s.cageDiceResult)s.dailyCounters.cageDice=1;
-      s.trainerOn = !!s.trainerOn;
+      s.trainerOn = !!s.trainerOn;s.treatmentAvailable=source.treatmentAvailable===undefined?true:source.treatmentAvailable===true;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
@@ -514,7 +515,7 @@
   function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 250+state.level*75}
-  function recoveryFee(){return 40+state.level*15}
+  function recoveryFee(treatment){return (treatment?.feeBase??40)+state.level*(treatment?.feePerLevel??15)}
   function updateDailyResetClocks(){
     const date=todayKey(),clocks=$$('[data-daily-reset-clock]');
     if(dailyResetDate&&date!==dailyResetDate){dailyResetDate=date;ensureDailyCounters();updateUI();return}
@@ -776,14 +777,14 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',4),sparringLeft=sessionsLeft('sparring',2),coach=state.trainerOn,fee=coachFee(),recoveryLeft=sessionsLeft('recovery',1),treatmentFee=recoveryFee();
+    const left=sessionsLeft('train',4),sparringLeft=sessionsLeft('sparring',2),coach=state.trainerOn,fee=coachFee(),treatmentReady=state.treatmentAvailable;
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
     const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const trainRepeat=state.dailyCounters.train;const coachCost=coach?fee:0;const cost=LOGIC.trainingCost(a,trainRepeat);const gain=LOGIC.trainingGain(a.gain,coach,false,trainRepeat);const locked=state.energy<cost||state.cash<coachCost||left<1;const gainText=`+${Number(gain).toFixed(1)}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainText} ${a.stat.toUpperCase()}</b><small>-${cost} energy${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
     $('#sparringLimitText').textContent=`${sparringLeft} SESSION${sparringLeft===1?'':'S'} LEFT`;
     $('#sparringActions').innerHTML=sparringDefs.map((a,i)=>{const sparringRepeat=state.dailyCounters.sparring;const coachCost=coach?fee:0;const cost=LOGIC.trainingCost(a,sparringRepeat);const gain=LOGIC.trainingGain(a.gain,coach,false,sparringRepeat);const risk=a.damage?` · ${LOGIC.sparringDamage(a.damage[0],sparringRepeat)}–${LOGIC.sparringDamage(a.damage[1],sparringRepeat)} health risk`:' · no health damage';const locked=state.energy<cost||state.cash<coachCost||sparringLeft<1;const skillLabel=a.skills===1?`+${Number(gain).toFixed(1)} RANDOM SKILL`:`+${Number(gain).toFixed(1)} TO 2 RANDOM SKILLS`;return `<button class="action sparring-${a.skills===1?'light':'heavy'}" data-sparring="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${skillLabel}</b><small>-${cost} energy${risk}${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
-    $('#recoveryLimitText').textContent=`${recoveryLeft} TREATMENT${recoveryLeft===1?'':'S'} LEFT`;
-    $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const quote=LOGIC.recoveryQuote(state,a,treatmentFee,recoveryLeft<1),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'USED TODAY':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
+    $('#recoveryLimitText').textContent=treatmentReady?'TREATMENT READY':'FIGHT TO UNLOCK';
+    $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const treatmentFee=recoveryFee(a),quote=LOGIC.recoveryQuote(state,a,treatmentFee,!treatmentReady),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'COMPLETE A FIGHT TO UNLOCK':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
     updateDailyResetClocks();
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
@@ -941,11 +942,11 @@
     const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills);skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));if(a.skills>1){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${Number(gain).toFixed(1)} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` · -${damage} health`:'';toast(`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
-    ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(),quote=LOGIC.recoveryQuote(state,treatment,fee,sessionsLeft('recovery',1)<1);
-    if(quote.reason==='limit'){toast('Recovery room treatment already used today.','#ff766d');return}
+    ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(treatment),quote=LOGIC.recoveryQuote(state,treatment,fee,!state.treatmentAvailable);
+    if(quote.reason==='limit'){toast('Complete another fight to unlock your next treatment.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Recovery treatment costs $${fee}. Pick up a side job first.`,'#ffcc75');return}
     if(quote.reason==='full'){toast('Your energy and health are already full.','#78dfff');return}
-    state.cash-=quote.cashCost;state.dailyCounters.recovery=1;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
+    state.cash-=quote.cashCost;state.treatmentAvailable=false;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
   function handleHustle(i){
     ensureDailyCounters();if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
@@ -1094,7 +1095,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:100,oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'',focus:0,focusBase:0,focusEncounter:null,focusResult:null,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[]};
+    return {o,player:P,opp:O,playerCondition:LOGIC.startingFightCondition(state.health,state.maxHealth),oppCondition:100,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'',focus:0,focusBase:0,focusEncounter:null,focusResult:null,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:false,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[]};
   }
 
   function planFamiliarity(styleId,planId){
@@ -1234,12 +1235,12 @@
   }
   function selectFightMode(mode){if(!['sim-plus','quick'].includes(mode)||combatLocked)return;state.fightModePreference=mode;renderFightModeToggle();saveState();sfx.tap()}
   function fillTape(f){
-    const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),roundCost=currentFightRoundCost(),clearance=roundCost*FIGHT_ROUNDS,cleared=fightsLeft>0&&state.energy>=clearance&&state.health>=20;
+    const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),roundCost=currentFightRoundCost(),clearance=roundCost*FIGHT_ROUNDS,startingCondition=LOGIC.startingFightCondition(state.health,state.maxHealth),cleared=fightsLeft>0&&state.energy>=clearance&&state.health>=20;
     $('#tapeHypeBonus').textContent=`${Math.floor(state.hype)}% HYPE · WIN BONUS +${Math.round(state.hype/1.3)}% PURSE · +${Math.floor(state.hype)}% FOLLOWERS`;
     $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);$('#tapeOppSprite').classList.toggle('network-portrait',!!f.o.network);
     $('#tapePPower').textContent=`PWR ${formatStat(f.player.power)}`;$('#tapeOPower').textContent=`PWR ${formatStat(f.opp.power)}`;$('#tapePSpeed').textContent=`SPD ${formatStat(f.player.speed)}`;$('#tapeOSpeed').textContent=`SPD ${formatStat(f.opp.speed)}`;$('#tapePChin').textContent=`CHN ${formatStat(f.player.chin)}`;$('#tapeOChin').textContent=`CHN ${formatStat(f.opp.chin)}`;$('#tapePCardio').textContent=`CAR ${formatStat(f.player.cardio)}`;$('#tapeOCardio').textContent=`CAR ${formatStat(f.opp.cardio)}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeEnergy').textContent=`${clearance} ENERGY CLEARANCE · ${roundCost} PER ROUND`;$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:f.o.network?'CAGE NETWORK · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<clearance?`YOU NEED ${clearance} ENERGY FOR THREE-ROUND CLEARANCE · ${roundCost} PER ROUND`:state.energy<clearance+HAYMAKER_ENERGY?`CLEARED · ${roundCost} PER ROUND · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:`CLEARED · ${roundCost} ENERGY PER STARTED ROUND`;
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeEnergy').textContent=`${clearance} ENERGY CLEARANCE · ${roundCost} PER ROUND`;$('#tapeBoutLabel').textContent=f.o.championship?f.o.titleName:f.o.network?'CAGE NETWORK · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<clearance?`YOU NEED ${clearance} ENERGY FOR THREE-ROUND CLEARANCE · ${roundCost} PER ROUND`:startingCondition<100?`LIMITED CLEARANCE · ${startingCondition}% STARTING CONDITION`:state.energy<clearance+HAYMAKER_ENERGY?`CLEARED · ${roundCost} PER ROUND · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:`CLEARED · ${roundCost} ENERGY PER STARTED ROUND`;
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio),playerFavorite=edge>=4,oppFavorite=edge<=-4;$('#tapePlayerFavorite').hidden=!playerFavorite;$('#tapeOppFavorite').hidden=!oppFavorite;
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.',networkNote=f.o.network?" This is an AI-controlled snapshot; the real fighter's public record is unaffected.":'';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.${networkNote}`;renderFightModeToggle();
   }
@@ -1316,7 +1317,7 @@
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
   function prepareLiveFight(){
-    const intro=$('#roundInterstitial');intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width='100%';$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent='100% CONDITION';$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
+    const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.playerCondition);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
   }
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
@@ -1411,7 +1412,7 @@
   }
 
   function showRoundInterstitial(round,resume){
-    const intro=$('#roundInterstitial');if(!intro){resume();return}$('#roundInterstitialIcon').innerHTML=gameIcon(`round-intro-${round}`,'🔔');$('#roundInterstitialNumber').textContent=`ROUND ${round}`;intro.classList.remove('leaving');intro.classList.add('active');intro.setAttribute('aria-hidden','false');scheduleFight(()=>{intro.classList.add('leaving');intro.classList.remove('active');scheduleFight(()=>{intro.classList.remove('leaving');intro.setAttribute('aria-hidden','true');resume()},300*fightSpeed)},1800*fightSpeed);
+    const intro=$('#roundInterstitial');if(!intro){resume();return}const score=$('#roundInterstitialScore');$('#roundInterstitialIcon').innerHTML=gameIcon(`round-intro-${round}`,'🔔');$('#roundInterstitialNumber').textContent=`ROUND ${round}`;if(round===1){score.textContent='THE FIGHT STARTS NOW'}else{const totals=LOGIC.fightScore(fight.rounds.filter(item=>item.round<round)),read=totals.player>totals.opponent?'YOU LEAD':totals.player<totals.opponent?'YOU TRAIL':'EVEN';score.textContent=`CORNER SCORE · ${read} ${totals.player}–${totals.opponent}`}intro.classList.remove('leaving');intro.classList.add('active');intro.setAttribute('aria-hidden','false');scheduleFight(()=>{intro.classList.add('leaving');intro.classList.remove('active');scheduleFight(()=>{intro.classList.remove('leaving');intro.setAttribute('aria-hidden','true');resume()},300*fightSpeed)},2000*fightSpeed);
   }
 
   function playFightTimeline(index){
@@ -1436,7 +1437,7 @@
   }
 
   function finishFightSimulation(){
-    if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
+    if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;state.treatmentAvailable=true;
     const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4;let cash=0,fans=0,xp=0,coachCut=0,ceoBonus=0,gearDrop=null,titleWon=false;const lootNotes=[];o.meetings=(o.meetings||0)+1;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});coachCut=fight.mode==='sim-plus'?Math.round(cash*.10):0;cash-=coachCut;fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);state.health=clamp(state.health-Math.max(3,Math.round(fight.totals.opp.damage*.18)),1,state.maxHealth);gainXp(xp);sfx.win();confettiBurst();

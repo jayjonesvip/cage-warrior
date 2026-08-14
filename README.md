@@ -163,6 +163,10 @@ generated league.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
+- Persistent Health determines starting fight Condition. Fighters at 90% or
+  better Health enter at 100% Condition; 70–89% enters at 95%, 50–69% at 88%,
+  and 20–49% at 78%. Below 20 Health still fails medical clearance, making a
+  quick turnaround while hurt possible but meaningfully dangerous.
 - When condition falls to 25% or lower between rounds, the corner presents a
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it
@@ -183,7 +187,10 @@ generated league.
   dramatic knockdown, steal the decision, or produce a last-second knockout;
   missing leaves the fighter open to an immediate counter knockout.
 - Watch fights normally or use 2× speed. There is no result skip: every
-  surviving round requires its corner decision.
+  surviving round requires its corner decision. Each round-number interlude
+  remains visible for two seconds. Before Rounds 2 and 3, the sign also carries
+  the corner's cumulative unofficial score and whether the fighter leads,
+  trails, or is even.
 - Fight results lead with a large **YOU WIN** or red **YOU LOST** outcome, then
   show the finish method, round, and clock beneath it before the full scorecard.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
@@ -361,11 +368,14 @@ generated league.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
   better perfect-session chance. His fee is `$250 + ($75 × fighter level)` per
   session, including each Light or Heavy Sparring session.
-- The Training page also has a Recovery Room with one paid treatment per local
-  day. An Ice Bath restores 25 energy. A Sauna restores 15 energy and 12 health.
-  A Sports Massage restores 5 energy and 25 health.
-  Treatment costs `$40 + ($15 × fighter level)`, never exceeds the resource
-  maximums, and does not consume a training session.
+- The Training page also has a Recovery Room with one paid treatment
+  opportunity. Every completed fight makes one treatment available; unused
+  opportunities never accumulate. An Ice Bath restores 25 energy, a Sauna
+  restores 15 energy and 12 health, and a Sports Massage restores 5 energy and
+  25 health. Standard treatment costs `$40 + ($15 × fighter level)`. Premium
+  Cryotherapy restores 20 energy and 35 health for
+  `$250 + ($25 × fighter level)`. Treatments never exceed resource maximums
+  and do not consume a training session.
 - Live countdowns on the Training and Hustle pages show the time remaining
   until their daily limits reset at the player's next local midnight.
 

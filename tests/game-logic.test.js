@@ -252,7 +252,7 @@ test('repeated training and sparring sessions ramp the cost and damage instead o
   assert.ok(logic.sparringDamage(3,2)>3);
 });
 
-test('recovery treatments share one daily use and clamp restored resources',()=>{
+test('recovery treatments require one available opportunity and clamp restored resources',()=>{
   const ice={energy:25,health:0},sauna={energy:15,health:12},massage={energy:5,health:25},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
   assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');
   assert.equal(logic.recoveryQuote({...state,cash:40},ice,55,false).reason,'cash');
@@ -262,6 +262,18 @@ test('recovery treatments share one daily use and clamp restored resources',()=>
   assert.equal(state.energy,97);
   assert.equal(state.health,100);
   assert.deepEqual(logic.applyRecovery({energy:95,maxEnergy:100,health:70,maxHealth:100},massage),{energy:5,health:25});
+});
+
+test('persistent health sets a tiered starting fight condition',()=>{
+  assert.equal(logic.startingFightCondition(100,100),100);
+  assert.equal(logic.startingFightCondition(90,100),100);
+  assert.equal(logic.startingFightCondition(89,100),95);
+  assert.equal(logic.startingFightCondition(70,100),95);
+  assert.equal(logic.startingFightCondition(69,100),88);
+  assert.equal(logic.startingFightCondition(50,100),88);
+  assert.equal(logic.startingFightCondition(49,100),78);
+  assert.equal(logic.startingFightCondition(20,100),78);
+  assert.equal(logic.startingFightCondition(90,120),95);
 });
 
 test('blackjack values aces correctly, caps bets, and pays standard outcomes',()=>{

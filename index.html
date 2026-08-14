@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.57" />
+<meta name="app-version" content="2.5.58" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.57">
+<link rel="stylesheet" href="styles.css?v=2.5.58">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -190,8 +190,8 @@
       <div class="daily-reset-clock"><span>DAILY LIMITS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily training limits reset">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="card sparring-card"><div class="card-title">Sparring <span class="limit-pill" id="sparringLimitText">2 SESSIONS LEFT</span></div><div class="action-list" id="sparringActions"></div></div>
-      <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">1 TREATMENT LEFT</span></div><div class="action-list" id="recoveryActions"></div></div>
-      <div class="section-note">Basic drills allow four sessions per day. Sparring has its own two-session daily limit: Light Sparring improves one random skill safely, while Heavy Sparring improves two random skills but costs more energy and may cost health. Coach Vega can boost either. Choose one paid recovery treatment each day.</div>
+      <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">TREATMENT READY</span></div><div class="action-list" id="recoveryActions"></div></div>
+      <div class="section-note">Basic drills allow four sessions per day. Sparring has its own two-session daily limit: Light Sparring improves one random skill safely, while Heavy Sparring improves two random skills but costs more energy and may cost health. Coach Vega can boost either. One paid treatment is available after each completed fight and treatment opportunities never accumulate.</div>
     </section>
 
     <section class="screen" data-screen="fight">
@@ -292,7 +292,7 @@
     <div class="gig-modal cage-dice-dialog" role="dialog" aria-modal="true" aria-labelledby="cageDiceTitle" aria-describedby="cageDiceRules">
       <span class="cage-dice-kicker">UNDERGROUND BUZZ · ONE ROLL DAILY</span>
       <h2 id="cageDiceTitle">Cage <span>Dice</span></h2>
-      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.57" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
+      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.58" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
       <p id="cageDiceRules">Choose one outcome, set a whole-dollar wager, and roll two dice. Under and over exclude seven.</p>
       <div class="blackjack-bankroll cage-dice-bankroll"><span>YOUR CASH <b id="cageDiceCash">$0</b></span><span>MAX BET <b id="cageDiceMaxBet">$0</b></span></div>
       <div id="cageDiceSetup">
@@ -320,7 +320,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.57" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.58" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -387,7 +387,7 @@
           <small class="focus-tier" id="focusTier">COMPOSED</small>
         </div>
         <div class="focus-locker-room">
-          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.57" alt="Fight-night locker room prepared for the fighter">
+          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.58" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MINUTES BEFORE THE WALKOUT</small></div>
           <div class="focus-encounter" id="focusEncounter"></div>
         </div>
@@ -411,7 +411,7 @@
           </div>
           <div class="action-feed" id="actionFeed"></div>
           <div id="cornerChoice"></div>
-          <div class="round-interstitial" id="roundInterstitial" aria-hidden="true"><div class="round-interstitial-card"><span class="round-interstitial-icon" id="roundInterstitialIcon">🔔</span><small>FIGHT NIGHT</small><b id="roundInterstitialNumber">ROUND 1</b><em>SECONDS OUT</em></div></div>
+          <div class="round-interstitial" id="roundInterstitial" aria-hidden="true"><div class="round-interstitial-card"><span class="round-interstitial-icon" id="roundInterstitialIcon">🔔</span><small>FIGHT NIGHT</small><b id="roundInterstitialNumber">ROUND 1</b><em class="round-interstitial-score" id="roundInterstitialScore">THE FIGHT STARTS NOW</em></div></div>
         </div>
         <div class="sim-footer">Stats set the odds. Your tactics shape each round.</div>
       </div>
@@ -422,7 +422,7 @@
     <h2 id="resultTitle" class="win">DECISION WIN!</h2>
     <div class="result-method" id="resultMethod">UNANIMOUS DECISION · 3 ROUNDS</div>
     <p id="resultLine">You gave the crowd something to remember.</p>
-    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.57" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.58" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
     <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="result-bonuses" id="resultBonuses" hidden></div>
     <div class="loot" id="lootBox" style="display:none"></div>
@@ -435,12 +435,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.57"></script>
-<script src="strings.js?v=2.5.57"></script>
-<script src="analytics.js?v=2.5.57"></script>
-<script src="supabase-client.js?v=2.5.57"></script>
-<script src="cage-social.js?v=2.5.57"></script>
-<script src="game.js?v=2.5.57"></script>
-<script src="pwa.js?v=2.5.57"></script>
+<script src="game-logic.js?v=2.5.58"></script>
+<script src="strings.js?v=2.5.58"></script>
+<script src="analytics.js?v=2.5.58"></script>
+<script src="supabase-client.js?v=2.5.58"></script>
+<script src="cage-social.js?v=2.5.58"></script>
+<script src="game.js?v=2.5.58"></script>
+<script src="pwa.js?v=2.5.58"></script>
 </body>
 </html>
