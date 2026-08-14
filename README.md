@@ -167,6 +167,12 @@ generated league.
   better Health enter at 100% Condition; 70–89% enters at 95%, 50–69% at 88%,
   and 20–49% at 78%. Below 20 Health still fails medical clearance, making a
   quick turnaround while hurt possible but meaningfully dangerous.
+- Each confirmed opponent strike or takedown directly removes 1 persistent
+  Health while its existing fight damage continues to reduce Condition. A
+  knockdown removes 4 Health, then a losing KO/TKO removes 12 additional
+  Health or a losing submission removes 8. Misses, movement, and defensive
+  narration remove no Health. The live deductions are saved immediately and
+  the result screen reports the total fight damage.
 - When condition falls to 25% or lower between rounds, the corner presents a
   one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
   throwing a last-chance haymaker can swing or finish the fight, but missing it

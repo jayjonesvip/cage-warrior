@@ -276,6 +276,15 @@ test('persistent health sets a tiered starting fight condition',()=>{
   assert.equal(logic.startingFightCondition(90,120),95);
 });
 
+test('landed opponent offense directly damages persistent health',()=>{
+  assert.equal(logic.liveFightHealthDamage(),0);
+  assert.equal(logic.liveFightHealthDamage({landed:true}),1);
+  assert.equal(logic.liveFightHealthDamage({landed:true,knockdown:true}),4);
+  assert.equal(logic.liveFightHealthDamage({finish:'KO'}),12);
+  assert.equal(logic.liveFightHealthDamage({finish:'TKO'}),12);
+  assert.equal(logic.liveFightHealthDamage({finish:'SUBMISSION'}),8);
+});
+
 test('blackjack values aces correctly, caps bets, and pays standard outcomes',()=>{
   assert.deepEqual(logic.blackjackHandValue(['AS','KH']),{total:21,soft:true,blackjack:true,bust:false});
   assert.deepEqual(logic.blackjackHandValue(['AS','6H']),{total:17,soft:true,blackjack:false,bust:false});
