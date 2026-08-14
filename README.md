@@ -237,7 +237,9 @@ generated league.
   fighter's avatar and opening their public profile. Feed and fighter-profile
   copy uses a larger mobile text scale for easier reading.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
-  deals generate contextual `CageReporter` coverage. The global feed emphasizes
+  deals generate contextual `CageReporter` coverage. Wins earned while carrying
+  a training injury receive dedicated headlines questioning whether fighting
+  hurt was courageous, reckless, or both. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.
 - The verified `@CageGrindCEO` account uses the CEO's office portrait and a
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
