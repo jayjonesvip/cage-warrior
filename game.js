@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.60';
+  const ICON_ASSET_VERSION = '2.5.61';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -35,7 +35,7 @@
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,treatmentAvailable:true,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',
-    pendingFight:null,fightModePreference:'sim-plus',focusTextDeck:[],lastFocusTextId:'',
+    pendingFight:null,fightModePreference:'sim-plus',focusTextDeck:[],lastFocusTextId:'',trainingCooldownUntil:0,trainingCooldownDate:'',trainingInjury:null,
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,milestones:[],equippedGear:[],leagueInitialized:false
   };
 
@@ -324,6 +324,17 @@
     {id:'heavy-sparring',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills, but expect to absorb some damage.',cost:20,gain:1,xp:28,skills:2,damage:[3,9]}
   ];
 
+  const trainingInjuryDefs = [
+    {id:'knee',name:'Sprained Knee',icon:'🦵'},
+    {id:'shoulder',name:'Strained Shoulder',icon:'💪'},
+    {id:'elbow',name:'Hyperextended Elbow',icon:'🦾'},
+    {id:'ribs',name:'Bruised Ribs',icon:'🩻'},
+    {id:'ankle',name:'Twisted Ankle',icon:'🦶'},
+    {id:'back',name:'Lower-Back Strain',icon:'⚠️'},
+    {id:'hand',name:'Cut Hand',icon:'🩹'},
+    {id:'neck',name:'Neck Strain',icon:'🤕'}
+  ];
+
   const hustleDefs = [
     {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90],xp:4},
     {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],xp:5},
@@ -336,7 +347,7 @@
     {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25},
     {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium whole-body recovery for a fast return to the cage.',energy:20,health:35,feeBase:250,feePerLevel:25}
   ];
-  const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10;
+  const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10,TRAINING_COOLDOWN_MS=60000;
   const currentFightRoundCost=()=>LOGIC.fightRoundCost(state.level);
   const currentFightClearance=()=>currentFightRoundCost()*FIGHT_ROUNDS;
 
@@ -382,6 +393,7 @@
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
       s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;s.cageDiceResult=normalizeCageDiceResult(source.cageDiceResult);if(s.cageDiceResult)s.dailyCounters.cageDice=1;
       s.trainerOn = !!s.trainerOn;s.treatmentAvailable=source.treatmentAvailable===undefined?true:source.treatmentAvailable===true;
+      const trainingDate=LOGIC.localDateKey(),savedInjury=source.trainingInjury&&typeof source.trainingInjury==='object'?source.trainingInjury:null,injuryDef=trainingInjuryDefs.find(entry=>entry.id===savedInjury?.id);s.trainingCooldownDate=source.trainingCooldownDate===trainingDate?trainingDate:'';s.trainingCooldownUntil=s.trainingCooldownDate?Math.max(0,Number(source.trainingCooldownUntil)||0):0;s.trainingInjury=injuryDef&&savedInjury.date===trainingDate?{id:injuryDef.id,date:trainingDate}:null;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
@@ -453,7 +465,7 @@
   function effectiveStat(key){
     let v=state.stats[key],style=fighterStyles.find(s=>s.id===state.fighterStyle);if(style&&style.stats[key])v+=style.stats[key];
     for(const id of state.equippedGear){const g=gearItems.find(x=>x.id===id);if(g&&g.stat===key)v+=g.bonus}
-    return v;
+    return LOGIC.injuredStat(v,!!state.trainingInjury);
   }
   function ensureLoadout(){const limit=LOGIC.gearLoadoutLimit(state.level),ownedFight=state.gear.filter(id=>{const g=gearItems.find(x=>x.id===id);return g&&g.category==='Fight Gear'});state.equippedGear=state.equippedGear.filter(id=>ownedFight.includes(id)).slice(0,limit);if(!state.equippedGear.length&&ownedFight.length)state.equippedGear=ownedFight.slice(0,limit)}
   function currentStyle(){return fighterStyles.find(s=>s.id===state.fighterStyle)||null}
@@ -510,7 +522,18 @@
     if(!pool.length)return null;const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
   }
   function ensureDailyCounters(){
-    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;if(state.cageDiceResult&&state.cageDiceResult.date!==today)state.cageDiceResult=null;
+    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;if(state.cageDiceResult&&state.cageDiceResult.date!==today)state.cageDiceResult=null;if(state.trainingCooldownDate!==today){state.trainingCooldownDate='';state.trainingCooldownUntil=0}if(state.trainingInjury?.date!==today)state.trainingInjury=null;
+  }
+  function currentTrainingInjury(){return trainingInjuryDefs.find(entry=>entry.id===state.trainingInjury?.id)||null}
+  function trainingCooldownRemaining(now=Date.now()){ensureDailyCounters();return Math.max(0,(Number(state.trainingCooldownUntil)||0)-now)}
+  function trainingCooldownText(milliseconds){const seconds=Math.max(0,Math.ceil(milliseconds/1000));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
+  function applyTrainingCooldown(){
+    const now=Date.now(),remaining=trainingCooldownRemaining(now),overtraining=remaining>0;state.trainingCooldownDate=todayKey();state.trainingCooldownUntil=(overtraining?Math.max(now,state.trainingCooldownUntil):now)+TRAINING_COOLDOWN_MS;let injury=null;
+    if(overtraining&&!state.trainingInjury&&Math.random()<.33){injury=trainingInjuryDefs[rint(0,trainingInjuryDefs.length-1)];state.trainingInjury={id:injury.id,date:todayKey()}}
+    return {overtraining,injury};
+  }
+  function updateTrainingCooldownDisplay(){
+    const remaining=trainingCooldownRemaining(),active=remaining>0,progress=clamp(remaining/TRAINING_COOLDOWN_MS*100,0,100),text=trainingCooldownText(remaining);$$('[data-train],[data-sparring]').forEach(card=>{card.classList.toggle('training-cooldown',active);card.style.setProperty('--cooldown-progress',`${progress}%`);const clock=card.querySelector('.training-cooldown-clock');if(clock){clock.hidden=!active;clock.textContent=`COOL DOWN · ${text}`}});
   }
   function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
@@ -521,6 +544,7 @@
     if(dailyResetDate&&date!==dailyResetDate){dailyResetDate=date;ensureDailyCounters();updateUI();return}
     dailyResetDate=date;
     const countdown=LOGIC.formatCountdown(LOGIC.millisecondsUntilNextLocalDay());clocks.forEach(clock=>clock.textContent=countdown);
+    updateTrainingCooldownDisplay();
   }
 
   function initAudio(){
@@ -598,6 +622,7 @@
     $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';$('#healthHud').classList.toggle('critical',LOGIC.resourceIsCritical(state.health,state.maxHealth));
     $('#xpText').textContent=`${Math.floor(state.xp)}/${xpNeed()}`;
     $('#hypeText').textContent=Math.floor(state.hype)+'%';
+    const trainingInjury=currentTrainingInjury(),attributesRow=$('.hud-attributes-row');attributesRow.classList.toggle('injured',!!trainingInjury);attributesRow.setAttribute('aria-label',trainingInjury?`Fighter attributes reduced by ${trainingInjury.name}`:'Fighter attributes');
     ['power','speed','chin','cardio'].forEach(k=>{const value=effectiveStat(k);$('#'+k+'Stat').textContent=formatStat(value);$('#'+k+'Mini').style.width=clamp(value*4,5,100)+'%'});
     const today=todayKey();$('#dailyBtn').disabled=state.lastDaily===today;$('#dailyBtn').textContent=state.lastDaily===today?'DROP CLAIMED':'DAILY DROP';
     renderCareer();renderSocial();renderTrain();renderHustle();renderGear();renderOpponents();drawHero();saveState();if(state.installDetected&&!state.installRewardClaimed)queueMicrotask(maybeGrantInstallReward);
@@ -777,14 +802,15 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',4),sparringLeft=sessionsLeft('sparring',2),coach=state.trainerOn,fee=coachFee(),treatmentReady=state.treatmentAvailable;
+    const left=sessionsLeft('train',4),sparringLeft=sessionsLeft('sparring',2),coach=state.trainerOn,fee=coachFee(),treatmentReady=state.treatmentAvailable,cooldown=trainingCooldownRemaining(),cooling=cooldown>0,cooldownLabel=trainingCooldownText(cooldown),injury=currentTrainingInjury();
+    const injuryBanner=$('#trainingInjuryBanner');injuryBanner.hidden=!injury;if(injury){$('#trainingInjuryIcon').textContent=injury.icon;$('#trainingInjuryName').textContent=injury.name.toUpperCase()}
     $('#trainLimitText').textContent=`${left} SESSION${left===1?'':'S'} LEFT`;
     const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
-    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const trainRepeat=state.dailyCounters.train;const coachCost=coach?fee:0;const cost=LOGIC.trainingCost(a,trainRepeat);const gain=LOGIC.trainingGain(a.gain,coach,false,trainRepeat);const locked=state.energy<cost||state.cash<coachCost||left<1;const gainText=`+${Number(gain).toFixed(1)}`;return `<button class="action" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gainText} ${a.stat.toUpperCase()}</b><small>-${cost} energy${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
+    $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const trainRepeat=state.dailyCounters.train,coachCost=coach?fee:0,cost=LOGIC.trainingCost(a,trainRepeat),gain=LOGIC.trainingGain(a.gain,coach,false,trainRepeat),locked=state.energy<cost||state.cash<coachCost||left<1;return `<button class="action${cooling?' training-cooldown':''}" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>+${gain} ${a.stat.toUpperCase()}</b><small>-${cost} energy${coach?` &middot; COACH $${coachCost}`:''}</small><small class="training-cooldown-clock" ${cooling?'':'hidden'}>COOL DOWN &middot; ${cooldownLabel}</small></div></button>`}).join('');
     $('#sparringLimitText').textContent=`${sparringLeft} SESSION${sparringLeft===1?'':'S'} LEFT`;
-    $('#sparringActions').innerHTML=sparringDefs.map((a,i)=>{const sparringRepeat=state.dailyCounters.sparring;const coachCost=coach?fee:0;const cost=LOGIC.trainingCost(a,sparringRepeat);const gain=LOGIC.trainingGain(a.gain,coach,false,sparringRepeat);const risk=a.damage?` · ${LOGIC.sparringDamage(a.damage[0],sparringRepeat)}–${LOGIC.sparringDamage(a.damage[1],sparringRepeat)} health risk`:' · no health damage';const locked=state.energy<cost||state.cash<coachCost||sparringLeft<1;const skillLabel=a.skills===1?`+${Number(gain).toFixed(1)} RANDOM SKILL`:`+${Number(gain).toFixed(1)} TO 2 RANDOM SKILLS`;return `<button class="action sparring-${a.skills===1?'light':'heavy'}" data-sparring="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${skillLabel}</b><small>-${cost} energy${risk}${coach?` · COACH $${coachCost}`:''}</small></div></button>`}).join('');
+    $('#sparringActions').innerHTML=sparringDefs.map((a,i)=>{const sparringRepeat=state.dailyCounters.sparring,coachCost=coach?fee:0,cost=LOGIC.trainingCost(a,sparringRepeat),gain=LOGIC.trainingGain(a.gain,coach,false,sparringRepeat),risk=a.damage?` &middot; ${LOGIC.sparringDamage(a.damage[0],sparringRepeat)}&ndash;${LOGIC.sparringDamage(a.damage[1],sparringRepeat)} health risk`:' &middot; no health damage',locked=state.energy<cost||state.cash<coachCost||sparringLeft<1,skillLabel=a.skills===1?`+${gain} RANDOM SKILL`:`+${gain} TO 2 RANDOM SKILLS`;return `<button class="action sparring-${a.skills===1?'light':'heavy'}${cooling?' training-cooldown':''}" data-sparring="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${skillLabel}</b><small>-${cost} energy${risk}${coach?` &middot; COACH $${coachCost}`:''}</small><small class="training-cooldown-clock" ${cooling?'':'hidden'}>COOL DOWN &middot; ${cooldownLabel}</small></div></button>`}).join('');
     $('#recoveryLimitText').textContent=treatmentReady?'TREATMENT READY':'FIGHT TO UNLOCK';
-    $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const treatmentFee=recoveryFee(a),quote=LOGIC.recoveryQuote(state,a,treatmentFee,!treatmentReady),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' · '),status=quote.reason==='limit'?'COMPLETE A FIGHT TO UNLOCK':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
+    $('#recoveryActions').innerHTML=recoveryDefs.map((a,i)=>{const treatmentFee=recoveryFee(a),quote=LOGIC.recoveryQuote(state,a,treatmentFee,!treatmentReady),gain=[a.energy?`+${a.energy} ENERGY`:'',a.health?`+${a.health} HEALTH`:''].filter(Boolean).join(' &middot; '),status=quote.reason==='limit'?'COMPLETE A FIGHT TO UNLOCK':quote.reason==='cash'?`NEED $${treatmentFee}`:quote.reason==='full'?'RESOURCES FULL':`-$${treatmentFee}`;return `<button class="action" data-recovery="${i}" ${quote.ok?'':'disabled'}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost"><b>${gain}</b><small>${status}</small></div></button>`}).join('');
     updateDailyResetClocks();
   }
   function opportunityUnlocked(a){return state.level>=a.minLevel&&state.fans>=a.minFans}
@@ -931,15 +957,15 @@
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
     const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount);
-    state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));sfx.train();shake(false);toast(perfect?`PERFECT SESSION! +${Number(gain).toFixed(1)} ${a.stat.toUpperCase()}`:`+${Number(gain).toFixed(1)} ${a.stat.toUpperCase()}`,perfect?'#f4c34a':'#77d13e');
-    trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
+    const recovery=applyTrainingCooldown();state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));if(recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - +${gain} ${a.stat.toUpperCase()}`:perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');
+    trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
   }
   function handleSparring(i){
     ensureDailyCounters();const a=sparringDefs[i],coach=state.trainerOn;if(!a)return;const repeatCount=state.dailyCounters.sparring;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('sparring',2));
     if(quote.reason==='limit'){toast('No sparring sessions left today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.sparring+=quote.sessions;
-    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills);skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));if(a.skills>1){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${Number(gain).toFixed(1)} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` · -${damage} health`:'';toast(`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
+    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills),recovery=applyTrainingCooldown();skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));if(a.skills>1||recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` - ${damage} health lost`:'';toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - ${gains}`:`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
     ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(treatment),quote=LOGIC.recoveryQuote(state,treatment,fee,!state.treatmentAvailable);
