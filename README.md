@@ -376,7 +376,9 @@ generated league.
   by another minute and triggers a hidden injury roll. Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
   by 10% or at least one point, whichever is greater. Injuries clear at the
-  player's next local midnight and never carry into a new day.
+  player's next local midnight and never carry into a new day. While injured,
+  all gym and sparring actions are locked; recovery, hustles, and fights remain
+  available, and fights use the reduced attributes.
 - Coach Vega is an optional training upgrade that adds skill gain, XP, and a
   better perfect-session chance. His fee is `$250 + ($75 × fighter level)` per
   session, including each Light or Heavy Sparring session.
