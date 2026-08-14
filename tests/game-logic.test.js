@@ -240,14 +240,16 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingQuote({cash:500,energy:10},action,true,75,4).reason,'energy');
   assert.deepEqual(logic.trainingQuote({cash:500,energy:50},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
   assert.equal(logic.trainingGain(2,false,false),2);
-  assert.equal(logic.trainingGain(2,true,true),6);
+  assert.equal(logic.trainingGain(2,true,true),3);
+  assert.equal(logic.trainingGain(1,false,true),2);
 });
 
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
   assert.equal(logic.trainingCost({cost:8},0),8);
   assert.equal(logic.trainingCost({cost:8},2),12);
   assert.equal(logic.trainingGain(1,false,false,0),1);
-  assert.ok(logic.trainingGain(1,false,false,2)<1);
+  assert.equal(logic.trainingGain(1,false,false,2),1);
+  assert.equal(Number.isInteger(logic.trainingGain(1,true,true,2)),true);
   assert.equal(logic.sparringDamage(3,0),3);
   assert.ok(logic.sparringDamage(3,2)>3);
 });
@@ -262,6 +264,14 @@ test('recovery treatments require one available opportunity and clamp restored r
   assert.equal(state.energy,97);
   assert.equal(state.health,100);
   assert.deepEqual(logic.applyRecovery({energy:95,maxEnergy:100,health:70,maxHealth:100},massage),{energy:5,health:25});
+});
+
+test('training injuries reduce every effective attribute by ten percent or at least one point',()=>{
+  assert.equal(logic.injuredStat(5,true),4);
+  assert.equal(logic.injuredStat(20,true),18);
+  assert.ok(Math.abs(logic.injuredStat(8.66,true)-7.66)<.000001);
+  assert.equal(logic.injuredStat(1,true),1);
+  assert.equal(logic.injuredStat(8.66,false),8.66);
 });
 
 test('persistent health sets a tiered starting fight condition',()=>{

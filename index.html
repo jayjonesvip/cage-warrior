@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.60" />
+<meta name="app-version" content="2.5.61" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.60">
+<link rel="stylesheet" href="styles.css?v=2.5.61">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -131,10 +131,10 @@
       </div>
     </div>
     <div class="hud-attributes-row" aria-label="Fighter attributes">
-      <div class="hud-attribute"><span>POWER</span><b id="powerStat">5.00</b><div class="mini"><i id="powerMini"></i></div></div>
-      <div class="hud-attribute"><span>SPEED</span><b id="speedStat">5.00</b><div class="mini"><i id="speedMini"></i></div></div>
-      <div class="hud-attribute"><span>CHIN</span><b id="chinStat">5.00</b><div class="mini"><i id="chinMini"></i></div></div>
-      <div class="hud-attribute"><span>CARDIO</span><b id="cardioStat">5.00</b><div class="mini"><i id="cardioMini"></i></div></div>
+      <div class="hud-attribute"><span>POWER <i class="attribute-injury-icon" aria-hidden="true">&#9888;</i></span><b id="powerStat">5.00</b><div class="mini"><i id="powerMini"></i></div></div>
+      <div class="hud-attribute"><span>SPEED <i class="attribute-injury-icon" aria-hidden="true">&#9888;</i></span><b id="speedStat">5.00</b><div class="mini"><i id="speedMini"></i></div></div>
+      <div class="hud-attribute"><span>CHIN <i class="attribute-injury-icon" aria-hidden="true">&#9888;</i></span><b id="chinStat">5.00</b><div class="mini"><i id="chinMini"></i></div></div>
+      <div class="hud-attribute"><span>CARDIO <i class="attribute-injury-icon" aria-hidden="true">&#9888;</i></span><b id="cardioStat">5.00</b><div class="mini"><i id="cardioMini"></i></div></div>
     </div>
   </section>
 
@@ -188,10 +188,11 @@
     <section class="screen" data-screen="train">
       <div class="trainer-card"><div><h3>Personal Trainer</h3><p>Hire Coach Vega for +1 extra skill gain, more XP, and a better perfect-session chance. His per-session fee rises with your level.</p></div><button class="trainer-toggle" id="trainerToggle" type="button" role="switch" aria-checked="false" aria-label="Use personal trainer"><span class="switch-copy"><b>COACH OFF</b><small>Optional boost</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span></button></div>
       <div class="daily-reset-clock"><span>DAILY LIMITS RESET IN</span><strong data-daily-reset-clock aria-label="Time until daily training limits reset">--:--:--</strong><small>YOUR LOCAL MIDNIGHT</small></div>
+      <div class="training-injury-banner" id="trainingInjuryBanner" hidden><span class="training-injury-symbol" id="trainingInjuryIcon" aria-hidden="true">&#9888;</span><div><small>ACTIVE INJURY</small><b id="trainingInjuryName">TRAINING INJURY</b><em>ALL ATTRIBUTES REDUCED &middot; HEALS AT LOCAL MIDNIGHT</em></div></div>
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="card sparring-card"><div class="card-title">Sparring <span class="limit-pill" id="sparringLimitText">2 SESSIONS LEFT</span></div><div class="action-list" id="sparringActions"></div></div>
       <div class="card recovery-card"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">TREATMENT READY</span></div><div class="action-list" id="recoveryActions"></div></div>
-      <div class="section-note">Basic drills allow four sessions per day. Sparring has its own two-session daily limit: Light Sparring improves one random skill safely, while Heavy Sparring improves two random skills but costs more energy and may cost health. Coach Vega can boost either. One paid treatment is available after each completed fight and treatment opportunities never accumulate.</div>
+      <div class="section-note">Every gym or sparring session starts a one-minute cooldown. Training again before it ends extends the cooldown and may cause an injury lasting until local midnight. Basic drills allow four sessions per day and sparring has its own two-session limit. Coach Vega can boost either. One paid treatment is available after each completed fight and treatment opportunities never accumulate.</div>
     </section>
 
     <section class="screen" data-screen="fight">
@@ -292,7 +293,7 @@
     <div class="gig-modal cage-dice-dialog" role="dialog" aria-modal="true" aria-labelledby="cageDiceTitle" aria-describedby="cageDiceRules">
       <span class="cage-dice-kicker">UNDERGROUND BUZZ · ONE ROLL DAILY</span>
       <h2 id="cageDiceTitle">Cage <span>Dice</span></h2>
-      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.60" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
+      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.61" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
       <p id="cageDiceRules">Choose one outcome, set a whole-dollar wager, and roll two dice. Under and over exclude seven.</p>
       <div class="blackjack-bankroll cage-dice-bankroll"><span>YOUR CASH <b id="cageDiceCash">$0</b></span><span>MAX BET <b id="cageDiceMaxBet">$0</b></span></div>
       <div id="cageDiceSetup">
@@ -320,7 +321,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.60" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.61" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -387,7 +388,7 @@
           <small class="focus-tier" id="focusTier">COMPOSED</small>
         </div>
         <div class="focus-locker-room">
-          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.60" alt="Fight-night locker room prepared for the fighter">
+          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.61" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MINUTES BEFORE THE WALKOUT</small></div>
           <div class="focus-encounter" id="focusEncounter"></div>
         </div>
@@ -422,7 +423,7 @@
     <h2 id="resultTitle" class="win">DECISION WIN!</h2>
     <div class="result-method" id="resultMethod">UNANIMOUS DECISION · 3 ROUNDS</div>
     <p id="resultLine">You gave the crowd something to remember.</p>
-    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.60" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.61" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
     <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="result-bonuses" id="resultBonuses" hidden></div>
     <div class="loot" id="lootBox" style="display:none"></div>
@@ -435,12 +436,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.60"></script>
-<script src="strings.js?v=2.5.60"></script>
-<script src="analytics.js?v=2.5.60"></script>
-<script src="supabase-client.js?v=2.5.60"></script>
-<script src="cage-social.js?v=2.5.60"></script>
-<script src="game.js?v=2.5.60"></script>
-<script src="pwa.js?v=2.5.60"></script>
+<script src="game-logic.js?v=2.5.61"></script>
+<script src="strings.js?v=2.5.61"></script>
+<script src="analytics.js?v=2.5.61"></script>
+<script src="supabase-client.js?v=2.5.61"></script>
+<script src="cage-social.js?v=2.5.61"></script>
+<script src="game.js?v=2.5.61"></script>
+<script src="pwa.js?v=2.5.61"></script>
 </body>
 </html>
