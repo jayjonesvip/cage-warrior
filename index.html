@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Cage Grind" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.70" />
+<meta name="app-version" content="2.5.71" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -41,7 +41,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="styles.css?v=2.5.70">
+<link rel="stylesheet" href="styles.css?v=2.5.71">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -293,7 +293,7 @@
     <div class="gig-modal cage-dice-dialog" role="dialog" aria-modal="true" aria-labelledby="cageDiceTitle" aria-describedby="cageDiceRules">
       <span class="cage-dice-kicker">UNDERGROUND BUZZ · ONE ROLL DAILY</span>
       <h2 id="cageDiceTitle">Cage <span>Dice</span></h2>
-      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.70" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
+      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.71" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
       <p id="cageDiceRules">Choose one outcome, set a whole-dollar wager, and roll two dice. Under and over exclude seven.</p>
       <div class="blackjack-bankroll cage-dice-bankroll"><span>YOUR CASH <b id="cageDiceCash">$0</b></span><span>MAX BET <b id="cageDiceMaxBet">$0</b></span></div>
       <div id="cageDiceSetup">
@@ -321,7 +321,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.70" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.71" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -370,7 +370,7 @@
         <div class="tape-card">
           <div class="tape-title"><b>Tale of the Tape</b><small id="tapeBoutLabel">3 ROUNDS</small></div>
           <div class="tape-title-bout" id="tapeTitleBout" hidden><span aria-hidden="true">♛</span><div><b>WORLD TITLE BOUT</b><small>CAGE GRIND WORLD CHAMPIONSHIP</small></div><span aria-hidden="true">♛</span></div>
-          <div class="tape-purse"><small>FIGHT PURSE</small><strong id="tapePurse">$0</strong><span class="tape-hype-bonus" id="tapeHypeBonus">0% HYPE · WIN BONUS +0% PURSE · +0% FOLLOWERS</span><span class="tape-energy" id="tapeEnergy">18 ENERGY CLEARANCE · 6 PER ROUND</span><em class="tape-haymaker">KEEP 5 EXTRA FOR A HAYMAKER</em></div>
+          <button class="tape-purse" id="tapePurseToggle" type="button" aria-expanded="false" aria-controls="tapeBreakdown"><strong id="tapePurse">$0</strong><small class="tape-purse-hint">TAP FOR BREAKDOWN</small></button>
           <div class="tape-versus-cards">
             <article class="tape-fighter-card player-card"><div class="tape-card-top"><span>YOU</span><span id="tapePlayerRecord">PRO 0-0</span></div><div class="tape-card-portrait"><span class="tape-favorite" id="tapePlayerFavorite" hidden>FAVORITE</span><img class="tape-player-art" id="tapePlayerArt" alt="Your fighter"></div><h3 id="tapePlayerName">ROOKIE</h3><div class="tape-style" id="tapePlayerTag">UNRANKED</div></article>
             <div class="tape-vs-badge">VS</div>
@@ -383,9 +383,19 @@
             <div class="tape-attribute-row" data-tape-stat="cardio"><span class="tape-attribute-value" id="tapePCardio">5.00</span><div class="tape-attribute-meter player"><i id="tapePCardioMeter"></i></div><b>CARDIO</b><div class="tape-attribute-meter opponent-meter"><i id="tapeOCardioMeter"></i></div><span class="tape-attribute-value" id="tapeOCardio">5.00</span></div>
           </div>
           <div class="tape-scout" id="walkoutText">Compare the matchup before you sign for the fight.</div>
-          <div class="tape-mode"><div class="tape-mode-head"><b>FIGHT MODE</b><small>REMEMBERS YOUR CHOICE</small></div><div class="fight-mode-toggle" role="group" aria-label="Fight mode"><button class="fight-mode-toggle-btn" data-fight-mode-toggle="sim-plus" type="button" aria-pressed="true">TACTICAL FIGHT<small>COACH · 10% ON WINS</small></button><button class="fight-mode-toggle-btn" data-fight-mode-toggle="quick" type="button" aria-pressed="false">FULL SIMULATION<small>HANDS-OFF · KEEP 100%</small></button></div><p id="tapeModeDescription">Your tactical decisions can change the outcome. The coach collects only when you win.</p></div>
+          <div class="tape-mode"><div class="fight-mode-toggle" role="group" aria-label="Fight mode"><button class="fight-mode-toggle-btn" data-fight-mode-toggle="sim-plus" type="button" aria-pressed="true">TACTICAL<small>10% COACH</small></button><button class="fight-mode-toggle-btn" data-fight-mode-toggle="quick" type="button" aria-pressed="false">FULL SIM<small>KEEP 100%</small></button></div></div>
           <div class="tape-actions"><button class="tape-action" id="tapeBackBtn" type="button">GO BACK</button><button class="tape-action fight" id="tapeFightBtn" type="button">START TACTICAL FIGHT</button><div class="tape-clearance" id="tapeClearance"></div></div>
         </div>
+      </div>
+
+      <div class="tape-breakdown" id="tapeBreakdown" hidden>
+        <button class="tape-breakdown-backdrop" id="tapeBreakdownBackdrop" type="button" aria-label="Close purse breakdown"></button>
+        <section class="tape-breakdown-sheet" role="dialog" aria-modal="true" aria-labelledby="tapeBreakdownTitle">
+          <header><div><small>FIGHT TERMS</small><h2 id="tapeBreakdownTitle">PURSE BREAKDOWN</h2></div><button id="tapeBreakdownClose" type="button" aria-label="Close purse breakdown">×</button></header>
+          <div class="tape-breakdown-total"><small>BASE PURSE</small><strong id="tapeBreakdownPurse">$0</strong></div>
+          <div class="tape-breakdown-rows"><div><span>HYPE BONUS</span><b id="tapeHypeBonus">0% HYPE · +0% WINNINGS</b></div><div><span>FOLLOWER BOOST</span><b id="tapeBreakdownFollowers">+0% ON A WIN</b></div><div><span>FIGHT MODE</span><b id="tapeBreakdownMode">TACTICAL · 10% COACH SHARE</b></div><div><span>ENERGY TERMS</span><b class="tape-energy" id="tapeEnergy">18 REQUIRED · 6 PER STARTED ROUND</b></div></div>
+          <p id="tapeBreakdownHaymaker">KEEP 5 EXTRA ENERGY TO PRESERVE THE HAYMAKER OPTION.</p><p id="tapeBreakdownNetwork" hidden>NETWORK FIGHTS USE AN AI-CONTROLLED SNAPSHOT. THE REAL FIGHTER'S PUBLIC RECORD IS UNAFFECTED.</p>
+        </section>
       </div>
 
       <div class="sim-stage hidden" id="focusStage">
@@ -395,7 +405,7 @@
           <small class="focus-tier" id="focusTier">COMPOSED</small>
         </div>
         <div class="focus-locker-room">
-          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.70" alt="Fight-night locker room prepared for the fighter">
+          <img class="focus-locker-art" src="assets/focus-locker-room.jpg?v=2.5.71" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MINUTES BEFORE THE WALKOUT</small></div>
           <div class="focus-encounter" id="focusEncounter"></div>
         </div>
@@ -431,7 +441,7 @@
     <div class="result-method" id="resultMethod">UNANIMOUS DECISION · 3 ROUNDS</div>
     <div class="official-judges" id="officialJudges" hidden></div>
     <p id="resultLine">You gave the crowd something to remember.</p>
-    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.70" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.71" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
     <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="result-bonuses" id="resultBonuses" hidden></div>
     <div class="loot" id="lootBox" style="display:none"></div>
@@ -444,12 +454,12 @@
   </div></div>
 </div>
 
-<script src="game-logic.js?v=2.5.70"></script>
-<script src="strings.js?v=2.5.70"></script>
-<script src="analytics.js?v=2.5.70"></script>
-<script src="supabase-client.js?v=2.5.70"></script>
-<script src="cage-social.js?v=2.5.70"></script>
-<script src="game.js?v=2.5.70"></script>
-<script src="pwa.js?v=2.5.70"></script>
+<script src="game-logic.js?v=2.5.71"></script>
+<script src="strings.js?v=2.5.71"></script>
+<script src="analytics.js?v=2.5.71"></script>
+<script src="supabase-client.js?v=2.5.71"></script>
+<script src="cage-social.js?v=2.5.71"></script>
+<script src="game.js?v=2.5.71"></script>
+<script src="pwa.js?v=2.5.71"></script>
 </body>
 </html>
