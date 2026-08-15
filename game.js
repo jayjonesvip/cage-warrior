@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.72';
+  const ICON_ASSET_VERSION = '2.5.73';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -437,7 +437,7 @@
     $('#landingTitleLead').textContent=returning?'WELCOME BACK,':building?'FINISH YOUR':'FROM NOBODY';
     $('#landingTitleAccent').textContent=returning?state.name:building?'FIGHTER BUILD':'TO MAIN EVENT';
     $('#landingDescription').textContent=returning?'Your corner is ready and your rivals are waiting. Pick up the climb exactly where you left it.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Create your fighter, call the tactics between rounds, and grind from local cards to the world title.';
-    $('#landingEnterBtn').textContent=returning?'KEEP GRINDING':building?'CONTINUE YOUR BUILD':'START YOUR CAREER';
+    $('#landingEnterBtn').textContent=returning?'CONTINUE CAREER':building?'CONTINUE YOUR BUILD':'START YOUR CAREER';
     const stats=$('#landingCareerStats');stats.hidden=!returning;if(returning){$('#landingRank').textContent=`LVL ${state.level}`;$('#landingRecord').textContent=`${state.wins}-${state.losses}`;$('#landingFollowers').textContent=fmt(state.fans)}renderLandingChampionship();
   }
   function showRecoveryReport(){
