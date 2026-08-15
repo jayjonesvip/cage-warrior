@@ -159,6 +159,8 @@ test('opponent availability covers career fights, the global title, and accepted
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:false},context),false);
+  assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,rematchBlocked:true},context),'blocked');
+  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,rematchBlocked:true},context),false);
 });
 
 test('retirement suppresses unload saves and clears only career storage',()=>{

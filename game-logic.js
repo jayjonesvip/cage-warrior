@@ -279,7 +279,7 @@
   function playerTrailing(rounds){const score=fightScore(rounds);return score.player<score.opponent}
 
   function opponentState(opponent,{level}){
-    if(opponent.globalChampionship)return opponent.isPlayerChampion?'champion':opponent.challengeEligible?'title':'locked';
+    if(opponent.globalChampionship)return opponent.isPlayerChampion?'champion':opponent.rematchBlocked?'blocked':opponent.challengeEligible?'title':'locked';
     if(level<opponent.tier)return 'locked';
     if(level>opponent.tier)return 'passed';
     return 'current';
