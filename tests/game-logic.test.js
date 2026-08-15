@@ -109,7 +109,7 @@ test('fight booking charges ten per started round and protects the scheduled res
   assert.equal(state.energy,5);
 });
 
-test('ordinary level ups grant partial recovery while title milestones restore fully',()=>{
+test('level-up resource helper supports ordinary recovery and explicit full recovery',()=>{
   const ordinary={energy:10,maxEnergy:100,health:20,maxHealth:100};
   logic.applyLevelUpResources(ordinary,false);
   assert.deepEqual(ordinary,{energy:40,maxEnergy:103,health:45,maxHealth:105});
@@ -146,19 +146,19 @@ test('fight and rematch payouts preserve existing formulas',()=>{
   const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};
   assert.equal(logic.payoutForOpponent(newOpponent,3),200);
   assert.equal(logic.payoutForOpponent(beatenOpponent,3),100);
-  assert.equal(logic.payoutForOpponent({...beatenOpponent,championship:true},3),200);
+  assert.equal(logic.payoutForOpponent({...beatenOpponent,globalChampionship:true},3),200);
   assert.equal(logic.winFightCash({basePurse:200,hype:0,cashBonus:0,winStreak:1,variance:1}),200);
   assert.equal(logic.lossFightCash(200),16);
 });
 
-test('opponent availability covers current fights, locked titles, and accepted rematches',()=>{
-  const context={level:5,milestones:[],titleOrder:['city','regional','us','world'],hasCity:true};
+test('opponent availability covers career fights, the global title, and accepted rematches',()=>{
+  const context={level:5};
   assert.equal(logic.opponentAvailable({tier:5,lossesToPlayer:0},context),true);
   assert.equal(logic.opponentAvailable({tier:6,lossesToPlayer:0},context),false);
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:false},context),false);
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
-  assert.equal(logic.opponentAvailable({championship:true,titleId:'city',tier:5,titleDefeated:false},context),true);
-  assert.equal(logic.opponentAvailable({championship:true,titleId:'regional',tier:5,titleDefeated:false},context),false);
+  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true},context),true);
+  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:false},context),false);
 });
 
 test('retirement suppresses unload saves and clears only career storage',()=>{

@@ -262,7 +262,7 @@
   function payoutForOpponent(opponent,level){
     const reward=Math.max(0,finite(opponent&&opponent.reward));
     const tier=Math.max(1,whole(opponent&&opponent.tier,1));
-    const full=!!(opponent&&opponent.championship)||(!(opponent&&opponent.lossesToPlayer)&&tier>=Math.max(1,whole(level,1)));
+    const full=!!(opponent&&opponent.globalChampionship)||(!(opponent&&opponent.lossesToPlayer)&&tier>=Math.max(1,whole(level,1)));
     return Math.round(reward*(full?1:.5));
   }
 
@@ -278,18 +278,14 @@
   function fightScore(rounds){return (Array.isArray(rounds)?rounds:[]).reduce((score,round)=>({player:score.player+finite(round.scoreP),opponent:score.opponent+finite(round.scoreO)}),{player:0,opponent:0})}
   function playerTrailing(rounds){const score=fightScore(rounds);return score.player<score.opponent}
 
-  function opponentState(opponent,{level,milestones=[],titleOrder=[],hasCity=false}){
-    if(opponent.championship){
-      if(opponent.titleDefeated||milestones.includes(opponent.titleId))return 'former';
-      const index=titleOrder.indexOf(opponent.titleId),previousWon=index<=0||milestones.includes(titleOrder[index-1]);
-      return hasCity&&level>=opponent.tier&&previousWon?'title':'locked';
-    }
+  function opponentState(opponent,{level}){
+    if(opponent.globalChampionship)return opponent.isPlayerChampion?'champion':opponent.challengeEligible?'title':'locked';
     if(level<opponent.tier)return 'locked';
     if(level>opponent.tier)return 'passed';
     return 'current';
   }
 
-  function opponentGroup(opponent,context){return !opponent.championship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
+  function opponentGroup(opponent,context){return !opponent.globalChampionship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
   function opponentAvailable(opponent,context){const status=opponentGroup(opponent,context);return ['title','current','passed'].includes(status)||(status==='rival'&&opponent.rematchAccepted===true)}
   function networkOpponentRatings(tier,avatarStats={},archetypeMods={},difficulty=0){
     const base=4+(Math.max(1,whole(tier,1))-1)*1.9,variance=clamp(finite(difficulty),-.7,.7),ratings={};
