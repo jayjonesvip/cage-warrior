@@ -25,6 +25,7 @@ interactions from `game.js`.
 - On phones, the personalized headline and entry action appear before the
   octagon artwork and longer feature pitch. The landing shell uses the safe
   viewport and device inset so the full action remains above the browser fold.
+  An inset rounded border matches the panel treatment used throughout the game.
 
 ### Responsive desktop interface
 
@@ -172,6 +173,8 @@ generated league.
   Health or a losing submission removes 8. Misses, movement, and defensive
   narration remove no Health. The live deductions are saved immediately and
   the result screen reports the total fight damage.
+- Major incoming damage (4 or more persistent Health) triggers a brief,
+  stylized blood-sport particle burst over the live fight. Routine shots do not.
 - Fight energy scales with the player's current career level: Levels 1–2 cost
   6 energy per started round, Levels 3–4 cost 7, Levels 5–6 cost 8, Levels
   7–8 cost 9, and Level 9 onward costs 10. Three-round clearance therefore
