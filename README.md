@@ -318,7 +318,11 @@ generated league.
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The champion's name,
-  level, record, and defense count appear in matchmaking.
+  level, record, and defense count appear on the landing page and in
+  matchmaking. The Tale of the Tape uses a dedicated World Title Bout banner
+  for championship matchups and compares Power, Speed, Chin, and Cardio with
+  proportional meters; the stronger side of each attribute is highlighted in
+  green and ties use a neutral gold treatment.
 - Daily Contracts and the seeded Daily Challenge are currently removed. The
   guaranteed Daily Drop remains available and may be expanded later.
 

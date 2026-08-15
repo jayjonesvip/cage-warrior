@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.67';
+  const ICON_ASSET_VERSION = '2.5.68';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -75,6 +75,8 @@
   let sharedSocialNoticeShown=false;
   let sharedSocialInteractionsRemaining=0;
   let sharedChampionship=null;
+  let landingChampionshipLoaded=false;
+  let landingChampionshipUnavailable=false;
   const networkOpponentCheckedLevels=new Set();
   let networkOpponentSyncPromise=null;
   let activeBioProfileId='';
@@ -421,6 +423,14 @@
     if(state.level>=2)return 'CLUB FIGHTER';
     return 'UNRANKED';
   }
+  function renderLandingChampionship(){
+    const name=$('#landingChampionName'),meta=$('#landingChampionMeta');
+    if(!landingChampionshipLoaded){name.textContent='CONNECTING…';meta.textContent='Loading the one shared Cage Grind title.';return}
+    if(landingChampionshipUnavailable){name.textContent='TITLE UPDATE UNAVAILABLE';meta.textContent='Enter the game and reconnect to Cage Network.';return}
+    if(!sharedChampionship?.champion_id){name.textContent='BELT VACANT';meta.textContent='One world title. The next champion must take it.';return}
+    const defenses=Math.max(0,Number(sharedChampionship.defenses)||0),record=`${Math.max(0,Number(sharedChampionship.champion_wins)||0)}-${Math.max(0,Number(sharedChampionship.champion_losses)||0)}`;
+    name.textContent=`@${sharedChampionship.champion_handle}`;meta.textContent=`LEVEL ${sharedChampionship.champion_level} · ${record} · ${defenses} DEFENSE${defenses===1?'':'S'}`;
+  }
   function renderLanding(){
     landingMode=LOGIC.careerLandingMode(state);const returning=landingMode==='returning',building=landingMode==='building',page=$('#landingPage');page.dataset.mode=landingMode;
     $('#landingEyebrow').textContent=returning?'YOUR CAREER IS WAITING':building?'FIGHTER BUILD IN PROGRESS':'YOUR FIGHT STARTS HERE';
@@ -428,7 +438,7 @@
     $('#landingTitleAccent').textContent=returning?state.name:building?'FIGHTER BUILD':'TO MAIN EVENT';
     $('#landingDescription').textContent=returning?'Your corner is ready and your rivals are waiting. Pick up the climb exactly where you left it.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Create your fighter, call the tactics between rounds, and grind from local cards to the world title.';
     $('#landingEnterBtn').textContent=returning?'KEEP GRINDING':building?'CONTINUE YOUR BUILD':'START YOUR CAREER';
-    const stats=$('#landingCareerStats');stats.hidden=!returning;if(returning){$('#landingRank').textContent=`LVL ${state.level}`;$('#landingRecord').textContent=`${state.wins}-${state.losses}`;$('#landingFollowers').textContent=fmt(state.fans)}
+    const stats=$('#landingCareerStats');stats.hidden=!returning;if(returning){$('#landingRank').textContent=`LVL ${state.level}`;$('#landingRecord').textContent=`${state.wins}-${state.losses}`;$('#landingFollowers').textContent=fmt(state.fans)}renderLandingChampionship();
   }
   function showRecoveryReport(){
     if(!recoveryReport)return;const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push('fight booking refunded');recoveryReport=null;toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff');
@@ -668,17 +678,22 @@
       const profile=await SHARED_FEED.registerProfile(sharedProfilePayload());
       if(!profile?.id||!profile?.handle)throw new Error('Shared profile registration failed.');
       state.socialProfileId=profile.id;if(normalizeIdentityName(profile.handle)!==state.name){state.name=normalizeIdentityName(profile.handle);state.nameLocked=true}
-      let [posts,profiles,interactionsRemaining,championship]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(100),SHARED_FEED.loadInteractionAllowance(),SHARED_FEED.loadChampionship()]);sharedChampionship=championship||null;const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
+      let [posts,profiles,interactionsRemaining,championship]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(100),SHARED_FEED.loadInteractionAllowance(),SHARED_FEED.loadChampionship()]);sharedChampionship=championship||null;landingChampionshipLoaded=true;landingChampionshipUnavailable=false;const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
       if(state.socialAccountCreated&&!hasOwnRemotePost&&!state.socialRemoteInitialized){await SHARED_FEED.publishPost({kind:'player',body:'Hello, fight fans! Stay tuned—the climb starts now.'});posts=await SHARED_FEED.loadFeed(50)}
       state.socialRemoteInitialized=state.socialAccountCreated&&(hasOwnRemotePost||Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id));
       sharedSocialProfiles=[profile,...(Array.isArray(profiles)?profiles.filter(item=>item.id!==profile.id):[])];try{state.socialFollowingCount=await SHARED_FEED.loadProfileCount()}catch{state.socialFollowingCount=sharedSocialProfiles.length}$('#followingText').textContent=fmt(state.socialFollowingCount);sharedSocialInteractionsRemaining=Math.max(0,Math.min(5,Number(interactionsRemaining)||0));sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];const latestRemoteId=Math.max(0,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0));if(currentScreen==='feed')state.socialLastRemotePostId=latestRemoteId;
-      sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();return true;
+      sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderLanding();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();return true;
     })().catch(error=>{
-      sharedSocialStatus='error';sharedSocialError=String(error?.message||'Shared feed unavailable.');sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;sharedChampionship=null;renderSocial();
+      sharedSocialStatus='error';sharedSocialError=String(error?.message||'Shared feed unavailable.');sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;sharedChampionship=null;landingChampionshipLoaded=true;landingChampionshipUnavailable=true;renderSocial();renderLanding();
       if(currentScreen==='feed'&&!sharedSocialNoticeShown){sharedSocialNoticeShown=true;toast('SHARED FEED SETUP PENDING · USING LOCAL FEED','#ffcf78')}
       return false;
     }).finally(()=>{sharedSocialSyncPromise=null});
     return sharedSocialSyncPromise;
+  }
+  async function loadLandingChampionship(){
+    if(!SHARED_FEED?.configured?.()){landingChampionshipLoaded=true;landingChampionshipUnavailable=true;renderLanding();return false}
+    try{sharedChampionship=await SHARED_FEED.loadChampionship()||null;landingChampionshipLoaded=true;landingChampionshipUnavailable=false;renderLanding();renderCareer();return true}
+    catch{landingChampionshipLoaded=true;landingChampionshipUnavailable=true;renderLanding();return false}
   }
   function queueSharedPosts(entries){
     if(!entries.length||!state.socialAccountCreated)return;
@@ -1238,13 +1253,20 @@
     const mode=state.fightModePreference==='quick'?'quick':'sim-plus';$$('[data-fight-mode-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.fightModeToggle===mode)));$('#tapeModeDescription').textContent=mode==='quick'?'No prompts. Your stats and signature style decide the fight automatically, and you keep the full purse.':'Your tactical decisions can change the outcome. The coach collects 10% only when you win.';$('#tapeFightBtn').textContent=mode==='quick'?'START FULL SIMULATION':'START TACTICAL FIGHT';
   }
   function selectFightMode(mode){if(!['sim-plus','quick'].includes(mode)||combatLocked)return;state.fightModePreference=mode;renderFightModeToggle();saveState();sfx.tap()}
+  function renderTapeAttributes(f){
+    const attributes=[['Power','power','tapePPower','tapeOPower'],['Speed','speed','tapePSpeed','tapeOSpeed'],['Chin','chin','tapePChin','tapeOChin'],['Cardio','cardio','tapePCardio','tapeOCardio']],scale=Math.max(10,...attributes.flatMap(([,key])=>[Number(f.player[key])||0,Number(f.opp[key])||0]));
+    attributes.forEach(([,key,playerId,oppId])=>{
+      const playerValue=Number(f.player[key])||0,oppValue=Number(f.opp[key])||0,even=Math.abs(playerValue-oppValue)<.005,playerAdvantage=!even&&playerValue>oppValue,oppAdvantage=!even&&oppValue>playerValue,playerValueEl=$('#'+playerId),oppValueEl=$('#'+oppId),playerMeter=$('#'+playerId+'Meter').parentElement,oppMeter=$('#'+oppId+'Meter').parentElement;
+      playerValueEl.textContent=formatStat(playerValue);oppValueEl.textContent=formatStat(oppValue);playerValueEl.classList.toggle('advantage',playerAdvantage);oppValueEl.classList.toggle('advantage',oppAdvantage);playerValueEl.classList.toggle('even',even);oppValueEl.classList.toggle('even',even);playerMeter.classList.toggle('advantage',playerAdvantage);oppMeter.classList.toggle('advantage',oppAdvantage);playerMeter.classList.toggle('even',even);oppMeter.classList.toggle('even',even);$('#'+playerId+'Meter').style.width=`${clamp(playerValue/scale*100,4,100)}%`;$('#'+oppId+'Meter').style.width=`${clamp(oppValue/scale*100,4,100)}%`;
+    });
+  }
   function fillTape(f){
     const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),roundCost=currentFightRoundCost(),clearance=roundCost*FIGHT_ROUNDS,startingCondition=LOGIC.startingFightCondition(state.health,state.maxHealth),cleared=fightsLeft>0&&state.energy>=clearance&&state.health>=20;
     $('#tapeHypeBonus').textContent=`${Math.floor(state.hype)}% HYPE · WIN BONUS +${Math.round(state.hype/1.3)}% PURSE · +${Math.floor(state.hype)}% FOLLOWERS`;
-    $('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;
+    const titleBout=!!f.o.globalChampionship,playerIsChampion=titleBout&&sharedChampionship?.is_champion===true;$('#tapePlayerName').textContent=f.player.name;$('#tapePlayerTag').textContent=playerIsChampion?'REIGNING WORLD CHAMPION':currentStyle()?.name||'NO ARCHETYPE';$('#tapePlayerRecord').textContent=`PRO ${state.wins}-${state.losses}`;$('#tapeOppName').textContent=f.opp.name;$('#tapeOppRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;$('.tape-opp-tag').textContent=titleBout?(playerIsChampion?'TITLE CHALLENGER':'REIGNING WORLD CHAMPION'):f.o.tag||'CHALLENGER';
     $('#tapePlayerArt').src=$('#heroFighterArt').src;$('#tapeOppSprite').src=silhouetteForOpponent(f.o);$('#tapeOppSprite').classList.toggle('network-portrait',!!f.o.network);
-    $('#tapePPower').textContent=`PWR ${formatStat(f.player.power)}`;$('#tapeOPower').textContent=`PWR ${formatStat(f.opp.power)}`;$('#tapePSpeed').textContent=`SPD ${formatStat(f.player.speed)}`;$('#tapeOSpeed').textContent=`SPD ${formatStat(f.opp.speed)}`;$('#tapePChin').textContent=`CHN ${formatStat(f.player.chin)}`;$('#tapeOChin').textContent=`CHN ${formatStat(f.opp.chin)}`;$('#tapePCardio').textContent=`CAR ${formatStat(f.player.cardio)}`;$('#tapeOCardio').textContent=`CAR ${formatStat(f.opp.cardio)}`;
-    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeEnergy').textContent=`${clearance} ENERGY CLEARANCE · ${roundCost} PER ROUND`;$('#tapeBoutLabel').textContent=f.o.globalChampionship?f.o.titleName:f.o.network?'CAGE NETWORK · UNSANCTIONED · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<clearance?`YOU NEED ${clearance} ENERGY FOR THREE-ROUND CLEARANCE · ${roundCost} PER ROUND`:startingCondition<100?`LIMITED CLEARANCE · ${startingCondition}% STARTING CONDITION`:state.energy<clearance+HAYMAKER_ENERGY?`CLEARED · ${roundCost} PER ROUND · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:`CLEARED · ${roundCost} ENERGY PER STARTED ROUND`;
+    renderTapeAttributes(f);$('#tapeTitleBout').hidden=!titleBout;$('#tapeStage .tape-card').classList.toggle('title-bout',titleBout);
+    $('#tapePurse').textContent='$'+fmt(payoutForOpponent(f.o));$('#tapeEnergy').textContent=`${clearance} ENERGY CLEARANCE · ${roundCost} PER ROUND`;$('#tapeBoutLabel').textContent=titleBout?'WORLD TITLE BOUT · 3 ROUNDS':f.o.network?'CAGE NETWORK · UNSANCTIONED · 3 ROUNDS':'3 ROUNDS';$('#tapeFightBtn').disabled=!cleared;$('#tapeClearance').textContent=!fightsLeft?'DAILY FIGHT LIMIT REACHED · NEW FIGHTS AT LOCAL MIDNIGHT':state.health<20?'MEDICAL CLEARANCE REQUIRES 20 HEALTH':state.energy<clearance?`YOU NEED ${clearance} ENERGY FOR THREE-ROUND CLEARANCE · ${roundCost} PER ROUND`:startingCondition<100?`LIMITED CLEARANCE · ${startingCondition}% STARTING CONDITION`:state.energy<clearance+HAYMAKER_ENERGY?`CLEARED · ${roundCost} PER ROUND · BRING ${HAYMAKER_ENERGY} MORE ENERGY TO KEEP A HAYMAKER READY`:`CLEARED · ${roundCost} ENERGY PER STARTED ROUND`;
     const edge=(f.player.power+f.player.speed+f.player.chin+f.player.cardio)-(f.opp.power+f.opp.speed+f.opp.chin+f.opp.cardio),playerFavorite=edge>=4,oppFavorite=edge<=-4;$('#tapePlayerFavorite').hidden=!playerFavorite;$('#tapeOppFavorite').hidden=!oppFavorite;
     const matchup=edge>4?'Your corner likes the raw numbers.':edge<-4?`${f.o.name} enters with the statistical edge.`:'The raw numbers are close.',networkNote=f.o.network?" This is an AI-controlled snapshot; the real fighter's public record is unaffected.":'';$('#walkoutText').textContent=`${matchup} A deeper tactical read must be earned inside the cage.${networkNote}`;renderFightModeToggle();
   }
@@ -1620,6 +1642,6 @@
   updateUI();
   renderLanding();
   writeHistory('screen','replace');
-  if(state.nameLocked)connectSharedSocial(true);
+  if(state.nameLocked)connectSharedSocial(true);else loadLandingChampionship();
   trackEvent('game_open',{returning_career:landingMode==='returning',setup_complete:landingMode==='returning'});trackEvent('landing_view',{career_state:landingMode});
 })();
