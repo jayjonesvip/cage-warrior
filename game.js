@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.80';
+  const ICON_ASSET_VERSION = '2.5.81';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -1279,10 +1279,10 @@
   function selectFightPlanSetting(setting,value){if(!fight||!combatLocked)return;const valid={pace:['slow','fast'],offense:['conservative','aggressive'],tactics:['stick','adapt']};if(!valid[setting]?.includes(value))return;fight.gamePlan[setting]=value;renderFightPlan();sfx.tap()}
   function confirmFightPlan(){if(!fight)return;state.fightPlanPreference=Object.assign({},fight.gamePlan);saveState();trackEvent('fight_plan_locked',{pace:fight.gamePlan.pace,offense:fight.gamePlan.offense,tactics:fight.gamePlan.tactics,cardio_edge:Number((fight.player.cardio-fight.opp.cardio).toFixed(2))});beginFocusSequence();sfx.tap()}
   function updateFocusDisplay(){
-    if(!fight)return;const value=clamp(Math.round(fight.focus||fight.focusBase||80),50,100),tier=focusTier(value);fight.focus=value;$('#focusValue').textContent=`${value}%`;$('#focusMeterFill').style.width=`${value}%`;$('#focusTier').textContent=tier;$('#liveFocusText').textContent=`${value}% FOCUS · ${tier}`;
+    if(!fight)return;const value=clamp(Math.round(fight.focus||fight.focusBase||80),50,100),tier=focusTier(value);fight.focus=value;$('#focusValue').textContent=`${value}%`;$('#liveFocusText').textContent=`${value}% FOCUS · ${tier}`;
   }
   function renderFocusEncounter(){
-    if(!fight?.focusEncounter)return;updateFocusDisplay();const encounter=fight.focusEncounter,box=$('#focusEncounter');box.className='focus-encounter';
+    if(!fight?.focusEncounter)return;updateFocusDisplay();const encounter=fight.focusEncounter,box=$('#focusEncounter');box.className='fight-plan-card focus-encounter';
     if(encounter.type==='quiet')box.innerHTML=`<span class="focus-kicker">THE LOCKER ROOM IS YOURS</span><h2>HOW DO YOU PREPARE?</h2><p>No interruptions. Choose how to use the final minutes before the walkout.</p><div class="focus-options"><div class="focus-option"><button class="focus-choice risk" data-focus-choice="music"><b>LISTEN TO MUSIC</b></button><small class="focus-option-hint">Gain 4–10 Focus · 20% chance to hit 100%</small></div><div class="focus-option"><button class="focus-choice safe" data-focus-choice="meditate"><b>MEDITATE</b></button><small class="focus-option-hint">Reliable · raises Focus to at least 92%</small></div></div>`;
     else{const message=encounter.message,contact=message.contact;box.innerHTML=`<span class="focus-kicker">TEXT FROM ${contact.name}</span><h2>INCOMING TEXT</h2><div class="focus-phone"><div class="focus-contact"><img src="${contact.avatar}" alt=""><div><b>${contact.name}</b><small>just now</small></div></div><div class="focus-notification"><b>New message</b><span>Read it now or protect your routine.</span></div></div><div class="focus-options"><div class="focus-option"><button class="focus-choice safe" data-focus-choice="read"><b>READ IT</b></button><small class="focus-option-hint">Open the message · outcome unknown</small></div><div class="focus-option"><button class="focus-choice risk" data-focus-choice="ignore"><b>IGNORE</b></button><small class="focus-option-hint">Leave it unread · ${contact.ignoreDelta} Focus</small></div></div>`}
   }
