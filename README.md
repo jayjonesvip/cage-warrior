@@ -152,7 +152,9 @@ generated league.
   other half offer quiet preparation: music gains 4–10 Focus with a 20% chance
   to reach 100%, while meditation reliably raises Focus to at least 92%.
   Focus is capped at 50–100% and affects initiative, strike execution, and the
-  quality of adaptive game-plan changes for that fight only.
+  quality of adaptive game-plan changes for that fight only. The Focus screen
+  reuses the full-bleed fight-plan locker room and shows the percentage in the
+  final-moments label instead of a separate meter.
 - Mom and Wife each have 16 possible texts, Tommy has 10, and Carl has 4; every
   contact's pool is evenly split between positive and negative outcomes.
   Messages come from a shuffled, saved 46-card deck, so
