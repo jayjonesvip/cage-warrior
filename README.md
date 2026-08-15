@@ -58,8 +58,9 @@ generated league.
   Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
   Submission Hunter, or Wrestle-Boxer. The last step suggests a fighter identity
   from shared color and weather/dangerous-animal pools, followed by the hometown
-  abbreviation. **New Name** rerolls it, while **Ready** checks the global roster,
-  permanently reserves the unique identity, and starts the career.
+  abbreviation. **Shuffle** rerolls it, while **Manual Entry** opens the name card
+  as a text field for a custom single-word handle. **Ready** checks the global
+  roster, permanently reserves the unique identity, and starts the career.
 - Every avatar has a unique base allocation across Power, Speed, Chin, and
   Cardio. Each value is a whole number from 2 through 8 and the four values
   always total exactly 20. The game validates that allocation before locking
@@ -71,7 +72,9 @@ generated league.
   avatar remains visible in the Home hero without a duplicate identity row.
   The fighter name is also the Cage Feed username and cannot be edited after
   **Ready**. New names use CapitalCase without a numeric suffix, such as
-  `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Every hometown uses
+  `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Manual handles are
+  3–32 characters, start with a letter, and use only letters, numbers, or an
+  underscore. Every hometown uses
   the same 76 opening words (colors, former wildcard modifiers, and 24
   nationality/origin terms), plus 23 weather/force, 35 animal, and 28 combat
   terms. Exact repeated words are excluded, producing 6,534 combinations per

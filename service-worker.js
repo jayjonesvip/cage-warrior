@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.78';
+const APP_VERSION='2.5.80';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,24 +8,24 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.78',
-  './game-logic.js?v=2.5.78',
-  './strings.js?v=2.5.78',
-  './analytics.js?v=2.5.78',
-  './supabase-client.js?v=2.5.78',
-  './cage-social.js?v=2.5.78',
-  './game.js?v=2.5.78',
-  './pwa.js?v=2.5.78',
+  './styles.css?v=2.5.80',
+  './game-logic.js?v=2.5.80',
+  './strings.js?v=2.5.80',
+  './analytics.js?v=2.5.80',
+  './supabase-client.js?v=2.5.80',
+  './cage-social.js?v=2.5.80',
+  './game.js?v=2.5.80',
+  './pwa.js?v=2.5.80',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
-  './assets/focus-locker-room.jpg?v=2.5.78',
-  './assets/contact-mom.jpg?v=2.5.78',
-  './assets/contact-wife.jpg?v=2.5.78',
-  './assets/contact-brother-tommy.png?v=2.5.78',
-  './assets/contact-agent-carl.png?v=2.5.78',
-  './assets/cage-grind-ceo.jpg?v=2.5.78',
-  './assets/cage-dice.jpg?v=2.5.78',
+  './assets/focus-locker-room.jpg?v=2.5.80',
+  './assets/contact-mom.jpg?v=2.5.80',
+  './assets/contact-wife.jpg?v=2.5.80',
+  './assets/contact-brother-tommy.png?v=2.5.80',
+  './assets/contact-agent-carl.png?v=2.5.80',
+  './assets/cage-grind-ceo.jpg?v=2.5.80',
+  './assets/cage-dice.jpg?v=2.5.80',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
@@ -40,10 +40,10 @@ const CORE_ASSETS=[
   './assets/icons/nav-hustle.png',
   './assets/icons/nav-gear.png',
   './assets/icons/nav-feed.png',
-  './assets/icons/title-world.png?v=2.5.78',
-  './assets/icons/round-intro-1.png?v=2.5.78',
-  './assets/icons/round-intro-2.png?v=2.5.78',
-  './assets/icons/round-intro-3.png?v=2.5.78'
+  './assets/icons/title-world.png?v=2.5.80',
+  './assets/icons/round-intro-1.png?v=2.5.80',
+  './assets/icons/round-intro-2.png?v=2.5.80',
+  './assets/icons/round-intro-3.png?v=2.5.80'
 ].map(path=>new URL(path,self.location.href).href);
 
 self.addEventListener('install',event=>{
