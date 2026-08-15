@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.81';
+  const ICON_ASSET_VERSION = '2.5.83';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -1350,8 +1350,9 @@
   function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0)+fightFocusModifier(sim),.15,.68)}
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
+  function resetBloodSportBurst(){const layer=$('#bloodSportBurst');if(!layer)return;clearTimeout(layer._clearTimer);layer.classList.remove('active');layer.replaceChildren()}
   function prepareLiveFight(){
-    const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.playerCondition);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#liveOppStyle').textContent=fight.o.tag||'UNKNOWN STYLE';$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
+    const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.playerCondition);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');resetBloodSportBurst();showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#liveOppStyle').textContent=fight.o.tag||'UNKNOWN STYLE';$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
   }
   function beginFightApproach(approach){
     if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
@@ -1438,8 +1439,14 @@
   function applyLiveFightHealthDamage(item){
     const requested=Math.max(0,Math.round(Number(item?.healthDamage)||0));if(!requested||item.healthApplied)return 0;item.healthApplied=true;const before=state.health;state.health=clamp(state.health-requested,1,state.maxHealth);const lost=Math.max(0,Number((before-state.health).toFixed(2)));if(!lost)return 0;fight.healthLost=Number(((fight.healthLost||0)+lost).toFixed(2));$('#hudHealthText').textContent=`${Math.floor(state.health)}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';flashResource('health',lost);lastShownHealth=Math.floor(state.health);saveState();return lost;
   }
+  function showBloodSportBurst(item){
+    const majorDamage=LOGIC.liveFightHealthDamage({landed:true,knockdown:true}),layer=$('#bloodSportBurst');if(!layer||Number(item?.healthDamage)<majorDamage)return;clearTimeout(layer._clearTimer);layer.classList.remove('active');layer.replaceChildren();const particles=document.createDocumentFragment(),count=item.type==='ko'?20:14;
+    for(let i=0;i<count;i++){const particle=document.createElement('i');particle.style.setProperty('--blood-x',`${rand(-145,175)}px`);particle.style.setProperty('--blood-y',`${rand(-150,125)}px`);particle.style.setProperty('--blood-size',`${rand(3,8)}px`);particle.style.setProperty('--blood-delay',`${rint(0,85)}ms`);particle.style.setProperty('--blood-rotate',`${rint(-170,170)}deg`);particles.appendChild(particle)}
+    layer.appendChild(particles);void layer.offsetWidth;layer.classList.add('active');layer._clearTimer=setTimeout(()=>resetBloodSportBurst(),760);
+  }
   function appendFightLine(item){
     applyLiveFightHealthDamage(item);
+    showBloodSportBurst(item);
     const feed=$('#actionFeed'),line=document.createElement('div');line.className=`action-line ${item.className||''}`;line.innerHTML=`<span class="stamp">${item.clock||''}</span>${item.text}`;feed.appendChild(line);feed.scrollTop=feed.scrollHeight;
     if(item.playerCondition!=null){const p=Math.round(item.playerCondition),o=Math.round(item.oppCondition);$('#livePlayerCondition').style.width=p+'%';$('#liveOppCondition').style.width=o+'%';$('#livePlayerConditionText').textContent=p+'% CONDITION';$('#liveOppConditionText').textContent=o+'% CONDITION'}
     if(item.big||item.type==='ko'){sfx.crit();shake(true)}else if(item.type==='action'&&item.landed){sfx.hit()}else{tone(170,.025,'square',.012,25)}
