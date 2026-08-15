@@ -1,7 +1,5 @@
 # Cage Grind
 
-The in-round Sim+ trigger and choice rules are documented in [FIGHT-DECISION-MATRIX.md](FIGHT-DECISION-MATRIX.md).
-
 [![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
 
 [Play Cage Grind](https://cagegrind.com/)
@@ -20,7 +18,7 @@ interactions from `game.js`.
   current level, record, Followers, and a **Keep Grinding** action. A partially
   completed fighter receives **Continue Your Build** instead of being mistaken
   for a new or finished career.
-- New players see a concise career pitch covering tactical rounds, training,
+- New players see a concise career pitch covering fight plans, training,
   hustles, drops, sponsors, and the title climb before choosing **Start Your
   Career**. Choosing an entry action never resets or replaces the recovered
   local save.
@@ -37,8 +35,8 @@ interactions from `game.js`.
 - Home uses a split career dashboard, Training and Hustle use two-column
   workspaces, opponents and gear render four across, and Cage Feed receives a
   wider reading column.
-- Fight Night keeps the same simulation and decisions, while the live timeline
-  and between-round corner decision can appear side by side.
+- Fight Night keeps the same planned simulation, with a wider live timeline on
+  desktop after the locker-room plan is locked.
 - Buttons use one shared three-color language at every screen size: blue for
   primary actions, slate for secondary choices, and amber for rare rewards,
   title opportunities, and other limited moments.
@@ -112,7 +110,7 @@ generated league.
   repair incomplete sponsor history before rendering or accepting deals.
 - A rotating promoter ticker leads the unlocked Home screen and teaches the
   active rules—fight costs, medical clearance, purses, rematches, tactics,
-  drops, coaching, and titles—in the voice of a suspiciously well-informed
+  drops, fight planning, and titles—in the voice of a suspiciously well-informed
   fight agent.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
@@ -128,38 +126,34 @@ generated league.
 - Every generated opponent uses the same seven-archetype system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
-- Round 1 starts with a one-time opening choice. **Aggressive** immediately
-  imposes your permanent signature style and gains initiative. **Feel Them
-  Out** uses that same signature discipline more cautiously, conceding some
-  early initiative in exchange for a deeper corner read. Either choice reveals
-  the opponent's basic tendency after Round 1.
-- Before the fight, players choose their corner. **Hire the Coach** enables the
-  full Sim+ opening, contextual round decisions, and corner adjustments; those
-  calls can change damage, control, scorecards, and the outcome, and the coach
-  receives 10% of fight winnings only after a win. **Quick Sim** keeps the full
-  purse and automatically runs an accelerated fight using the fighter's stats
-  and signature style without decision prompts. The Tale of the Tape toggle
-  remembers the last selected mode for the next fight.
+- Every booked fight begins with a locker-room **Fight Plan**. Players set a
+  **Slow** or **Fast** pace, choose **Conservative** or **Aggressive** offense,
+  and decide whether to **Stick to Style** or **Adapt**. The last locked-in
+  combination is saved and preselected for the next fight.
+- Slow pace creates fewer exchanges and reduces accumulated cardio fatigue.
+  Fast pace creates more exchanges and gains initiative when the fighter has
+  both strong cardio and a cardio edge, but magnifies fatigue when that edge is
+  missing. Conservative offense favors jabs, accuracy, and defense at the cost
+  of damage and knockdowns; Aggressive offense favors power shots and finish
+  attempts while sacrificing accuracy and creating counter opportunities.
+- Stick to Style uses the permanent signature archetype and its full
+  familiarity throughout the bout. Adapt starts in the signature style, makes
+  a partial matchup adjustment in Round 2, and uses the full response plan in
+  Round 3. High Focus improves the execution of those switches while low Focus
+  can turn adaptation into hesitation. The fight then runs as one uninterrupted
+  full simulation, with no coach fee or routine mid-fight decision prompts.
 - Every booked fight generates a fight-only **Focus** rating from 75–90%. Half
   of walkouts receive an unread text from Mom, the fighter's wife, brother
   Tommy, or Agent Carl. Reading it reveals one of 46 messages with a meaningful boost or distraction; ignoring
   it leaves the message hidden and applies a smaller known Focus cost. The
   other half offer quiet preparation: music gains 4–10 Focus with a 20% chance
   to reach 100%, while meditation reliably raises Focus to at least 92%.
-  Focus is capped at 50–100% and affects initiative, strike execution,
-  tactical decision odds, and final haymaker execution for that fight only.
+  Focus is capped at 50–100% and affects initiative, strike execution, and the
+  quality of adaptive game-plan changes for that fight only.
 - Mom and Wife each have 16 possible texts, Tommy has 10, and Carl has 4; every
   contact's pool is evenly split between positive and negative outcomes.
   Messages come from a shuffled, saved 46-card deck, so
   every text appears once before any repeats, including after a reload.
-- Between rounds, the corner gives an unofficial **Protect the Lead**, **Too
-  Close to Call**, or **You're Behind** read, followed by natural matchup
-  advice. The grounded tactical choices are **Fight Your Way** with the
-  signature style or an action-specific counter such as **Protect Your Neck**
-  or **Circle Off the Fence**. Deep reads still identify strong, workable, or
-  risky adjustments. When the signature style already supplies the answer,
-  the duplicate choice collapses into one **Fight Your Way** action. The
-  coach's-corner surface snaps directly to the live fight card edges.
 - Submission Hunters can finish a fight by tap after a successful takedown.
   Speed, cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
@@ -173,13 +167,6 @@ generated league.
   Health or a losing submission removes 8. Misses, movement, and defensive
   narration remove no Health. The live deductions are saved immediately and
   the result screen reports the total fight damage.
-- When condition falls to 25% or lower between rounds, the corner presents a
-  one-time crisis choice. Throwing in the towel gives the opponent a TKO win;
-  throwing a last-chance haymaker can swing or finish the fight, but missing it
-  results in an immediate knockout loss. A haymaker costs 5 additional energy
-  beyond the energy reserved for any rounds still to come. Its landing chance
-  starts at 15%, then responds to attributes, condition, damage, and the
-  Brawler archetype, with a 68% maximum.
 - Fight energy scales with the player's current career level: Levels 1–2 cost
   6 energy per started round, Levels 3–4 cost 7, Levels 5–6 cost 8, Levels
   7–8 cost 9, and Level 9 onward costs 10. Three-round clearance therefore
@@ -187,16 +174,10 @@ generated league.
 - Fighters can complete up to 10 fights per local calendar day. The Fight page
   shows the remaining bouts and a live countdown to the local-midnight reset;
   energy and medical clearance remain the primary pacing limits.
-- If the player's corner has them behind on the unofficial scorecards with ten
-  seconds left in Round 3, the action pauses for one last decision: stay
-  disciplined or spend 5 additional energy on a haymaker. Landing can score a
-  dramatic knockdown, steal the decision, or produce a last-second knockout;
-  missing leaves the fighter open to an immediate counter knockout.
-- Watch fights normally or use 2× speed. There is no result skip: every
-  surviving round requires its corner decision. Each round-number interlude
-  remains visible for two seconds. Before Rounds 2 and 3, the sign also carries
-  the corner's cumulative unofficial score and whether the fighter leads,
-  trails, or is even.
+- Watch fights normally or use 2× speed. There is no result skip and no routine
+  interruption once the cage door closes. Each round-number interlude remains
+  visible for two seconds; before Rounds 2 and 3 it carries the cumulative
+  unofficial score and whether the fighter leads, trails, or is even.
 - Fight results lead with a large **YOU WIN** or red **YOU LOST** outcome, then
   show the finish method, round, and clock beneath it before the full scorecard.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
@@ -282,8 +263,9 @@ generated league.
   where they fight out of, their region, and the available purse. A fighter with
   no prior player matchup is labeled **First Meeting** instead of showing an
   empty head-to-head message.
-- Pre-fight roster and Tale of the Tape cards conceal the opponent's
-  tendency and scouting report until the first round has been completed.
+- Opponent style is always visible on roster cards, the Tale of the Tape,
+  locker-room Fight Plan, and live fight header so players can make an informed
+  tactical choice before the opening bell.
 - The current level always replenishes to three fresh contenders, so the fight
   path cannot run dry before a level-up. Fresh current-level fights pay a full
   purse; past-level fights and rival rematches pay half purse.
@@ -309,10 +291,9 @@ generated league.
   a separate action and does not trigger the flip.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
-  spends no energy and explains the current level-based clearance, round cost,
-  and optional 5-energy haymaker reserve directly beneath the purse. It then
-  offers **Go Back** or **Fight!**; the first round's energy is charged only
-  after Fight is confirmed and the cage-opening choice begins.
+  spends no energy and explains the current level-based clearance and round
+  cost directly beneath the purse. It then offers **Go Back** or **Set Fight
+  Plan**; the first round's energy is charged only after the fight is booked.
 - When the ten-fight daily allowance is exhausted, otherwise available fighter
   cards take on the locked presentation and replace **See Matchup** with
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
@@ -520,7 +501,7 @@ limits string lengths, and treats analytics failures as non-fatal so tracking
 can never interrupt gameplay. The initial event set covers career setup and
 starts, screen navigation, training and recovery, hustles and publicity,
 endorsements, Cage Feed activity, daily rewards, blackjack, underground
-sparring, matchup and fight decisions, fight results, titles, level-ups, gear
+sparring, matchup and fight-plan decisions, fight results, titles, level-ups, gear
 drops, and equipment changes. Events include gameplay categories and numeric
 outcomes but never fighter names, opponent names, social post copy, or saved
 career data.
