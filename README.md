@@ -69,7 +69,7 @@ generated league.
 - Each selector disappears as soon as its choice is locked. Career systems,
   the HUD, and navigation remain hidden until hometown, fighter, archetype, and
   permanent fighter name are complete. The Career Identity card keeps the hometown and archetype
-  beside Followers, career earnings, and the next milestone; the selected
+  beside Followers, career earnings, and the live World Championship status; the selected
   avatar remains visible in the Home hero without a duplicate identity row.
   The fighter name is also the Cage Feed username and cannot be edited after
   **Ready**. New names use CapitalCase without a numeric suffix, such as
@@ -101,8 +101,8 @@ generated league.
   built-in dice fallback if the artwork cannot load.
 - Fighter selection places each transparent portrait over a blue arena-light
   gradient, with a brighter keyboard-focus and hover treatment around the card.
-- The Home hero shows a Cage Status tied to the real title ladder: Prospect,
-  Contender, Title Challenger, or the fighter's current championship.
+- The Home hero shows a Cage Status tied to the shared World Championship:
+  career rank, Title Challenger, or World Champion.
 - An active endorsement appears in the Home hero directly beneath Cage Status,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder beginning with Bob's Auto Shop
@@ -201,15 +201,18 @@ generated league.
   show the finish method, round, and clock beneath it before the full scorecard.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
   become notable Cage Feed headlines after every additional win.
-- Progress through a hometown title, its regional title, the U.S. Title, and
-  the World Title. Reaching a championship threshold only unlocks its reigning
-  champion; the belt is awarded only after that fighter is defeated.
+- Cage Grind has one shared World Championship held only by an active real-user
+  profile. A fighter may challenge once their level reaches or exceeds the
+  champion's level.
+- The belt may have one sanctioned championship bout total per UTC day, and the
+  same challenger and champion never receive a championship rematch. When the
+  reigning champion selects any real Cage Network fighter, the belt is
+  automatically on the line; fights against generated opponents are unsanctioned.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, partial recovery,
-  career bonus, and any newly unlocked title challenge. Ordinary levels restore
-  up to 30 energy and 25 health; title-challenge levels 5, 9, 12, and 15 fully
-  restore both resources. Celebration effects share one bounded canvas loop,
+  career bonus, and newly available competition. Every level restores up to 30
+  energy and 25 health. Celebration effects share one bounded canvas loop,
   respect reduced-motion preferences, and stop when their result dialog closes
   so repeated rewards cannot accumulate background animation work.
 
@@ -237,19 +240,20 @@ generated league.
   fighter's avatar and opening their public profile. Feed and fighter-profile
   copy uses a larger mobile text scale for easier reading.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
-  deals generate contextual `CageReporter` coverage. The global feed emphasizes
+  deals generate contextual `CageReporter` coverage. Wins earned while carrying
+  a training injury receive dedicated headlines questioning whether fighting
+  hurt was courageous, reckless, or both. The global feed emphasizes
   real fighters' canned posts instead of filling the timeline with fake fans.
 - The verified `@CageGrindCEO` account uses the CEO's office portrait and a
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
-  career, title opportunities, championship wins, and the first exceptional
-  performance bonus without allowing arbitrary client-authored CEO copy.
+  career and the first exceptional performance bonus without allowing arbitrary
+  client-authored CEO copy. Championship transfers and defenses are announced
+  only by the database-owned global belt workflow.
 - Tapping the CEO portrait opens his verified public profile with his executive
   bio. The official account does not accept fighter-message interactions.
-- Title opportunities open a full-photo message from the CEO's office after the
-  level-up celebration. Winning the World Title adds the CEO's championship
-  presentation directly to the fight result. Qualifying upsets, finishes, and
-  win streaks have a deterministic 30% chance at one modest CEO cash and Hype
-  bonus per local day.
+- Every sanctioned title shot receives an official CEO announcement. Outside
+  the championship picture, only qualifying upsets and knockout finishes have
+  a deterministic 10% chance at one modest CEO cash and Hype bonus per local day.
 - A fighter profile offers exactly three randomized, personalized message
   drafts presented as text-style composers with explicit **Send** buttons. The
   roughly 50-message pool covers callouts, props, welcomes, respect, and putting
@@ -292,8 +296,8 @@ generated league.
   cost, pays half purse, and retains full fight XP. Winning closes the offer
   until another taunt, while losing keeps the rematch immediately available.
 - The Career Opponents roster shows available current and past opponents, past
-  rivals, former champions, and a locked preview of the next level. The
-  current-level group starts open; all other groups start
+  rivals, the shared World Championship, and a locked preview of the next level.
+  The championship and current-level groups start open; all other groups start
   collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork
   selected deterministically from 24 standalone transparent fighter
@@ -312,9 +316,9 @@ generated league.
 - When the ten-fight daily allowance is exhausted, otherwise available fighter
   cards take on the locked presentation and replace **See Matchup** with
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
-- Title champions are persistent named fighters with professional records and
-  attributes. A failed title challenge leaves the champion available for
-  another attempt; a win archives the defeated former champion.
+- The shared champion is rendered from the authenticated Supabase profile and
+  is never generated or stored in the local career save. The champion's name,
+  level, record, and defense count appear in matchmaking.
 - Daily Contracts and the seeded Daily Challenge are currently removed. The
   guaranteed Daily Drop remains available and may be expanded later.
 
@@ -397,13 +401,14 @@ generated league.
 
 Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, avatar and base allocation,
-generated rosters, rivalries, collections, loadouts, championships, Cash, and
+generated rosters, rivalries, collections, loadouts, Cash, and
 Career Earnings. An in-progress blackjack hand is also persisted so a refresh
 cannot consume the wager without allowing the player to finish. Legacy Technician, Grappler, and Endurance identities map to
 Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
 tendencies migrate without losing records or rivalries, and previously retired
-regular fighters return to the permanent Past Rivals system. Legacy District and
-National belt progress migrates into the new title ladder. The game also keeps
+regular fighters return to the permanent Past Rivals system. Legacy local title
+progress and generated champions are removed because the shared database owns
+the only World Championship. The game also keeps
 a last-known-good backup and refunds energy from an interrupted fight when the
 save is restored. If a blank rookie save is ever written over a progressed
 career, startup prefers the progressed last-known-good backup automatically.

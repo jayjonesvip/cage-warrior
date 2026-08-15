@@ -50,7 +50,7 @@ globalThis.CAGE_STRINGS = {
 
   fightFocus: {
     contacts: [
-      {id:'mom',name:'MOM',avatar:'assets/contact-mom.jpg?v=2.5.63',ignoreDelta:-4,ignoreText:'You leave Mom’s message unread, but keep wondering why she texted tonight.',messages:[
+      {id:'mom',name:'MOM',avatar:'assets/contact-mom.jpg?v=2.5.67',ignoreDelta:-4,ignoreText:'You leave Mom’s message unread, but keep wondering why she texted tonight.',messages:[
         {id:'mom-proud',text:'We are so proud of you. Go show them who you are. ❤️',focus:100},
         {id:'mom-watch-party',text:'The whole family is here in your shirts. This house is LOUD. We love you!',delta:12},
         {id:'mom-dad-advice',text:'Dad says keep your hands up, breathe, and call us after you win.',delta:7},
@@ -68,7 +68,7 @@ globalThis.CAGE_STRINGS = {
         {id:'mom-pipe-burst',text:'A pipe burst at the house. There is water everywhere, but we are handling it.',delta:-7},
         {id:'mom-urgent-call',text:'Call me as soon as you can. It is important. I do not want to put it in a text.',delta:-12}
       ]},
-      {id:'wife',name:'WIFE',avatar:'assets/contact-wife.jpg?v=2.5.63',ignoreDelta:-5,ignoreText:'You leave your wife’s message unread, and the notification follows you toward the cage.',messages:[
+      {id:'wife',name:'WIFE',avatar:'assets/contact-wife.jpg?v=2.5.67',ignoreDelta:-5,ignoreText:'You leave your wife’s message unread, and the notification follows you toward the cage.',messages:[
         {id:'wife-good-luck',text:'Good luck, baby. Trust your work. We love you and we are already proud. ❤️',delta:10},
         {id:'wife-sexy-photo',text:'[Photo] Win fast. I have plans for you when you get home. 😘',delta:12},
         {id:'wife-kids-video',text:'The kids made you a video. They keep yelling “BRING HOME THE WIN!”',delta:15},
@@ -86,7 +86,7 @@ globalThis.CAGE_STRINGS = {
         {id:'wife-talk',text:'We need to talk when you get home. This cannot keep going the way it has.',delta:-20},
         {id:'wife-car',text:'The car will not start. If you are able, I need you to pick us up afterward.',delta:-6}
       ]},
-      {id:'brother-tommy',name:'BROTHER TOMMY',avatar:'assets/contact-brother-tommy.png?v=2.5.63',ignoreDelta:-3,ignoreText:'You leave Tommy’s message unread. With him, that could mean anything.',messages:[
+      {id:'brother-tommy',name:'BROTHER TOMMY',avatar:'assets/contact-brother-tommy.png?v=2.5.67',ignoreDelta:-3,ignoreText:'You leave Tommy’s message unread. With him, that could mean anything.',messages:[
         {id:'tommy-front-row',text:'Good luck. I’m in the front row. I’ll be the loud one.',delta:10},
         {id:'tommy-payback',text:'I got paid, so I’ll finally pay you back after the fight. Every dollar.',delta:8},
         {id:'tommy-family-proud',text:'Everybody is proud of you. Tonight is yours. Go handle it.',minimum:95},
@@ -98,7 +98,7 @@ globalThis.CAGE_STRINGS = {
         {id:'tommy-police',text:'Do you know anybody who can get me out of the police station tonight?',delta:-20},
         {id:'tommy-bet',text:'I bet money I did not have on you tonight. You really need to win.',delta:-16}
       ]},
-      {id:'agent-carl',name:'AGENT CARL',avatar:'assets/contact-agent-carl.png?v=2.5.63',ignoreDelta:-2,ignoreText:'You leave Carl on unread, but wonder what deal—or problem—he is sitting on.',messages:[
+      {id:'agent-carl',name:'AGENT CARL',avatar:'assets/contact-agent-carl.png?v=2.5.67',ignoreDelta:-2,ignoreText:'You leave Carl on unread, but wonder what deal—or problem—he is sitting on.',messages:[
         {id:'carl-sponsor',text:'Big sponsor in the front row. Put on a show and I can make the phone ring tomorrow.',delta:9},
         {id:'carl-purse',text:'I squeezed another bonus into the deal. Win tonight and the number gets very interesting.',delta:7},
         {id:'carl-fees',text:'Small paperwork issue: my expenses come out before your purse. We’ll discuss the total later.',delta:-12},
@@ -110,7 +110,7 @@ globalThis.CAGE_STRINGS = {
   social: {
     profiles: {
       media: {author:'CageReporter',handle:'@CageReporter',tone:'media'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.63',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.67',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -126,14 +126,6 @@ globalThis.CAGE_STRINGS = {
     ],
     ceo: {
       debut:{profile:'ceo',text:'Welcome to Cage Grind, @{name}. Build a record worth putting under the bright lights.'},
-      cityOffer:{profile:'ceo',text:'@{name}, you have made enough noise. Beat the city champion and take the first belt.'},
-      cityTitle:{profile:'ceo',text:'First belt secured. Congratulations, @{name}. The climb gets steeper from here.'},
-      regionalOffer:{profile:'ceo',text:'@{name}, your region needs a champion. Win the next one and make it yours.'},
-      regionalTitle:{profile:'ceo',text:'@{name} now owns the regional stage. National attention comes next.'},
-      usOffer:{profile:'ceo',text:'The U.S. Title is waiting, @{name}. This is where contenders become headliners.'},
-      usTitle:{profile:'ceo',text:'@{name} is the new U.S. Champion. Every serious name in the sport is watching now.'},
-      worldOffer:{profile:'ceo',text:'@{name}, one fight remains between you and the top of the world. Finish the climb.'},
-      worldTitle:{profile:'ceo',text:'Welcome to the summit, @{name}. You are the Cage Grind World Champion.'},
       performanceBonus:{profile:'ceo',text:'I noticed that performance, @{name}. A bonus is already on the way.'}
     },
     cycles: {
@@ -144,6 +136,12 @@ globalThis.CAGE_STRINGS = {
         {profile:'media',text:'{name} defeats {opponent} by {finish}.{titleSuffix}'},
         {profile:'rival',author:'{opponent}',text:'Enjoy the win, {name}. If they book it again, I know what changes.'},
         {profile:'fan',text:'That was the kind of performance that turns a prospect into must-watch television. {name} showed up.'}
+      ],
+      fightInjuredWin: [
+        {profile:'media',text:'COURAGEOUS OR STUPID? {name} fought through a {injury} and still beat {opponent} by {finish}.{titleSuffix}'},
+        {profile:'media',text:'FIGHTING HURT: {name} carried a {injury} into the cage and came out with a {finish} win over {opponent}.{titleSuffix}'},
+        {profile:'media',text:'Brave, reckless, or bothâ€”{name} ignored a {injury} and defeated {opponent} by {finish}.{titleSuffix}'},
+        {profile:'media',text:'INJURED AND VICTORIOUS: A {injury} did not stop {name} from finishing the job against {opponent}.{titleSuffix}'}
       ],
       fightWinHater: {profile:'hater',text:'Everybody relax. One win does not make {name} unbeatable. Book the rematch.'},
       fightStreakHeadline: [

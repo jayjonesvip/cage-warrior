@@ -78,9 +78,23 @@
     async function publishPost({kind,body,targetProfileId=null}){
       return database.insertCagePost({p_post_kind:kind,p_body:body,p_target_profile_id:targetProfileId||null});
     }
+
+    async function loadChampionship(){
+      const data=await database.getCageChampionship();
+      return Array.isArray(data)?data[0]||null:data;
+    }
+
+    async function beginChampionshipBout(opponentId=null){
+      const data=await database.beginCageChampionshipChallenge(opponentId);
+      return Array.isArray(data)?data[0]||null:data;
+    }
+
+    async function settleChampionshipBout({challengeId,challengerId,challengerWon}){
+      return database.settleCageChampionshipChallenge({challenge_id:challengeId,challenger_id:challengerId,challenger_won:challengerWon});
+    }
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

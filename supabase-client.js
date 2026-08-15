@@ -99,6 +99,9 @@
     async function registerCageProfile(values){return rpc('sync_cage_profile',values)}
     async function claimCageIdentity(values){return rpc('claim_cage_identity',values)}
     async function retireCageProfile(){return rpc('retire_cage_profile',{})}
+    async function getCageChampionship(){return rpc('get_cage_championship',{})}
+    async function beginCageChampionshipChallenge(opponentId=null){return rpc('begin_cage_championship_challenge',{p_opponent_id:opponentId||null})}
+    async function settleCageChampionshipChallenge(values){return authenticatedRequest('/functions/v1/settle-cage-championship',{method:'POST',body:values})}
 
     async function selectCageFeed(limit){
       return authenticatedRequest(`/rest/v1/cage_feed_posts?select=id,author_id,author_handle,post_kind,body,target_profile_id,target_handle,created_at&order=created_at.desc&limit=${limit}`);
@@ -114,7 +117,7 @@
     async function insertCagePost(values){return rpc('publish_cage_post',values)}
     async function insertCageCeoPost(eventKey){return rpc('publish_cage_ceo_post',{p_event_key:eventKey})}
 
-    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,sessionUserId:()=>session?.user?.id||''};
+    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,getCageChampionship,beginCageChampionshipChallenge,settleCageChampionshipChallenge,selectCageFeed,selectCageProfiles,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};
