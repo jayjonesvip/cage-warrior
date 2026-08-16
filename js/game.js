@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.102';
+  const ICON_ASSET_VERSION = '2.5.103';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -208,7 +208,7 @@
     }
     state.roster=[...state.roster.filter(o=>!o.network),...ranked];
   }
-  function fighterLevelOrder(a,b){return a.tier-b.tier||Number(b.network)-Number(a.network)||String(a.name).localeCompare(String(b.name))}
+  function fighterLevelOrder(a,b){return b.tier-a.tier||Number(b.network)-Number(a.network)||String(a.name).localeCompare(String(b.name))}
   function refreshOpponents(){
     const champion=championshipOpponent(),dailyTitleOpponents=new Set(Array.isArray(sharedChampionship?.daily_opponent_ids)?sharedChampionship.daily_opponent_ids:[]),career=state.roster.filter(o=>(o.network||(o.tier===state.level&&(o.lossesToPlayer||0)===0))&&(sharedChampionship?.is_champion||o.sourceProfileId!==sharedChampionship?.champion_id)).map(o=>{if(!sharedChampionship?.is_champion||!o.network)return o;const titleCooldown=dailyTitleOpponents.has(o.sourceProfileId);return Object.assign({},o,{globalChampionship:true,championDefense:true,titleName:'CAGE GRIND WORLD CHAMPIONSHIP',challengeEligible:!titleCooldown,titleCooldown,eligibilityStatus:titleCooldown?'daily_bout_used':'champion_defense'})}),all=champion?[champion,...career]:career;opponents=all.filter(o=>o.network||opponentGroup(o)==='current').sort(fighterLevelOrder);
   }
