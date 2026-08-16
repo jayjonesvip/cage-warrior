@@ -317,17 +317,18 @@ generated league.
 
 ### Collectible drops
 
-- Equipment is earned from fight wins and the guaranteed Daily Drop; it is
-  never purchased.
+- Fight-win collectibles arrive as gifts from the CEO after the player catches
+  his attention. Daily and install drops remain separately branded rewards;
+  equipment is never purchased.
 - The home-screen Daily Drop awards Cash, energy, and one deterministic,
   level-eligible collectible every day. It does not reset fight-drop pity.
 - Collectible card artwork is emphasized within the fixed two-column card
   layout, while the Daily Drop uses the same high-contrast label treatment as
   other primary actions.
-- A win has a 25% base drop chance. Upsets, rivalries, and KO/TKO finishes
-  improve the chance, up to 75%.
-- The fourth win without a drop guarantees one. Winning a title guarantees a
-  drop of at least Rare quality.
+- A win has a 33% base chance to earn a CEO gift. Upsets, rivalries, and KO/TKO
+  finishes improve the chance, up to 75%.
+- The fourth win without a CEO gift guarantees one. Winning a title guarantees
+  a specially labeled CEO title gift of at least Rare quality.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
 - Duplicate copies increase the collectible quantity but never stack the
