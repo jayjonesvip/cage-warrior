@@ -348,6 +348,12 @@
   function nextGearPityCount(value){return Math.min(4,nonNegativeWhole(value)+1)}
   function isGearPity(value){return nonNegativeWhole(value)>=4}
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
+  function landingChampionshipProof(champ,loaded=false,unavailable=false){
+    if(champ?.champion_handle){const handle=String(champ.champion_handle).replace(/^@/,'');const defenses=Math.max(0,Number(champ.defenses)||0);return {heading:`@${handle}`,meta:`${defenses} successful title defense${defenses===1?'':'s'}`,state:'loaded'}}
+    if(unavailable)return {heading:'TITLE UPDATE OFFLINE',meta:'Champion status unavailable — play anytime',state:'offline'};
+    if(loaded)return {heading:'THE BELT IS VACANT',meta:'The next reign is waiting',state:'vacant'};
+    return {heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'};
+  }
 
   function normalizeGearDrop(drop,rarities=['COMMON','RARE','EPIC','LEGENDARY']){
     if(!drop||typeof drop!=='object'||!drop.item||typeof drop.item!=='object')return null;
@@ -365,5 +371,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

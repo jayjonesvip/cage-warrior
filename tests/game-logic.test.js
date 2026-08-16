@@ -38,6 +38,14 @@ test('partial careers stay building until the full identity is locked and comple
   assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
 });
 
+test('landing championship proof covers loading, champion, vacant, and offline states',()=>{
+  assert.deepEqual(logic.landingChampionshipProof(null,false,false),{heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'});
+  assert.deepEqual(logic.landingChampionshipProof({champion_handle:'BlazingCoyoteCHI',defenses:1},true,false),{heading:'@BlazingCoyoteCHI',meta:'1 successful title defense',state:'loaded'});
+  assert.deepEqual(logic.landingChampionshipProof({champion_handle:'@NightWolf',defenses:3},true,false),{heading:'@NightWolf',meta:'3 successful title defenses',state:'loaded'});
+  assert.deepEqual(logic.landingChampionshipProof(null,true,false),{heading:'THE BELT IS VACANT',meta:'The next reign is waiting',state:'vacant'});
+  assert.deepEqual(logic.landingChampionshipProof(null,true,true),{heading:'TITLE UPDATE OFFLINE',meta:'Champion status unavailable — play anytime',state:'offline'});
+});
+
 test('selectStoredState falls back to the last useful legacy save when all newer slots are blank',()=>{
   const raw={
     primary:'{}',
