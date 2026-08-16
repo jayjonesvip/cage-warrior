@@ -167,8 +167,17 @@ test('opponent availability covers career fights, the global title, and accepted
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:false},context),false);
-  assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,rematchBlocked:true},context),'blocked');
-  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,rematchBlocked:true},context),false);
+  assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),'blocked');
+  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),false);
+});
+
+test('championship career rank follows rookie, prospect, contender, former champion, and champion priority',()=>{
+  assert.equal(logic.championshipCareerRank(1,null),'ROOKIE');
+  assert.equal(logic.championshipCareerRank(2,{champion_id:'champ',champion_level:5}),'ROOKIE');
+  assert.equal(logic.championshipCareerRank(3,{champion_id:'champ',champion_level:5}),'PROSPECT');
+  assert.equal(logic.championshipCareerRank(6,{champion_id:'champ',champion_level:5}),'TITLE CONTENDER');
+  assert.equal(logic.championshipCareerRank(4,{champion_id:'champ',champion_level:7,former_champion:true}),'FORMER WORLD CHAMPION');
+  assert.equal(logic.championshipCareerRank(2,{champion_id:'self',champion_level:2,is_champion:true,former_champion:true}),'WORLD CHAMPION');
 });
 
 test('retirement suppresses unload saves and clears only career storage',()=>{

@@ -113,8 +113,10 @@ generated league.
   built-in dice fallback if the artwork cannot load.
 - Fighter selection places each transparent portrait over a blue arena-light
   gradient, with a brighter keyboard-focus and hover treatment around the card.
-- The Home hero shows a Cage Status tied to the shared World Championship:
-  career rank, Title Challenger, or World Champion.
+- The Home hero shows a championship-aware career rank. Levels 1–2 are Rookie;
+  Level 3+ is Prospect until the fighter reaches the reigning champion's level,
+  when the rank becomes Title Contender. World Champion and Former World
+  Champion override those progression ranks for the current career.
 - An active endorsement appears in the Home hero directly beneath Cage Status,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder beginning with Bob's Auto Shop
@@ -203,13 +205,14 @@ generated league.
 - Cage Grind has one shared World Championship held only by an active real-user
   profile. A fighter may challenge once their level reaches or exceeds the
   champion's level.
-- The belt may have one sanctioned championship bout total per UTC day, and the
-  same challenger and champion never receive a championship rematch within
-  their current careers. Retiring and claiming a new fighter preserves old
-  results but starts a new championship-eligibility window. When the
-  reigning champion selects a real Cage Network fighter at the champion's current
-  level, the belt is automatically on the line; fighters from other levels and
-  generated opponents are unsanctioned.
+- Each contender receives one sanctioned championship attempt per UTC day. A
+  challenger who loses may challenge again after the next UTC midnight without
+  closing the title picture for other contenders. A dethroned champion receives
+  the same daily rematch window plus a level override against the fighter who
+  took the belt. Retiring and claiming a new fighter preserves old results but
+  starts a new championship-history window. The champion may defend against
+  multiple real Cage Network fighters in one day, but may face each fighter only
+  once that day. Generated opponents remain unsanctioned.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, partial recovery,
@@ -320,8 +323,12 @@ generated league.
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The champion's name,
-  level, record, and defense count appear on the landing page and in
-  matchmaking. The Tale of the Tape uses a dedicated World Title Bout banner
+  level, record, defense count, the viewer's daily title availability, and
+  former-champion rematch status appear on the Fight page. A champion sees only
+  previously used matchups locked; other real-fighter defenses remain open.
+  A fighter who loses the belt while
+  away receives a one-time title-loss notice naming the new champion. The Tale
+  of the Tape uses a dedicated World Title Bout banner
   for championship matchups and compares Power, Speed, Chin, and Cardio with
   proportional meters; the stronger side of each attribute is highlighted in
   green and ties use a neutral gold treatment.
