@@ -75,6 +75,29 @@ test('expired anonymous sessions refresh without creating a second player identi
   assert.deepEqual(JSON.parse(calls[0].options.body), { refresh_token: 'refresh-token' });
 });
 
+test('concurrent startup requests share one session refresh', async () => {
+  const oldSession = { ...session, access_token: 'expired', expires_at: 10 };
+  const refreshed = { ...session, access_token: 'refreshed', expires_at: 9000 };
+  const storage = memoryStorage({ [SESSION_KEY]: JSON.stringify(oldSession) });
+  const calls = [];
+  const client = createClient({
+    url: 'https://test.supabase.co',
+    key: 'sb_publishable_test-key',
+    storage,
+    now: () => 100_000,
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      await new Promise(resolve => setImmediate(resolve));
+      return jsonResponse(refreshed);
+    },
+  });
+
+  const sessions = await Promise.all([client.ensureSession(), client.ensureSession(), client.ensureSession()]);
+  assert.deepEqual(sessions.map(active => active.access_token), ['refreshed','refreshed','refreshed']);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /\/auth\/v1\/token\?grant_type=refresh_token$/);
+});
+
 test('identity claiming, profile sync, retirement, feed reads, roster filtering, and posting use authenticated REST requests', async () => {
   const storage = memoryStorage();
   const otherId = '22222222-2222-4222-8222-222222222222';
