@@ -6,16 +6,17 @@
 
 Cage Grind is a mobile-first, single-player combat-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
-The page loads its presentation from `styles.css`, scalable copy pools from
-`strings.js`, testable gameplay rules from `game-logic.js`, and browser
-interactions from `game.js`.
+The page uses ordinary, ordered scripts with no bundler. Shared presentation
+lives in `styles.css`; the landing screen has its own `landing.css` and
+`landing.js`; fight planning and fight-focus flows live in `fight-plan.js` and
+`fight-focus.js`; and `game.js` coordinates those features with the career.
 
 ### Landing page
 
 - Every browser visit opens on a branded, responsive Cage Grind front door
   before revealing the game interface.
 - A completed local career receives a personalized **Welcome Back** message,
-  current level, record, Followers, and a **Keep Grinding** action. A partially
+  current level, record, Followers, and a **Continue Career** action. A partially
   completed fighter receives **Continue Your Build** instead of being mistaken
   for a new or finished career.
 - New players see **Build Your MMA Fighter. Become World Champion.** and the
@@ -443,15 +444,16 @@ Run the repository checks with:
 npm test
 ```
 
-The game uses `index.html`, `styles.css`, `game-logic.js`, `strings.js`,
-`analytics.js`, and `game.js` without a build step. `game-logic.js` contains the small shared rule
-helpers used by both the browser and behavioral tests. `strings.js` groups
-opponent names, fight commentary, Cage Feed
-copy, generated social usernames, and promoter ticker lines so new variations
-can be added without editing simulation logic.
+The game uses static HTML, CSS, and ordinary scripts without a build step.
+`game-logic.js` contains shared rule helpers used by the browser and behavioral
+tests. `game.js` remains the coordinator; `landing.js`, `fight-plan.js`, and
+`fight-focus.js` own their feature flows and receive state/UI callbacks from the
+coordinator. `fight-focus-contacts.js` owns the locker-room contact and message
+data, while `strings.js` groups the remaining opponent, commentary, Cage Feed,
+username, and ticker copy. Script order in `index.html` and the service-worker
+precache list must keep data and feature modules ahead of `game.js`.
 The generated transparent header wordmark lives at
-`assets/cage-grind-logo.png`, and the landing hero uses the transparent
-`assets/cage-grind-octagon-transparent.png` artwork. The six bottom-navigation icons live under
+`assets/cage-grind-logo.png`. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
 The 40 runtime fighter portraits use transparent `fighter-avatar-01.png`
 through `fighter-avatar-40.png` assets. Replaceable icons and
