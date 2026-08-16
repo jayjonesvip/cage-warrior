@@ -172,8 +172,8 @@ test('opponent availability covers career fights, the global title, and accepted
   assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),'blocked');
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),false);
   assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:5,challengeEligible:true},context),'title');
-  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:3,challengeEligible:true},context),'passed');
-  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:6,challengeEligible:true},context),'locked');
+  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:3,challengeEligible:true},context),'title');
+  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:6,challengeEligible:true},context),'title');
   assert.equal(logic.opponentAvailable({globalChampionship:true,championDefense:true,tier:3,challengeEligible:false,titleCooldown:true},context),false);
 });
 
@@ -184,6 +184,34 @@ test('championship career rank follows rookie, prospect, contender, former champ
   assert.equal(logic.championshipCareerRank(6,{champion_id:'champ',champion_level:5}),'TITLE CONTENDER');
   assert.equal(logic.championshipCareerRank(4,{champion_id:'champ',champion_level:7,former_champion:true}),'FORMER WORLD CHAMPION');
   assert.equal(logic.championshipCareerRank(2,{champion_id:'self',champion_level:2,is_champion:true,former_champion:true}),'WORLD CHAMPION');
+});
+
+test('simplified championship experience covers contender, champion, rematch, and offline states',()=>{
+  const locked=logic.championshipExperience({champion_level:5,challenge_eligible:false},{level:4});
+  assert.deepEqual(locked,{status:'locked',headline:'WORLD TITLE SHOT LOCKED',action:'REACH LEVEL 5',disabled:true});
+  const eligible=logic.championshipExperience({champion_level:5,challenge_eligible:true},{level:5});
+  assert.deepEqual(eligible,{status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false});
+  assert.deepEqual(logic.championshipExperience({champion_level:5,daily_bout_used:true},{level:6}),{status:'used',headline:'TITLE SHOT USED TODAY',action:'AVAILABLE AT MIDNIGHT',disabled:true});
+  assert.deepEqual(logic.championshipExperience({is_champion:true,selected_challenger_id:'challenger'}),{status:'defense',headline:'YOU ARE THE WORLD CHAMPION',action:'DEFEND YOUR TITLE',disabled:false});
+  assert.deepEqual(logic.championshipExperience({is_champion:true,defense_used_today:true}),{status:'defended',headline:'TITLE DEFENDED',action:'NEXT CHALLENGER AVAILABLE TOMORROW',disabled:true});
+  assert.deepEqual(logic.championshipExperience({is_champion:true}),{status:'no-challenger',headline:'YOU ARE THE WORLD CHAMPION',action:'NO CHALLENGER AVAILABLE',disabled:true});
+  assert.deepEqual(logic.championshipExperience({former_champion_rematch:true,daily_bout_used:true}),{status:'rematch-waiting',headline:'TITLE REMATCH AVAILABLE TOMORROW',action:'AVAILABLE AT MIDNIGHT',disabled:true});
+  assert.deepEqual(logic.championshipExperience({former_champion_rematch:true}),{status:'rematch',headline:'TITLE REMATCH AVAILABLE',action:'RECLAIM YOUR TITLE',disabled:false});
+  assert.deepEqual(logic.championshipExperience(null,{networkUnavailable:true}),{status:'unavailable',headline:'CHAMPIONSHIP UPDATE UNAVAILABLE',action:'TRY AGAIN',disabled:false});
+});
+
+test('regular ranked fighters never become championship bouts',()=>{
+  const ranked={network:true,tier:5,lossesToPlayer:0};
+  assert.equal(logic.opponentState(ranked,{level:5}),'current');
+  assert.equal(logic.opponentAvailable(ranked,{level:5}),true);
+  assert.equal(ranked.globalChampionship,undefined);
+});
+
+test('title-rematch wins, losses, and stale settlements use authoritative presentation',()=>{
+  assert.deepEqual(logic.championshipSettlementPresentation({status:'new_champion',mode:'rematch',isChampion:true}),{heading:'TITLE RECLAIMED',message:'You took back the World Championship.'});
+  assert.deepEqual(logic.championshipSettlementPresentation({status:'champion_defended',mode:'rematch',isChampion:false}),{heading:'TITLE FIGHT LOST',message:'The reigning champion kept the belt.'});
+  assert.deepEqual(logic.championshipSettlementPresentation({status:'stale',mode:'challenge'}),{heading:'CHAMPIONSHIP CHANGED',message:'The belt changed before this result could transfer it.'});
+  assert.deepEqual(logic.championshipSettlementPresentation({status:'new_champion',mode:'defense',isChampion:false,championHandle:'NewChamp'}),{heading:'YOU LOST THE WORLD TITLE',message:'@NewChamp took the belt. TITLE REMATCH AVAILABLE TOMORROW.'});
 });
 
 test('retirement suppresses unload saves and clears only career storage',()=>{

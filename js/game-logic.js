@@ -280,8 +280,6 @@
 
   function opponentState(opponent,{level}){
     if(opponent.globalChampionship&&opponent.championDefense){
-      if(level<opponent.tier)return 'locked';
-      if(level>opponent.tier)return 'passed';
       return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
     }
     if(opponent.globalChampionship)return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
@@ -298,6 +296,29 @@
     if(title?.former_champion)return 'FORMER WORLD CHAMPION';
     if(title?.champion_id&&fighterLevel>=Math.max(1,whole(title.champion_level,1)))return 'TITLE CONTENDER';
     return fighterLevel>=3?'PROSPECT':'ROOKIE';
+  }
+  function championshipExperience(championship,{level=1,networkUnavailable=false}={}){
+    const champ=championship&&typeof championship==='object'?championship:null,fighterLevel=Math.max(1,whole(level,1));
+    if(networkUnavailable)return {status:'unavailable',headline:'CHAMPIONSHIP UPDATE UNAVAILABLE',action:'TRY AGAIN',disabled:false};
+    if(!champ)return {status:'loading',headline:'CHECKING THE WORLD CHAMPION',action:'PLEASE WAIT',disabled:true};
+    if(champ.is_champion){
+      if(champ.defense_used_today)return {status:'defended',headline:'TITLE DEFENDED',action:'NEXT CHALLENGER AVAILABLE TOMORROW',disabled:true};
+      if(!champ.selected_challenger_id)return {status:'no-challenger',headline:'YOU ARE THE WORLD CHAMPION',action:'NO CHALLENGER AVAILABLE',disabled:true};
+      return {status:'defense',headline:'YOU ARE THE WORLD CHAMPION',action:'DEFEND YOUR TITLE',disabled:false};
+    }
+    if(champ.daily_bout_used)return champ.former_champion_rematch?{status:'rematch-waiting',headline:'TITLE REMATCH AVAILABLE TOMORROW',action:'AVAILABLE AT MIDNIGHT',disabled:true}:{status:'used',headline:'TITLE SHOT USED TODAY',action:'AVAILABLE AT MIDNIGHT',disabled:true};
+    if(champ.former_champion_rematch)return {status:'rematch',headline:'TITLE REMATCH AVAILABLE',action:'RECLAIM YOUR TITLE',disabled:false};
+    const requiredLevel=Math.max(1,whole(champ.champion_level,1));
+    if(champ.challenge_eligible&&fighterLevel>=requiredLevel)return {status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false};
+    return {status:'locked',headline:'WORLD TITLE SHOT LOCKED',action:`REACH LEVEL ${requiredLevel}`,disabled:true};
+  }
+  function championshipSettlementPresentation({status='',mode='challenge',isChampion=false,defenses=0,championHandle='' }={}){
+    if(status==='stale')return {heading:'CHAMPIONSHIP CHANGED',message:'The belt changed before this result could transfer it.'};
+    if(status==='expired')return {heading:'TITLE RESULT EXPIRED',message:'The championship was not changed.'};
+    if(status==='champion_defended')return mode==='defense'?{heading:'TITLE DEFENDED',message:`${nonNegativeWhole(defenses)} SUCCESSFUL DEFENSE${nonNegativeWhole(defenses)===1?'':'S'} · NEXT CHALLENGER AVAILABLE TOMORROW`}:{heading:'TITLE FIGHT LOST',message:'The reigning champion kept the belt.'};
+    if(status==='new_champion'&&isChampion)return mode==='rematch'?{heading:'TITLE RECLAIMED',message:'You took back the World Championship.'}:{heading:'YOU ARE WORLD CHAMPION',message:'The World Championship is yours.'};
+    if(status==='new_champion')return {heading:'YOU LOST THE WORLD TITLE',message:`@${String(championHandle||'THE NEW CHAMPION')} took the belt. TITLE REMATCH AVAILABLE TOMORROW.`};
+    return {heading:'CHAMPIONSHIP RESULT SETTLED',message:'The official championship record is updated.'};
   }
   function networkOpponentRatings(tier,avatarStats={},archetypeMods={},difficulty=0){
     const base=4+(Math.max(1,whole(tier,1))-1)*1.9,variance=clamp(finite(difficulty),-.7,.7),ratings={};
@@ -383,5 +404,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

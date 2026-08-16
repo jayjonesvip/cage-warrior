@@ -32,8 +32,12 @@ Deno.serve(async request=>{
     const challengeResponse=await fetch(`${supabaseUrl}/rest/v1/cage_championship_challenges?select=id,challenger_id,initiated_by,status&id=eq.${challengeId}`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`,Accept:'application/json'}});
     const challenges=await challengeResponse.json();
     const challenge=Array.isArray(challenges)?challenges[0]:null;
-    if(!challenge||challenge.status!=='pending'||challenge.challenger_id!==challengerId)return json({error:'Pending championship bout not found'},404);
+    if(!challenge||challenge.challenger_id!==challengerId)return json({error:'Championship bout not found'},404);
     if(challenge.initiated_by!==user.id)return json({error:'Only the fighter who started this bout can submit its result'},403);
+    if(challenge.status!=='pending'){
+      const settledStatus=challenge.status==='challenger_won'?'new_champion':challenge.status==='champion_defended'?'champion_defended':challenge.status;
+      return json({status:settledStatus,settled:true,replayed:true});
+    }
 
     const resultResponse=await fetch(`${supabaseUrl}/rest/v1/rpc/resolve_cage_championship_challenge`,{
       method:'POST',
