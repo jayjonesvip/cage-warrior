@@ -93,7 +93,9 @@ generated league.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,
-  and the game returns to the first fighter-creation step. If the public
+  and the game returns to the first fighter-creation step. Historical title
+  results remain in the public record, while the newly claimed fighter starts
+  with fresh title-shot eligibility against the current champion. If the public
   retirement cannot be recorded, the local career is kept safe.
 - Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
@@ -202,7 +204,9 @@ generated league.
   profile. A fighter may challenge once their level reaches or exceeds the
   champion's level.
 - The belt may have one sanctioned championship bout total per UTC day, and the
-  same challenger and champion never receive a championship rematch. When the
+  same challenger and champion never receive a championship rematch within
+  their current careers. Retiring and claiming a new fighter preserves old
+  results but starts a new championship-eligibility window. When the
   reigning champion selects any real Cage Network fighter, the belt is
   automatically on the line; fights against generated opponents are unsanctioned.
 - Generated progression continues beyond level 15.
