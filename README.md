@@ -207,8 +207,9 @@ generated league.
   same challenger and champion never receive a championship rematch within
   their current careers. Retiring and claiming a new fighter preserves old
   results but starts a new championship-eligibility window. When the
-  reigning champion selects any real Cage Network fighter, the belt is
-  automatically on the line; fights against generated opponents are unsanctioned.
+  reigning champion selects a real Cage Network fighter at the champion's current
+  level, the belt is automatically on the line; fighters from other levels and
+  generated opponents are unsanctioned.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, partial recovery,
