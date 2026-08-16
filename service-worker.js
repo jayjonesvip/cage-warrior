@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.90';
+const APP_VERSION='2.5.91';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,25 +8,30 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './styles.css?v=2.5.90',
-  './game-logic.js?v=2.5.90',
-  './strings.js?v=2.5.90',
-  './analytics.js?v=2.5.90',
-  './supabase-client.js?v=2.5.90',
-  './cage-social.js?v=2.5.90',
-  './game.js?v=2.5.90',
-  './pwa.js?v=2.5.90',
+  './styles.css?v=2.5.91',
+  './landing.css?v=2.5.91',
+  './game-logic.js?v=2.5.91',
+  './fight-focus-contacts.js?v=2.5.91',
+  './strings.js?v=2.5.91',
+  './analytics.js?v=2.5.91',
+  './supabase-client.js?v=2.5.91',
+  './cage-social.js?v=2.5.91',
+  './landing.js?v=2.5.91',
+  './fight-focus.js?v=2.5.91',
+  './fight-plan.js?v=2.5.91',
+  './game.js?v=2.5.91',
+  './pwa.js?v=2.5.91',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
-  './assets/focus-locker-room.jpg?v=2.5.90',
-  './assets/contact-mom.jpg?v=2.5.90',
-  './assets/contact-wife.jpg?v=2.5.90',
-  './assets/contact-brother-tommy.png?v=2.5.90',
-  './assets/contact-agent-carl.png?v=2.5.90',
-  './assets/contact-grandma.jpg?v=2.5.90',
-  './assets/cage-grind-ceo.jpg?v=2.5.90',
-  './assets/cage-dice.jpg?v=2.5.90',
+  './assets/focus-locker-room.jpg?v=2.5.91',
+  './assets/contact-mom.jpg?v=2.5.91',
+  './assets/contact-wife.jpg?v=2.5.91',
+  './assets/contact-brother-tommy.png?v=2.5.91',
+  './assets/contact-agent-carl.png?v=2.5.91',
+  './assets/contact-grandma.jpg?v=2.5.91',
+  './assets/cage-grind-ceo.jpg?v=2.5.91',
+  './assets/cage-dice.jpg?v=2.5.91',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
@@ -41,10 +46,10 @@ const CORE_ASSETS=[
   './assets/icons/nav-hustle.png',
   './assets/icons/nav-gear.png',
   './assets/icons/nav-feed.png',
-  './assets/icons/title-world.png?v=2.5.90',
-  './assets/icons/round-intro-1.png?v=2.5.90',
-  './assets/icons/round-intro-2.png?v=2.5.90',
-  './assets/icons/round-intro-3.png?v=2.5.90'
+  './assets/icons/title-world.png?v=2.5.91',
+  './assets/icons/round-intro-1.png?v=2.5.91',
+  './assets/icons/round-intro-2.png?v=2.5.91',
+  './assets/icons/round-intro-3.png?v=2.5.91'
 ].map(path=>new URL(path,self.location.href).href);
 
 self.addEventListener('install',event=>{

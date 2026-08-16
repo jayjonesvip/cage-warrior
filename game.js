@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.90';
+  const ICON_ASSET_VERSION = '2.5.91';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -46,8 +46,7 @@
     return ANALYTICS.track(eventName,Object.assign({fighter_level:state?.level||1},parameters));
   }
   let recoveryReport = null;
-  let landingMode = 'new';
-  let landingEntered = false;
+  let landingFeature = null;
   let audioCtx = null;
   let currentScreen = 'home';
   let fight = null;
@@ -75,9 +74,6 @@
   let sharedSocialNoticeShown=false;
   let sharedSocialInteractionsRemaining=0;
   let sharedChampionship=null;
-  let landingChampionshipLoaded=false;
-  let landingChampionshipUnavailable=false;
-  let landingFeatureViewed=false;
   const networkOpponentCheckedLevels=new Set();
   let networkOpponentSyncPromise=null;
   let activeBioProfileId='';
@@ -419,38 +415,17 @@
     if(state.level>=2)return 'CLUB FIGHTER';
     return 'UNRANKED';
   }
-  function renderLanding(){
-    landingMode=LOGIC.careerLandingMode(state);const returning=landingMode==='returning',building=landingMode==='building',page=$('#landingPage');page.dataset.mode=landingMode;
-    $('#landingEyebrow').textContent=returning?'YOUR CAREER IS WAITING':building?'FIGHTER BUILD IN PROGRESS':'YOUR FIGHT STARTS HERE';
-    $('#landingTitleLead').textContent=returning?'WELCOME BACK,':building?'FINISH YOUR':'BUILD YOUR MMA FIGHTER.';
-    $('#landingTitleAccent').textContent=returning?state.name:building?'FIGHTER BUILD':'BECOME WORLD CHAMPION.';
-    $('#landingDescription').textContent=returning?'Your fight plan and your rivals are waiting. Pick up the climb exactly where you left it.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Train, hustle, choose fight strategies, earn sponsors, and climb a shared world ranking.';
-    $('#landingEnterBtn').textContent=returning?'CONTINUE CAREER':building?'CONTINUE YOUR BUILD':'PLAY FREE NOW';
-    const stats=$('#landingCareerStats');stats.hidden=!returning;if(returning){$('#landingRank').textContent=`LVL ${state.level}`;$('#landingRecord').textContent=`${state.wins}-${state.losses}`;$('#landingFollowers').textContent=fmt(state.fans)}
-    renderLandingChampionship();
-  }
-  function renderLandingChampionship(){
-    const heading=$('#landingChampionHeading'),meta=$('#landingChampionMeta');if(!heading||!meta)return;
-    const proof=LOGIC.landingChampionshipProof(sharedChampionship,landingChampionshipLoaded,landingChampionshipUnavailable);heading.textContent=proof.heading;meta.textContent=proof.meta;
-  }
-  async function loadLandingChampionship(){
-    if(landingChampionshipLoaded)return;
-    if(!SHARED_FEED?.configured?.()){landingChampionshipLoaded=true;landingChampionshipUnavailable=true;renderLandingChampionship();return}
-    try{sharedChampionship=await SHARED_FEED.loadChampionship()||null;landingChampionshipLoaded=true;landingChampionshipUnavailable=false}
-    catch{landingChampionshipLoaded=true;landingChampionshipUnavailable=true}
-    renderLandingChampionship();
-  }
-  function observeLandingFeatures(){
-    const features=$('#landingFeatures');if(!features||landingMode!=='new'||typeof IntersectionObserver!=='function')return;
-    const observer=new IntersectionObserver(entries=>{if(landingFeatureViewed||!entries.some(entry=>entry.isIntersecting))return;landingFeatureViewed=true;trackEvent('landing_feature_view',{career_state:'new'});observer.disconnect()},{threshold:.35});observer.observe(features);
-  }
+  function renderLanding(){landingFeature.render()}
+  function renderLandingChampionship(){landingFeature.renderChampionship()}
+  function loadLandingChampionship(){return landingFeature.loadChampionship()}
+  function observeLandingFeatures(){landingFeature.observeFeatures()}
   function showRecoveryReport(){
     if(!recoveryReport)return;const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push('fight booking refunded');recoveryReport=null;toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff');
   }
-  function enterGameFromLanding(){
-    if(landingEntered)return;landingEntered=true;const page=$('#landingPage'),button=$('#landingEnterBtn'),mode=landingMode;button.disabled=true;trackEvent('landing_enter',{career_state:mode});sfx.tap();page.classList.add('leaving');
-    setTimeout(()=>{page.hidden=true;page.classList.remove('leaving');document.body.classList.remove('landing-active');$('#app').removeAttribute('aria-hidden');$('.screen[data-screen="home"]').scrollTop=0;trackEvent('game_screen_view',{screen_name:'home',entry_point:'landing'});setTimeout(showRecoveryReport,180)},230);
-  }
+  landingFeature=globalThis.CAGE_LANDING.createLandingFeature({
+    $,logic:LOGIC,getState:()=>state,getChampionship:()=>sharedChampionship,setChampionship:value=>{sharedChampionship=value},sharedFeed:SHARED_FEED,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(showRecoveryReport,180)
+  });
+  function enterGameFromLanding(){landingFeature.enter()}
   function cageStatus(){
     if(sharedChampionship?.is_champion)return 'WORLD CHAMPION';
     if(sharedChampionship?.challenge_eligible)return 'TITLE CHALLENGER';
@@ -623,7 +598,7 @@
   }
 
   function renderCareer(){
-    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),coreReady=!!(style&&city&&avatar&&allocationValid),ready=coreReady&&state.nameLocked,completed=Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)+Number(state.nameLocked),progress=completed*25,pwa=globalThis.CAGE_PWA;if(pwa?.isInstalled?.())state.installDetected=true;const installOffer=$('#installOffer'),nativeInstall=!!pwa?.installAvailable?.();installOffer.hidden=!ready||state.installDetected||state.installRewardClaimed;$('#installGameBtn').disabled=false;$('#installOfferStatus').textContent=nativeInstall?'READY TO INSTALL · DROP UNLOCKS AFTER SUCCESS':'USE YOUR BROWSER INSTALL OR ADD-TO-HOME-SCREEN OPTION';$('#app').classList.toggle('career-setup',!ready);$('.resource-hud').hidden=!ready;$('.bottomnav').hidden=!ready;$('#fighterBuilderIntro').hidden=ready;$('#builderProgressStep').textContent=`${completed} OF 4 COMPLETE`;$('#builderProgressPercent').textContent=`${progress}%`;$('#builderProgressFill').style.width=`${progress}%`;$('#builderProgressTrack').setAttribute('aria-valuenow',String(progress));$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#fighterNameSetup').hidden=!coreReady||state.nameLocked;if(coreReady&&!state.nameLocked&&!identitySuggestion)identitySuggestion=randomIdentitySuggestion();const identityDisplay=$('#fighterNameSuggestion'),manualInput=$('#manualFighterNameInput'),nameRule=$('#fighterNameRule'),manualValid=manualIdentityName(identityManualValue);identityDisplay.textContent=identitySuggestion||state.name;identityDisplay.hidden=identityManualMode;manualInput.hidden=!identityManualMode;nameRule.hidden=!identityManualMode;if(document.activeElement!==manualInput)manualInput.value=identityManualValue||identitySuggestion;manualInput.disabled=identityPending;manualInput.classList.toggle('invalid',identityManualMode&&!!identityManualValue&&!manualValid);nameRule.classList.toggle('invalid',identityManualMode&&!!identityManualValue&&!manualValid);$('#newFighterNameBtn').disabled=identityPending||identityShufflePending;$('#manualFighterNameBtn').disabled=identityPending||identityShufflePending;$('#manualFighterNameBtn').textContent=identityManualMode?'USE SUGGESTION':'MANUAL ENTRY';$('#lockFighterNameBtn').disabled=identityPending||identityShufflePending||(identityManualMode&&!manualValid);$('#lockFighterNameBtn').textContent=identityPending?'CHECKING NAME…':'READY';$('#careerIdentityStatus').textContent='LOCKED IN';$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);const champ=sharedChampionship,defenses=Math.max(0,Number(champ?.defenses)||0);let titleKicker='TITLE STATUS',championshipText='CONNECTING TO WORLD TITLE',titleMeta='Loading the current champion and title requirements.';if(champ?.is_champion){titleKicker='REIGNING WORLD CHAMPION';championshipText='YOU HOLD THE BELT';titleMeta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'} · EVERY REAL-USER FIGHT PUTS IT ON THE LINE` }else if(champ?.champion_handle){const championHandle=`@${champ.champion_handle}`,requiredLevel=Math.max(5,Number(champ.champion_level)||5);titleKicker='CURRENT WORLD CHAMPION';championshipText=championHandle;titleMeta=champ.rematch_blocked?'TITLE SHOT USED · NO CHAMPIONSHIP REMATCHES':champ.challenge_eligible?`FIND ${championHandle} ON THE FIGHT SELECTIONS PAGE`:`YOU'LL NEED TO REACH LEVEL ${requiredLevel} TO CHALLENGE FOR THE BELT` }else if(landingChampionshipLoaded&&!landingChampionshipUnavailable){titleKicker='BELT VACANT';championshipText='THE WORLD TITLE IS OPEN';titleMeta='ONE BELT · REAL FIGHTERS ONLY'}else if(landingChampionshipUnavailable){titleKicker='CAGE NETWORK OFFLINE';championshipText='TITLE UPDATE UNAVAILABLE';titleMeta='Reconnect to load the current champion.'}$('#worldTitleKicker').textContent=titleKicker;$('#nextMilestoneText').textContent=championshipText;$('#worldTitleMeta').textContent=titleMeta;
+    const style=currentStyle(),city=currentCity(),avatar=currentAvatar(),allocationValid=!!avatar&&validFighterAllocation(state.fighterBaseStats),coreReady=!!(style&&city&&avatar&&allocationValid),ready=coreReady&&state.nameLocked,completed=Number(!!city)+Number(!!avatar&&allocationValid)+Number(!!style)+Number(state.nameLocked),progress=completed*25,pwa=globalThis.CAGE_PWA;if(pwa?.isInstalled?.())state.installDetected=true;const installOffer=$('#installOffer'),nativeInstall=!!pwa?.installAvailable?.();installOffer.hidden=!ready||state.installDetected||state.installRewardClaimed;$('#installGameBtn').disabled=false;$('#installOfferStatus').textContent=nativeInstall?'READY TO INSTALL · DROP UNLOCKS AFTER SUCCESS':'USE YOUR BROWSER INSTALL OR ADD-TO-HOME-SCREEN OPTION';$('#app').classList.toggle('career-setup',!ready);$('.resource-hud').hidden=!ready;$('.bottomnav').hidden=!ready;$('#fighterBuilderIntro').hidden=ready;$('#builderProgressStep').textContent=`${completed} OF 4 COMPLETE`;$('#builderProgressPercent').textContent=`${progress}%`;$('#builderProgressFill').style.width=`${progress}%`;$('#builderProgressTrack').setAttribute('aria-valuenow',String(progress));$('#citySetup').hidden=!!city;$('#fighterSetup').hidden=!city||!!avatar;$('#archetypeSetup').hidden=!city||!avatar||!!style;$('#fighterNameSetup').hidden=!coreReady||state.nameLocked;if(coreReady&&!state.nameLocked&&!identitySuggestion)identitySuggestion=randomIdentitySuggestion();const identityDisplay=$('#fighterNameSuggestion'),manualInput=$('#manualFighterNameInput'),nameRule=$('#fighterNameRule'),manualValid=manualIdentityName(identityManualValue);identityDisplay.textContent=identitySuggestion||state.name;identityDisplay.hidden=identityManualMode;manualInput.hidden=!identityManualMode;nameRule.hidden=!identityManualMode;if(document.activeElement!==manualInput)manualInput.value=identityManualValue||identitySuggestion;manualInput.disabled=identityPending;manualInput.classList.toggle('invalid',identityManualMode&&!!identityManualValue&&!manualValid);nameRule.classList.toggle('invalid',identityManualMode&&!!identityManualValue&&!manualValid);$('#newFighterNameBtn').disabled=identityPending||identityShufflePending;$('#manualFighterNameBtn').disabled=identityPending||identityShufflePending;$('#manualFighterNameBtn').textContent=identityManualMode?'USE SUGGESTION':'MANUAL ENTRY';$('#lockFighterNameBtn').disabled=identityPending||identityShufflePending||(identityManualMode&&!manualValid);$('#lockFighterNameBtn').textContent=identityPending?'CHECKING NAME…':'READY';$('#careerIdentityStatus').textContent='LOCKED IN';$('#homeCityText').textContent=city?city.name:'NOT SELECTED';$('#homeStyleText').textContent=style?style.name:'NOT SELECTED';$('#careerFollowersText').textContent=fmt(state.fans);$('#careerEarningsText').textContent='$'+fmt(state.careerEarnings);const champ=sharedChampionship,defenses=Math.max(0,Number(champ?.defenses)||0);let titleKicker='TITLE STATUS',championshipText='CONNECTING TO WORLD TITLE',titleMeta='Loading the current champion and title requirements.';if(champ?.is_champion){titleKicker='REIGNING WORLD CHAMPION';championshipText='YOU HOLD THE BELT';titleMeta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'} · EVERY REAL-USER FIGHT PUTS IT ON THE LINE` }else if(champ?.champion_handle){const championHandle=`@${champ.champion_handle}`,requiredLevel=Math.max(5,Number(champ.champion_level)||5);titleKicker='CURRENT WORLD CHAMPION';championshipText=championHandle;titleMeta=champ.rematch_blocked?'TITLE SHOT USED · NO CHAMPIONSHIP REMATCHES':champ.challenge_eligible?`FIND ${championHandle} ON THE FIGHT SELECTIONS PAGE`:`YOU'LL NEED TO REACH LEVEL ${requiredLevel} TO CHALLENGE FOR THE BELT` }else if(landingFeature.status().championshipLoaded&&!landingFeature.status().championshipUnavailable){titleKicker='BELT VACANT';championshipText='THE WORLD TITLE IS OPEN';titleMeta='ONE BELT · REAL FIGHTERS ONLY'}else if(landingFeature.status().championshipUnavailable){titleKicker='CAGE NETWORK OFFLINE';championshipText='TITLE UPDATE UNAVAILABLE';titleMeta='Reconnect to load the current champion.'}$('#worldTitleKicker').textContent=titleKicker;$('#nextMilestoneText').textContent=championshipText;$('#worldTitleMeta').textContent=titleMeta;
     const sponsor=state.activeEndorsement?endorsementDefs.find(d=>d.id===state.activeEndorsement.id):null,sponsorBadge=$('#heroSponsor');sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${sponsor.brand}</b><em>${state.activeEndorsement.fightsLeft} FIGHTS LEFT</em></span>`:'';
     $('#buildChoices').innerHTML=style?'':fighterStyles.map(s=>`<button class="build-choice" data-style="${s.id}"><b>${s.name}</b><small>${s.text}</small></button>`).join('');
     $('#cityChoices').innerHTML=city?'':fighterCities.map(c=>`<button class="city-choice" data-city="${c.id}">${c.name}</button>`).join('');
@@ -688,13 +663,13 @@
       const profile=await SHARED_FEED.registerProfile(sharedProfilePayload());
       if(!profile?.id||!profile?.handle)throw new Error('Shared profile registration failed.');
       state.socialProfileId=profile.id;if(normalizeIdentityName(profile.handle)!==state.name){state.name=normalizeIdentityName(profile.handle);state.nameLocked=true}
-      let [posts,profiles,interactionsRemaining,championship]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(100),SHARED_FEED.loadInteractionAllowance(),SHARED_FEED.loadChampionship()]);sharedChampionship=championship||null;landingChampionshipLoaded=true;landingChampionshipUnavailable=false;const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
+      let [posts,profiles,interactionsRemaining,championship]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(100),SHARED_FEED.loadInteractionAllowance(),SHARED_FEED.loadChampionship()]);sharedChampionship=championship||null;landingFeature.setAvailability(sharedChampionship,true,false);const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
       if(state.socialAccountCreated&&!hasOwnRemotePost&&!state.socialRemoteInitialized){await SHARED_FEED.publishPost({kind:'player',body:'Hello, fight fans! Stay tuned—the climb starts now.'});posts=await SHARED_FEED.loadFeed(50)}
       state.socialRemoteInitialized=state.socialAccountCreated&&(hasOwnRemotePost||Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id));
       sharedSocialProfiles=[profile,...(Array.isArray(profiles)?profiles.filter(item=>item.id!==profile.id):[])];try{state.socialFollowingCount=await SHARED_FEED.loadProfileCount()}catch{state.socialFollowingCount=sharedSocialProfiles.length}sharedSocialInteractionsRemaining=Math.max(0,Math.min(5,Number(interactionsRemaining)||0));sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];const latestRemoteId=Math.max(0,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0));if(currentScreen==='feed')state.socialLastRemotePostId=latestRemoteId;
       sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderLanding();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();return true;
     })().catch(error=>{
-      sharedSocialStatus='error';sharedSocialError=String(error?.message||'Shared feed unavailable.');sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;if(!landingChampionshipLoaded){sharedChampionship=null;landingChampionshipLoaded=true;landingChampionshipUnavailable=true}renderSocial();renderLanding();
+      sharedSocialStatus='error';sharedSocialError=String(error?.message||'Shared feed unavailable.');sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;if(!landingFeature.status().championshipLoaded)landingFeature.setAvailability(null,true,true);renderSocial();renderLanding();
       if(currentScreen==='feed'&&!sharedSocialNoticeShown){sharedSocialNoticeShown=true;toast('SHARED FEED SETUP PENDING · USING LOCAL FEED','#ffcf78')}
       return false;
     }).finally(()=>{sharedSocialSyncPromise=null});
@@ -1261,44 +1236,20 @@
   }
 
   function showFightStage(stage){['tapeStage','planStage','focusStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
-  function fightPlanLabel(plan=fight?.gamePlan){return `${plan?.pace==='fast'?'Fast':'Slow'} · ${plan?.offense==='aggressive'?'Aggressive':'Conservative'} · ${plan?.tactics==='adapt'?'Adapt':'Stick to Style'}`}
-  function renderFightPlan(){
-    if(!fight)return;const plan=fight.gamePlan,fast=plan.pace==='fast',aggressive=plan.offense==='aggressive',adapt=plan.tactics==='adapt',cardioEdge=fight.player.cardio-fight.opp.cardio,paceText=fast?(cardioEdge>0?'Your cardio edge supports a higher-output fight.':'Fast pace raises fatigue risk without a cardio edge.'):'Fewer exchanges conserve cardio for the later rounds.',offenseText=aggressive?'Power shots raise damage and knockout chances, but lower accuracy and expose counters.':'Jabs and safer attacks improve accuracy and defense at the cost of damage and knockdowns.',tacticsText=adapt?'Use your natural style in Round 1, partially adjust in Round 2, and fully adapt in Round 3. Focus controls execution.':`Trust your ${currentStyle()?.name||'signature'} style with full familiarity all fight.`;$$('[data-plan-setting]').forEach(button=>button.setAttribute('aria-pressed',String(plan[button.dataset.planSetting]===button.dataset.planValue)));$('#fightPlanSummary').innerHTML=`<b>${fightPlanLabel(plan)}</b><strong>OPPONENT STYLE · ${escapeHtml(fight.o.tag||'UNKNOWN STYLE')}</strong>${paceText} ${offenseText} ${tacticsText}`;
-  }
-  function beginFightPlan(){if(!fight)return;fight.gamePlan=Object.assign({},state.fightPlanPreference);showFightStage('planStage');$('#fightControls').classList.add('hidden');renderFightPlan();trackEvent('fight_plan_presented',{pace:fight.gamePlan.pace,offense:fight.gamePlan.offense,tactics:fight.gamePlan.tactics})}
-  function selectFightPlanSetting(setting,value){if(!fight||!combatLocked)return;const valid={pace:['slow','fast'],offense:['conservative','aggressive'],tactics:['stick','adapt']};if(!valid[setting]?.includes(value))return;fight.gamePlan[setting]=value;renderFightPlan();sfx.tap()}
-  function confirmFightPlan(){if(!fight)return;state.fightPlanPreference=Object.assign({},fight.gamePlan);saveState();trackEvent('fight_plan_locked',{pace:fight.gamePlan.pace,offense:fight.gamePlan.offense,tactics:fight.gamePlan.tactics,cardio_edge:Number((fight.player.cardio-fight.opp.cardio).toFixed(2))});beginFocusSequence();sfx.tap()}
-  function updateFocusDisplay(){
-    if(!fight)return;const value=clamp(Math.round(fight.focus||fight.focusBase||80),50,100),tier=focusTier(value);fight.focus=value;$('#focusValue').textContent=`${value}%`;$('#liveFocusText').textContent=`${value}% FOCUS · ${tier}`;
-  }
-  function renderFocusEncounter(){
-    if(!fight?.focusEncounter)return;updateFocusDisplay();const encounter=fight.focusEncounter,box=$('#focusEncounter');box.className='fight-plan-card focus-encounter';
-    if(encounter.type==='quiet')box.innerHTML=`<span class="focus-kicker">THE LOCKER ROOM IS YOURS</span><h2>HOW DO YOU PREPARE?</h2><p>No interruptions. Choose how to use the final minutes before the walkout.</p><div class="focus-options"><div class="focus-option"><button class="focus-choice risk" data-focus-choice="music"><b>LISTEN TO MUSIC</b></button><small class="focus-option-hint">Gain 4–10 Focus · 20% chance to hit 100%</small></div><div class="focus-option"><button class="focus-choice safe" data-focus-choice="meditate"><b>MEDITATE</b></button><small class="focus-option-hint">Reliable · raises Focus to at least 92%</small></div></div>`;
-    else{const message=encounter.message,contact=message.contact;box.innerHTML=`<span class="focus-kicker">TEXT FROM ${contact.name}</span><h2>INCOMING TEXT</h2><div class="focus-phone"><div class="focus-contact"><img src="${contact.avatar}" alt=""><div><b>${contact.name}</b><small>just now</small></div></div><div class="focus-notification"><b>New message</b><span>Read it now or protect your routine.</span></div></div><div class="focus-options"><div class="focus-option"><button class="focus-choice safe" data-focus-choice="read"><b>READ IT</b></button><small class="focus-option-hint">Open the message · outcome unknown</small></div><div class="focus-option"><button class="focus-choice risk" data-focus-choice="ignore"><b>IGNORE</b></button><small class="focus-option-hint">Leave it unread · ${contact.ignoreDelta} Focus</small></div></div>`}
-  }
-  function focusTextMessages(){return (STRINGS.fightFocus?.contacts||[]).flatMap(contact=>contact.messages.map(message=>Object.assign({contact},message)))}
-  function drawFocusText(messages){
-    const byId=new Map(messages.map(message=>[message.id,message]));let deck=Array.isArray(state.focusTextDeck)?state.focusTextDeck.filter(id=>byId.has(id)):[];
-    if(!deck.length){deck=messages.map(message=>message.id);for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}if(deck.length>1&&deck[deck.length-1]===state.lastFocusTextId){const swap=deck.findIndex(id=>id!==state.lastFocusTextId);[deck[swap],deck[deck.length-1]]=[deck[deck.length-1],deck[swap]]}}
-    const id=deck.pop();state.focusTextDeck=deck;state.lastFocusTextId=id;return byId.get(id)||messages[0];
-  }
-  function beginFocusSequence(){
-    if(!fight)return;fight.focusBase=rint(75,90);fight.focus=fight.focusBase;fight.focusResult=null;const messages=focusTextMessages(),quiet=Math.random()<.5||!messages.length;fight.focusEncounter=quiet?{type:'quiet'}:{type:'text',message:drawFocusText(messages)};saveState();showFightStage('focusStage');$('#fightControls').classList.add('hidden');renderFocusEncounter();trackEvent('fight_focus_presented',{fight_mode:fight.mode,encounter_type:quiet?'quiet':'text',event_id:fight.focusEncounter.message?.id||'routine',contact_id:fight.focusEncounter.message?.contact?.id||'none',starting_focus:fight.focusBase});
-  }
-  function resolveFocusChoice(choice){
-    if(!fight?.focusEncounter||fight.focusResult)return;const before=fight.focus,encounter=fight.focusEncounter;let text='',outcomeType='steady';
-    if(encounter.type==='quiet'){
-      if(choice==='music'){if(Math.random()<.20){fight.focus=100;text='The perfect song hits at the perfect moment. Every doubt disappears.';outcomeType='perfect'}else{fight.focus+=rint(4,10);text='The music raises the pulse and pulls your attention toward the cage.';outcomeType='boost'}}
-      else if(choice==='meditate'){fight.focus=Math.max(fight.focus,92);text='Your breathing slows. The noise outside the room loses its grip.';outcomeType='steady'}else return;
-    }else{
-      const message=encounter.message,contact=message.contact;if(choice==='read'){fight.focus=message.focus??(message.minimum?Math.max(fight.focus,message.minimum):fight.focus+(message.delta||0));text=message.text;outcomeType=fight.focus>=before?'boost':'hit'}
-      else if(choice==='ignore'){fight.focus+=contact.ignoreDelta;text=contact.ignoreText;outcomeType='doubt'}else return;
-    }
-    fight.focus=clamp(Math.round(fight.focus),50,100);fight.focusResult={choice,before,after:fight.focus,text,outcomeType};updateFocusDisplay();const delta=fight.focus-before,change=delta===0?'FOCUS HOLDS':`${delta>0?'+':''}${delta} FOCUS`,box=$('#focusEncounter'),isQuiet=encounter.type==='quiet',message=encounter.message,contact=message?.contact,resultKicker=isQuiet?'LOCKER ROOM · FINAL PREPARATION':`TEXT FROM ${contact.name}`,resultTitle=isQuiet?(choice==='music'?'THE MUSIC HITS':'YOUR MIND SETTLES'):(choice==='read'?'MESSAGE OPENED':'MESSAGE LEFT UNREAD'),messageHtml=isQuiet?`<div class="focus-message">${text}</div>`:choice==='read'?`<div class="focus-thread"><div class="focus-contact"><img src="${contact.avatar}" alt=""><div><b>${contact.name}</b><small>just now</small></div></div><div class="focus-text-bubble">${text}</div></div>`:`<div class="focus-unread">${text}</div>`;box.classList.add(delta<0?'outcome-negative':'outcome-positive');box.innerHTML=`<div class="focus-result"><span class="focus-kicker">${resultKicker}</span><h2>${resultTitle}</h2>${messageHtml}<b class="focus-change ${delta<0?'loss':''}">${before}% → ${fight.focus}% · ${change}</b><p>${focusTier(fight.focus)} Focus carries into this fight.</p><button class="focus-continue" data-focus-continue type="button">WALK TO THE CAGE</button></div>`;trackEvent('fight_focus_resolved',{fight_mode:fight.mode,encounter_type:encounter.type,event_id:message?.id||'routine',contact_id:contact?.id||'none',choice,starting_focus:before,final_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_')});sfx.tap();saveState();
-  }
-  function continueAfterFocus(){
-    if(!fight?.focusResult)return;showFightStage('liveStage');$('#fightControls').classList.remove('hidden');beginPlannedFight();sfx.tap();
-  }
+  const fightFocusFeature=globalThis.CAGE_FIGHT_FOCUS.createFightFocusFeature({$,getFight:()=>fight,getState:()=>state,contacts:globalThis.CAGE_FIGHT_FOCUS_CONTACTS,clamp,rint,focusTier,showFightStage,saveState,trackEvent,tap:()=>sfx.tap(),beginPlannedFight});
+  const fightPlanFeature=globalThis.CAGE_FIGHT_PLAN.createFightPlanFeature({$,$$,getFight:()=>fight,getState:()=>state,isCombatLocked:()=>combatLocked,currentStyle,escapeHtml,showFightStage,saveState,trackEvent,tap:()=>sfx.tap(),beginFocus:()=>fightFocusFeature.begin()});
+  function fightPlanLabel(plan=fight?.gamePlan){return fightPlanFeature.label(plan)}
+  function renderFightPlan(){fightPlanFeature.render()}
+  function beginFightPlan(){fightPlanFeature.begin()}
+  function selectFightPlanSetting(setting,value){fightPlanFeature.select(setting,value)}
+  function confirmFightPlan(){fightPlanFeature.confirm()}
+  function updateFocusDisplay(){fightFocusFeature.updateDisplay()}
+  function renderFocusEncounter(){fightFocusFeature.renderEncounter()}
+  function focusTextMessages(){return fightFocusFeature.messages()}
+  function drawFocusText(messages){return fightFocusFeature.draw(messages)}
+  function beginFocusSequence(){fightFocusFeature.begin()}
+  function resolveFocusChoice(choice){fightFocusFeature.resolve(choice)}
+  function continueAfterFocus(){fightFocusFeature.continueAfter()}
   function tauntOpponent(key){
     const o=state.roster.find(f=>f.key===key);if(!o||o.globalChampionship||(o.lossesToPlayer||0)<1||o.rematchAccepted)return;
     o.rematchAccepted=true;state.hype=clamp(state.hype+3,0,100);trackEvent('rival_taunted',{prior_meetings:o.meetings||0});initAudio();sfx.rage();shake(true);updateUI();toast(`${o.name} TOOK THE BAIT · REMATCH ACCEPTED!`,'#ffb157');
@@ -1645,5 +1596,5 @@
   observeLandingFeatures();
   writeHistory('screen','replace');
   if(state.nameLocked)connectSharedSocial(true);
-  trackEvent('game_open',{returning_career:landingMode==='returning',setup_complete:landingMode==='returning'});trackEvent('landing_view',{career_state:landingMode});
+  const initialLandingMode=landingFeature.status().mode;trackEvent('game_open',{returning_career:initialLandingMode==='returning',setup_complete:initialLandingMode==='returning'});trackEvent('landing_view',{career_state:initialLandingMode});
 })();
