@@ -18,14 +18,22 @@ interactions from `game.js`.
   current level, record, Followers, and a **Keep Grinding** action. A partially
   completed fighter receives **Continue Your Build** instead of being mistaken
   for a new or finished career.
-- New players see a concise career pitch covering fight plans, training,
-  hustles, drops, sponsors, and the title climb before choosing **Start Your
-  Career**. Choosing an entry action never resets or replaces the recovered
-  local save.
-- On phones, the personalized headline and entry action appear before the
-  octagon artwork and longer feature pitch. The landing shell uses the safe
-  viewport and device inset so the full action remains above the browser fold.
-  An inset rounded border matches the panel treatment used throughout the game.
+- New players see **Build Your MMA Fighter. Become World Champion.**, a compact
+  gameplay preview, and the **Play Free Now** action. The preview reuses a small
+  fighter asset and game-style record, fight-plan, and title-progression UI so
+  it stays lightweight. Choosing an entry action never resets or replaces the
+  recovered local save.
+- A non-blocking World Championship panel uses the shared championship client
+  to show the current handle and successful defenses. Loading, vacant, and
+  offline states use quiet fallbacks; none can disable or delay career entry.
+- New-player landing pages scroll to three game-styled feature cards covering
+  fighter creation, fight planning, and the shared title chase. On phones, the
+  headline, entry action, automatic-save message, and championship proof remain
+  near the top, while returning careers and unfinished builds keep their
+  personalized copy and recovery actions.
+- `landing_view` and `landing_enter` remain the primary funnel events.
+  `landing_feature_view` records only when a new player actually reaches the
+  feature-card section.
 
 ### Responsive desktop interface
 
