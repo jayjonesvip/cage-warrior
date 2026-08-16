@@ -50,7 +50,7 @@
     }
 
     async function loadProfiles(limit=100){
-      const count=Math.max(1,Math.min(200,Math.floor(Number(limit))||100));
+      const count=Math.max(1,Math.min(1000,Math.floor(Number(limit))||100));
       const rows=await database.selectCageProfiles(count);
       const active=await database.ensureSession();
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];

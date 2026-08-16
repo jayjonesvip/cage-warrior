@@ -30,7 +30,7 @@
     const status=String(champ?.eligibility_status||'');
     const model={eyebrow:'CAGE GRIND · ONE BELT',title:'WORLD CHAMPIONSHIP',kicker:'TITLE STATUS',headline:'CONNECTING TO WORLD TITLE',meta:'Loading the current champion and title requirements.'};
     if(champ?.is_champion){
-      model.kicker='REIGNING WORLD CHAMPION';model.headline='YOU HOLD THE BELT';model.meta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'} · EVERY REAL-USER FIGHT PUTS IT ON THE LINE`;
+      model.kicker='REIGNING WORLD CHAMPION';model.headline='YOU HOLD THE BELT';model.meta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'} · EVERY RANKED FIGHT PUTS IT ON THE LINE`;
     }else if(champ?.champion_handle){
       const championHandle=`@${champ.champion_handle}`,requiredLevel=Math.max(1,Math.floor(Number(champ.champion_level))||1);
       if(champ.former_champion){
@@ -39,7 +39,7 @@
         model.kicker=level>=requiredLevel?'TITLE CONTENDER':'CURRENT WORLD CHAMPION';model.headline=championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):champ.challenge_eligible?`YOU'RE ELIGIBLE · CHAMPION LVL ${requiredLevel} · YOU LVL ${level}`:`REACH LEVEL ${requiredLevel} TO CHALLENGE FOR THE BELT`;
       }
     }else if(loaded&&!unavailable){
-      model.kicker='BELT VACANT';model.headline='THE WORLD TITLE IS OPEN';model.meta='ONE BELT · REAL FIGHTERS ONLY';
+      model.kicker='BELT VACANT';model.headline='THE WORLD TITLE IS OPEN';model.meta='ONE BELT · RANKED FIGHTERS ONLY';
     }else if(unavailable){
       model.kicker='CAGE NETWORK OFFLINE';model.headline='TITLE UPDATE UNAVAILABLE';model.meta='Reconnect to load the current champion.';
     }

@@ -279,14 +279,19 @@
   function playerTrailing(rounds){const score=fightScore(rounds);return score.player<score.opponent}
 
   function opponentState(opponent,{level}){
+    if(opponent.globalChampionship&&opponent.championDefense){
+      if(level<opponent.tier)return 'locked';
+      if(level>opponent.tier)return 'passed';
+      return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
+    }
     if(opponent.globalChampionship)return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
     if(level<opponent.tier)return 'locked';
     if(level>opponent.tier)return 'passed';
     return 'current';
   }
 
-  function opponentGroup(opponent,context){return !opponent.globalChampionship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
-  function opponentAvailable(opponent,context){const status=opponentGroup(opponent,context);return ['title','current','passed'].includes(status)||(status==='rival'&&opponent.rematchAccepted===true)}
+  function opponentGroup(opponent,context){return !opponent.network&&!opponent.globalChampionship&&nonNegativeWhole(opponent.lossesToPlayer)>0?'rival':opponentState(opponent,context)}
+  function opponentAvailable(opponent,context){if(opponent.globalChampionship&&opponent.titleCooldown)return false;const status=opponentGroup(opponent,context);return ['title','current','passed'].includes(status)||(status==='rival'&&opponent.rematchAccepted===true)}
   function championshipCareerRank(level,championship){
     const fighterLevel=Math.max(1,whole(level,1)),title=championship&&typeof championship==='object'?championship:null;
     if(title?.is_champion)return 'WORLD CHAMPION';
