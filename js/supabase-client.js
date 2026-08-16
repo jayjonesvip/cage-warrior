@@ -42,6 +42,14 @@
     let session=normalizeSession(safeRead(storage,SESSION_KEY));
     let sessionPromise=null;
 
+    function storedSession(){return normalizeSession(safeRead(storage,SESSION_KEY))}
+    function adoptNewerStoredSession(){
+      const stored=storedSession();
+      if(!stored)return session;
+      if(!session||stored.user.id===session.user.id&&stored.refresh_token!==session.refresh_token)session=stored;
+      return session;
+    }
+
     function configured(){return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)&&/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)&&typeof fetchImpl==='function'}
 
     async function request(path,{method='GET',body,token,headers={}}={}){
@@ -69,16 +77,22 @@
 
     async function refreshSession(){
       if(!session?.refresh_token)return null;
+      const attempted=session;
       try{
         const data=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
         return rememberSession(data);
       }catch(error){
-        if(error?.status===400||error?.status===401){rememberSession(null);return null}
+        if(error?.status===400||error?.status===401){
+          const stored=storedSession();
+          if(stored&&stored.user.id===attempted.user.id&&stored.refresh_token!==attempted.refresh_token){session=stored;return refreshSession()}
+          throw new Error('Fighter session expired. Reopen the browser profile that created this fighter.');
+        }
         throw error;
       }
     }
 
     async function establishSession(){
+      adoptNewerStoredSession();
       const currentTime=Math.floor(now()/1000);
       if(session&&session.expires_at>currentTime+60)return session;
       if(session&&await refreshSession())return session;
@@ -101,7 +115,7 @@
       try{return await request(path,Object.assign({},options,{token:active.access_token}))}
       catch(error){
         if(error.status!==401)throw error;
-        rememberSession(null);active=await ensureSession();
+        session=active;active=await refreshSession();
         return request(path,Object.assign({},options,{token:active.access_token}));
       }
     }

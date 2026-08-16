@@ -75,6 +75,55 @@ test('expired anonymous sessions refresh without creating a second player identi
   assert.deepEqual(JSON.parse(calls[0].options.body), { refresh_token: 'refresh-token' });
 });
 
+test('an invalid refresh token never replaces an established fighter with a new anonymous identity', async () => {
+  const oldSession = { ...session, access_token: 'expired', expires_at: 10 };
+  const storage = memoryStorage({ [SESSION_KEY]: JSON.stringify(oldSession) });
+  const calls = [];
+  const client = createClient({
+    url: 'https://test.supabase.co',
+    key: 'sb_publishable_test-key',
+    storage,
+    now: () => 100_000,
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      return jsonResponse({ message: 'Invalid Refresh Token' }, 400);
+    },
+  });
+
+  await assert.rejects(client.ensureSession(), /Fighter session expired/);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /\/auth\/v1\/token\?grant_type=refresh_token$/);
+  assert.equal(normalizeSession(JSON.parse(storage.value(SESSION_KEY))).user.id, session.user.id);
+});
+
+test('a tab adopts a rotated same-fighter refresh token instead of creating a new identity', async () => {
+  const oldSession = { ...session, access_token: 'expired', refresh_token: 'old-refresh', expires_at: 10 };
+  const rotated = { ...session, access_token: 'rotated-expired', refresh_token: 'rotated-refresh', expires_at: 10 };
+  const refreshed = { ...session, access_token: 'refreshed', refresh_token: 'latest-refresh', expires_at: 9000 };
+  const storage = memoryStorage({ [SESSION_KEY]: JSON.stringify(oldSession) });
+  const calls = [];
+  const client = createClient({
+    url: 'https://test.supabase.co',
+    key: 'sb_publishable_test-key',
+    storage,
+    now: () => 100_000,
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      const token = JSON.parse(options.body).refresh_token;
+      if(token === 'old-refresh'){
+        storage.setItem(SESSION_KEY, JSON.stringify(rotated));
+        return jsonResponse({ message: 'Already Used' }, 400);
+      }
+      return jsonResponse(refreshed);
+    },
+  });
+
+  const active = await client.ensureSession();
+  assert.equal(active.access_token, 'refreshed');
+  assert.deepEqual(calls.map(call => JSON.parse(call.options.body).refresh_token), ['old-refresh','rotated-refresh']);
+  assert.ok(calls.every(call => call.url.includes('/auth/v1/token?grant_type=refresh_token')));
+});
+
 test('concurrent startup requests share one session refresh', async () => {
   const oldSession = { ...session, access_token: 'expired', expires_at: 10 };
   const refreshed = { ...session, access_token: 'refreshed', expires_at: 9000 };
