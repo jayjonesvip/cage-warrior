@@ -153,3 +153,17 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `midnight-cruiser.png` | Midnight Cruiser |
 | `redline-superbike.png` | Redline Superbike |
 | `diamond-grill.png` | Diamond Grill |
+
+## Luxury drop artwork
+
+These supplied assets use JPEG artwork; their item definitions set `assetExt:'jpg'`.
+
+| Filename | Item |
+| --- | --- |
+| `designer-sunglasses.jpg` | Designer Sunglasses |
+| `diamond-cluster-ring.jpg` | Diamond Cluster Ring |
+| `shrimp-cocktail.jpg` | Victory Shrimp Cocktail |
+| `performance-jet-ski.jpg` | Performance Jet Ski |
+| `coastal-speedboat.jpg` | Coastal Speedboat |
+| `luxury-yacht.jpg` | Luxury Yacht |
+| `private-jet.jpg` | Private Jet |
