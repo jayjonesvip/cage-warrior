@@ -7,9 +7,9 @@
 Cage Grind is a mobile-first, single-player combat-career game. Open
 `index.html` directly in a modern browser; no build step or server is required.
 The page uses ordinary, ordered scripts with no bundler. Shared presentation
-lives in `styles.css`; the landing screen has its own `landing.css` and
-`landing.js`; fight planning and fight-focus flows live in `fight-plan.js` and
-`fight-focus.js`; and `game.js` coordinates those features with the career.
+lives in `css/styles.css`; the landing screen has its own `css/landing.css` and
+`js/landing.js`; fight planning and fight-focus flows live in `js/fight-plan.js`
+and `js/fight-focus.js`; and `js/game.js` coordinates those features with the career.
 
 ### Landing page
 
@@ -457,13 +457,13 @@ npm test
 ```
 
 The game uses static HTML, CSS, and ordinary scripts without a build step.
-`game-logic.js` contains shared rule helpers used by the browser and behavioral
-tests. `game.js` remains the coordinator; `landing.js`, `fight-plan.js`, and
-`fight-focus.js` own their feature flows and receive state/UI callbacks from the
-coordinator. `fight-focus-contacts.js` owns the locker-room contact and message
-data, while `strings.js` groups the remaining opponent, commentary, Cage Feed,
+`js/game-logic.js` contains shared rule helpers used by the browser and behavioral
+tests. `js/game.js` remains the coordinator; `js/landing.js`, `js/fight-plan.js`, and
+`js/fight-focus.js` own their feature flows and receive state/UI callbacks from the
+coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and message
+data, while `js/strings.js` groups the remaining opponent, commentary, Cage Feed,
 username, and ticker copy. Script order in `index.html` and the service-worker
-precache list must keep data and feature modules ahead of `game.js`.
+precache list must keep data and feature modules ahead of `js/game.js`.
 The generated transparent header wordmark lives at
 `assets/cage-grind-logo.png`. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
@@ -497,7 +497,7 @@ verified standalone launch grants exactly one deterministic collectible drop,
 then permanently hides the offer for that saved career.
 
 `service-worker.js` caches the core shell and previously visited same-origin
-assets for offline fallback. `pwa.js` checks uncached `app-version.json` on
+assets for offline fallback. `js/pwa.js` checks uncached `app-version.json` on
 startup, when the app returns to the foreground, and when connectivity returns.
 If a newer semantic version is deployed, the game opens a styled update dialog;
 updating reloads code without modifying the career save. For each release, keep
@@ -507,7 +507,7 @@ and `service-worker.js` synchronized. Tests enforce that contract.
 ### Supabase Cage Feed setup
 
 Low-level Supabase authentication, session recovery, REST, and RPC calls live in
-`supabase-client.js`; Cage Feed-specific queries live in `cage-social.js`.
+`js/supabase-client.js`; Cage Feed-specific queries live in `js/cage-social.js`.
 Both remain dependency-free browser scripts. Apply the SQL files in
 `supabase/migrations/` in filename order using the Supabase SQL Editor (or the
 Supabase CLI). The avatar migration adds each career portrait to its public
@@ -528,7 +528,7 @@ the intentionally public browser key.
 ## Analytics
 
 Google Analytics 4 measurement ID `G-LMT6RLVT5L` is loaded from the page head.
-`analytics.js` validates event and parameter names, strips unsupported values,
+`js/analytics.js` validates event and parameter names, strips unsupported values,
 limits string lengths, and treats analytics failures as non-fatal so tracking
 can never interrupt gameplay. The initial event set covers career setup and
 starts, screen navigation, training and recovery, hustles and publicity,

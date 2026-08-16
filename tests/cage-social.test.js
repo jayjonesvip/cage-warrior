@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { SESSION_KEY, normalizeSession } = require('../supabase-client.js');
-const { createClient } = require('../cage-social.js');
+const { SESSION_KEY, normalizeSession } = require('../js/supabase-client.js');
+const { createClient } = require('../js/cage-social.js');
 
 function jsonResponse(data, status = 200) {
   return {

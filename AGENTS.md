@@ -7,13 +7,13 @@ This repository contains Cage Grind, a mobile-first browser game built with plai
 ## Key files
 
 - `index.html` — app shell and page metadata
-- `styles.css` — layout, responsive styling, and game presentation
-- `strings.js` — content strings and copy pools
-- `game-logic.js` — testable state logic and progression rules
-- `game.js` — browser-side interactions and UI wiring
-- `analytics.js` — non-fatal analytics tracking wrapper
-- `cage-social.js` — shared social feed integration
-- `supabase-client.js` — authenticated Supabase client wrapper
+- `css/styles.css` — layout, responsive styling, and game presentation
+- `js/strings.js` — content strings and copy pools
+- `js/game-logic.js` — testable state logic and progression rules
+- `js/game.js` — browser-side interactions and UI wiring
+- `js/analytics.js` — non-fatal analytics tracking wrapper
+- `js/cage-social.js` — shared social feed integration
+- `js/supabase-client.js` — authenticated Supabase client wrapper
 - `tests/*.test.js` — project validation tests
 - `assets/` — branded PNG assets and icons
 
@@ -38,5 +38,5 @@ This repo uses Node's built-in test runner for validation. Keep changes compatib
 ## Repository context
 
 - Game behavior is intentionally described in `README.md` and enforced by tests.
-- Core progression logic is centralized in `game-logic.js` rather than scattered across UI code.
+- Core progression logic is centralized in `js/game-logic.js` rather than scattered across UI code.
 - Social and Supabase features are isolated behind the public client wrappers and should remain non-fatal when network issues occur.

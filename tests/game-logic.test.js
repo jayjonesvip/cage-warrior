@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const logic = require('../game-logic.js');
+const logic = require('../js/game-logic.js');
 
 const defaults = {
   level:1,xp:0,cash:0,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
