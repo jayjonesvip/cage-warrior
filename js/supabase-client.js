@@ -40,6 +40,7 @@
     const storage=options.storage===undefined?globalThis.localStorage:options.storage;
     const now=options.now||(()=>Date.now());
     let session=normalizeSession(safeRead(storage,SESSION_KEY));
+    let sessionPromise=null;
 
     function configured(){return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)&&/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)&&typeof fetchImpl==='function'}
 
@@ -71,10 +72,13 @@
       try{
         const data=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
         return rememberSession(data);
-      }catch{rememberSession(null);return null}
+      }catch(error){
+        if(error?.status===400||error?.status===401){rememberSession(null);return null}
+        throw error;
+      }
     }
 
-    async function ensureSession(){
+    async function establishSession(){
       const currentTime=Math.floor(now()/1000);
       if(session&&session.expires_at>currentTime+60)return session;
       if(session&&await refreshSession())return session;
@@ -82,6 +86,14 @@
       const created=rememberSession(data);
       if(!created)throw new Error('Supabase did not return an anonymous session.');
       return created;
+    }
+
+    function ensureSession(){
+      const currentTime=Math.floor(now()/1000);
+      if(session&&session.expires_at>currentTime+60)return Promise.resolve(session);
+      if(sessionPromise)return sessionPromise;
+      sessionPromise=establishSession().finally(()=>{sessionPromise=null});
+      return sessionPromise;
     }
 
     async function authenticatedRequest(path,options={}){
