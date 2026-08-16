@@ -35,6 +35,7 @@ const cageCeoMigration = fs.readFileSync('supabase/migrations/20260812120000_cag
 const cageChampionshipMigration = fs.readFileSync('supabase/migrations/20260814120000_global_cage_championship.sql', 'utf8');
 const sanctionedChampionshipMigration = fs.readFileSync('supabase/migrations/20260814143000_daily_sanctioned_championship_bouts.sql', 'utf8');
 const rematchVisibilityMigration = fs.readFileSync('supabase/migrations/20260815160000_title_rematch_visibility_and_ceo_results.sql', 'utf8');
+const careerScopedTitleMigration = fs.readFileSync('supabase/migrations/20260816120000_scope_title_history_to_active_careers.sql', 'utf8');
 const manualIdentityMigration = fs.readFileSync('supabase/migrations/20260815143000_manual_fighter_handles.sql', 'utf8');
 const twoArchetypeMigration = fs.readFileSync('supabase/migrations/20260815200000_two_major_archetypes.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
@@ -579,6 +580,16 @@ test('sanctioned championship bouts are daily, non-repeatable, and automatic for
   assert.match(rematchVisibilityMigration, /create trigger cage_title_defense_ceo_voice[\s\S]*before insert on public\.cage_feed_posts/);
 });
 
+test('retired title history does not block a newly claimed fighter career', () => {
+  assert.match(twoArchetypeMigration, /on conflict \(id\) do update set[\s\S]*created_at=now\(\)[\s\S]*retired_at=null/);
+  assert.match(careerScopedTitleMigration, /create or replace function public\.get_cage_championship\(\)/);
+  assert.match(careerScopedTitleMigration, /create or replace function public\.begin_cage_championship_challenge\(p_opponent_id uuid default null\)/);
+  const careerBoundaries=careerScopedTitleMigration.match(/prior\.started_at>=greatest\((?:champion\.created_at,viewer\.created_at|v_champion\.created_at,v_challenger\.created_at)\)/g)||[];
+  assert.equal(careerBoundaries.length,3,'both status branches and server authorization must use the active-career boundary');
+  assert.doesNotMatch(careerScopedTitleMigration, /delete from public\.cage_championship_challenges/);
+  assert.match(careerScopedTitleMigration, /Historical bouts remain preserved/);
+});
+
 test('fighter identity is globally unique, permanent, and locked before the career starts', () => {
   assert.match(html, /<small>Followers<\/small><b id="careerFollowersText">0<\/b>/);
   assert.doesNotMatch(html, /homeAvatarText|<small>Fighter Avatar<\/small>/);
@@ -676,6 +687,7 @@ test('retirement is warned, reported, and clears only Cage Grind career saves', 
   assert.doesNotMatch(script, /localStorage\.clear\(/);
   assert.match(cageIdentityMigration, /'cagereporter','reporter',[\s\S]*has officially retired from competition/i);
   assert.match(cageIdentityMigration, /update public\.cage_name_registry\s+set retired_at=now\(\)/i);
+  assert.match(readme, /newly claimed fighter starts\s+with fresh title-shot eligibility/i);
 });
 
 test('career opponent roster uses proportional two-across collectible fighter cards', () => {
