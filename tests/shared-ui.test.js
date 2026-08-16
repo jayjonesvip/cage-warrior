@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 
 const context = {};
 vm.runInNewContext(fs.readFileSync('js/shared-ui.js', 'utf8'), context);
-const { championshipCardModel } = context.CAGE_SHARED_UI;
+const { championshipCardModel, isCurrentChampion } = context.CAGE_SHARED_UI;
 
 test('shared championship card presents contenders consistently everywhere', () => {
   const model = championshipCardModel({
@@ -23,6 +23,8 @@ test('shared championship card presents contenders consistently everywhere', () 
 
 test('shared championship card covers champion, vacant, and offline states', () => {
   assert.equal(championshipCardModel({championship:{is_champion:true,defenses:1}}).headline, 'YOU HOLD THE BELT');
+  assert.equal(championshipCardModel({championship:{champion_handle:'JayJonesVIP',defenses:2},state:{name:'@jayjonesvip'}}).headline, 'YOU HOLD THE BELT');
+  assert.equal(isCurrentChampion({champion_handle:'JayJonesVIP'},{name:'DifferentFighter'}), false);
   assert.equal(championshipCardModel({loaded:true}).headline, 'THE WORLD TITLE IS OPEN');
   assert.equal(championshipCardModel({unavailable:true}).headline, 'TITLE UPDATE UNAVAILABLE');
 });

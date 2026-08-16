@@ -7,13 +7,23 @@
     return `TITLE WINDOW REOPENS ${reset.toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})}`.toUpperCase();
   }
 
+  function normalizedFighterHandle(value){
+    return String(value||'').trim().replace(/^@/,'').toLowerCase();
+  }
+
+  function isCurrentChampion(championship,state={}){
+    if(championship?.is_champion===true)return true;
+    const championHandle=normalizedFighterHandle(championship?.champion_handle),fighterHandle=normalizedFighterHandle(state.name);
+    return !!championHandle&&championHandle===fighterHandle;
+  }
+
   function championshipCardModel({championship,state={},loaded=false,unavailable=false}={}){
     const champ=championship&&typeof championship==='object'?championship:null;
     const level=Math.max(1,Math.floor(Number(state.level))||1);
     const defenses=Math.max(0,Math.floor(Number(champ?.defenses))||0);
     const status=String(champ?.eligibility_status||'');
     const model={eyebrow:'CAGE GRIND · ONE BELT',title:'WORLD CHAMPIONSHIP',kicker:'TITLE STATUS',headline:'CONNECTING TO WORLD TITLE',meta:'Loading the current champion and title requirements.'};
-    if(champ?.is_champion){
+    if(isCurrentChampion(champ,state)){
       model.kicker='REIGNING WORLD CHAMPION';model.headline='YOU HOLD THE BELT';model.meta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'} · EVERY REAL-USER FIGHT PUTS IT ON THE LINE`;
     }else if(champ?.champion_handle){
       const championHandle=`@${champ.champion_handle}`,requiredLevel=Math.max(1,Math.floor(Number(champ.champion_level))||1);
@@ -41,5 +51,5 @@
     return model;
   }
 
-  root.CAGE_SHARED_UI={championshipCardModel,renderChampionshipCard,championshipResetCopy:resetCopy};
+  root.CAGE_SHARED_UI={championshipCardModel,renderChampionshipCard,championshipResetCopy:resetCopy,isCurrentChampion};
 })(globalThis);

@@ -9,9 +9,9 @@
       sharedUi.renderChampionshipCard($('#landingChampionPanel'),{championship:getChampionship(),state:getState(),loaded:championshipLoaded,unavailable:championshipUnavailable,headingId:'landingChampionHeading'});
     }
     function render(){
-      const state=getState();mode=logic.careerLandingMode(state);const returning=mode==='returning',building=mode==='building',champion=returning&&getChampionship()?.is_champion===true,page=$('#landingPage');page.dataset.mode=mode;
+      const state=getState();mode=logic.careerLandingMode(state);const returning=mode==='returning',building=mode==='building',champion=returning&&sharedUi.isCurrentChampion(getChampionship(),state),page=$('#landingPage');page.dataset.mode=mode;
       $('#landingEyebrow').textContent=champion?'THE CHAMP IS BACK':returning?'YOUR CAREER IS WAITING':building?'FIGHTER BUILD IN PROGRESS':'YOUR FIGHT STARTS HERE';
-      $('#landingTitleLead').textContent=champion?'WELCOME BACK, CHAMP!':returning?'WELCOME BACK,':building?'FINISH YOUR':'BUILD YOUR MMA FIGHTER.';
+      const titleLead=$('#landingTitleLead');titleLead.textContent=champion?'WELCOME BACK, ':returning?'WELCOME BACK,':building?'FINISH YOUR':'BUILD YOUR MMA FIGHTER.';if(champion){const champAccent=document.createElement('span');champAccent.className='champ-accent';champAccent.textContent='CHAMP!';titleLead.append(champAccent)}
       $('#landingTitleAccent').textContent=returning?state.name:building?'FIGHTER BUILD':'BECOME WORLD CHAMPION.';
       $('#landingDescription').textContent=returning?'Your fight plan and your rivals are waiting. Pick up the climb exactly where you left it.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Train, hustle, choose fight strategies, earn sponsors, and climb a shared world ranking.';
       $('#landingEnterBtn').textContent=returning?'CONTINUE CAREER':building?'CONTINUE YOUR BUILD':'PLAY FREE NOW';
