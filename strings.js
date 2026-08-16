@@ -50,7 +50,7 @@ globalThis.CAGE_STRINGS = {
 
   fightFocus: {
     contacts: [
-      {id:'mom',name:'MOM',avatar:'assets/contact-mom.jpg?v=2.5.83',ignoreDelta:-4,ignoreText:'You leave Mom’s message unread, but keep wondering why she texted tonight.',messages:[
+      {id:'mom',name:'MOM',avatar:'assets/contact-mom.jpg?v=2.5.84',ignoreDelta:-4,ignoreText:'You leave Mom’s message unread, but keep wondering why she texted tonight.',messages:[
         {id:'mom-proud',text:'We are so proud of you. Go show them who you are. ❤️',focus:100},
         {id:'mom-watch-party',text:'The whole family is here in your shirts. This house is LOUD. We love you!',delta:12},
         {id:'mom-dad-advice',text:'Dad says keep your hands up, breathe, and call us after you win.',delta:7},
@@ -68,7 +68,7 @@ globalThis.CAGE_STRINGS = {
         {id:'mom-pipe-burst',text:'A pipe burst at the house. There is water everywhere, but we are handling it.',delta:-7},
         {id:'mom-urgent-call',text:'Call me as soon as you can. It is important. I do not want to put it in a text.',delta:-12}
       ]},
-      {id:'wife',name:'WIFE',avatar:'assets/contact-wife.jpg?v=2.5.83',ignoreDelta:-5,ignoreText:'You leave your wife’s message unread, and the notification follows you toward the cage.',messages:[
+      {id:'wife',name:'WIFE',avatar:'assets/contact-wife.jpg?v=2.5.84',ignoreDelta:-5,ignoreText:'You leave your wife’s message unread, and the notification follows you toward the cage.',messages:[
         {id:'wife-good-luck',text:'Good luck, baby. Trust your work. We love you and we are already proud. ❤️',delta:10},
         {id:'wife-sexy-photo',text:'[Photo] Win fast. I have plans for you when you get home. 😘',delta:12},
         {id:'wife-kids-video',text:'The kids made you a video. They keep yelling “BRING HOME THE WIN!”',delta:15},
@@ -86,7 +86,7 @@ globalThis.CAGE_STRINGS = {
         {id:'wife-talk',text:'We need to talk when you get home. This cannot keep going the way it has.',delta:-20},
         {id:'wife-car',text:'The car will not start. If you are able, I need you to pick us up afterward.',delta:-6}
       ]},
-      {id:'brother-tommy',name:'BROTHER TOMMY',avatar:'assets/contact-brother-tommy.png?v=2.5.83',ignoreDelta:-3,ignoreText:'You leave Tommy’s message unread. With him, that could mean anything.',messages:[
+      {id:'brother-tommy',name:'BROTHER TOMMY',avatar:'assets/contact-brother-tommy.png?v=2.5.84',ignoreDelta:-3,ignoreText:'You leave Tommy’s message unread. With him, that could mean anything.',messages:[
         {id:'tommy-front-row',text:'Good luck. I’m in the front row. I’ll be the loud one.',delta:10},
         {id:'tommy-payback',text:'I got paid, so I’ll finally pay you back after the fight. Every dollar.',delta:8},
         {id:'tommy-family-proud',text:'Everybody is proud of you. Tonight is yours. Go handle it.',minimum:95},
@@ -98,7 +98,7 @@ globalThis.CAGE_STRINGS = {
         {id:'tommy-police',text:'Do you know anybody who can get me out of the police station tonight?',delta:-20},
         {id:'tommy-bet',text:'I bet money I did not have on you tonight. You really need to win.',delta:-16}
       ]},
-      {id:'agent-carl',name:'AGENT CARL',avatar:'assets/contact-agent-carl.png?v=2.5.83',ignoreDelta:-2,ignoreText:'You leave Carl on unread, but wonder what deal—or problem—he is sitting on.',messages:[
+      {id:'agent-carl',name:'AGENT CARL',avatar:'assets/contact-agent-carl.png?v=2.5.84',ignoreDelta:-2,ignoreText:'You leave Carl on unread, but wonder what deal—or problem—he is sitting on.',messages:[
         {id:'carl-sponsor',text:'Big sponsor in the front row. Put on a show and I can make the phone ring tomorrow.',delta:9},
         {id:'carl-purse',text:'I squeezed another bonus into the deal. Win tonight and the number gets very interesting.',delta:7},
         {id:'carl-fees',text:'Small paperwork issue: my expenses come out before your purse. We’ll discuss the total later.',delta:-12},
@@ -110,7 +110,7 @@ globalThis.CAGE_STRINGS = {
   social: {
     profiles: {
       media: {author:'CageReporter',handle:'@CageReporter',tone:'media'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.83',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.84',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -295,40 +295,15 @@ globalThis.CAGE_STRINGS = {
       }
     },
     matchups: {
-      pressure: {
-        advice:"They're walking you down and building volume. Make them reset before they can swarm.",
-        plan:'counter',action:'CIRCLE OFF THE FENCE',
-        description:'Draw the rush, change the angle, and punish the opening.'
+      striker: {
+        advice:"They're built to keep this standing and punish you with combinations. Break the range before the power builds.",
+        plan:'grappler',action:'TAKE AWAY THE STAND-UP',
+        description:'Close distance, change levels, and force the fight into grappling exchanges.'
       },
-      counter: {
-        advice:"They're waiting for you to overreach. Give them feints, not easy counters.",
-        plan:'control',action:'STOP CHASING',
-        description:'Crowd their timing and make them work before they can set a trap.'
-      },
-      brawler: {
-        advice:"They're loading up for one big shot. Stay composed and make every swing cost them.",
-        plan:'control',action:'STAY OUT OF THE POCKET',
-        description:'Smother the power, control the position, and deny the wild exchange.'
-      },
-      trickster: {
-        advice:"They're breaking rhythm with feints and odd angles. Keep the picture simple and own the center.",
-        plan:'control',action:'CONTROL THE DISTANCE',
-        description:'Cut off the exits and force them into a predictable exchange.'
-      },
-      control: {
-        advice:"They're driving every exchange toward the fence. Win the first grip and get your back off the cage.",
-        plan:'submission',action:'DEFEND THE TAKEDOWN',
-        description:'Stay dangerous in the scramble and attack every exposed neck or limb.'
-      },
-      submission: {
-        advice:"They're hunting your neck whenever the distance closes. Protect the entry and make them pay for reaching.",
-        plan:'pressure',action:'PROTECT YOUR NECK',
-        description:'Keep them backing up so they cannot settle into submission attacks.'
-      },
-      wrestleBox: {
-        advice:"They're mixing hands with level changes. Make them commit to one phase before you answer.",
-        plan:'submission',action:'MAKE THEM COMMIT',
-        description:'Read the transition and attack when they switch between striking and wrestling.'
+      grappler: {
+        advice:"They're driving every exchange toward takedowns and control. Protect your hips and make every entry cost them.",
+        plan:'striker',action:'KEEP IT STANDING',
+        description:'Own the range, punish level changes, and deny settled grappling positions.'
       }
     }
   },

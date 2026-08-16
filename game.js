@@ -17,7 +17,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.83';
+  const ICON_ASSET_VERSION = '2.5.84';
   function gameIcon(name,fallback){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.png?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -29,7 +29,7 @@
   let careerSaveKnown = false;
 
   const defaultState = {
-    version:21,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
+    version:22,name:'ROOKIE',nameLocked:false,cash:0,careerEarnings:0,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,
     energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
     stats:{power:5,speed:5,chin:5,cardio:5},
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,treatmentAvailable:true,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
@@ -92,23 +92,14 @@
   const HISTORY_KEY='cageGrind';
 
   const planDefs = [
-    {id:'pressure',icon:'🌊',name:'PRESSURE FIGHTER',text:'Drown them with pace and volume. Vulnerable to clean counters.'},
-    {id:'counter',icon:'🎯',name:'COUNTER-STRIKER',text:'Wait, draw the attack, then punish. Gives up initiative.'},
-    {id:'brawler',icon:'💥',name:'BRAWLER',text:'Trade defense for knockout power and heavy exchanges.'},
-    {id:'trickster',icon:'🌀',name:'TRICKSTER',text:'Break their timing with kicks, feints, and unorthodox attacks.'},
-    {id:'control',icon:'🔒',name:'CONTROL GRAPPLER',text:'Secure takedowns and smother them with top control.'},
-    {id:'submission',icon:'🐍',name:'SUBMISSION HUNTER',text:'Chase the tap from every grappling exchange.'},
-    {id:'wrestleBox',icon:'🥊',name:'WRESTLE-BOXER',text:'Blend crisp hands and takedowns to keep them guessing.'}
+    {id:'striker',icon:'🥊',name:'STRIKER',text:'Keep the fight standing with fast combinations, kicks, and knockout power.'},
+    {id:'grappler',icon:'🔒',name:'GRAPPLER',text:'Take the fight down, control position, and hunt the submission.'}
   ];
   const fighterStyles = [
-    {id:'pressure',icon:'🌊',name:'PRESSURE FIGHTER',text:'+2 Cardio. Relentless pace and volume.',stats:{cardio:2},plan:'pressure'},
-    {id:'counter',icon:'🎯',name:'COUNTER-STRIKER',text:'+2 Speed. Patient, precise punishment.',stats:{speed:2},plan:'counter'},
-    {id:'brawler',icon:'💥',name:'BRAWLER',text:'+2 Power. Dangerous in wild exchanges.',stats:{power:2},plan:'brawler'},
-    {id:'trickster',icon:'🌀',name:'TRICKSTER / UNORTHODOX',text:'+1 Speed and Cardio. Disrupts conventional timing.',stats:{speed:1,cardio:1},plan:'trickster'},
-    {id:'control',icon:'🔒',name:'CONTROL GRAPPLER',text:'+1 Power and Cardio. Positional dominance.',stats:{power:1,cardio:1},plan:'control'},
-    {id:'submission',icon:'🐍',name:'SUBMISSION HUNTER',text:'+1 Speed and Cardio. Always hunting the tap.',stats:{speed:1,cardio:1},plan:'submission'},
-    {id:'wrestleBox',icon:'🥊',name:'WRESTLE-BOXER',text:'+1 Power and Speed. Blends hands and takedowns.',stats:{power:1,speed:1},plan:'wrestleBox'}
+    {id:'striker',icon:'🥊',name:'STRIKER',text:'+1 Power and Speed. Better stand-up offense and knockout pressure.',stats:{power:1,speed:1},plan:'striker'},
+    {id:'grappler',icon:'🔒',name:'GRAPPLER',text:'+1 Power and Cardio. Better takedowns, control, and submissions.',stats:{power:1,cardio:1},plan:'grappler'}
   ];
+  function normalizeMajorArchetype(value){return ['control','submission','wrestleBox','wrestle','wrestler','grappler'].includes(value)?'grappler':['pressure','counter','brawler','trickster','technician','endurance','tank','cardio','striker'].includes(value)?'striker':''}
   const fighterAvatars = [
     {id:'fighter-01',asset:'assets/fighter-avatar-01.png',stats:{power:8,speed:6,chin:2,cardio:4}},
     {id:'fighter-02',asset:'assets/fighter-avatar-02.png',stats:{power:7,speed:6,chin:3,cardio:4}},
@@ -168,13 +159,8 @@
   let opponents=[];
   const opponentNameCountries=STRINGS.opponentNames.countries;
   const opponentArchetypes=[
-    {id:'pressure',tag:'PRESSURE FIGHTER',tendency:'pressure',scout:'Counter the march or control the pace before the volume builds.',mods:{power:0,speed:0,chin:0,cardio:2}},
-    {id:'counter',tag:'COUNTER-STRIKER',tendency:'counter',scout:'Feints and takedown threats deny the clean counter window.',mods:{power:0,speed:2,chin:0,cardio:0}},
-    {id:'brawler',tag:'BRAWLER',tendency:'brawler',scout:'Avoid a firefight. Precision and control beat raw power.',mods:{power:2,speed:-1,chin:1,cardio:0}},
-    {id:'trickster',tag:'TRICKSTER / UNORTHODOX',tendency:'trickster',scout:'Steady pressure can crowd the space needed for flashy attacks.',mods:{power:-1,speed:2,chin:-1,cardio:1}},
-    {id:'control',tag:'CONTROL GRAPPLER',tendency:'control',scout:'Do not grapple on their terms. Damage the entries or stay mobile.',mods:{power:1,speed:0,chin:0,cardio:1}},
-    {id:'submission',tag:'SUBMISSION HUNTER',tendency:'submission',scout:'Top control is never safe. Keep exchanges standing or stay positionally disciplined.',mods:{power:0,speed:1,chin:-1,cardio:1}},
-    {id:'wrestleBox',tag:'WRESTLE-BOXER',tendency:'wrestleBox',scout:'Their threat comes from mixing levels. Force them into one predictable phase.',mods:{power:1,speed:1,chin:0,cardio:0}}
+    {id:'striker',tag:'STRIKER',tendency:'striker',scout:'Expect combinations, kicks, and knockout pressure. Disrupt the range or force grappling exchanges.',mods:{power:1,speed:1,chin:0,cardio:0}},
+    {id:'grappler',tag:'GRAPPLER',tendency:'grappler',scout:'Expect level changes, fence control, and submission attacks. Punish entries and protect position.',mods:{power:1,speed:0,chin:0,cardio:1}}
   ];
   const rosterColors=['#b94a35','#377ea6','#7c5836','#9f2c43','#8052a6','#267ca8','#566b85','#2e6aa8','#326f63','#8a6a2e'];
   function rosterPick(list,seed){return list[Math.abs(seed)%list.length]}
@@ -187,7 +173,7 @@
   function hashSeed(text){let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return hash>>>0}
   function seededRandom(seed){let value=seed>>>0;return ()=>{value+=0x6D2B79F5;let n=value;n=Math.imul(n^n>>>15,n|1);n^=n+Math.imul(n^n>>>7,n|61);return ((n^n>>>14)>>>0)/4294967296}}
   function normalizeOpponentArchetype(o){
-    if(!o)return;const legacy={wrestle:'control',wrestler:'control',tank:'brawler',cardio:'pressure'},id=legacy[o.archetype]||legacy[o.tendency]||o.archetype||o.tendency,arch=opponentArchetypes.find(a=>a.id===id)||opponentArchetypes[0];o.archetype=arch.id;o.tendency=arch.id;o.tag=arch.tag;o.scout=arch.scout;
+    if(!o)return;const id=normalizeMajorArchetype(o.archetype)||normalizeMajorArchetype(o.tendency)||'striker',arch=opponentArchetypes.find(a=>a.id===id)||opponentArchetypes[0];o.archetype=arch.id;o.tendency=arch.id;o.tag=arch.tag;o.scout=arch.scout;
   }
   function ensureProfessionalRecord(o){if(!o||o.recordInitialized)return;const seed=hashSeed(o.key||`${o.name}|${o.tier}`);o.wins=(Number(o.wins)||0)+Math.max(1,(Number(o.tier)||1)*2+(seed%7));o.losses=(Number(o.losses)||0)+((seed>>>5)%Math.max(2,(Number(o.tier)||1)+2));o.recordInitialized=true}
   function networkOpponentDisplayName(value){const identity=STRINGS.fighterIdentity||{};return LOGIC.displayFighterIdentity(normalizeIdentityName(value),[...(identity.colors||[]),...(identity.origins||[])],[...(identity.weather||[]),...(identity.animals||[]),...(identity.combat||[])],Object.values(identity.cityCodes||{}))}
@@ -207,7 +193,7 @@
     refreshOpponents();
   }
   function networkOpponentFromProfile(profile,tier){
-    const id=String(profile?.id||''),handle=normalizeIdentityName(profile?.handle),name=networkOpponentDisplayName(handle),avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),arch=opponentArchetypes.find(item=>item.id===profile?.archetype);
+    const id=String(profile?.id||''),handle=normalizeIdentityName(profile?.handle),name=networkOpponentDisplayName(handle),avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),arch=opponentArchetypes.find(item=>item.id===normalizeMajorArchetype(profile?.archetype));
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)||!handle||!name||!avatar||!arch||Number(profile?.level)!==tier)return null;
     const seed=hashSeed(`cage-network-v1|${id}|${tier}`),difficulty=((seed%3)-1)*.7,ratings=LOGIC.networkOpponentRatings(tier,avatar.stats,arch.mods,difficulty);
     return {key:`network-${id}`,network:true,sourceProfileId:id,networkHandle:handle,networkCity:String(profile.city||''),networkPortrait:avatar.asset,fighterAvatar:avatar.id,name,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,scout:arch.scout,tier,min:tier,max:99,...ratings,reward:Math.round(125*Math.pow(1.55,tier-1)*(1+difficulty*.08)),fans:Math.round(22*Math.pow(1.48,tier-1)),color:rosterPick(rosterColors,seed),look:seed%10,wins:Math.max(0,Math.floor(Number(profile.wins))||0),losses:Math.max(0,Math.floor(Number(profile.losses))||0),winsVsPlayer:0,lossesToPlayer:0,meetings:0,rematchAccepted:false,recordInitialized:true,createdAt:Date.now()};
@@ -388,10 +374,10 @@
       const savedPlan=source.fightPlanPreference&&typeof source.fightPlanPreference==='object'?source.fightPlanPreference:{};s.fightPlanPreference={pace:['slow','fast'].includes(savedPlan.pace)?savedPlan.pace:'slow',offense:['conservative','aggressive'].includes(savedPlan.offense)?savedPlan.offense:'conservative',tactics:['stick','adapt'].includes(savedPlan.tactics)?savedPlan.tactics:'stick'};delete s.fightModePreference;
       const focusTextIds=(STRINGS.fightFocus?.contacts||[]).flatMap(contact=>contact.messages.map(message=>message.id));s.focusTextDeck=Array.isArray(source.focusTextDeck)?source.focusTextDeck.filter((id,index,deck)=>focusTextIds.includes(id)&&deck.indexOf(id)===index):[];s.lastFocusTextId=focusTextIds.includes(source.lastFocusTextId)?source.lastFocusTextId:'';delete s.focusInterruptionDeck;delete s.lastFocusInterruptionId;
       s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);s.socialProfileId=typeof source.socialProfileId==='string'&&/^[0-9a-f-]{36}$/i.test(source.socialProfileId)?source.socialProfileId:'';s.socialLastRemotePostId=Math.max(0,Math.floor(Number(source.socialLastRemotePostId))||0);s.socialRemoteInitialized=source.socialRemoteInitialized===true;s.socialFollowingCount=Math.max(0,Math.floor(Number(source.socialFollowingCount))||0);const savedHeadlineCounts=source.socialHeadlineCounts&&typeof source.socialHeadlineCounts==='object'&&!Array.isArray(source.socialHeadlineCounts)?source.socialHeadlineCounts:{};s.socialHeadlineCounts={};for(const key of ['fightWin','fightInjuredWin','fightStreak','fightLoss','appearance','viralAppearance','autographFree','autographStandard','autographExpensive','sponsor'])s.socialHeadlineCounts[key]=Math.max(0,Math.floor(Number(savedHeadlineCounts[key]))||0);s.ceoEvents=Array.isArray(source.ceoEvents)?[...new Set(source.ceoEvents.filter(key=>typeof key==='string'&&key.length<=40))].slice(-40):[];s.ceoBonusDate=typeof source.ceoBonusDate==='string'?source.ceoBonusDate:'';if(!s.socialAccountCreated){s.fans=0;s.socialFollowingCount=0}
-      const legacyStyle={technician:'counter',grappler:'control',endurance:'pressure'};s.fighterStyle=legacyStyle[s.fighterStyle]||s.fighterStyle;
-      s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['pressure','counter','brawler','trickster','control','submission','wrestleBox'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland','seattle','new-orleans','hawaii'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;delete s.milestones;s.roster=Array.isArray(s.roster)?s.roster.filter(o=>!o.championship&&!o.globalChampionship):[];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
+      s.fighterStyle=normalizeMajorArchetype(s.fighterStyle);
+      s.rosterSerial=Math.max(0,Number(s.rosterSerial)||0);s.fighterStyle=['striker','grappler'].includes(s.fighterStyle)?s.fighterStyle:'';s.fighterCity=['phoenix','los-angeles','chicago','new-york','miami','houston','cleveland','seattle','new-orleans','hawaii'].includes(s.fighterCity)?s.fighterCity:'';s.fighterAvatar=fighterAvatars.some(a=>a.id===s.fighterAvatar)?s.fighterAvatar:'';const avatar=fighterAvatars.find(a=>a.id===s.fighterAvatar);s.fighterBaseStats=avatar&&validFighterAllocation(s.fighterBaseStats)?Object.assign({},s.fighterBaseStats):avatar?Object.assign({},avatar.stats):null;delete s.milestones;s.roster=Array.isArray(s.roster)?s.roster.filter(o=>!o.championship&&!o.globalChampionship):[];s.equippedGear=Array.isArray(s.equippedGear)?s.equippedGear.filter(id=>s.gear.includes(id)):[];s.leagueInitialized=source.leagueInitialized===true;
       const coreReady=!!(s.fighterStyle&&s.fighterCity&&s.fighterAvatar&&validFighterAllocation(s.fighterBaseStats)),legacyHandle=normalizeIdentityName(source.socialHandle),legacyName=normalizeIdentityName(source.name);s.nameLocked=coreReady&&(source.nameLocked===undefined?true:source.nameLocked===true);s.name=s.nameLocked?(legacyHandle||legacyName||'cagefighter'):'ROOKIE';delete s.socialHandle;
-      s.version=21;
+      s.version=22;
       return s;
   }
   function loadState(){
@@ -739,7 +725,7 @@
   }
   function feedAge(post){if(post.createdAt){const seconds=Math.max(0,Math.floor((Date.now()-new Date(post.createdAt).getTime())/1000));if(seconds<60)return 'NOW';if(seconds<3600)return `${Math.floor(seconds/60)}M`;if(seconds<86400)return `${Math.floor(seconds/3600)}H`;return `${Math.floor(seconds/86400)}D`}const age=Math.max(0,state.socialCycle-(Number(post.cycle)||0));return age===0?'NOW':age===1?'1 EVENT AGO':`${age} EVENTS AGO`}
   function renderFeedPost(post){const initials=String(post.author||'?').split(/\s+/).map(part=>part[0]||'').join('').slice(0,2).toUpperCase(),reactions=post.shared?'':`<div class="feed-reactions"><span>♡ ${fmt(post.likes||0)}</span><span>↻ ${fmt(post.reposts||0)}</span></div>`,avatarContent=post.avatarAsset?`<img src="${escapeHtml(post.avatarAsset)}" alt="">`:escapeHtml(initials),avatar=post.profileId?`<button class="feed-avatar fighter-photo" type="button" data-feed-profile="${escapeHtml(post.profileId)}" aria-label="View ${escapeHtml(post.author)} fighter bio">${avatarContent}</button>`:post.tone==='ceo'?`<button class="feed-avatar" type="button" data-ceo-profile aria-label="View Cage Grind CEO profile">${avatarContent}</button>`:`<div class="feed-avatar">${avatarContent}</div>`,verified=post.verified?'<i class="feed-verified" aria-label="Verified official account" title="Verified official account">✓</i>':'';return `<article class="feed-post ${escapeHtml(post.tone||'media')}">${avatar}<div class="feed-post-copy"><div class="feed-post-head"><b>${escapeHtml(post.author)}</b>${verified}<span>${escapeHtml(post.handle)}</span><time>${feedAge(post)}</time></div><p>${escapeHtml(post.text)}</p>${reactions}</div></article>`}
-  function fighterBioSentence(profile){const city=fighterCities.find(item=>item.id===profile.city)?.name||String(profile.city||'UNKNOWN').toUpperCase(),style=fighterStyles.find(item=>item.id===profile.archetype)?.name||'FIGHTER',wins=Math.max(0,Number(profile.wins)||0),losses=Math.max(0,Number(profile.losses)||0);return `${profile.handle} is a Level ${Math.max(1,Number(profile.level)||1)} ${style.toLowerCase()} fighting out of ${city}, with a professional record of ${wins} win${wins===1?'':'s'} and ${losses} loss${losses===1?'':'es'}.`}
+  function fighterBioSentence(profile){const city=fighterCities.find(item=>item.id===profile.city)?.name||String(profile.city||'UNKNOWN').toUpperCase(),style=fighterStyles.find(item=>item.id===normalizeMajorArchetype(profile.archetype))?.name||'FIGHTER',wins=Math.max(0,Number(profile.wins)||0),losses=Math.max(0,Number(profile.losses)||0);return `${profile.handle} is a Level ${Math.max(1,Number(profile.level)||1)} ${style.toLowerCase()} fighting out of ${city}, with a professional record of ${wins} win${wins===1?'':'s'} and ${losses} loss${losses===1?'':'es'}.`}
   function fighterInteractionChoices(profile){
     const definitions=STRINGS.social.interactions,pool=Object.entries(definitions).flatMap(([kind,definition])=>definition.messages.map((message,index)=>({id:`${kind}-${index}`,kind,message}))),dailyDeckSeed=hashSeed(`fighter-posts|${state.socialProfileId||state.name}|${todayKey()}`),random=seededRandom(dailyDeckSeed);
     for(let index=pool.length-1;index>0;index--){const swap=Math.floor(random()*(index+1));[pool[index],pool[swap]]=[pool[swap],pool[index]]}
@@ -1109,77 +1095,57 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerCondition:LOGIC.startingFightCondition(state.health,state.maxHealth),oppCondition:100,healthLost:0,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'planned',gamePlan:Object.assign({},state.fightPlanPreference),focus:0,focusBase:0,focusEncounter:null,focusResult:null,plans:[],lastPlan:state.fighterStyle||'pressure',openingApproach:null,tendencyRevealed:true,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[]};
+    return {o,player:P,opp:O,playerCondition:LOGIC.startingFightCondition(state.health,state.maxHealth),oppCondition:100,healthLost:0,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:3,finishClock:'0:00',ended:false,mode:'planned',gamePlan:Object.assign({},state.fightPlanPreference),focus:0,focusBase:0,focusEncounter:null,focusResult:null,plans:[],lastPlan:state.fighterStyle||'striker',openingApproach:null,tendencyRevealed:true,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[]};
   }
 
   function planFamiliarity(styleId,planId){
-    if(!styleId)return 0;if(styleId===planId)return .10;
-    const striking=['pressure','counter','brawler','trickster'],grappling=['control','submission'];
-    if(styleId==='wrestleBox')return ['pressure','counter','control'].includes(planId)?.03:planId==='submission'?-.03:0;
-    if(planId==='wrestleBox')return striking.includes(styleId)?-.03:0;
-    if(striking.includes(styleId))return striking.includes(planId)?.01:grappling.includes(planId)?-.11:0;
-    if(grappling.includes(styleId))return grappling.includes(planId)?.02:striking.includes(planId)?-.09:0;
-    return 0;
+    if(!styleId)return 0;return styleId===planId?.08:-.06;
   }
   function matchupEdge(planId,opponentId){
-    const matrix={
-      pressure:{pressure:0,counter:-.15,brawler:-.06,trickster:.12,control:-.08,submission:.09,wrestleBox:-.05},
-      counter:{pressure:.15,counter:0,brawler:.12,trickster:-.11,control:-.13,submission:-.05,wrestleBox:-.09},
-      brawler:{pressure:.03,counter:-.12,brawler:0,trickster:.06,control:-.08,submission:.08,wrestleBox:-.07},
-      trickster:{pressure:-.12,counter:.10,brawler:.08,trickster:0,control:-.14,submission:-.04,wrestleBox:-.07},
-      control:{pressure:-.06,counter:.13,brawler:.15,trickster:.14,control:0,submission:-.14,wrestleBox:-.05},
-      submission:{pressure:-.12,counter:-.06,brawler:-.07,trickster:-.08,control:.14,submission:0,wrestleBox:.07},
-      wrestleBox:{pressure:.07,counter:.08,brawler:.09,trickster:.06,control:-.04,submission:-.10,wrestleBox:0}
-    };return matrix[planId]?.[opponentId]||0;
+    const matrix={striker:{striker:0,grappler:.14},grappler:{striker:.14,grappler:0}};return matrix[planId]?.[opponentId]||0;
   }
   function strategyEdge(planId,tendency){return clamp(matchupEdge(planId,tendency)+planFamiliarity(state.fighterStyle,planId),-.26,.24)}
   function focusTier(value){return value>=95?'LOCKED IN':value>=85?'SHARP':value>=70?'COMPOSED':value>=60?'DISTRACTED':'SHAKEN'}
   function fightFocusModifier(sim=fight){const value=Number(sim?.focus)||80;return value>=95?.05:value>=85?.025:value>=70?0:value>=60?-.025:-.06}
-  function responsePlanId(tendency){return STRINGS.corner.matchups[tendency]?.plan||state.fighterStyle||'pressure'}
-  function plannedStyleForRound(sim,round){const signature=state.fighterStyle||'pressure';return sim.gamePlan?.tactics==='adapt'&&round>1?responsePlanId(sim.o.tendency):signature}
+  function responsePlanId(tendency){return STRINGS.corner.matchups[tendency]?.plan||state.fighterStyle||'striker'}
+  function plannedStyleForRound(sim,round){const signature=state.fighterStyle||'striker';return sim.gamePlan?.tactics==='adapt'&&round>1?responsePlanId(sim.o.tendency):signature}
   function adaptationModifier(sim,round){if(sim.gamePlan?.tactics!=='adapt'||round===1)return 0;const focus=Number(sim.focus)||80,execution=focus>=95?.04:focus>=85?.02:focus>=70?0:focus>=60?-.04:-.08;return execution+(round===2?-.025:0)}
   function plannedTechnique(archetype,offense){let type=techniqueFor(archetype,Math.random());if(offense==='conservative'&&['cross','hook','kick'].includes(type)&&Math.random()<.38)type='jab';else if(offense==='aggressive'&&type==='jab'&&Math.random()<.58)type=Math.random()<.62?'hook':'cross';return type}
   function techniqueFor(archetype,roll){
-    if(archetype==='pressure')return roll<.31?'jab':roll<.55?'cross':roll<.78?'hook':roll<.92?'kick':'takedown';
-    if(archetype==='counter')return roll<.22?'jab':roll<.55?'cross':roll<.77?'hook':roll<.94?'kick':'takedown';
-    if(archetype==='brawler')return roll<.12?'jab':roll<.43?'cross':roll<.77?'hook':roll<.9?'kick':'takedown';
-    if(archetype==='trickster')return roll<.16?'jab':roll<.34?'cross':roll<.49?'hook':roll<.88?'kick':'takedown';
-    if(archetype==='control')return roll<.46?'takedown':roll<.63?'jab':roll<.79?'cross':roll<.91?'hook':'kick';
-    if(archetype==='submission')return roll<.50?'takedown':roll<.65?'jab':roll<.79?'cross':roll<.89?'hook':'kick';
-    if(archetype==='wrestleBox')return roll<.28?'takedown':roll<.49?'jab':roll<.72?'cross':roll<.88?'hook':'kick';
-    return roll<.28?'jab':roll<.51?'cross':roll<.69?'hook':roll<.87?'kick':'takedown';
+    if(archetype==='grappler')return roll<.41?'takedown':roll<.59?'jab':roll<.77?'cross':roll<.90?'hook':'kick';
+    return roll<.20?'jab':roll<.47?'cross':roll<.70?'hook':roll<.91?'kick':'takedown';
   }
 
   const fightMomentDefs={
     opponentHurt:{title:'YOU HAVE THEM HURT',prompt:'Your opponent is retreating with their guard broken.',choices:[
-      {id:'swarm',label:'SWARM FOR THE FINISH',risk:'HIGH RISK',stat:'power',base:.54,styles:['pressure','brawler'],success:{damage:14},fail:{selfDamage:8}},
-      {id:'pick',label:'PICK YOUR SHOTS',risk:'SAFE',stat:'speed',base:.78,styles:['counter','trickster'],success:{damage:8},fail:{selfDamage:2}},
-      {id:'level',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.65,styles:['control','wrestleBox'],success:{damage:4,control:38,takedown:1},fail:{selfDamage:3}}
+      {id:'swarm',label:'SWARM FOR THE FINISH',risk:'HIGH RISK',stat:'power',base:.54,styles:['striker'],success:{damage:14},fail:{selfDamage:8}},
+      {id:'pick',label:'PICK YOUR SHOTS',risk:'SAFE',stat:'speed',base:.78,styles:['striker'],success:{damage:8},fail:{selfDamage:2}},
+      {id:'level',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.65,styles:['grappler'],success:{damage:4,control:38,takedown:1},fail:{selfDamage:3}}
     ]},
     playerHurt:{title:'YOU ARE BADLY HURT',prompt:'Your opponent closes in, looking for the finish.',choices:[
-      {id:'shell',label:'SHELL UP & RECOVER',risk:'SAFE',stat:'chin',base:.80,styles:['counter','control'],success:{control:12},fail:{selfDamage:4}},
-      {id:'clinch',label:'FORCE THE CLINCH',risk:'CONTROL',stat:'cardio',base:.66,styles:['control','wrestleBox'],success:{control:32,takedown:1},fail:{selfDamage:6}},
-      {id:'fire',label:'FIRE BACK',risk:'HIGH RISK',stat:'power',base:.48,styles:['pressure','brawler'],success:{damage:13},fail:{selfDamage:11}}
+      {id:'shell',label:'SHELL UP & RECOVER',risk:'SAFE',stat:'chin',base:.80,styles:['striker','grappler'],success:{control:12},fail:{selfDamage:4}},
+      {id:'clinch',label:'FORCE THE CLINCH',risk:'CONTROL',stat:'cardio',base:.66,styles:['grappler'],success:{control:32,takedown:1},fail:{selfDamage:6}},
+      {id:'fire',label:'FIRE BACK',risk:'HIGH RISK',stat:'power',base:.48,styles:['striker'],success:{damage:13},fail:{selfDamage:11}}
     ]},
     opponentShot:{title:'THEY SHOOT ON YOUR HIPS',prompt:'The takedown is coming. Make the read now.',choices:[
-      {id:'sprawl',label:'SPRAWL & RESET',risk:'SAFE',stat:'cardio',base:.76,styles:['wrestleBox','control'],success:{control:18},fail:{oppControl:18}},
-      {id:'guillotine',label:'ATTACK THE GUILLOTINE',risk:'FINISH HUNT',stat:'speed',base:.50,styles:['submission'],success:{damage:10,control:34},fail:{oppControl:34}},
-      {id:'knee',label:'MEET THEM WITH A KNEE',risk:'HIGH RISK',stat:'power',base:.46,styles:['brawler','trickster'],success:{damage:15},fail:{selfDamage:7,oppControl:24}}
+      {id:'sprawl',label:'SPRAWL & RESET',risk:'SAFE',stat:'cardio',base:.76,styles:['grappler'],success:{control:18},fail:{oppControl:18}},
+      {id:'guillotine',label:'ATTACK THE GUILLOTINE',risk:'FINISH HUNT',stat:'speed',base:.50,styles:['grappler'],success:{damage:10,control:34},fail:{oppControl:34}},
+      {id:'knee',label:'MEET THEM WITH A KNEE',risk:'HIGH RISK',stat:'power',base:.46,styles:['striker'],success:{damage:15},fail:{selfDamage:7,oppControl:24}}
     ]},
     topControl:{title:'YOU SECURE TOP POSITION',prompt:'Your opponent is pinned beneath you. Choose the priority.',choices:[
-      {id:'ground',label:'GROUND-AND-POUND',risk:'DAMAGE',stat:'power',base:.63,styles:['pressure','brawler'],success:{damage:11,control:18},fail:{control:8}},
-      {id:'advance',label:'ADVANCE POSITION',risk:'CONTROL',stat:'speed',base:.70,styles:['submission','control'],success:{damage:5,control:42},fail:{control:14}},
-      {id:'stand',label:'LET THEM UP',risk:'SAFE RESET',stat:'cardio',base:.88,styles:['counter','trickster'],success:{damage:5},fail:{}}
+      {id:'ground',label:'GROUND-AND-POUND',risk:'DAMAGE',stat:'power',base:.63,styles:['striker','grappler'],success:{damage:11,control:18},fail:{control:8}},
+      {id:'advance',label:'ADVANCE POSITION',risk:'CONTROL',stat:'speed',base:.70,styles:['grappler'],success:{damage:5,control:42},fail:{control:14}},
+      {id:'stand',label:'LET THEM UP',risk:'SAFE RESET',stat:'cardio',base:.88,styles:['striker'],success:{damage:5},fail:{}}
     ]},
     underPressure:{title:'YOUR BACK HITS THE FENCE',prompt:'Your opponent is taking away the space to escape.',choices:[
-      {id:'circle',label:'CIRCLE INTO OPEN SPACE',risk:'SAFE',stat:'speed',base:.76,styles:['counter','trickster'],success:{damage:4},fail:{selfDamage:3}},
-      {id:'reverse',label:'FIGHT FOR THE REVERSAL',risk:'CONTROL',stat:'cardio',base:.61,styles:['control','wrestleBox'],success:{control:30},fail:{oppControl:22}},
-      {id:'trade',label:'BITE DOWN & TRADE',risk:'HIGH RISK',stat:'chin',base:.50,styles:['pressure','brawler'],success:{damage:12},fail:{selfDamage:10}}
+      {id:'circle',label:'CIRCLE INTO OPEN SPACE',risk:'SAFE',stat:'speed',base:.76,styles:['striker'],success:{damage:4},fail:{selfDamage:3}},
+      {id:'reverse',label:'FIGHT FOR THE REVERSAL',risk:'CONTROL',stat:'cardio',base:.61,styles:['grappler'],success:{control:30},fail:{oppControl:22}},
+      {id:'trade',label:'BITE DOWN & TRADE',risk:'HIGH RISK',stat:'chin',base:.50,styles:['striker'],success:{damage:12},fail:{selfDamage:10}}
     ]},
     tactical:{title:'THE ROUND IS IN THE BALANCE',prompt:'The pace settles near the midpoint. Choose where to take the fight.',choices:[
-      {id:'pressure',label:'RAISE THE PRESSURE',risk:'DAMAGE',stat:'power',base:.61,styles:['pressure','brawler'],success:{damage:9},fail:{selfDamage:5}},
-      {id:'counter',label:'DRAW OUT A COUNTER',risk:'PRECISION',stat:'speed',base:.68,styles:['counter','trickster'],success:{damage:8},fail:{selfDamage:3}},
-      {id:'grapple',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.63,styles:['control','submission','wrestleBox'],success:{damage:3,control:34,takedown:1},fail:{oppControl:14}}
+      {id:'pressure',label:'RAISE THE PRESSURE',risk:'DAMAGE',stat:'power',base:.61,styles:['striker'],success:{damage:9},fail:{selfDamage:5}},
+      {id:'counter',label:'DRAW OUT A COUNTER',risk:'PRECISION',stat:'speed',base:.68,styles:['striker'],success:{damage:8},fail:{selfDamage:3}},
+      {id:'grapple',label:'CHANGE LEVELS',risk:'CONTROL',stat:'cardio',base:.63,styles:['grappler'],success:{damage:3,control:34,takedown:1},fail:{oppControl:14}}
     ]}
   };
   function selectFightMoment({side,type,landed,kd,playerCondition,oppCondition}){
@@ -1203,8 +1169,8 @@
       if(!stopped){const discipline=familiarity<=-.08?' It is outside their natural discipline.':'',planAction=adapting?(round===2?'begins adjusting toward':'fully shifts to'):'opens with',openingText=opening?.damage?`${P.name} has life again and pours on pressure.`:`${P.name} ${planAction} the ${plan.name.toLowerCase()} game plan at a ${fastPace?'fast':'measured'} pace.${discipline}`;sim.timeline.push({type:'action',round,clock:opening?.damage?'4:48':'5:00',text:openingText,className:'big',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition})}
       const exchanges=fastPace?rint(9,11):rint(6,7);
       for(let ex=1;ex<=exchanges&&!stopped;ex++){
-        const initiativeMod={pressure:.12,counter:-.05,brawler:.06,trickster:.03,control:.02,submission:-.01,wrestleBox:.04}[plan.id]||0;
-        const tendencyInitiative={pressure:-.09,counter:.04,brawler:-.05,trickster:.01,control:-.04,submission:-.02,wrestleBox:-.03}[sim.o.tendency]||0;
+        const initiativeMod={striker:.06,grappler:-.01}[plan.id]||0;
+        const tendencyInitiative={striker:-.05,grappler:.01}[sim.o.tendency]||0;
         const paceInitiative=fastPace?clamp((P.cardio-O.cardio)*.018+(P.cardio-8)*.008,-.12,.14):0;
         const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative+paceInitiative+focusMod*.7,.14,.86);
         const side=Math.random()<pInitiative?'player':'opp',A=side==='player'?P:O,D=side==='player'?O:P,aStats=rs[side],attackingStyle=side==='player'?plan.id:sim.o.tendency;
@@ -1213,25 +1179,25 @@
         let chance=.53+(A.speed-D.speed)*.018+(A.cardio-D.cardio)*.006-roundFatigue+rand(-.11,.11);
         if(type==='takedown')chance=.43+(A.power+A.speed-D.chin-D.cardio)*.012+rand(-.10,.10);
         if(side==='player'){
-          chance+=edge*.72+focusMod+(aggressiveOffense?-.045:.05);if(plan.id==='pressure')chance+=.035;if(plan.id==='counter')chance+=.065;if(plan.id==='brawler')chance-=.015;if(plan.id==='trickster'&&type==='kick')chance+=.10;if(plan.id==='control'&&type==='takedown')chance+=.16;if(plan.id==='submission'&&type==='takedown')chance+=.10;if(plan.id==='wrestleBox')chance+=type==='takedown'?.08:.025;
+          chance+=edge*.72+focusMod+(aggressiveOffense?-.045:.05);if(plan.id==='striker'&&type!=='takedown')chance+=.035;if(plan.id==='grappler'&&type==='takedown')chance+=.14;
         }else{
-          chance-=edge*.45+focusMod*.35;chance+=aggressiveOffense?.04:-.035;if(sim.o.tendency==='counter')chance+=.05;if(sim.o.tendency==='brawler')chance-=.03;if(sim.o.tendency==='trickster'&&type==='kick')chance+=.08;if(sim.o.tendency==='control'&&type==='takedown')chance+=.15;if(sim.o.tendency==='submission'&&type==='takedown')chance+=.10;if(sim.o.tendency==='wrestleBox'&&type==='takedown')chance+=.07;if(plan.id==='pressure'||plan.id==='brawler')chance+=.05;if(plan.id==='counter')chance-=.075;if(plan.id==='trickster')chance-=.03;
+          chance-=edge*.45+focusMod*.35;chance+=aggressiveOffense?.04:-.035;if(sim.o.tendency==='striker'&&type!=='takedown')chance+=.03;if(sim.o.tendency==='grappler'&&type==='takedown')chance+=.13;if(plan.id==='striker')chance+=.025;
         }
         chance=clamp(chance,.22,.84);const landed=Math.random()<chance;let damage=0,kd=false,control=0;
         if(landed){
           aStats.landed++;const base={jab:3.2,cross:6.2,hook:7.4,kick:6.1,takedown:4.6}[type],powerScale={jab:.13,cross:.25,hook:.31,kick:.23,takedown:.18}[type];
-          const styleDamage={pressure:1.12,counter:1.08,brawler:1.22,trickster:1.05,control:.84,submission:.80,wrestleBox:1}[attackingStyle]||1,tacticalDamage=(side==='player'?1+edge:1-edge*.35)*styleDamage;
+          const styleDamage={striker:1.12,grappler:.88}[attackingStyle]||1,tacticalDamage=(side==='player'?1+edge:1-edge*.35)*styleDamage;
           const offenseDamage=side==='player'?(aggressiveOffense?1.16:.86):1;damage=Math.max(1,Math.round((base+A.power*powerScale)*rand(.72,1.22)*clamp(1-D.chin*.014,.55,.94)*tacticalDamage*offenseDamage));
           if(type!=='jab'&&type!=='takedown')aStats.sig++;
-          if(type==='takedown'){const controlBonus={control:26,submission:10,wrestleBox:14}[attackingStyle]||0;aStats.takedowns++;control=rint(18,58)+Math.max(0,A.cardio-D.cardio)*2+controlBonus;aStats.control+=control}
-          const intentKnockdown=side==='player'?(aggressiveOffense?.045:-.02):0,kdChance=clamp(.025+(A.power-D.chin)*.012+(damage-8)*.018+(attackingStyle==='brawler'?.025:0)+intentKnockdown,0,.36);
+          if(type==='takedown'){const controlBonus=attackingStyle==='grappler'?22:0;aStats.takedowns++;control=rint(18,58)+Math.max(0,A.cardio-D.cardio)*2+controlBonus;aStats.control+=control}
+          const intentKnockdown=side==='player'?(aggressiveOffense?.045:-.02):0,kdChance=clamp(.025+(A.power-D.chin)*.012+(damage-8)*.018+(attackingStyle==='striker'?.02:0)+intentKnockdown,0,.36);
           if(type!=='jab'&&type!=='takedown'&&Math.random()<kdChance){kd=true;aStats.kd++;damage+=rint(5,10)}
           aStats.damage+=damage;if(side==='player')sim.oppCondition=clamp(sim.oppCondition-damage,0,100);else sim.playerCondition=clamp(sim.playerCondition-damage,0,100);
         }
         const clock=fightClock(ex,exchanges);let text=commentaryFor(type,A,D,landed),className=side==='player'?'you':'opp';if(kd){text=`DOWN! ${A.name} drops ${D.name}! The crowd detonates.`;className='big'}
         sim.timeline.push({type:'action',round,clock,text,className,playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:kd,landed,side,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({landed,knockdown:kd}):0});
-        if(landed&&type==='takedown'&&attackingStyle==='submission'){
-          const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,signatureBoost=side==='player'&&state.fighterStyle==='submission'?.05:0,subChance=clamp(.055+(A.speed-D.speed)*.012+(A.cardio-D.cardio)*.008+(100-targetCondition)*.001+signatureBoost,.04,.34);
+        if(landed&&type==='takedown'&&attackingStyle==='grappler'){
+          const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,signatureBoost=side==='player'&&state.fighterStyle==='grappler'?.05:0,subChance=clamp(.055+(A.speed-D.speed)*.012+(A.cardio-D.cardio)*.008+(100-targetCondition)*.001+signatureBoost,.04,.34);
           if(Math.random()<subChance){sim.winner=side;sim.method='SUBMISSION';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'submission',round,clock,text:`TAP! ${A.name} locks in the submission and ${D.name} has nowhere to go!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({finish:'SUBMISSION'}):0})}
         }
         if(!stopped){const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,koChance=targetCondition<=0?1:(kd&&targetCondition<22?.40:targetCondition<10?.24:0);if(koChance&&Math.random()<koChance){sim.winner=side;sim.method=targetCondition<=0?'KO':'TKO';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'ko',round,clock,text:`IT'S OVER! ${A.name} gets the stoppage!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({finish:sim.method}):0})}}
@@ -1338,7 +1304,7 @@
 
   function cornerFightState(rounds){const score=LOGIC.fightScore(rounds);return score.player>score.opponent?'ahead':score.player<score.opponent?'behind':'even'}
   function renderCornerPlans(container,nextRound){
-    const signature=state.fighterStyle||'pressure',opponentStyle=fight?.o.tendency||signature,signaturePlan=planDefs.find(plan=>plan.id===signature)||planDefs[0],matchup=STRINGS.corner.matchups[opponentStyle]||STRINGS.corner.matchups.pressure,responsePlan=planDefs.find(plan=>plan.id===matchup.plan)||signaturePlan,sameStyle=signature===opponentStyle||signature===responsePlan.id;
+    const signature=state.fighterStyle||'striker',opponentStyle=fight?.o.tendency||signature,signaturePlan=planDefs.find(plan=>plan.id===signature)||planDefs[0],matchup=STRINGS.corner.matchups[opponentStyle]||STRINGS.corner.matchups.striker,responsePlan=planDefs.find(plan=>plan.id===matchup.plan)||signaturePlan,sameStyle=signature===opponentStyle||signature===responsePlan.id;
     const signatureDescription=sameStyle&&signature===opponentStyle?'You know this style. Stay disciplined and win the familiar exchanges.':`Trust your ${signaturePlan.name.toLowerCase()} game and dictate the round.`;
     const choices=[{plan:signaturePlan,isSignature:true,label:'FIGHT YOUR WAY',description:signatureDescription}];
     if(!sameStyle){
@@ -1347,7 +1313,7 @@
     }
     container.innerHTML=choices.map(({plan,isSignature,label,description})=>`<button class="corner-plan-btn ${isSignature?'signature':'response'}" data-fight-plan="${plan.id}" data-plan-context="corner"><b>${label}</b><small>${description}</small></button>`).join('');
   }
-  function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='brawler'?.06:0)+fightFocusModifier(sim),.15,.68)}
+  function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='striker'?.04:0)+fightFocusModifier(sim),.15,.68)}
   function chargeFightEnergy(amount){if(!LOGIC.chargePendingFightEnergy(state,amount))return false;updateUI();return true}
   function haymakerEnergyAvailable(roundsToReserve=0){return LOGIC.availableFightEnergy(state,roundsToReserve,fight?.roundCost||currentFightRoundCost())>=HAYMAKER_ENERGY}
   function resetBloodSportBurst(){const layer=$('#bloodSportBurst');if(!layer)return;clearTimeout(layer._clearTimer);layer.classList.remove('active');layer.replaceChildren()}
@@ -1355,7 +1321,7 @@
     const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.playerCondition);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');resetBloodSportBurst();showFightStage('liveStage');setFightDecisionFocus(false);$('#fightControls').classList.remove('hidden');$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#liveOppStyle').textContent=fight.o.tag||'UNKNOWN STYLE';$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';updateFocusDisplay();
   }
   function beginFightApproach(approach){
-    if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'pressure';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
+    if(!fight||fight.rounds.length||!['aggressive','feel'].includes(approach))return;const signature=state.fighterStyle||'striker';fight.openingApproach=approach;fight.deepRead=approach==='feel';trackEvent('fight_opening_selected',{approach,player_archetype:signature});simulateRound(fight,1,signature,{mode:approach});fight.tendencyRevealed=true;prepareLiveFight();$('#speedBtn').disabled=false;appendFightLine({clock:'5:00',text:approach==='aggressive'?`The cage door locks. ${fight.player.name} attacks behind the signature style.`:`The cage door locks. ${fight.player.name} stays disciplined in the signature style while gathering a read.`,className:'big'});fightTimelineIndex=0;playFightTimeline(0);
   }
   function beginPlannedFight(){
     if(!fight||fight.rounds.length)return;fight.openingApproach=fightPlanLabel(fight.gamePlan).toLowerCase();fight.tendencyRevealed=true;
@@ -1371,7 +1337,7 @@
       box.innerHTML=`<div class="corner-panel crisis-panel"><h3>${gameIcon('corner-danger','🚨')} ${Math.round(fight.playerCondition)}% CONDITION · MAKE THE CALL</h3><p>Your fighter is badly hurt. The corner needs an answer before round ${next}.</p><div class="crisis-grid"><button class="crisis-btn towel" data-crisis="towel"><b>${gameIcon('corner-towel','🏳️')} THROW IN THE TOWEL</b><small>Protect your fighter. ${fight.o.name} wins by TKO.</small></button><button class="crisis-btn haymaker" data-crisis="haymaker" ${canHaymaker?'':'disabled'}><b>${gameIcon('corner-haymaker','💥')} THROW A HAYMAKER</b><small>${canHaymaker?`${chance}% chance · ${HAYMAKER_ENERGY} extra energy. Miss and you are knocked out.`:`Need ${HAYMAKER_ENERGY} energy beyond the remaining round reserve.`}</small></button></div></div>`;
       return;
     }
-    const style=fighterStyles.find(item=>item.id===fight.o.tendency),fightState=cornerFightState(fight.rounds),stateCopy=STRINGS.corner.states[fightState],matchup=STRINGS.corner.matchups[fight.o.tendency]||STRINGS.corner.matchups.pressure,roundLabel=next===3?'FINAL ROUND':'ROUND 2',readLabel=fight.deepRead?'DEEP READ':'OPPONENT READ';
+    const style=fighterStyles.find(item=>item.id===fight.o.tendency),fightState=cornerFightState(fight.rounds),stateCopy=STRINGS.corner.states[fightState],matchup=STRINGS.corner.matchups[fight.o.tendency]||STRINGS.corner.matchups.striker,roundLabel=next===3?'FINAL ROUND':'ROUND 2',readLabel=fight.deepRead?'DEEP READ':'OPPONENT READ';
     box.innerHTML=`<div class="corner-panel coach-corner"><h3>${roundLabel} — ${stateCopy.label}</h3><div class="corner-readline">${readLabel} · ${style?.name||fight.o.tag}</div><div class="corner-coach-quote"><b>COACH'S CORNER</b><p>“${stateCopy.advice} ${matchup.advice}”</p></div><div class="corner-plan-list" id="cornerPlanGrid"></div></div>`;renderCornerPlans($('#cornerPlanGrid'),next);
   }
   function chooseCornerPlan(planId){if(!fight||fight.winner)return;const next=fight.rounds.length+1;if(!chargeFightEnergy(fight.roundCost||currentFightRoundCost())){toast('Not enough reserved energy to start the next round.','#ff766d');return}trackEvent('fight_strategy_selected',{round_number:next,plan_id:planId,is_signature:planId===state.fighterStyle});setFightDecisionFocus(false);$('#cornerChoice').innerHTML='';simulateRound(fight,next,planId);playFightTimeline(fightTimelineIndex)}
@@ -1386,7 +1352,7 @@
     if(!landed){
       const damage=Math.max(12,Math.round(16+fight.opp.power*.65)),playerRound=emptyFightStats(),oppRound=emptyFightStats();playerRound.attempted=1;oppRound.attempted=1;oppRound.landed=1;oppRound.sig=1;oppRound.kd=1;oppRound.damage=damage;addFightStats(fight.totals.player,playerRound);addFightStats(fight.totals.opp,oppRound);fight.rounds.push({round:next,plan:'haymaker',player:playerRound,opp:oppRound,scoreP:8,scoreO:10});fight.haymakerMiss=true;fight.playerCondition=0;fight.winner='opp';fight.method='KO';fight.finishRound=next;fight.finishClock='4:55';fight.timeline.push({type:'roundStart',round:next,clock:'5:00'},{type:'action',round:next,clock:'4:57',text:`${state.name} loads up on the haymaker—but ${fight.o.name} sees it coming.`,className:'opp',playerCondition:fight.playerCondition,oppCondition:fight.oppCondition,side:'opp',healthDamage:LOGIC.liveFightHealthDamage({landed:true,knockdown:true})},{type:'ko',round:next,clock:'4:55',text:`COUNTER SHOT! ${state.name} is knocked out cold.`,className:'ko',playerCondition:0,oppCondition:fight.oppCondition,healthDamage:LOGIC.liveFightHealthDamage({finish:'KO'})});playFightTimeline(startIndex);return;
     }
-    const damage=Math.max(16,Math.round((18+fight.player.power*.72)*rand(.88,1.16)));simulateRound(fight,next,'pressure',{damage});playFightTimeline(startIndex);
+    const damage=Math.max(16,Math.round((18+fight.player.power*.72)*rand(.88,1.16)));simulateRound(fight,next,'striker',{damage});playFightTimeline(startIndex);
   }
   function fightMomentChance(choice){
     const stat=choice.stat||'speed',styleBonus=choice.styles?.includes(state.fighterStyle)?.08:0,statEdge=(fight.player[stat]-fight.opp[stat])*.018;
