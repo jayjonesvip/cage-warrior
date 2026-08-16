@@ -55,9 +55,9 @@ generated league.
   Miami, Houston, Cleveland, Seattle, New Orleans, or Hawaii. Next, choose one of
   40 fighter avatar cards. New Orleans belongs to the Deep South title region;
   Hawaii belongs to the Pacific Islands.
-  Finally, choose one of seven permanent MMA archetypes: Pressure Fighter,
-  Counter-Striker, Brawler, Trickster / Unorthodox, Control Grappler,
-  Submission Hunter, or Wrestle-Boxer. The last step suggests a fighter identity
+  Finally, choose one of two permanent MMA archetypes: **Striker** for stand-up
+  offense and knockout pressure, or **Grappler** for takedowns, control, and
+  submissions. The last step suggests a fighter identity
   from shared color and weather/dangerous-animal pools, followed by the hometown
   abbreviation. **Shuffle** rerolls it, while **Manual Entry** opens the name card
   as a text field for a custom single-word handle. **Ready** checks the global
@@ -127,7 +127,7 @@ generated league.
   short-term attention. Successful fighter-to-fighter Cage Feed posts add a
   small, deterministic burst of both while keeping the shared community feed
   at the center of the interaction.
-- Every generated opponent uses the same seven-archetype system. Their card,
+- Every generated opponent uses the same Striker-or-Grappler system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
   reflect that archetype.
 - Every booked fight begins with a locker-room **Fight Plan**. Players set a
@@ -160,8 +160,8 @@ generated league.
   contact's pool is evenly split between positive and negative outcomes.
   Messages come from a shuffled, saved 46-card deck, so
   every text appears once before any repeats, including after a reload.
-- Submission Hunters can finish a fight by tap after a successful takedown.
-  Speed, cardio, opponent condition, and signature-plan proficiency affect the
+- Grapplers can finish a fight by tap after a successful takedown. Speed,
+  cardio, opponent condition, and signature-plan proficiency affect the
   submission chance.
 - Persistent Health determines starting fight Condition. Fighters at 90% or
   better Health enter at 100% Condition; 70–89% enters at 95%, 50–69% at 88%,
@@ -396,8 +396,10 @@ Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, avatar and base allocation,
 generated rosters, rivalries, collections, loadouts, Cash, and
 Career Earnings. An in-progress blackjack hand is also persisted so a refresh
-cannot consume the wager without allowing the player to finish. Legacy Technician, Grappler, and Endurance identities map to
-Counter-Striker, Control Grappler, and Pressure Fighter. Old opponent
+cannot consume the wager without allowing the player to finish. Legacy
+Pressure Fighter, Counter-Striker, Brawler, Trickster, Technician, and
+Endurance identities map to Striker. Control Grappler, Submission Hunter,
+Wrestle-Boxer, and older wrestling identities map to Grappler. Old opponent
 tendencies migrate without losing records or rivalries, and previously retired
 regular fighters return to the permanent Past Rivals system. Legacy local title
 progress and generated champions are removed because the shared database owns
