@@ -205,14 +205,14 @@ generated league.
 - Cage Grind has one shared World Championship held only by an active ranked
   profile. A fighter may challenge once their level reaches or exceeds the
   champion's level.
-- Each contender receives one sanctioned championship attempt per UTC day. A
-  challenger who loses may challenge again after the next UTC midnight without
-  closing the title picture for other contenders. A dethroned champion receives
-  the same daily rematch window plus a level override against the fighter who
-  took the belt. Retiring and claiming a new fighter preserves old results but
-  starts a new championship-history window. The champion may defend against
-  multiple real Cage Network fighters in one day, but may face each fighter only
-  once that day. Real-player opponents are ranked fighters; generated opponents are unranked.
+- The Fight page starts with a dedicated World Championship section. Reach the
+  champion's level to earn one title shot per UTC day. A dethroned champion gets
+  one level-override **Title Rematch** against the fighter who took the belt;
+  after that attempt, win or lose, the normal contender rules apply. Champions
+  receive one deterministic active ranked challenger and may defend once per
+  UTC day. Regular ranked fights are separate and never put the belt at risk.
+  Retiring and claiming a new fighter preserves old results and title history
+  while starting a new career-history window.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, partial recovery,
@@ -292,19 +292,17 @@ generated league.
   tactical choice before the opening bell.
 - The current level always replenishes to three fresh contenders, so the fight
   path cannot run dry before a level-up. Fresh current-level fights pay a full
-  purse; past-level fights and rival rematches pay half purse.
+  purse; past-level fights and rival fights pay half purse.
 - Any available opponent who has beaten the player carries a bright horizontal
-  **Rematch** banner across the lower part of their fighter image and remains
+  **Rival Fight** banner across the lower part of their fighter image and remains
   immediately available.
 - Regular opponents never retire. Every defeated fighter persists in the
-  **Past Rivals** collection. A free **Taunt for Rematch** guarantees that rival
+  **Past Rivals** collection. A free taunt guarantees that rival
   accepts one more fight; the bout uses the player's current level-based round
   cost, pays half purse, and retains full fight XP. Winning closes the offer
-  until another taunt, while losing keeps the rematch immediately available.
-- The Career Opponents roster shows available current and past opponents, past
-  rivals, the shared World Championship, and a locked preview of the next level.
-  The championship and current-level groups start open; all other groups start
-  collapsed behind tappable headers with fighter counts. Fighters are presented as fixed-ratio
+  until another taunt, while losing keeps **Run It Back** immediately available.
+- The Career Opponents roster shows available current and past opponents and
+  rivals. Championship bouts never appear inside this roster. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork
   selected deterministically from 24 standalone transparent fighter
   silhouettes. Bright accent spotlights and subtle rim lighting keep the black
@@ -322,13 +320,12 @@ generated league.
   cards take on the locked presentation and replace **See Matchup** with
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
 - The shared champion is rendered from the authenticated Supabase profile and
-  is never generated or stored in the local career save. The champion's name,
-  level, record, defense count, the viewer's daily title availability, and
-  former-champion rematch status appear on the Fight page. A champion sees only
-  previously used matchups locked; other real-fighter defenses remain open.
-  A fighter who loses the belt while
-  away receives a one-time title-loss notice naming the new champion. The Tale
-  of the Tape uses a dedicated World Title Bout banner
+  is never generated or stored in the local career save. The dedicated card
+  shows champion identity, record, level, defenses, player status, and one clear
+  action or requirement. A champion sees one server-selected ranked challenger.
+  A fighter who loses the belt while away receives a one-time title-loss notice
+  naming the new champion and the next rematch date. The Tale
+  of the Tape uses a dedicated **World Championship Bout** banner
   for championship matchups and compares Power, Speed, Chin, and Cardio with
   proportional meters; the stronger side of each attribute is highlighted in
   green and ties use a neutral gold treatment.
@@ -473,7 +470,7 @@ standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and
 cover script parsing plus behavioral save recovery and migration, resource
-clamping, fight booking and payouts, rematches, opponent availability, training,
+clamping, fight booking and payouts, rival fights, championship states and settlement, opponent availability, training,
 recovery options, blackjack rules and wager limits,
 gear pity, endorsements, daily resets, roster rules, readable text sizing,
 equipment drops, reward reveals, and the Cash/Career Earnings economy.
