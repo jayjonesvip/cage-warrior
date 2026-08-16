@@ -202,7 +202,7 @@ generated league.
   show the finish method, round, and clock beneath it before the full scorecard.
 - Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
   become notable Cage Feed headlines after every additional win.
-- Cage Grind has one shared World Championship held only by an active real-user
+- Cage Grind has one shared World Championship held only by an active ranked
   profile. A fighter may challenge once their level reaches or exceeds the
   champion's level.
 - Each contender receives one sanctioned championship attempt per UTC day. A
@@ -212,7 +212,7 @@ generated league.
   took the belt. Retiring and claiming a new fighter preserves old results but
   starts a new championship-history window. The champion may defend against
   multiple real Cage Network fighters in one day, but may face each fighter only
-  once that day. Generated opponents remain unsanctioned.
+  once that day. Real-player opponents are ranked fighters; generated opponents are unranked.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
   and rank, cumulative max-energy and max-health gains, partial recovery,
@@ -239,7 +239,7 @@ generated league.
 - Cage Feed has its own bottom-navigation icon. New timeline entries add a
   numbered red unread badge, and opening the Feed marks the visible posts read.
 - The top-bar audience line shows both Followers and Following. Following is the
-  live count of real fighter profiles in the shared Cage Feed roster.
+  live count of ranked fighter profiles in the shared Cage Feed roster.
 - The timeline owns the Feed explanation and scrolls inside its own card.
   Generic composer controls are removed; interaction begins by tapping a real
   fighter's avatar and opening their public profile. Feed and fighter-profile
@@ -248,7 +248,7 @@ generated league.
   deals generate contextual `CageReporter` coverage. Wins earned while carrying
   a training injury receive dedicated headlines questioning whether fighting
   hurt was courageous, reckless, or both. The global feed emphasizes
-  real fighters' canned posts instead of filling the timeline with fake fans.
+  ranked fighters' canned posts instead of filling the timeline with fake fans.
 - The verified `@CageGrindCEO` account uses the CEO's office portrait and a
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
   career and the first exceptional performance bonus without allowing arbitrary
@@ -281,7 +281,7 @@ generated league.
   preserve CapitalCase identity display even for legacy all-caps profiles,
   without rewriting the fighter's stored Cage Feed handle.
 - Cage Network snapshots persist in the local career and remain playable
-  offline. Fighting one never changes the real fighter's public record, never
+  offline. Fighting one never changes the ranked fighter's public record, never
   creates a misleading shared CageReporter result, and can never award a title.
 - A Cage Network card uses the fighter's stored city or identity suffix to show
   where they fight out of, their region, and the available purse. A fighter with

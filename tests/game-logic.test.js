@@ -165,10 +165,16 @@ test('opponent availability covers career fights, the global title, and accepted
   assert.equal(logic.opponentAvailable({tier:6,lossesToPlayer:0},context),false);
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:false},context),false);
   assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
+  assert.equal(logic.opponentGroup({network:true,tier:2,lossesToPlayer:1},context),'passed');
+  assert.equal(logic.opponentAvailable({network:true,tier:2,lossesToPlayer:1},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true},context),true);
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:false},context),false);
   assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),'blocked');
   assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),false);
+  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:5,challengeEligible:true},context),'title');
+  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:3,challengeEligible:true},context),'passed');
+  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:6,challengeEligible:true},context),'locked');
+  assert.equal(logic.opponentAvailable({globalChampionship:true,championDefense:true,tier:3,challengeEligible:false,titleCooldown:true},context),false);
 });
 
 test('championship career rank follows rookie, prospect, contender, former champion, and champion priority',()=>{

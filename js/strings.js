@@ -53,7 +53,7 @@ globalThis.CAGE_STRINGS = {
   social: {
     profiles: {
       media: {author:'CageReporter',handle:'@CageReporter',tone:'media'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.100',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.102',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -181,10 +181,10 @@ globalThis.CAGE_STRINGS = {
           '@{handle} just joined the conversation. Welcome to the noise.',
           'Good to see @{handle} on the feed. Now give everybody a fight to talk about.',
           'Welcome, @{handle}. Keep the posts honest and the fights violent.',
-          'Another real fighter enters the timeline. Welcome, @{handle}.',
+          'Another ranked fighter enters the timeline. Welcome, @{handle}.',
           'Welcome aboard, @{handle}. The feed just got a little more dangerous.',
           '@{targetName} is here. Somebody warn the matchmakers the timeline has teeth now.',
-          'Glad to see @{handle} join us. The grind is better with real fighters in it.',
+          'Glad to see @{handle} join us. The grind is better with ranked fighters in it.',
           'New name on the feed, proven name in the cage. Welcome, @{handle}.',
           'Welcome to Cage Grind, @{handle}. Talk your talk and back it up under the lights.'
         ]
