@@ -18,11 +18,10 @@ interactions from `game.js`.
   current level, record, Followers, and a **Keep Grinding** action. A partially
   completed fighter receives **Continue Your Build** instead of being mistaken
   for a new or finished career.
-- New players see **Build Your MMA Fighter. Become World Champion.**, a compact
-  gameplay preview, and the **Play Free Now** action. The preview reuses a small
-  fighter asset and game-style record, fight-plan, and title-progression UI so
-  it stays lightweight. Choosing an entry action never resets or replaces the
-  recovered local save.
+- New players see **Build Your MMA Fighter. Become World Champion.** and the
+  **Play Free Now** action without a simulated fighter card that could be
+  mistaken for live gameplay. Choosing an entry action never resets or replaces
+  the recovered local save.
 - A non-blocking World Championship panel uses the shared championship client
   to show the current handle and successful defenses. Loading, vacant, and
   offline states use quiet fallbacks; none can disable or delay career entry.
@@ -156,7 +155,7 @@ generated league.
   full simulation, with no coach fee or routine mid-fight decision prompts.
 - Every booked fight generates a fight-only **Focus** rating from 75–90%. Half
   of walkouts receive an unread text from Mom, the fighter's wife, brother
-  Tommy, or Agent Carl. Reading it reveals one of 46 messages with a meaningful boost or distraction; ignoring
+  Tommy, Agent Carl, or Grandma. Reading it reveals one of 50 messages with a meaningful boost or distraction; ignoring
   it leaves the message hidden and applies a smaller known Focus cost. The
   other half offer quiet preparation: music gains 4–10 Focus with a 20% chance
   to reach 100%, while meditation reliably raises Focus to at least 92%.
@@ -164,9 +163,9 @@ generated league.
   quality of adaptive game-plan changes for that fight only. The Focus screen
   reuses the full-bleed fight-plan locker room and shows the percentage in the
   final-moments label instead of a separate meter.
-- Mom and Wife each have 16 possible texts, Tommy has 10, and Carl has 4; every
-  contact's pool is evenly split between positive and negative outcomes.
-  Messages come from a shuffled, saved 46-card deck, so
+- Mom and Wife each have 16 possible texts, Tommy has 10, and Carl and Grandma
+  have 4 each; every contact's pool is evenly split between positive and
+  negative outcomes. Messages come from a shuffled, saved 50-card deck, so
   every text appears once before any repeats, including after a reload.
 - Grapplers can finish a fight by tap after a successful takedown. Speed,
   cardio, opponent condition, and signature-plan proficiency affect the
