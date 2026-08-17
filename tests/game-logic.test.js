@@ -341,6 +341,14 @@ test('Coach Vega improves training and reduces explicit injury risk without XP',
   assert.equal(logic.trainingInjuryChance(true,true),.20);
 });
 
+test('training cooldowns scale with workout gains and sparring intensity',()=>{
+  assert.equal(logic.trainingCooldownDuration({type:'training',gain:1}),60000);
+  assert.equal(logic.trainingCooldownDuration({type:'training',gain:2}),120000);
+  assert.equal(logic.trainingCooldownDuration({type:'training',gain:3}),120000);
+  assert.equal(logic.trainingCooldownDuration({type:'sparring',skills:1}),120000);
+  assert.equal(logic.trainingCooldownDuration({type:'sparring',skills:2}),240000);
+});
+
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
   assert.equal(logic.trainingCost({cost:8},0),8);
   assert.equal(logic.trainingCost({cost:8},2),12);

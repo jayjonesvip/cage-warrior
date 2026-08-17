@@ -389,9 +389,12 @@ generated league.
   separate two-session daily track: Light Sparring costs 10 energy and improves
   one random skill without health damage, while Heavy Sparring costs 20 energy,
   improves two random skills, and risks 3–9 health.
-- Training gains are whole points. Every gym or sparring session begins a
-  one-minute recovery cooldown. Training again before the timer ends extends it
-  by another minute and triggers a hidden injury roll. Knee, shoulder, elbow,
+- Training gains are whole points. A +1 gym workout begins a one-minute recovery
+  cooldown, while a +2 gain (including trainer-assisted workouts) takes two
+  minutes. Light Sparring takes two minutes and Heavy Sparring takes four.
+  Training again before the timer ends requires confirmation, extends the
+  cooldown by the new activity's duration, and triggers a hidden injury roll.
+  Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
   by 10% or at least one point, whichever is greater. Injuries clear at the
   player's next local midnight and never carry into a new day. While injured,

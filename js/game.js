@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.124';
+  const ICON_ASSET_VERSION = '2.5.125';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -37,7 +37,7 @@
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,trainerOn:false,treatmentAvailable:true,dailyCounters:{date:'',fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0},blackjackHand:null,cageDiceResult:null,
     activeEndorsement:null,endorsementHistory:[],lastAutographPrice:0,lastSave:Date.now(),lastDaily:'',freeLoot:0,installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',lastTitleLossSeenId:0,hasHeldWorldTitle:false,
-    pendingFight:null,pendingChampionshipResult:null,fightPlanPreference:{pace:'slow',offense:'conservative',tactics:'stick'},focusTextDeck:[],lastFocusTextId:'',trainingCooldownUntil:0,trainingCooldownDate:'',trainingInjury:null,
+    pendingFight:null,pendingChampionshipResult:null,fightPlanPreference:{pace:'slow',offense:'conservative',tactics:'stick'},focusTextDeck:[],lastFocusTextId:'',trainingCooldownUntil:0,trainingCooldownDurationMs:0,trainingCooldownDate:'',trainingInjury:null,
     roster:[],rosterSerial:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,equippedGear:[],leagueInitialized:false
   };
 
@@ -85,6 +85,7 @@
   let identityManualMode=false;
   let identityManualValue='';
   let retirementPending=false;
+  let pendingTrainingAction=null;
   let pendingCeoPresentation=null;
   let pendingTitleLossPresentation=null;
   let cageDiceChoice='under';
@@ -329,7 +330,7 @@
     {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:25},
     {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium whole-body recovery for a fast return to the cage.',energy:20,health:35,feeBase:250,feePerLevel:25}
   ];
-  const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10,TRAINING_COOLDOWN_MS=60000;
+  const FIGHT_ROUNDS=3,HAYMAKER_ENERGY=5,DAILY_FIGHT_LIMIT=10,MIN_TRAINING_COOLDOWN_MS=60000;
   const currentFightRoundCost=()=>LOGIC.fightRoundCost(state.level);
   const currentFightClearance=()=>currentFightRoundCost()*FIGHT_ROUNDS;
 
@@ -375,7 +376,7 @@
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
       s.dailyCounters = LOGIC.dailyCountersFor(s.dailyCounters,LOGIC.localDateKey());s.blackjackHand=normalizeBlackjackHand(source.blackjackHand);if(s.blackjackHand)s.dailyCounters.blackjack=1;s.cageDiceResult=normalizeCageDiceResult(source.cageDiceResult);if(s.cageDiceResult)s.dailyCounters.cageDice=1;
       s.trainerOn = !!s.trainerOn;s.treatmentAvailable=source.treatmentAvailable===undefined?true:source.treatmentAvailable===true;
-      const trainingDate=LOGIC.localDateKey(),savedInjury=source.trainingInjury&&typeof source.trainingInjury==='object'?source.trainingInjury:null,injuryId=TRAINING_INJURY_IDS.has(savedInjury?.id)?savedInjury.id:'';s.trainingCooldownDate=source.trainingCooldownDate===trainingDate?trainingDate:'';s.trainingCooldownUntil=s.trainingCooldownDate?Math.max(0,Number(source.trainingCooldownUntil)||0):0;s.trainingInjury=injuryId&&savedInjury.date===trainingDate?{id:injuryId,date:trainingDate}:null;
+      const trainingDate=LOGIC.localDateKey(),savedInjury=source.trainingInjury&&typeof source.trainingInjury==='object'?source.trainingInjury:null,injuryId=TRAINING_INJURY_IDS.has(savedInjury?.id)?savedInjury.id:'';s.trainingCooldownDate=source.trainingCooldownDate===trainingDate?trainingDate:'';s.trainingCooldownUntil=s.trainingCooldownDate?Math.max(0,Number(source.trainingCooldownUntil)||0):0;s.trainingCooldownDurationMs=s.trainingCooldownDate?Math.max(0,Number(source.trainingCooldownDurationMs)||0):0;s.trainingInjury=injuryId&&savedInjury.date===trainingDate?{id:injuryId,date:trainingDate}:null;
       const savedHistory=Array.isArray(s.endorsementHistory)?s.endorsementHistory:[],savedActiveId=s.activeEndorsement&&typeof s.activeEndorsement==='object'&&ENDORSEMENT_IDS.includes(s.activeEndorsement.id)?s.activeEndorsement.id:'';
       const furthestEndorsement=Math.max(-1,...savedHistory.map(id=>ENDORSEMENT_IDS.indexOf(id)),savedActiveId?ENDORSEMENT_IDS.indexOf(savedActiveId):-1);s.endorsementHistory=ENDORSEMENT_IDS.slice(0,furthestEndorsement+1);s.activeEndorsement=savedActiveId?{id:savedActiveId,fightsLeft:clamp(Math.floor(Number(s.activeEndorsement.fightsLeft))||ENDORSEMENT_FIGHTS[savedActiveId],1,ENDORSEMENT_FIGHTS[savedActiveId])}:null;
       s.lastAutographPrice = clamp(Number(s.lastAutographPrice)||0,0,50);s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
@@ -498,19 +499,22 @@
     if(!pool.length)return null;const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
   }
   function ensureDailyCounters(){
-    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;if(state.cageDiceResult&&state.cageDiceResult.date!==today)state.cageDiceResult=null;if(state.trainingCooldownDate!==today){state.trainingCooldownDate='';state.trainingCooldownUntil=0}if(state.trainingInjury?.date!==today)state.trainingInjury=null;
+    const today=todayKey();state.dailyCounters=LOGIC.dailyCountersFor(state.dailyCounters,today);if(state.blackjackHand&&state.blackjackHand.date!==today)state.blackjackHand=null;if(state.cageDiceResult&&state.cageDiceResult.date!==today)state.cageDiceResult=null;if(state.trainingCooldownDate!==today){state.trainingCooldownDate='';state.trainingCooldownUntil=0;state.trainingCooldownDurationMs=0}if(state.trainingInjury?.date!==today)state.trainingInjury=null;
   }
   function currentTrainingInjury(){return trainingInjuryDefs.find(entry=>entry.id===state.trainingInjury?.id)||null}
   function trainingCooldownRemaining(now=Date.now()){ensureDailyCounters();return Math.max(0,(Number(state.trainingCooldownUntil)||0)-now)}
   function trainingCooldownText(milliseconds){const seconds=Math.max(0,Math.ceil(milliseconds/1000));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
-  function applyTrainingCooldown(coach=false){
-    const now=Date.now(),remaining=trainingCooldownRemaining(now),overtraining=remaining>0;state.trainingCooldownDate=todayKey();state.trainingCooldownUntil=(overtraining?Math.max(now,state.trainingCooldownUntil):now)+TRAINING_COOLDOWN_MS;let injury=null;
+  function applyTrainingCooldown(durationMs,coach=false){
+    const now=Date.now(),remaining=trainingCooldownRemaining(now),overtraining=remaining>0,duration=Math.max(MIN_TRAINING_COOLDOWN_MS,Number(durationMs)||0);state.trainingCooldownDate=todayKey();state.trainingCooldownUntil=(overtraining?Math.max(now,state.trainingCooldownUntil):now)+duration;state.trainingCooldownDurationMs=remaining+duration;let injury=null;
     if(overtraining&&!state.trainingInjury&&Math.random()<LOGIC.trainingInjuryChance(overtraining,coach)){injury=trainingInjuryDefs[rint(0,trainingInjuryDefs.length-1)];state.trainingInjury={id:injury.id,date:todayKey()}}
     return {overtraining,injury};
   }
   function updateTrainingCooldownDisplay(){
-    const remaining=trainingCooldownRemaining(),active=remaining>0&&!currentTrainingInjury(),progress=clamp(remaining/TRAINING_COOLDOWN_MS*100,0,100),text=trainingCooldownText(remaining);$$('[data-train],[data-sparring]').forEach(card=>{card.classList.toggle('training-cooldown',active);card.style.setProperty('--cooldown-progress',`${progress}%`);const clock=card.querySelector('.training-cooldown-clock');if(clock){clock.hidden=!active;clock.textContent=`COOL DOWN · ${text}`}});
+    const remaining=trainingCooldownRemaining(),active=remaining>0&&!currentTrainingInjury(),duration=Math.max(MIN_TRAINING_COOLDOWN_MS,Number(state.trainingCooldownDurationMs)||remaining),progress=clamp(remaining/duration*100,0,100),text=trainingCooldownText(remaining);$$('[data-train],[data-sparring]').forEach(card=>{card.classList.toggle('training-cooldown',active);card.style.setProperty('--cooldown-progress',`${progress}%`);const clock=card.querySelector('.training-cooldown-clock');if(clock){clock.hidden=!active;clock.textContent=`COOL DOWN · ${text}`}});if($('#trainingCooldownModal').classList.contains('open'))$('#trainingCooldownWarningClock').textContent=text;
   }
+  function openTrainingCooldownWarning(type,index){pendingTrainingAction={type,index};$('#trainingCooldownWarningClock').textContent=trainingCooldownText(trainingCooldownRemaining());const modal=$('#trainingCooldownModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.tap();requestAnimationFrame(()=>$('#cancelCooldownTraining').focus())}
+  function closeTrainingCooldownWarning(){const modal=$('#trainingCooldownModal');if(!modal.classList.contains('open'))return;pendingTrainingAction=null;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
+  function continueTrainingDuringCooldown(){const pending=pendingTrainingAction;if(!pending)return;pendingTrainingAction=null;const modal=$('#trainingCooldownModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');if(pending.type==='sparring')handleSparring(pending.index,true);else handleTrain(pending.index,true)}
   function awardInstallCollectible(){const drop=awardDailyCollectible('install-reward-v1');if(drop)drop.reason='INSTALL DROP';return drop}
   function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
   function coachFee(){return 250+state.level*75}
@@ -972,21 +976,21 @@
     x.restore();
   }
 
-  function handleTrain(i){
-    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn;if(!a)return;if(currentTrainingInjury()){toast('Training is closed until your injury heals at midnight.','#ff6875');return}const repeatCount=state.dailyCounters.train;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('train',4));
+  function handleTrain(i,cooldownConfirmed=false){
+    ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn;if(!a)return;if(currentTrainingInjury()){toast('Training is closed until your injury heals at midnight.','#ff6875');return}if(trainingCooldownRemaining()>0&&!cooldownConfirmed){openTrainingCooldownWarning('training',i);return}const repeatCount=state.dailyCounters.train;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('train',4));
     if(quote.reason==='limit'){toast('No training sessions left today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
     const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount);
-    const recovery=applyTrainingCooldown(coach);state.stats[a.stat]+=gain;if(recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - +${gain} ${a.stat.toUpperCase()}`:perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');
+    const recovery=applyTrainingCooldown(LOGIC.trainingCooldownDuration({type:'training',gain}),coach);state.stats[a.stat]+=gain;if(recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - +${gain} ${a.stat.toUpperCase()}`:perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');
     trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
   }
-  function handleSparring(i){
-    ensureDailyCounters();const a=sparringDefs[i],coach=state.trainerOn;if(!a)return;if(currentTrainingInjury()){toast('Sparring is closed until your injury heals at midnight.','#ff6875');return}const repeatCount=state.dailyCounters.sparring;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('sparring',2));
+  function handleSparring(i,cooldownConfirmed=false){
+    ensureDailyCounters();const a=sparringDefs[i],coach=state.trainerOn;if(!a)return;if(currentTrainingInjury()){toast('Sparring is closed until your injury heals at midnight.','#ff6875');return}if(trainingCooldownRemaining()>0&&!cooldownConfirmed){openTrainingCooldownWarning('sparring',i);return}const repeatCount=state.dailyCounters.sparring;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('sparring',2));
     if(quote.reason==='limit'){toast('No sparring sessions left today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.sparring+=quote.sessions;
-    const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills),recovery=applyTrainingCooldown(coach);skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);if(a.skills>1||recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` - ${damage} health lost`:'';toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - ${gains}`:`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
+    const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills),recovery=applyTrainingCooldown(LOGIC.trainingCooldownDuration({type:'sparring',skills:a.skills}),coach);skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);if(a.skills>1||recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` - ${damage} health lost`:'';toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - ${gains}`:`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
     ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(treatment),quote=LOGIC.recoveryQuote(state,treatment,fee,!state.treatmentAvailable);
@@ -1622,6 +1626,8 @@
   $('#newFighterNameBtn').addEventListener('click',rerollFighterIdentity);$('#manualFighterNameBtn').addEventListener('click',toggleManualFighterIdentity);$('#manualFighterNameInput').addEventListener('input',updateManualFighterIdentity);$('#manualFighterNameInput').addEventListener('keydown',event=>{if(event.key==='Enter')lockFighterIdentity()});$('#lockFighterNameBtn').addEventListener('click',lockFighterIdentity);
   $('#retireCareerBtn').addEventListener('click',openRetirementDialog);$('#cancelRetireBtn').addEventListener('click',closeRetirementDialog);$('#confirmRetireBtn').addEventListener('click',retireCareer);
   $('#retireCareerModal').addEventListener('click',e=>{if(e.target===$('#retireCareerModal'))closeRetirementDialog()});$('#retireCareerModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeRetirementDialog()});
+  $('#cancelCooldownTraining').addEventListener('click',closeTrainingCooldownWarning);$('#confirmCooldownTraining').addEventListener('click',continueTrainingDuringCooldown);
+  $('#trainingCooldownModal').addEventListener('click',e=>{if(e.target===$('#trainingCooldownModal'))closeTrainingCooldownWarning()});$('#trainingCooldownModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeTrainingCooldownWarning()});
   $('#fighterBioClose').addEventListener('click',closeFighterBio);
   $('#fighterBioModal').addEventListener('click',e=>{if(e.target===$('#fighterBioModal'))closeFighterBio()});
   $('#fighterBioModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeFighterBio()});
