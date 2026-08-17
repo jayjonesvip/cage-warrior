@@ -50,6 +50,14 @@
       return session;
     }
 
+    function assertExpectedSession(expectedUserId,active=session){
+      const expected=String(expectedUserId||'').trim();
+      if(!expected)return active;
+      if(!active)throw new Error('Fighter network session missing. Recovery is required for this saved career.');
+      if(active.user.id!==expected)throw new Error('Fighter network identity does not match this saved career. Recovery is required.');
+      return active;
+    }
+
     function configured(){return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)&&/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)&&typeof fetchImpl==='function'}
 
     async function request(path,{method='GET',body,token,headers={}}={}){
@@ -85,37 +93,37 @@
         if(error?.status===400||error?.status===401){
           const stored=storedSession();
           if(stored&&stored.user.id===attempted.user.id&&stored.refresh_token!==attempted.refresh_token){session=stored;return refreshSession()}
-          throw new Error('Fighter session expired. Reopen the browser profile that created this fighter.');
+          throw new Error('Fighter network session expired. Recovery is required for this saved career.');
         }
         throw error;
       }
     }
 
-    async function establishSession(){
+    async function establishSession(expectedUserId=''){
       adoptNewerStoredSession();
+      assertExpectedSession(expectedUserId);
       const currentTime=Math.floor(now()/1000);
       if(session&&session.expires_at>currentTime+60)return session;
-      if(session&&await refreshSession())return session;
+      if(session&&await refreshSession())return assertExpectedSession(expectedUserId);
       const data=await request('/auth/v1/signup',{method:'POST',body:{data:{game:'cage-grind'},gotrue_meta_security:{captcha_token:null}}});
       const created=rememberSession(data);
       if(!created)throw new Error('Supabase did not return an anonymous session.');
-      return created;
+      return assertExpectedSession(expectedUserId,created);
     }
 
-    function ensureSession(){
+    async function ensureSession(expectedUserId=''){
       const currentTime=Math.floor(now()/1000);
-      if(session&&session.expires_at>currentTime+60)return Promise.resolve(session);
-      if(sessionPromise)return sessionPromise;
-      sessionPromise=establishSession().finally(()=>{sessionPromise=null});
-      return sessionPromise;
+      if(session&&session.expires_at>currentTime+60)return assertExpectedSession(expectedUserId);
+      if(!sessionPromise)sessionPromise=establishSession(expectedUserId).finally(()=>{sessionPromise=null});
+      return assertExpectedSession(expectedUserId,await sessionPromise);
     }
 
-    async function authenticatedRequest(path,options={}){
-      let active=await ensureSession();
+    async function authenticatedRequest(path,options={},expectedUserId=''){
+      let active=await ensureSession(expectedUserId);
       try{return await request(path,Object.assign({},options,{token:active.access_token}))}
       catch(error){
         if(error.status!==401)throw error;
-        session=active;active=await refreshSession();
+        session=active;active=assertExpectedSession(expectedUserId,await refreshSession());
         return request(path,Object.assign({},options,{token:active.access_token}));
       }
     }
@@ -137,8 +145,8 @@
       return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
     }
 
-    async function selectOwnCageProfile(){
-      const active=await ensureSession(),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`);
+    async function selectOwnCageProfile(expectedUserId=''){
+      const active=await ensureSession(expectedUserId),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`,{},expectedUserId);
       return Array.isArray(rows)?rows[0]||null:null;
     }
 

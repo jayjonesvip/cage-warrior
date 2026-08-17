@@ -56,7 +56,7 @@
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
     }
 
-    async function loadOwnProfile(){return database.selectOwnCageProfile()}
+    async function loadOwnProfile(expectedProfileId=''){return database.selectOwnCageProfile(expectedProfileId)}
 
     async function loadProfileCount(){
       const data=await database.countCageProfiles();

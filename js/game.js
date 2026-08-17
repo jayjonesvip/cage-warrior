@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.121';
+  const ICON_ASSET_VERSION = '2.5.122';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -661,9 +661,9 @@
   function sharedSocialUnreadCount(){return sharedSocialStatus==='ready'?sharedSocialPosts.filter(post=>(Number(String(post.id).replace('shared-',''))||0)>state.socialLastRemotePostId).length:0}
   function sharedProfilePayload(){return {city:state.fighterCity,archetype:state.fighterStyle,fighterAvatar:state.fighterAvatar,level:state.level,wins:state.wins,losses:state.losses}}
   function mapSharedPost(post){const reporter=post.post_kind==='reporter',ceo=post.post_kind==='ceo',mine=post.author_id===state.socialProfileId,profile=reporter||ceo?null:sharedSocialProfiles.find(item=>item.id===post.author_id)||null,avatar=fighterAvatars.find(item=>item.id===profile?.fighter_avatar),ceoProfile=STRINGS.social.profiles.ceo;return {id:`shared-${post.id}`,author:ceo?ceoProfile.author:reporter?'CageReporter':post.author_handle,handle:ceo?ceoProfile.handle:`@${reporter?'CageReporter':post.author_handle}`,tone:ceo?'ceo':reporter?'media':mine?'player player-post':'fighter',text:String(post.body||''),createdAt:post.created_at,shared:true,profileId:profile?.id||'',avatarAsset:ceo?ceoProfile.avatar:avatar?.asset||'',verified:ceo}}
-  function fighterSessionMessage(error){const message=String(error?.message||error||'Cage Network unavailable.');if(/permanent fighter identity/i.test(message))return 'FIGHTER REGISTRATION MISSING · RECONNECTING THIS CAREER FAILED';if(/fighter session expired/i.test(message))return 'FIGHTER SESSION EXPIRED · REOPEN THE BROWSER PROFILE THAT CREATED THIS FIGHTER';if(/fighter session disconnected/i.test(message))return 'THIS SAVED FIGHTER BELONGS TO A DIFFERENT BROWSER PROFILE';if(/No unique Cage Grind name was available/i.test(message))return 'THIS FIGHTER IDENTITY IS ALREADY OWNED BY ANOTHER BROWSER PROFILE';return message}
+  function fighterSessionMessage(error){const message=String(error?.message||error||'Cage Network unavailable.');if(/permanent fighter identity/i.test(message))return 'FIGHTER REGISTRATION MISSING · RECOVERY REQUIRED';if(/fighter (network )?session (missing|expired)/i.test(message))return 'FIGHTER NETWORK SESSION UNAVAILABLE · RECOVERY REQUIRED';if(/fighter (network )?(session disconnected|identity does not match)/i.test(message))return 'FIGHTER NETWORK IDENTITY DOES NOT MATCH THIS CAREER · RECOVERY REQUIRED';if(/No unique Cage Grind name was available/i.test(message))return 'FIGHTER NETWORK IDENTITY CONFLICT · RECOVERY REQUIRED';return message}
   function sharedProfileMatchesCareer(profile){return !!profile&&normalizeIdentityName(profile.handle)===state.name&&String(profile.city||'')===state.fighterCity&&normalizeMajorArchetype(profile.archetype)===state.fighterStyle&&String(profile.fighter_avatar||'')===state.fighterAvatar}
-  async function syncSharedProfile(){const existing=await SHARED_FEED.loadOwnProfile();if(existing){if(!sharedProfileMatchesCareer(existing))throw new Error('Fighter session disconnected from this saved career.');return SHARED_FEED.registerProfile(sharedProfilePayload())}if(!SHARED_FEED.claimIdentity)throw new Error('Create a permanent fighter identity before syncing');const profile=await SHARED_FEED.claimIdentity(Object.assign(sharedProfilePayload(),{candidates:[state.name]}));if(!sharedProfileMatchesCareer(profile))throw new Error('Fighter session disconnected from this saved career.');return profile}
+  async function syncSharedProfile(){const existing=await SHARED_FEED.loadOwnProfile(state.socialProfileId);if(existing){if(!sharedProfileMatchesCareer(existing))throw new Error('Fighter network identity does not match this saved career.');return SHARED_FEED.registerProfile(sharedProfilePayload())}if(!SHARED_FEED.claimIdentity)throw new Error('Create a permanent fighter identity before syncing');const profile=await SHARED_FEED.claimIdentity(Object.assign(sharedProfilePayload(),{candidates:[state.name]}));if(!sharedProfileMatchesCareer(profile))throw new Error('Fighter network identity does not match this saved career.');return profile}
   function scheduleSharedSocialRefresh(){clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null;if(currentScreen==='feed'&&sharedSocialStatus==='ready')sharedSocialRefreshTimer=setTimeout(()=>connectSharedSocial(true),30000)}
   async function connectSharedSocial(force=false){
     if(!state.nameLocked||!SHARED_FEED?.configured?.())return false;
@@ -673,7 +673,7 @@
     sharedSocialSyncPromise=(async()=>{
       const profile=await syncSharedProfile();
       if(!profile?.id||!profile?.handle)throw new Error('Shared profile registration failed.');
-      if(state.socialProfileId&&profile.id!==state.socialProfileId&&!sharedProfileMatchesCareer(profile))throw new Error('Fighter session disconnected from this saved career.');
+      if(state.socialProfileId&&profile.id!==state.socialProfileId)throw new Error('Fighter network identity does not match this saved career.');
       state.socialProfileId=profile.id;if(normalizeIdentityName(profile.handle)!==state.name){state.name=normalizeIdentityName(profile.handle);state.nameLocked=true}
       let [posts,profiles,interactionsRemaining,championship]=await Promise.all([SHARED_FEED.loadFeed(50),SHARED_FEED.loadProfiles(1000),SHARED_FEED.loadInteractionAllowance(),SHARED_FEED.loadChampionship()]);setSharedChampionship(championship);syncRankedOpponents(profiles);queueTitleLossPresentation(sharedChampionship);landingFeature.setAvailability(sharedChampionship,true,false);const hasOwnRemotePost=Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id);
       if(state.socialAccountCreated&&!hasOwnRemotePost&&!state.socialRemoteInitialized){await SHARED_FEED.publishPost({kind:'player',body:'Hello, fight fans! Stay tuned—the climb starts now.'});posts=await SHARED_FEED.loadFeed(50)}
@@ -1647,7 +1647,7 @@
   recoveryReport=applyOfflineRecovery();
   updateUI();
   renderLanding();
-  loadLandingChampionship();
+  if(!state.nameLocked)loadLandingChampionship();
   observeLandingFeatures();
   writeHistory('screen','replace');
   if(state.nameLocked)connectSharedSocial(true);

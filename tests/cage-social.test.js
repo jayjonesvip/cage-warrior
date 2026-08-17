@@ -90,7 +90,7 @@ test('an invalid refresh token never replaces an established fighter with a new 
     },
   });
 
-  await assert.rejects(client.ensureSession(), /Fighter session expired/);
+  await assert.rejects(client.ensureSession(), /Fighter network session expired/);
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, /\/auth\/v1\/token\?grant_type=refresh_token$/);
   assert.equal(normalizeSession(JSON.parse(storage.value(SESSION_KEY))).user.id, session.user.id);
@@ -213,4 +213,33 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
   assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
   assert.ok(authenticated.some(request => request.url.includes(`id=eq.${session.user.id}`)));
+});
+
+test('an existing career never creates a replacement identity when its network session is missing', async () => {
+  const calls = [];
+  const client = createClient({
+    url: 'https://test.supabase.co',
+    key: 'sb_publishable_test-key',
+    storage: memoryStorage(),
+    now: () => 1_000_000,
+    fetchImpl: async (url, options) => { calls.push({ url, options }); return jsonResponse(session); },
+  });
+
+  await assert.rejects(client.loadOwnProfile(session.user.id), /network session missing/i);
+  assert.equal(calls.length, 0);
+});
+
+test('an existing career rejects a different valid browser identity before any profile request', async () => {
+  const otherSession = { ...session, user: { id: '22222222-2222-4222-8222-222222222222' } };
+  const calls = [];
+  const client = createClient({
+    url: 'https://test.supabase.co',
+    key: 'sb_publishable_test-key',
+    storage: memoryStorage({ [SESSION_KEY]: JSON.stringify(otherSession) }),
+    now: () => 1_000_000,
+    fetchImpl: async (url, options) => { calls.push({ url, options }); return jsonResponse([]); },
+  });
+
+  await assert.rejects(client.loadOwnProfile(session.user.id), /identity does not match/i);
+  assert.equal(calls.length, 0);
 });
