@@ -13,27 +13,19 @@ and `js/fight-focus.js`; and `js/game.js` coordinates those features with the ca
 
 ### Landing page
 
-- Every browser visit opens on a branded, responsive Cage Grind front door
-  before revealing the game interface.
+- Every browser visit opens on a minimal, responsive Cage Grind card before
+  revealing the game interface. The transparent app icon sits behind the card
+  as a centered ten-percent-opacity watermark.
 - A completed local career receives a personalized **Welcome Back** message,
-  current level, record, Followers, and a **Continue Career** action. A partially
+  current level, record, career rank, and a **Continue Career** action. A partially
   completed fighter receives **Continue Your Build** instead of being mistaken
   for a new or finished career.
-- New players see **Build Your MMA Fighter. Become World Champion.** and the
-  **Play Free Now** action without a simulated fighter card that could be
-  mistaken for live gameplay. Choosing an entry action never resets or replaces
-  the recovered local save.
-- A non-blocking World Championship panel uses the shared championship client
-  to show the current handle and successful defenses. Loading, vacant, and
-  offline states use quiet fallbacks; none can disable or delay career entry.
-- New-player landing pages scroll to three game-styled feature cards covering
-  fighter creation, fight planning, and the shared title chase. On phones, the
-  headline, entry action, automatic-save message, and championship proof remain
-  near the top, while returning careers and unfinished builds keep their
-  personalized copy and recovery actions.
+- New players see **Build. Fight. Become.** and **Start Your Career** without a
+  simulated fighter card that could be mistaken for live gameplay. Choosing an
+  entry action never resets or replaces the recovered local save.
+- Championship loading remains non-blocking and personalizes a returning
+  champion's status without adding another panel to the front door.
 - `landing_view` and `landing_enter` remain the primary funnel events.
-  `landing_feature_view` records only when a new player actually reaches the
-  feature-card section.
 
 ### Responsive desktop interface
 

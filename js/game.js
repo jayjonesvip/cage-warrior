@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.114';
+  const ICON_ASSET_VERSION = '2.5.116';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -428,7 +428,7 @@
     if(!recoveryReport)return;const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push('fight booking refunded');recoveryReport=null;toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff');
   }
   landingFeature=globalThis.CAGE_LANDING.createLandingFeature({
-    $,logic:LOGIC,getState:()=>state,getAvatar:()=>currentAvatar(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(showRecoveryReport,180),onChampionshipChange:renderFightChampionship
+    $,logic:LOGIC,getState:()=>state,getRank:()=>rankName(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(showRecoveryReport,180),onChampionshipChange:renderFightChampionship
   });
   function enterGameFromLanding(){landingFeature.enter()}
   function cageStatus(){
