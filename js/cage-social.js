@@ -56,6 +56,8 @@
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
     }
 
+    async function loadOwnProfile(){return database.selectOwnCageProfile()}
+
     async function loadProfileCount(){
       const data=await database.countCageProfiles();
       const value=Array.isArray(data)?data[0]:data;
@@ -94,7 +96,7 @@
     }
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

@@ -182,6 +182,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const profile = await client.registerProfile({ fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
+  const ownProfile = await client.loadOwnProfile();
   const profileCount = await client.loadProfileCount();
   const opponents = await client.loadOpponentCandidates(4, 12);
   const remaining = await client.loadInteractionAllowance();
@@ -194,6 +195,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.equal(retired.retired_at, '2026-08-10T12:00:00Z');
   assert.equal(feed[0].id, 7);
   assert.deepEqual(roster.map(row => row.id), [otherId]);
+  assert.equal(ownProfile.id, session.user.id);
   assert.equal(profileCount, 27);
   assert.equal(opponents[0].handle, 'GoldenTornadoNYC');
   assert.equal(remaining, 3);
@@ -210,4 +212,5 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.deepEqual(ceoPostBody, { p_event_key: 'city_offer' });
   const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
   assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
+  assert.ok(authenticated.some(request => request.url.includes(`id=eq.${session.user.id}`)));
 });
