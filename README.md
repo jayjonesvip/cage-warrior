@@ -468,8 +468,9 @@ precache list must keep data and feature modules ahead of `js/game.js`.
 The generated transparent header wordmark lives at
 `assets/cage-grind-logo.png`. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
-The 40 runtime fighter portraits use transparent `fighter-avatar-01.png`
-through `fighter-avatar-40.png` assets. Replaceable icons and
+The 44 runtime fighter portraits use transparent `assets/avatars/fighter-avatar-01.png`
+through `assets/avatars/fighter-avatar-44.png` assets. Generated opponent art is grouped
+under `assets/silhouettes/`. Replaceable icons and
 standalone opponent silhouettes in the
 [GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
 are source copies of the visual artwork. Regression tests live under `tests/` and
