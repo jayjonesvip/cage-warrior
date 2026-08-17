@@ -42,6 +42,7 @@ const dailyTitleRematchMigration = fs.readFileSync('supabase/migrations/20260816
 const simplifiedChampionshipMigration = fs.readFileSync('supabase/migrations/20260816193000_simplified_world_championship.sql', 'utf8');
 const manualIdentityMigration = fs.readFileSync('supabase/migrations/20260815143000_manual_fighter_handles.sql', 'utf8');
 const twoArchetypeMigration = fs.readFileSync('supabase/migrations/20260815200000_two_major_archetypes.sql', 'utf8');
+const resumeOwnedIdentityMigration = fs.readFileSync('supabase/migrations/20260817153000_resume_owned_fighter_identity.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
@@ -656,6 +657,9 @@ test('fighter identity is globally unique, permanent, and locked before the care
   assert.match(manualIdentityMigration, /name ~ '\^\[A-Za-z\]\[A-Za-z0-9_\]\{2,31\}\$'/);
   assert.match(manualIdentityMigration, /v_candidate !~ '\^\[A-Za-z\]\[A-Za-z0-9_\]\{2,31\}\$'/);
   assert.doesNotMatch(manualIdentityMigration, /v_city_code|right\(v_candidate/);
+  assert.match(resumeOwnedIdentityMigration, /update public\.cage_name_registry[\s\S]*set retired_at=null[\s\S]*lower\(name\)=lower\(v_candidate\)[\s\S]*owner_id=v_user_id/i);
+  assert.match(resumeOwnedIdentityMigration, /if found then[\s\S]*insert into public\.cage_profiles[\s\S]*retired_at=null/i);
+  assert.match(resumeOwnedIdentityMigration, /raise exception 'No unique Cage Grind name was available'/i);
   assert.doesNotMatch(supabaseClient, /fighter_name|author_name|target_name/);
   assert.match(script, /handle=normalizeIdentityName\(profile\?\.handle\)[\s\S]{0,700}\|\|!handle\|\|!name\|\|!avatar\|\|!arch/);
   assert.doesNotMatch(script, /\[A-Za-z0-9\]\{2,31\}_\[0-9\]/);
