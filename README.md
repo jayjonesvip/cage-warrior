@@ -135,6 +135,10 @@ generated league.
 - XP sits beneath level and rank in the top-left identity block, while Hype
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
+- **XP is earned through fights. Training improves attributes, hustles earn
+  cash, and publicity builds Followers and Hype.** Completed losses award
+  visible fight experience, while forfeits award none. The level requirement
+  remains `80 + (level × 40)` XP.
 - Followers are the fighter's lasting social audience, while Hype represents
   short-term attention. Successful fighter-to-fighter Cage Feed posts add a
   small, deterministic burst of both while keeping the shared community feed
@@ -299,8 +303,15 @@ generated league.
 - Regular opponents never retire. Every defeated fighter persists in the
   **Past Rivals** collection. A free taunt guarantees that rival
   accepts one more fight; the bout uses the player's current level-based round
-  cost, pays half purse, and retains full fight XP. Winning closes the offer
+  cost, pays half purse, and awards 50% fight XP. Winning closes the offer
   until another taunt, while losing keeps **Run It Back** immediately available.
+- Current-level and higher-level opponents award full base fight XP. Ordinary
+  rivals and past-level opponents award 50%. Completed ranked fights add 20%;
+  World Championship bouts add 30% instead of stacking the ranked bonus. A
+  first World Championship victory adds 25 XP, while title defenses do not.
+  The level-scaled `26 + (opponent level × 9)` victory formula is unchanged
+  above Level 3; Levels 1–3 receive a small 15/10/5 XP early-career boost so
+  fight-only progression reaches the intended early pacing.
 - The Career Opponents roster shows available current and past opponents and
   rivals. Championship bouts never appear inside this roster. Fighters are presented as fixed-ratio
   collectible-style cards, two across on mobile, with proportional artwork
@@ -394,9 +405,10 @@ generated league.
   player's next local midnight and never carry into a new day. While injured,
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.
-- Coach Vega is an optional training upgrade that adds skill gain, XP, and a
-  better perfect-session chance. His fee is `$250 + ($75 × fighter level)` per
-  session, including each Light or Heavy Sparring session.
+- Coach Vega is an optional training upgrade that improves training gains,
+  raises perfect-session odds from 17% to 27%, and reduces overtraining injury
+  risk from 33% to 20%. His fee is `$250 + ($75 × fighter level)` per session,
+  including each Light or Heavy Sparring session.
 - The Training page also has a Recovery Room with one paid treatment
   opportunity. Every completed fight makes one treatment available; unused
   opportunities never accumulate. An Ice Bath restores 25 energy, a Sauna

@@ -59,8 +59,9 @@ test('selectStoredState falls back to the last useful legacy save when all newer
 });
 
 test('an older save keeps progression and fills newer resource fields',()=>{
-  const state=normalize({version:4,name:'OLD SAVE',level:4,wins:7,losses:2,cash:900,stats:{power:11}});
+  const state=normalize({version:4,name:'OLD SAVE',level:4,xp:73,wins:7,losses:2,cash:900,stats:{power:11}});
   assert.equal(state.level,4);
+  assert.equal(state.xp,73);
   assert.equal(state.wins,7);
   assert.equal(state.losses,2);
   assert.equal(state.careerEarnings,900);
@@ -157,6 +158,38 @@ test('fight and rematch payouts preserve existing formulas',()=>{
   assert.equal(logic.payoutForOpponent({...beatenOpponent,globalChampionship:true},3),200);
   assert.equal(logic.winFightCash({basePurse:200,hype:0,cashBonus:0,winStreak:1,variance:1}),200);
   assert.equal(logic.lossFightCash(200),16);
+});
+
+test('fight XP covers current-level wins, higher-level upsets, losses, and forfeits',()=>{
+  assert.equal(logic.xpRequirement(1),120);
+  assert.equal(logic.xpRequirement(5),280);
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true}),{xp:62,category:'standard',modifiers:[]});
+  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:5,won:true,upset:true}).xp,89);
+  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false}).xp,23);
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,forfeited:true}),{xp:0,category:'forfeit',modifiers:['FORFEIT · NO XP']});
+});
+
+test('past-level and ordinary rival fights award half XP without double reduction',()=>{
+  assert.deepEqual(logic.fightXp({playerLevel:5,opponentLevel:4,won:true}),{xp:31,category:'reduced',modifiers:['PAST-LEVEL FIGHT · 50% XP']});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,rival:true}),{xp:31,category:'reduced',modifiers:['RIVAL FIGHT · 50% XP']});
+  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:4,won:true,rival:true}).xp,31);
+});
+
+test('ranked and championship XP bonuses do not stack',()=>{
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,ranked:true}),{xp:74,category:'ranked',modifiers:['RANKED FIGHT BONUS +20%']});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,ranked:true,championship:true}),{xp:81,category:'championship',modifiers:['WORLD TITLE BOUT BONUS +30%']});
+});
+
+test('winning the belt adds 25 XP once while a title defense does not',()=>{
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,championship:true,titleWon:true}),{xp:106,category:'title_victory',modifiers:['WORLD TITLE BOUT BONUS +30%','WORLD TITLE WON +25 XP']});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,championship:true,titleWon:false}),{xp:81,category:'championship',modifiers:['WORLD TITLE BOUT BONUS +30%']});
+});
+
+test('small early-career fight XP boosts hit the target without changing middle levels',()=>{
+  assert.equal(logic.fightXp({playerLevel:1,opponentLevel:1,won:true}).xp,50);
+  assert.equal(logic.fightXp({playerLevel:2,opponentLevel:2,won:true}).xp,54);
+  assert.equal(logic.fightXp({playerLevel:3,opponentLevel:3,won:true}).xp,58);
+  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:5,won:true}).xp,71);
 });
 
 test('opponent availability covers career fights, the global title, and accepted rematches',()=>{
@@ -295,6 +328,16 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingGain(2,false,false),2);
   assert.equal(logic.trainingGain(2,true,true),3);
   assert.equal(logic.trainingGain(1,false,true),2);
+});
+
+test('Coach Vega improves training and reduces explicit injury risk without XP',()=>{
+  assert.equal(logic.trainingGain(1,false,false),1);
+  assert.equal(logic.trainingGain(1,true,false),2);
+  assert.equal(logic.trainingPerfectChance(false),.17);
+  assert.equal(logic.trainingPerfectChance(true),.27);
+  assert.equal(logic.trainingInjuryChance(false,false),0);
+  assert.equal(logic.trainingInjuryChance(true,false),.33);
+  assert.equal(logic.trainingInjuryChance(true,true),.20);
 });
 
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{

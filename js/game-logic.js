@@ -180,6 +180,9 @@
     return base+(coach||perfect?1:0);
   }
 
+  function trainingPerfectChance(coach=false){return coach ? .27 : .17}
+  function trainingInjuryChance(overtraining=false,coach=false){return overtraining?(coach ? .20 : .33):0}
+
   function injuredStat(value,injured=false){
     const rating=Math.max(1,finite(value,1));
     return injured?Math.max(1,rating-Math.max(1,rating*.10)):rating;
@@ -272,6 +275,24 @@
   }
 
   function lossFightCash(basePurse){return Math.round(Math.max(0,finite(basePurse))*.08)}
+
+  function xpRequirement(level){return 80+Math.max(1,whole(level,1))*40}
+
+  function fightXp({playerLevel=1,opponentLevel=1,won=false,forfeited=false,upset=false,ranked=false,championship=false,titleWon=false,rival=false}={}){
+    if(forfeited)return {xp:0,category:'forfeit',modifiers:['FORFEIT · NO XP']};
+    const fighterLevel=Math.max(1,whole(playerLevel,1)),opponent=Math.max(1,whole(opponentLevel,1));
+    const earlyCareerBonus=Math.max(0,20-opponent*5),baseVictory=26+opponent*9+earlyCareerBonus;
+    const reduced=!!rival||opponent<fighterLevel,reductionReason=rival?'RIVAL FIGHT · 50% XP':'PAST-LEVEL FIGHT · 50% XP';
+    let amount=baseVictory*(upset&&won?1.25:1)*(reduced?.5:1)*(won?1:.375);
+    const modifiers=[];
+    if(reduced)modifiers.push(reductionReason);
+    if(championship){amount*=1.3;modifiers.push('WORLD TITLE BOUT BONUS +30%')}
+    else if(ranked){amount*=1.2;modifiers.push('RANKED FIGHT BONUS +20%')}
+    const beltBonus=championship&&won&&titleWon?25:0;
+    if(beltBonus)modifiers.push('WORLD TITLE WON +25 XP');
+    const category=beltBonus?'title_victory':championship?'championship':ranked?'ranked':reduced?'reduced':'standard';
+    return {xp:Math.max(0,Math.round(amount)+beltBonus),category,modifiers};
+  }
 
   function gearLoadoutLimit(level){return finite(level)>=8?4:2}
 
@@ -404,5 +425,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
