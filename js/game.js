@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.116';
+  const ICON_ASSET_VERSION = '2.5.120';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -880,30 +880,30 @@
       const dailyExhausted=fightsLeft<1&&available;
       const stars=clamp(Math.ceil((o.power+o.speed+o.chin+o.cardio)/18),1,5);
       const silhouette=silhouetteForOpponent(o);
-      const badge=o.network?`RANKED · LVL ${o.tier}${status==='locked'?' · LOCKED':''}`:`UNRANKED · LVL ${o.tier}`,badgeIcon='';
-      const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rivalFight=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),networkLocation=o.network?networkOpponentLocation(o):null,note=status==='locked'?`Ranked fighter unlocks at level ${o.tier}`:status==='passed'?(hasHistory?`Ranked rival fight at level ${o.tier}`:`Ranked fighter from level ${o.tier}`):(hasHistory?`Current-level rival fight · payout $${fmt(purse)}`:`Current-level ${o.network?'ranked':'unranked'} fighter · payout $${fmt(purse)}`),cardInfo=o.network?`<div class="opp-note network-card-meta"><small>RANKED FIGHTER</small><b>${networkLocation?`${networkLocation.name} · ${networkLocation.region}`:'CAGE NETWORK'}</b><span>FULL PURSE · $${fmt(purse)}</span></div>`:`<div class="opp-note">${note}</div>`;
-      const btn=dailyExhausted?'DAILY LIMIT REACHED<br><small>NEW FIGHTS AT LOCAL MIDNIGHT</small>':status==='locked'?`LOCKED<br><small>LVL ${o.tier}</small>`:rivalFight?'RUN IT BACK':'SEE MATCHUP';
+      const fighterClass=o.network?'RANKED FIGHTER':'UNRANKED FIGHTER',frontClass=o.network?'RANKED':'UNRANKED';
+      const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rivalFight=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),networkLocation=o.network?networkOpponentLocation(o):null,region=networkLocation?`${networkLocation.name} ${networkLocation.region}`:(o.country?`${o.country} CIRCUIT`:'CAGE CIRCUIT'),matchup=hasHistory?`${rivalry?'RIVAL · ':''}YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}`:'FIRST MEETING';
+      const btn=dailyExhausted?'DAILY LIMIT REACHED<br><small>NEW FIGHTS AT LOCAL MIDNIGHT</small>':status==='locked'?`🔒 UNLOCKS AT LEVEL ${o.tier}`:rivalFight?'RUN IT BACK':'SEE MATCHUP';
       const action=tauntable?`<button class="fight-btn taunt" data-taunt-key="${o.key}">TAUNT<br><small>FOR A RIVAL FIGHT</small></button>`:dailyExhausted?`<button class="fight-btn locked daily-limit" disabled>${btn}</button>`:`<button class="fight-btn ${status}" data-fight-key="${o.key}" ${!available?'disabled':''}>${btn}</button>`;
       const safeName=escapeHtml(o.name),safeStyle=escapeHtml(o.tag||'UNKNOWN STYLE'),networkHandle=o.network?escapeHtml(o.networkHandle):'';
       return `<article class="opponent ${status} ${o.network?'network':''} ${rivalFight?'rematch':''} ${dailyExhausted?'daily-exhausted':''}" data-card-flip="true" data-card-name="${safeName}" tabindex="0" aria-label="${safeName} fighter card${dailyExhausted?', daily fight limit reached':rivalFight?', rival fight available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
         <div class="opponent-flip">
           <div class="opponent-side opponent-front" aria-hidden="false">
-            <div class="opp-card-top"><span class="opp-badge">${badgeIcon}${badge}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
+            <div class="opp-card-top"><span class="opp-badge">${frontClass}</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
             <div class="opp-face">
               <img class="opp-sprite" src="${silhouette}" alt="${safeName} ${o.network?'portrait':'silhouette'}" loading="lazy">
-              ${o.network&&status==='locked'?'<span class="sil-label">RANKED · LOCKED</span>':o.network&&status==='passed'?'<span class="sil-label">RANKED · AVAILABLE</span>':''}
               ${rivalFight?`<span class="rematch-banner">${gameIcon('rematch','⚡')} RIVAL FIGHT</span>`:''}
             </div>
-            <div class="opp-title"><h3>${safeName}</h3><span class="tendency opp-style">${safeStyle}</span>${o.network?`<small class="network-handle">@${networkHandle} · RANKED FIGHTER</small>`:'<small class="unranked-handle">COMPUTER · UNRANKED FIGHTER</small>'}</div>
-            <div class="flip-hint">↻ TAP CARD FOR DETAILS</div>
+            <div class="opp-title"><h3>${safeName}</h3><span class="opp-identity">${o.network?`@${networkHandle}`:`LEVEL ${o.tier}`}<i>•</i><b>${safeStyle}</b></span></div>
+            <div class="flip-hint">TAP FOR DETAILS</div>
             ${action}
           </div>
           <div class="opponent-side opponent-back" aria-hidden="true">
-            <div class="opp-card-top"><span class="opp-badge">${badgeIcon}${badge}</span><span class="flip-hint">DETAILS</span></div>
-            <div class="opp-back-title"><h3>${safeName}</h3><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
+            <div class="opp-card-top"><span class="opp-back-kicker">FIGHTER DETAILS</span><span class="opp-record">PRO ${o.wins}-${o.losses}</span></div>
+            <div class="opp-back-title"><h3>${safeName}</h3><span>${fighterClass}<i>•</i>${safeStyle}</span></div>
             <div class="opp-back-stats"><div class="opp-back-stat"><small>PWR</small><b>${formatStat(o.power)}</b></div><div class="opp-back-stat"><small>SPD</small><b>${formatStat(o.speed)}</b></div><div class="opp-back-stat"><small>CHN</small><b>${formatStat(o.chin)}</b></div><div class="opp-back-stat"><small>CAR</small><b>${formatStat(o.cardio)}</b></div></div>
-            <div class="opp-back-info"><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div><span class="tendency opp-style">${safeStyle}</span>${cardInfo}${rivalry?`<span class="tendency rival-pill">${gameIcon('rival','🔥')} RIVAL</span>`:''}${hasHistory?`<div class="opp-history">H2H YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}</div>`:'<div class="opp-history">FIRST MEETING</div>'}</div>
-            <div class="flip-hint">↻ TAP CARD TO RETURN</div>
+            <div class="opp-back-rating stars" aria-label="${stars} of 5 difficulty">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
+            <dl class="opp-back-info"><div><dt>REGION</dt><dd>${escapeHtml(region)}</dd></div><div><dt>PURSE</dt><dd>$${fmt(purse)}</dd></div><div><dt>MATCHUP</dt><dd>${matchup}</dd></div></dl>
+            <div class="flip-hint">TAP CARD TO RETURN</div>
           </div>
         </div>
       </article>`;
