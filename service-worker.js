@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='2.5.112';
+const APP_VERSION='2.5.113';
 const CACHE_PREFIX='cage-grind-app-';
 const CACHE_NAME=`${CACHE_PREFIX}${APP_VERSION}`;
 const ROOT_URL=new URL('./',self.location.href);
@@ -8,33 +8,33 @@ const OFFLINE_URL=new URL('index.html',ROOT_URL).href;
 const CORE_ASSETS=[
   './',
   './index.html',
-  './css/shared.css?v=2.5.112',
-  './css/styles.css?v=2.5.112',
-  './css/landing.css?v=2.5.112',
-  './js/game-logic.js?v=2.5.112',
-  './js/shared-ui.js?v=2.5.112',
-  './js/fight-focus-contacts.js?v=2.5.112',
-  './js/strings.js?v=2.5.112',
-  './js/analytics.js?v=2.5.112',
-  './js/supabase-client.js?v=2.5.112',
-  './js/cage-social.js?v=2.5.112',
-  './js/landing.js?v=2.5.112',
-  './js/fight-focus.js?v=2.5.112',
-  './js/fight-plan.js?v=2.5.112',
-  './js/game.js?v=2.5.112',
-  './js/pwa.js?v=2.5.112',
+  './css/shared.css?v=2.5.113',
+  './css/styles.css?v=2.5.113',
+  './css/landing.css?v=2.5.113',
+  './js/game-logic.js?v=2.5.113',
+  './js/shared-ui.js?v=2.5.113',
+  './js/fight-focus-contacts.js?v=2.5.113',
+  './js/strings.js?v=2.5.113',
+  './js/analytics.js?v=2.5.113',
+  './js/supabase-client.js?v=2.5.113',
+  './js/cage-social.js?v=2.5.113',
+  './js/landing.js?v=2.5.113',
+  './js/fight-focus.js?v=2.5.113',
+  './js/fight-plan.js?v=2.5.113',
+  './js/game.js?v=2.5.113',
+  './js/pwa.js?v=2.5.113',
   './manifest.webmanifest',
   './app-version.json',
   './assets/cage-grind-logo.png',
   './assets/fighter-silhouette-1.png',
-  './assets/focus-locker-room.jpg?v=2.5.112',
-  './assets/contact-mom.jpg?v=2.5.112',
-  './assets/contact-wife.jpg?v=2.5.112',
-  './assets/contact-brother-tommy.png?v=2.5.112',
-  './assets/contact-agent-carl.png?v=2.5.112',
-  './assets/contact-grandma.jpg?v=2.5.112',
-  './assets/cage-grind-ceo.jpg?v=2.5.112',
-  './assets/cage-dice.jpg?v=2.5.112',
+  './assets/focus-locker-room.jpg?v=2.5.113',
+  './assets/contact-mom.jpg?v=2.5.113',
+  './assets/contact-wife.jpg?v=2.5.113',
+  './assets/contact-brother-tommy.png?v=2.5.113',
+  './assets/contact-agent-carl.png?v=2.5.113',
+  './assets/contact-grandma.jpg?v=2.5.113',
+  './assets/cage-grind-ceo.jpg?v=2.5.113',
+  './assets/cage-dice.jpg?v=2.5.113',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
@@ -49,10 +49,10 @@ const CORE_ASSETS=[
   './assets/icons/nav-hustle.png',
   './assets/icons/nav-gear.png',
   './assets/icons/nav-feed.png',
-  './assets/icons/title-world.png?v=2.5.112',
-  './assets/icons/round-intro-1.png?v=2.5.112',
-  './assets/icons/round-intro-2.png?v=2.5.112',
-  './assets/icons/round-intro-3.png?v=2.5.112'
+  './assets/icons/title-world.png?v=2.5.113',
+  './assets/icons/round-intro-1.png?v=2.5.113',
+  './assets/icons/round-intro-2.png?v=2.5.113',
+  './assets/icons/round-intro-3.png?v=2.5.113'
 ].map(path=>new URL(path,self.location.href).href);
 
 self.addEventListener('install',event=>{

@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.112';
+  const ICON_ASSET_VERSION = '2.5.113';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -428,7 +428,7 @@
     if(!recoveryReport)return;const parts=[];if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} energy`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} health`);if(recoveryReport.refunded)parts.push('fight booking refunded');recoveryReport=null;toast(`WELCOME BACK · ${parts.join(' · ')}`,'#78dfff');
   }
   landingFeature=globalThis.CAGE_LANDING.createLandingFeature({
-    $,logic:LOGIC,getState:()=>state,getAvatar:()=>currentAvatar(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(showRecoveryReport,180)
+    $,logic:LOGIC,getState:()=>state,getAvatar:()=>currentAvatar(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(showRecoveryReport,180),onChampionshipChange:renderFightChampionship
   });
   function enterGameFromLanding(){landingFeature.enter()}
   function cageStatus(){
@@ -679,7 +679,7 @@
       sharedSocialProfiles=[profile,...(Array.isArray(profiles)?profiles.filter(item=>item.id!==profile.id):[])];try{state.socialFollowingCount=await SHARED_FEED.loadProfileCount()}catch{state.socialFollowingCount=sharedSocialProfiles.length}sharedSocialInteractionsRemaining=Math.max(0,Math.min(5,Number(interactionsRemaining)||0));sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];const latestRemoteId=Math.max(0,...sharedSocialPosts.map(post=>Number(String(post.id).replace('shared-',''))||0));if(currentScreen==='feed')state.socialLastRemotePostId=latestRemoteId;
       sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderLanding();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();if(state.pendingChampionshipResult&&!championshipSettlementPromise)queueMicrotask(()=>settleChampionshipResult());requestAnimationFrame(showPendingTitleLoss);return true;
     })().catch(error=>{
-      sharedSocialStatus='error';sharedSocialError=fighterSessionMessage(error);sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;if(!landingFeature.status().championshipLoaded)landingFeature.setAvailability(null,true,true);renderSocial();renderLanding();
+      sharedSocialStatus='error';sharedSocialError=fighterSessionMessage(error);sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;if(!landingFeature.status().championshipLoaded)landingFeature.setAvailability(null,true,true);renderSocial();renderLanding();renderOpponents();
       if(currentScreen==='feed'&&!sharedSocialNoticeShown){sharedSocialNoticeShown=true;toast('SHARED FEED SETUP PENDING · USING LOCAL FEED','#ffcf78')}
       return false;
     }).finally(()=>{sharedSocialSyncPromise=null});
@@ -852,7 +852,7 @@
   function championshipRecord(wins,losses){return `${Math.max(0,Number(wins)||0)}-${Math.max(0,Number(losses)||0)}`}
   function renderFightChampionship(){
     const card=$('#worldTitleCard');if(!card)return;
-    const unavailable=sharedSocialStatus==='error',loading=!sharedChampionship&&!unavailable,champ=sharedChampionship,opponent=championshipOpponent(),defenses=Math.max(0,Number(champ?.defenses)||0),championHandle=champ?.champion_handle?`@${escapeHtml(champ.champion_handle)}`:'—',championLevel=Math.max(1,Number(champ?.champion_level)||1),reset=championshipResetCopy(champ),fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT);
+    const landingStatus=landingFeature.status(),unavailable=landingStatus.championshipUnavailable===true||(sharedSocialStatus==='error'&&!sharedChampionship&&!landingStatus.championshipLoaded),loading=!sharedChampionship&&!unavailable&&!landingStatus.championshipLoaded,champ=sharedChampionship,opponent=championshipOpponent(),defenses=Math.max(0,Number(champ?.defenses)||0),championHandle=champ?.champion_handle?`@${escapeHtml(champ.champion_handle)}`:'—',championLevel=Math.max(1,Number(champ?.champion_level)||1),reset=championshipResetCopy(champ),fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT);
     let status='loading',headline='CHECKING THE WORLD CHAMPION',message='Loading the current champion and your title status.',action='PLEASE WAIT',disabled=true,actionLabel='Championship information is loading',opponentHtml='',reign='';
     if(unavailable){status='unavailable';headline='CHAMPIONSHIP UPDATE UNAVAILABLE';message='Regular fights are still available.';action='TRY AGAIN';disabled=false;actionLabel='Retry championship update'}
     else if(champ?.is_champion){

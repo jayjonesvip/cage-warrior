@@ -2,7 +2,7 @@
   'use strict';
 
   function createLandingFeature(options){
-    const {$,logic,getState,getAvatar,getChampionship,setChampionship,sharedFeed,sharedUi,trackEvent,tap,onEntered}=options;
+    const {$,logic,getState,getAvatar,getChampionship,setChampionship,sharedFeed,sharedUi,trackEvent,tap,onEntered,onChampionshipChange}=options;
     let mode='new',entered=false,championshipLoaded=false,championshipUnavailable=false,featureViewed=false;
 
     function renderChampionship(){
@@ -24,7 +24,7 @@
       try{setAvailability(await sharedFeed.loadChampionship()||null,true,false)}catch{setAvailability(null,true,true)}
     }
     function setAvailability(championship,loaded=true,unavailable=false){
-      setChampionship(championship);championshipLoaded=loaded;championshipUnavailable=unavailable;render();
+      setChampionship(championship);championshipLoaded=loaded;championshipUnavailable=unavailable;render();onChampionshipChange?.();
     }
     function observeFeatures(){
       const features=$('#landingFeatures');if(!features||mode!=='new'||typeof IntersectionObserver!=='function')return;
