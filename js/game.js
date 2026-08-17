@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.107';
+  const ICON_ASSET_VERSION = '2.5.108';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -291,15 +291,15 @@
   ];
 
   const trainDefs = [
-    {id:'heavy-bag-rounds',icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,xp:9,sessions:1},
-    {id:'slip-rope-drill',icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,xp:9,sessions:1},
-    {id:'body-conditioning',icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,xp:11,sessions:1},
-    {id:'roadwork-at-dawn',icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,xp:10,sessions:1}
+    {id:'heavy-bag-rounds',icon:'🥊',title:'Heavy Bag Rounds',text:'Power work. Hooks get meaner.',stat:'power',cost:8,gain:1,sessions:1},
+    {id:'slip-rope-drill',icon:'⚡',title:'Slip Rope Drill',text:'Speed work. Hands come back faster.',stat:'speed',cost:8,gain:1,sessions:1},
+    {id:'body-conditioning',icon:'🧱',title:'Body Conditioning',text:'Chin work. Learn to stay upright.',stat:'chin',cost:10,gain:1,sessions:1},
+    {id:'roadwork-at-dawn',icon:'🫁',title:'Roadwork at Dawn',text:'Cardio work. Bigger stamina pool.',stat:'cardio',cost:9,gain:1,sessions:1}
   ];
 
   const sparringDefs = [
-    {id:'light-sparring',icon:'🥋',title:'Light Sparring',text:'Technical rounds at a controlled pace. Improve one random skill without taking damage.',cost:10,gain:1,xp:14,skills:1},
-    {id:'heavy-sparring',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills, but expect to absorb some damage.',cost:20,gain:1,xp:28,skills:2,damage:[3,9]}
+    {id:'light-sparring',icon:'🥋',title:'Light Sparring',text:'Technical rounds at a controlled pace. Improve one random skill without taking damage.',cost:10,gain:1,skills:1},
+    {id:'heavy-sparring',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills, but expect to absorb some damage.',cost:20,gain:1,skills:2,damage:[3,9]}
   ];
 
   const trainingInjuryDefs = [
@@ -314,9 +314,9 @@
   ];
 
   const hustleDefs = [
-    {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90],xp:4},
-    {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],xp:5},
-    {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],xp:3}
+    {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90]},
+    {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135]},
+    {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70]}
   ];
 
   const recoveryDefs = [
@@ -330,12 +330,12 @@
   const currentFightClearance=()=>currentFightRoundCost()*FIGHT_ROUNDS;
 
   const publicityDefs = [
-    {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],xp:10,payout:'$80–190'},
-    {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:10,autograph:true,xp:14,payout:'UNKNOWN'},
-    {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],xp:16,payout:'$350–900'},
-    {id:'commercial',icon:'🎬',title:'Regional Commercial',text:'Shoot an ad. Solid payday with a chance for the clip to go viral.',minLevel:6,minFans:1500,cost:15,cash:[900,2400],fans:[120,360],xp:22,viral:.18,payout:'$900–2.4K'},
-    {id:'expo',icon:'🏟️',title:'National Fitness Expo',text:'Featured guest appearance with photos, interviews, and a packed signing line.',minLevel:8,minFans:5000,cost:20,cash:[3500,8000],fans:[450,1100],xp:32,payout:'$3.5K–8K'},
-    {id:'tv-spot',icon:'📺',title:'Prime-Time Sports Segment',text:'National television appearance. One good quote can change your career.',minLevel:10,minFans:15000,cost:24,cash:[9000,18000],fans:[1200,3000],xp:45,viral:.28,payout:'$9K–18K'}
+    {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],payout:'$80–190'},
+    {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:10,autograph:true,payout:'UNKNOWN'},
+    {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],payout:'$350–900'},
+    {id:'commercial',icon:'🎬',title:'Regional Commercial',text:'Shoot an ad. Solid payday with a chance for the clip to go viral.',minLevel:6,minFans:1500,cost:15,cash:[900,2400],fans:[120,360],viral:.18,payout:'$900–2.4K'},
+    {id:'expo',icon:'🏟️',title:'National Fitness Expo',text:'Featured guest appearance with photos, interviews, and a packed signing line.',minLevel:8,minFans:5000,cost:20,cash:[3500,8000],fans:[450,1100],payout:'$3.5K–8K'},
+    {id:'tv-spot',icon:'📺',title:'Prime-Time Sports Segment',text:'National television appearance. One good quote can change your career.',minLevel:10,minFans:15000,cost:24,cash:[9000,18000],fans:[1200,3000],viral:.28,payout:'$9K–18K'}
   ];
 
   const endorsementDefs = [
@@ -434,7 +434,7 @@
   function cageStatus(){
     return rankName();
   }
-  function xpNeed(){return 80+state.level*40}
+  function xpNeed(){return LOGIC.xpRequirement(state.level)}
   function effectiveStat(key){
     let v=state.stats[key],style=fighterStyles.find(s=>s.id===state.fighterStyle);if(style&&style.stats[key])v+=style.stats[key];
     for(const id of state.equippedGear){const g=gearItems.find(x=>x.id===id);if(g&&g.stat===key)v+=g.bonus}
@@ -499,9 +499,9 @@
   function currentTrainingInjury(){return trainingInjuryDefs.find(entry=>entry.id===state.trainingInjury?.id)||null}
   function trainingCooldownRemaining(now=Date.now()){ensureDailyCounters();return Math.max(0,(Number(state.trainingCooldownUntil)||0)-now)}
   function trainingCooldownText(milliseconds){const seconds=Math.max(0,Math.ceil(milliseconds/1000));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
-  function applyTrainingCooldown(){
+  function applyTrainingCooldown(coach=false){
     const now=Date.now(),remaining=trainingCooldownRemaining(now),overtraining=remaining>0;state.trainingCooldownDate=todayKey();state.trainingCooldownUntil=(overtraining?Math.max(now,state.trainingCooldownUntil):now)+TRAINING_COOLDOWN_MS;let injury=null;
-    if(overtraining&&!state.trainingInjury&&Math.random()<.33){injury=trainingInjuryDefs[rint(0,trainingInjuryDefs.length-1)];state.trainingInjury={id:injury.id,date:todayKey()}}
+    if(overtraining&&!state.trainingInjury&&Math.random()<LOGIC.trainingInjuryChance(overtraining,coach)){injury=trainingInjuryDefs[rint(0,trainingInjuryDefs.length-1)];state.trainingInjury={id:injury.id,date:todayKey()}}
     return {overtraining,injury};
   }
   function updateTrainingCooldownDisplay(){
@@ -578,7 +578,7 @@
     while(state.xp>=xpNeed()){
       state.xp-=xpNeed();state.level++;LOGIC.applyLevelUpResources(state,false);const bonus=100*state.level;receiveMoney(bonus,true);earningsBonus+=bonus;leveled=true;
     }
-    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus};trackEvent('level_up',{from_level:startingLevel,to_level:state.level,levels_gained:state.level-startingLevel});ensureRoster();showLevelUp(levelUpSummary);if(state.socialAccountCreated)connectSharedSocial(true)}
+    if(leveled){const previous=levelUpSummary;levelUpSummary={fromLevel:previous?.fromLevel||startingLevel,toLevel:state.level,earningsBonus:(previous?.earningsBonus||0)+earningsBonus};trackEvent('level_up',{from_level:startingLevel,to_level:state.level,levels_gained:state.level-startingLevel});ensureRoster();if(state.socialAccountCreated)connectSharedSocial(true)}
   }
   function showLevelUp(summary){if(!summary)return;const levels=summary.toLevel-summary.fromLevel,loadoutUnlocked=summary.fromLevel<8&&summary.toLevel>=8;$('#levelUpNumber').textContent=summary.toLevel;$('#levelUpTitle').textContent=rankName();$('#levelUpFrom').textContent=`LEVEL ${summary.fromLevel} → LEVEL ${summary.toLevel}`;$('#levelUpEnergy').textContent=`+${levels*3}`;$('#levelUpHealth').textContent=`+${levels*5}`;$('#levelUpCash').textContent=`+$${fmt(summary.earningsBonus)}`;$('#levelUpNote').textContent=`Your corner restored up to 30 energy and 25 health per level. ${loadoutUnlocked?'Four-slot Fight Gear loadout unlocked.':'New competition is now available.'}`;const modal=$('#levelUpModal');modal.classList.add('active');modal.setAttribute('aria-hidden','false');sfx.level();vibrate([35,35,65,35,90]);confettiBurst();clearTimeout(modal._burstTimer);modal._burstTimer=setTimeout(confettiBurst,620)}
   function closeLevelUp(){const modal=$('#levelUpModal');clearTimeout(modal._burstTimer);modal._burstTimer=null;stopConfetti();modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI();requestAnimationFrame(()=>showPendingTitleLoss()||showPendingCeoOffice())}
@@ -971,8 +971,8 @@
     if(quote.reason==='limit'){toast('No training sessions left today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
-    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount);
-    const recovery=applyTrainingCooldown();state.stats[a.stat]+=gain;gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?2:1)));if(recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - +${gain} ${a.stat.toUpperCase()}`:perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');
+    const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount);
+    const recovery=applyTrainingCooldown(coach);state.stats[a.stat]+=gain;if(recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - +${gain} ${a.stat.toUpperCase()}`:perfect?`PERFECT SESSION! +${gain} ${a.stat.toUpperCase()}`:`+${gain} ${a.stat.toUpperCase()}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');
     trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,sessions_used:quote.sessions});updateUI();
   }
   function handleSparring(i){
@@ -980,7 +980,7 @@
     if(quote.reason==='limit'){toast('No sparring sessions left today.','#ff766d');return}
     if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up a side job first.`,'#ffcc75');return}
     if(!spendEnergy(quote.energyCost))return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.sparring+=quote.sessions;
-    const perfect=Math.random()<(coach?.27:.17),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills),recovery=applyTrainingCooldown();skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);gainXp(Math.round(a.xp*(coach?1.35:1)*(perfect?1.5:1)));if(a.skills>1||recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` - ${damage} health lost`:'';toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - ${gains}`:`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
+    const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount),skills=['power','speed','chin','cardio'].sort(()=>Math.random()-.5).slice(0,a.skills),recovery=applyTrainingCooldown(coach);skills.forEach(k=>state.stats[k]+=gain);const damageBase=a.damage?rint(...a.damage):0;const damage=LOGIC.sparringDamage(damageBase,repeatCount);if(damage)state.health=clamp(state.health-damage,1,state.maxHealth);if(a.skills>1||recovery.injury){sfx.crit();shake(true)}else{sfx.train();shake(false)}const gains=skills.map(skill=>`+${gain} ${skill.toUpperCase()}`).join(' & '),damageText=damage?` - ${damage} health lost`:'';toast(recovery.injury?`${recovery.injury.icon} INJURED: ${recovery.injury.name.toUpperCase()} - ${gains}`:`${perfect?'ELITE SPAR!':'SPAR COMPLETE!'} ${gains}${damageText}`,recovery.injury?'#ff6875':perfect?'#f4c34a':'#77d13e');trackEvent('training_completed',{training_id:a.id,training_type:'sparring',coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:gain,skills_improved:a.skills,health_lost:damage,sessions_used:quote.sessions});updateUI();
   }
   function handleRecovery(i){
     ensureDailyCounters();const treatment=recoveryDefs[i];if(!treatment)return;const fee=recoveryFee(treatment),quote=LOGIC.recoveryQuote(state,treatment,fee,!state.treatmentAvailable);
@@ -990,7 +990,7 @@
     state.cash-=quote.cashCost;state.treatmentAvailable=false;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
   function handleHustle(i){
-    ensureDailyCounters();if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);gainXp(a.xp);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
+    ensureDailyCounters();if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
   }
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
@@ -1001,7 +1001,7 @@
     initAudio();state.dailyCounters.publicity++;
     let cash=rint(...a.cash),fans=rint(...a.fans),viral=false;
     if(a.viral&&Math.random()<a.viral){cash=Math.round(cash*1.65);fans=Math.round(fans*2.2);viral=true}
-    receiveMoney(cash,true);fans=changeFollowers(fans);gainXp(a.xp);sfx.coin();
+    receiveMoney(cash,true);fans=changeFollowers(fans);sfx.coin();
     if(viral){confettiBurst();sfx.win();toast(`THE CLIP WENT VIRAL! +$${fmt(cash)} · +${fmt(fans)} followers`,'#6ed7ff')}
     else toast(`+$${fmt(cash)} · +${fmt(fans)} followers`,'#77d13e');
     openSocialCycle('appearance',{title:a.title,viral,followers:fans});trackEvent('publicity_completed',{publicity_id:a.id,outcome:viral?'viral':'success',cash_earned:cash,followers_gained:fans,energy_spent:a.cost});
@@ -1043,7 +1043,7 @@
     else if(price<=25)fanChange=Math.round(signatures*rand(.03,.12));
     else if(price<=35)fanChange=Math.round(signatures*rand(-.04,.04));
     else fanChange=-Math.max(4,Math.round((price-34)*rand(.5,1.3)+state.fans*rand(.004,.012)));
-    receiveMoney(cash,true);fanChange=changeFollowers(fanChange);gainXp(a.xp);
+    receiveMoney(cash,true);fanChange=changeFollowers(fanChange);
     const fanText=fanChange>=0?`+${fmt(fanChange)} followers`:`-${fmt(Math.abs(fanChange))} followers`;
     $('#autographResult').innerHTML=`<b>${fmt(signatures)} AUTOGRAPHS SIGNED</b><span>+$${fmt(cash)} income · ${fanText}<br>${price===0?'The free signing created a packed line and strong goodwill.':price>35?'The price caused backlash despite the payday.':'Your price shaped the turnout and final payment.'}</span>`;
     $('#autographResult').classList.add('show');$('#autographRun').style.display='none';$('#autographCancel').textContent='COLLECT & CLOSE';
@@ -1488,16 +1488,17 @@
 
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;state.treatmentAvailable=true;
-    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=fight.healthLost||0;let cash=0,fans=0,xp=0,ceoBonus=0,gearDrop=null,titleWon=false;const lootNotes=[];o.meetings=(o.meetings||0)+1;
+    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=fight.healthLost||0,titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival});let cash=0,fans=0,xp=xpResult.xp,ceoBonus=0,gearDrop=null;const lootNotes=[];o.meetings=(o.meetings||0)+1;
     if(win){
-      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));xp=Math.round((26+o.min*9)*(upset?1.25:1));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);gainXp(xp);sfx.win();confettiBurst();
-      titleWon=!!(o.globalChampionship&&!fight.championshipBout?.player_is_champion);gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});ceoBonus=awardCeoPerformanceBonus({upset,ko:fight.method.includes('KO'),titleWon});cash+=ceoBonus;
+      o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+8,0,100);sfx.win();confettiBurst();
+      gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});ceoBonus=awardCeoPerformanceBonus({upset,ko:fight.method.includes('KO'),titleWon});cash+=ceoBonus;
       if(o.globalChampionship)lootNotes.push({iconName:'title-world',icon:'👑',text:'CONFIRMING TITLE RESULT'});if(ceoBonus)lootNotes.push({text:`CEO NOTICED · +$${fmt(ceoBonus)} · +3 HYPE`});if(upset)lootNotes.push({iconName:'upset-bonus',icon:'⚡',text:'UPSET BONUS +25%'});if(rivalry)lootNotes.push({iconName:'rivalry-bonus',icon:'🔥',text:'RIVALRY FIGHT BONUS +15%'});if(state.winStreak>1)lootNotes.push({iconName:'win-streak',icon:'🔥',text:`${state.winStreak}-FIGHT WIN STREAK`});ensureRoster()
       $('#resultTitle').textContent='YOU WIN';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
-      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;if(!fight.forfeited){cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);xp=10+o.min*3;receiveMoney(cash,true);fans=changeFollowers(fans);gainXp(xp)}state.hype=clamp(state.hype-7,0,100);sfx.lose();
+      o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;state.losses++;state.winStreak=0;if(!fight.forfeited){cash=LOGIC.lossFightCash(basePurse);fans=Math.round(o.fans*.15);receiveMoney(cash,true);fans=changeFollowers(fans)}state.hype=clamp(state.hype-7,0,100);sfx.lose();
       if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
+    if(xp)gainXp(xp);xpResult.modifiers.forEach(text=>lootNotes.push({text}));
     if(healthLoss)$('#resultLine').textContent+=` Fight damage: -${healthLoss} Health.`
     $('#ceoResultSpotlight').hidden=true;
     if(state.activeEndorsement&&!fight.forfeited){
@@ -1512,7 +1513,7 @@
     }
     if(!o.network)openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,injury:win?currentTrainingInjury()?.name||'':'',title:''});
     renderResultBonuses(lootNotes);
-    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:'planned',fight_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_'),plan_pace:fight.gamePlan.pace,plan_offense:fight.gamePlan.offense,plan_tactics:fight.gamePlan.tactics,health_lost:healthLoss,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.globalChampionship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});if(o.globalChampionship&&fight.championshipBout)state.pendingChampionshipResult={challengeId:fight.championshipBout.challenge_id,challengerId:fight.championshipBout.challenger_id,challengerWon:fight.championshipBout.player_is_champion===true?!win:win,mode:o.titleMode||'challenge'};state.pendingFight=null;pendingResultDrop=gearDrop;resultDropRevealed=false;buildResultDetails(fight);renderChampionshipSettlement(o.globalChampionship?'pending':'',o.globalChampionship?'CONFIRMING TITLE RESULT':'');$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} GIFT FROM THE CEO<small>You caught his attention · claim it to see what he sent</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;writeHistory('result','replace');saveState();if(o.globalChampionship)settleChampionshipResult();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
+    trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:'planned',fight_focus:fight.focus,focus_tier:focusTier(fight.focus).toLowerCase().replace(/\s+/g,'_'),plan_pace:fight.gamePlan.pace,plan_offense:fight.gamePlan.offense,plan_tactics:fight.gamePlan.tactics,health_lost:healthLoss,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.globalChampionship,title_won:titleWon,upset,rivalry,cash_earned:cash,followers_gained:fans,xp_earned:xp,xp_category:xpResult.category,gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});if(o.globalChampionship&&fight.championshipBout)state.pendingChampionshipResult={challengeId:fight.championshipBout.challenge_id,challengerId:fight.championshipBout.challenger_id,challengerWon:fight.championshipBout.player_is_champion===true?!win:win,mode:o.titleMode||'challenge'};state.pendingFight=null;pendingResultDrop=gearDrop;resultDropRevealed=false;buildResultDetails(fight);renderChampionshipSettlement(o.globalChampionship?'pending':'',o.globalChampionship?'CONFIRMING TITLE RESULT':'');$('#rewardCash').textContent='+$'+cash;$('#rewardCashLabel').textContent='Earnings';$('#rewardFans').textContent='+'+fans;$('#rewardFansLabel').textContent='Followers';$('#rewardXp').textContent='+'+xp;$('#rewardXpLabel').textContent='XP';armResultAction(win?'CLAIM REWARDS':'CONTINUE');const lootBox=$('#lootBox');lootBox.style.display=gearDrop?'block':'none';lootBox.className=`loot${gearDrop?' drop-pending':''}`;if(gearDrop)lootBox.innerHTML=`<span class="drop-teaser">${gameIcon('bonus-gear-drop','🎁')} GIFT FROM THE CEO<small>You caught his attention · claim it to see what he sent</small></span>`;$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;writeHistory('result','replace');saveState();if(o.globalChampionship)settleChampionshipResult();scheduleFight(()=>{$('#resultModal').style.display='flex'},180);
   }
 
   function armResultAction(label){
@@ -1548,7 +1549,7 @@
   }
 
   function closeResult(){
-    clearTimeout(resultActionTimer);resultActionTimer=null;stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home','replace');requestAnimationFrame(()=>showPendingTitleLoss()||showPendingCeoOffice());
+    clearTimeout(resultActionTimer);resultActionTimer=null;stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=null;resultDropRevealed=false;combatLocked=false;fightSpeed=1;updateUI();navTo('home','replace');requestAnimationFrame(()=>levelUpSummary?showLevelUp(levelUpSummary):showPendingTitleLoss()||showPendingCeoOffice());
   }
 
   function stopConfetti(){
