@@ -21,6 +21,14 @@ test('shared championship card presents contenders consistently everywhere', () 
   assert.equal(model.meta, 'TITLE SHOT AVAILABLE · CHAMPION LEVEL 5');
 });
 
+test('current career level repairs stale championship eligibility', () => {
+  const championship=resolveChampionshipIdentity({champion_id:'champ',champion_handle:'LevelFive',champion_level:5,challenge_eligible:false,level_eligible:false,eligibility_status:'level_locked'},{level:6,name:'LevelSix'});
+  assert.equal(championship.level_eligible,true);
+  assert.equal(championship.challenge_eligible,true);
+  assert.equal(championship.eligibility_status,'eligible');
+  assert.equal(championshipCardModel({championship,state:{level:6,name:'LevelSix'},loaded:true}).meta,'TITLE SHOT AVAILABLE · CHAMPION LEVEL 5');
+});
+
 test('shared championship card covers champion, vacant, and offline states', () => {
   assert.equal(championshipCardModel({championship:{is_champion:true,defenses:1}}).headline, 'YOU ARE THE WORLD CHAMPION');
   assert.equal(championshipCardModel({championship:{champion_handle:'JayJonesVIP',defenses:2},state:{name:'@jayjonesvip'}}).headline, 'YOU ARE THE WORLD CHAMPION');
