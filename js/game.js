@@ -19,7 +19,7 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.111';
+  const ICON_ASSET_VERSION = '2.5.112';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -256,8 +256,8 @@
     {id:'diamond-grill',category:'Bling',name:'Diamond Grill',icon:'😁',rarity:'EPIC',minLevel:6,desc:'+10% followers from fight wins. Smile for the face-off cameras.',prestige:10},
     {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% followers from fight wins.',prestige:12},
     {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% followers from fight wins.',prestige:18},
-    {id:'designer-sunglasses',category:'Bling',name:'Designer Sunglasses',icon:'🕶️',assetExt:'jpg',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins. Cameras flash; you never blink.',prestige:4},
-    {id:'diamond-cluster-ring',category:'Bling',name:'Diamond Cluster Ring',icon:'💍',assetExt:'jpg',rarity:'EPIC',minLevel:8,desc:'+12% followers from fight wins. A full face of championship-grade ice.',prestige:12},
+    {id:'designer-sunglasses',category:'Bling',name:'Designer Sunglasses',icon:'🕶️',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins. Cameras flash; you never blink.',prestige:4},
+    {id:'diamond-cluster-ring',category:'Bling',name:'Diamond Cluster Ring',icon:'💍',rarity:'EPIC',minLevel:8,desc:'+12% followers from fight wins. A full face of championship-grade ice.',prestige:12},
     {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
 
     // Lifestyle — improves passive recovery
@@ -267,7 +267,7 @@
     {id:'fight-fuel-protein',category:'Lifestyle',name:'Fight Fuel Protein',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Camp nutrition on demand. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
-    {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',assetExt:'jpg',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
+    {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
     {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
     {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
     {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 energy every recovery tick.',energyRegen:.15},
@@ -280,13 +280,13 @@
     {id:'midnight-cruiser',category:'Property & Rides',name:'Midnight Cruiser',icon:'🏍️',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Built for the long road.',cashBonus:2,prestige:3},
     {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'EPIC',minLevel:5,desc:'+3% fight money. You finally leave the gym couch.',cashBonus:3},
     {id:'redline-superbike',category:'Property & Rides',name:'Redline Superbike',icon:'🏍️',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. The parking lot hears you coming.',cashBonus:5,prestige:6},
-    {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',assetExt:'jpg',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Camp now includes open-water recovery.',cashBonus:2,prestige:3},
-    {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',assetExt:'jpg',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. Fast water, faster entrances.',cashBonus:5,prestige:6},
+    {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Camp now includes open-water recovery.',cashBonus:2,prestige:3},
+    {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. Fast water, faster entrances.',cashBonus:5,prestige:6},
     {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
     {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better recovery.',cashBonus:10,energyRegen:.10,healthRegen:.05},
     {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight followers.',cashBonus:15,prestige:12},
-    {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',assetExt:'jpg',rarity:'LEGENDARY',minLevel:14,desc:'+16% fight money, +18% fight followers, and smoother recovery.',cashBonus:16,prestige:18,healthRegen:.08},
-    {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',assetExt:'jpg',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and less travel fatigue.',cashBonus:20,prestige:15,energyRegen:.10},
+    {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+16% fight money, +18% fight followers, and smoother recovery.',cashBonus:16,prestige:18,healthRegen:.08},
+    {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and less travel fatigue.',cashBonus:20,prestige:15,energyRegen:.10},
     {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and recovery.',cashBonus:25,prestige:20,energyRegen:.15,healthRegen:.12}
   ];
 
