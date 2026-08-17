@@ -24,8 +24,12 @@
 
   function resolveChampionshipIdentity(value,state={}){
     const championship=value&&typeof value==='object'?value:null;
-    if(!championship||championship.is_champion===true||!isCurrentChampion(championship,state))return championship;
-    return Object.assign({},championship,{is_champion:true,challenge_eligible:false,rematch_blocked:false,level_eligible:true,daily_bout_used:false,eligibility_status:'champion',former_champion:false,former_champion_rematch:false});
+    if(!championship)return championship;
+    if(championship.is_champion===true||isCurrentChampion(championship,state))return Object.assign({},championship,{is_champion:true,challenge_eligible:false,rematch_blocked:false,level_eligible:true,daily_bout_used:false,eligibility_status:'champion',former_champion:false,former_champion_rematch:false});
+    const fighterLevel=Math.max(1,Math.floor(Number(state.level))||1),championLevel=Math.max(1,Math.floor(Number(championship.champion_level))||1),levelEligible=!!championship.champion_id&&fighterLevel>=championLevel;
+    if(!levelEligible)return championship;
+    const blocked=championship.daily_bout_used===true||championship.rematch_blocked===true;
+    return Object.assign({},championship,{level_eligible:true,challenge_eligible:!blocked,eligibility_status:blocked?championship.eligibility_status:'eligible'});
   }
 
   function championshipCardModel({championship,state={},loaded=false,unavailable=false}={}){
@@ -41,7 +45,7 @@
       if(champ.former_champion){
         model.kicker='FORMER WORLD CHAMPION';model.headline=champ.last_title_loss_opponent_handle?`LOST THE BELT TO @${champ.last_title_loss_opponent_handle}`:championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):champ.former_champion_rematch?`TITLE REMATCH AVAILABLE AGAINST ${championHandle}`:level>=requiredLevel?'STANDARD TITLE-SHOT RULES APPLY':`REACH LEVEL ${requiredLevel} TO CHALLENGE`;
       }else{
-        model.kicker=level>=requiredLevel?'TITLE CONTENDER':'CURRENT WORLD CHAMPION';model.headline=championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):champ.challenge_eligible?`TITLE SHOT AVAILABLE · CHAMPION LEVEL ${requiredLevel}`:`REACH LEVEL ${requiredLevel} TO CHALLENGE`;
+        model.kicker=level>=requiredLevel?'TITLE CONTENDER':'CURRENT WORLD CHAMPION';model.headline=championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):level>=requiredLevel?`TITLE SHOT AVAILABLE · CHAMPION LEVEL ${requiredLevel}`:`REACH LEVEL ${requiredLevel} TO CHALLENGE`;
       }
     }else if(loaded&&!unavailable){
       model.kicker='BELT VACANT';model.headline='THE WORLD TITLE IS OPEN';model.meta='ONE BELT · RANKED FIGHTERS ONLY';

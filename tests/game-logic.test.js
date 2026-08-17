@@ -224,6 +224,7 @@ test('simplified championship experience covers contender, champion, rematch, an
   assert.deepEqual(locked,{status:'locked',headline:'WORLD TITLE SHOT LOCKED',action:'REACH LEVEL 5',disabled:true});
   const eligible=logic.championshipExperience({champion_level:5,challenge_eligible:true},{level:5});
   assert.deepEqual(eligible,{status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false});
+  assert.deepEqual(logic.championshipExperience({champion_level:5,challenge_eligible:false},{level:6}),{status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false});
   assert.deepEqual(logic.championshipExperience({champion_level:5,daily_bout_used:true},{level:6}),{status:'used',headline:'TITLE SHOT USED TODAY',action:'AVAILABLE AT MIDNIGHT',disabled:true});
   assert.deepEqual(logic.championshipExperience({is_champion:true,selected_challenger_id:'challenger'}),{status:'defense',headline:'YOU ARE THE WORLD CHAMPION',action:'DEFEND YOUR TITLE',disabled:false});
   assert.deepEqual(logic.championshipExperience({is_champion:true,defense_used_today:true}),{status:'defended',headline:'TITLE DEFENDED',action:'NEXT CHALLENGER AVAILABLE TOMORROW',disabled:true});
