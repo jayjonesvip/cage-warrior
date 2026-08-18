@@ -107,7 +107,7 @@
       fight:clamp(nonNegativeWhole(counters.fight),0,10),
       train:clamp(nonNegativeWhole(counters.train),0,4),
       sparring:clamp(nonNegativeWhole(counters.sparring),0,2),
-      hustle:clamp(nonNegativeWhole(counters.hustle),0,3),
+      hustle:clamp(nonNegativeWhole(counters.hustle),0,2),
       blackjack:clamp(nonNegativeWhole(counters.blackjack),0,1),
       cageDice:clamp(nonNegativeWhole(counters.cageDice),0,1),
       publicity:clamp(nonNegativeWhole(counters.publicity),0,1),
@@ -196,6 +196,7 @@
     if(actionId==='corner-gym-cleanup')return {type:'cash',amount:2+Math.floor(roll*49)};
     if(actionId==='unload-freight')return {type:'power',amount:.5};
     if(actionId==='nightclub-door')return {type:'hype',amount:2+Math.floor(roll*3)};
+    if(actionId==='rideshare-driver')return {type:'energy',amount:5};
     return {type:'',amount:0};
   }
 

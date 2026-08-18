@@ -374,6 +374,7 @@ test('side-job bonus rolls stay at twenty-five percent with bounded rewards',()=
   assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:.5});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,0),{type:'hype',amount:2});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,.999999),{type:'hype',amount:4});
+  assert.deepEqual(logic.hustleBonus('rideshare-driver',0,.5),{type:'energy',amount:5});
 });
 
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
@@ -502,6 +503,7 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   assert.equal(today,'2026-01-02');
   assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,cageDice:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0});
   assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,cageDice:7,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,cageDice:1,publicity:1,recovery:1});
+  assert.equal(logic.dailyCountersFor({date:today,hustle:99},today).hustle,2);
 });
 
 test('fight gear loadout expands from two slots to four at level eight', () => {

@@ -95,13 +95,15 @@ generated league.
   obvious. Enabled primary actions use consistent blue fills and bold white
   labels; secondary controls use slate, special opportunities use amber, and
   disabled or locked controls remain visibly subdued.
-- `Make Ends Meet` side jobs are early-career work only. At Level 5 the section
+- `Odd Jobs` are early-career work only, with two jobs allowed per local day.
+  At Level 5 the section
   is replaced by a full-time fighter milestone note, while publicity,
   endorsements, and Underground Buzz remain available. Each shift runs through
   a short icon-driven work meter before revealing its pay. Every job has a 25%
   bonus chance: gym cleanup can uncover $2–$50 in spare change, extra-heavy
   freight adds 0.50 Power, and recognition at the nightclub door adds 2–4%
-  Hype.
+  Hype. Rideshare Driver pays $3 per randomly assigned mile across a 12–32 mile
+  route, with a 25% chance to restore 5 Energy from resting between fares.
 - Underground Buzz previews its locked games as future opportunities. Backroom
   Blackjack unlocks at Level 2, and Cage Dice unlocks at Level 4 with one daily
   roll on under seven, over seven, exactly seven, or doubles. Both games cap a
