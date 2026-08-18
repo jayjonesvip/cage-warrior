@@ -394,6 +394,8 @@ generated league.
   minutes. Light Sparring takes two minutes and Heavy Sparring takes four.
   Training again before the timer ends requires confirmation, extends the
   cooldown by the new activity's duration, and triggers a hidden injury roll.
+  Escaping that injury earns a +0.25 No Pain bonus on every stat improved by the
+  risky session.
   Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
   by 10% or at least one point, whichever is greater. Injuries clear at the

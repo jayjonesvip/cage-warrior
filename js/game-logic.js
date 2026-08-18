@@ -188,6 +188,8 @@
     return minutes*60000;
   }
 
+  function trainingRiskBonus(overtraining=false,injured=false){return overtraining&&!injured?.25:0}
+
   function injuredStat(value,injured=false){
     const rating=Math.max(1,finite(value,1));
     return injured?Math.max(1,rating-Math.max(1,rating*.10)):rating;
@@ -430,5 +432,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

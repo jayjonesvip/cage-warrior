@@ -349,6 +349,12 @@ test('training cooldowns scale with workout gains and sparring intensity',()=>{
   assert.equal(logic.trainingCooldownDuration({type:'sparring',skills:2}),240000);
 });
 
+test('successful overtraining earns a quarter-point no-pain bonus',()=>{
+  assert.equal(logic.trainingRiskBonus(false,false),0);
+  assert.equal(logic.trainingRiskBonus(true,true),0);
+  assert.equal(logic.trainingRiskBonus(true,false),.25);
+});
+
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
   assert.equal(logic.trainingCost({cost:8},0),8);
   assert.equal(logic.trainingCost({cost:8},2),12);
