@@ -486,12 +486,15 @@ npm test
 
 The game uses static HTML, CSS, and ordinary scripts without a build step.
 `js/game-logic.js` contains shared rule helpers used by the browser and behavioral
-tests. `js/game.js` remains the coordinator; `js/landing.js`, `js/fight-plan.js`, and
-`js/fight-focus.js` own their feature flows and receive state/UI callbacks from the
-coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and message
-data, while `js/strings.js` groups the remaining opponent, commentary, Cage Feed,
-username, and ticker copy. Script order in `index.html` and the service-worker
-precache list must keep data and feature modules ahead of `js/game.js`.
+tests. `js/definitions.js` owns the data-only catalogs for collectibles, training,
+sparring, odd jobs, recovery, publicity, endorsements, fight plans, and fight
+moments. `js/game.js` remains the coordinator; `js/landing.js`, `js/fight-plan.js`,
+and `js/fight-focus.js` own their feature flows and receive state/UI callbacks from
+the coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and
+message data, while `js/strings.js` groups the remaining opponent, commentary,
+Cage Feed, username, and ticker copy. Script order in `index.html` and the
+service-worker precache list must keep data and feature modules ahead of
+`js/game.js`.
 The generated transparent header wordmark lives at
 `assets/cage-grind-logo.png`. The six bottom-navigation icons live under
 `assets/icons/nav-*.png` and automatically use the same asset-override system.
