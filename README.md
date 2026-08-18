@@ -363,6 +363,8 @@ generated league.
   a specially labeled CEO title gift of at least Rare quality.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
+- The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
+  that adds 0.02 Energy per recovery tick.
 - Duplicate copies increase the collectible quantity but never stack the
   item's perk.
 - Drop reveals validate their reward data before rendering. If a stale item or

@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.134';
+  const ICON_ASSET_VERSION = '2.5.135';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -243,6 +243,7 @@
     // Fight Gear — earned from wins; minLevel controls when an item enters the permanent drop pool.
     {id:'wraps',category:'Fight Gear',name:'Stiff Hand Wraps',icon:'🩹',rarity:'COMMON',minLevel:1,desc:'+1 Power. Your first real piece of kit.',stat:'power',bonus:1},
     {id:'mouth',category:'Fight Gear',name:'Boil-Bite Guard',icon:'🦷',rarity:'COMMON',minLevel:1,desc:'+1 Chin. Keep the teeth you started with.',stat:'chin',bonus:1},
+    {id:'mma-shorts',category:'Fight Gear',name:'MMA Shorts',icon:'🩳',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+1 Speed. Flexible fight-night gear built for clean movement.',stat:'speed',bonus:1},
     {id:'rookie-gloves',category:'Fight Gear',name:'Rookie Blue Gloves',icon:'🥊',rarity:'COMMON',minLevel:2,desc:'+2 Power. Entry-level leather, honest pop.',stat:'power',bonus:2},
     {id:'shoes',category:'Fight Gear',name:'Canvas Fight Shoes',icon:'👟',rarity:'COMMON',minLevel:2,desc:'+2 Speed. Better footing in ugly scrambles.',stat:'speed',bonus:2},
     {id:'rope',category:'Fight Gear',name:'Weighted Rope',icon:'➰',rarity:'COMMON',minLevel:2,desc:'+2 Cardio. Deep rounds stop feeling endless.',stat:'cardio',bonus:2},
@@ -270,6 +271,7 @@
 
     // Lifestyle — improves passive recovery
     {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. Roadwork hurts a little less.',energyRegen:.02},
+    {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. A cold can keeps camp moving.',energyRegen:.02},
     {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
     {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
     {id:'fight-fuel-protein',category:'Lifestyle',name:'Fight Fuel Protein',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Camp nutrition on demand. +0.03 health every recovery tick.',healthRegen:.03},
