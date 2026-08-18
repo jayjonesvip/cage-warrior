@@ -107,6 +107,11 @@ generated league.
   freight adds 0.50 Power, and recognition at the nightclub door adds 2–4%
   Hype. Rideshare Driver pays $3 per randomly assigned mile across a 12–32 mile
   route, with a 25% chance to restore 5 Energy from resting between fares.
+- Odd Jobs, sparring, Recovery Room treatments, and Career Spotlight appearances
+  share one modal-meter layout: title, body, a stationary centered icon over the
+  filling meter, and a two-column Reward / Cost panel. Meter length is stored in
+  each action definition as `meterSeconds`; Career Spotlight appearances range
+  from two to six seconds and reveal their results only when the meter completes.
 - Underground Buzz previews its locked games as future opportunities. Backroom
   Blackjack unlocks at Level 2, and Cage Dice unlocks at Level 4 with one daily
   roll on under seven, over seven, exactly seven, or doubles. Both games cap a
@@ -445,7 +450,9 @@ generated league.
   25 health. Standard treatment costs `$40 + ($15 × fighter level)`. Premium
   Cryotherapy restores 20 energy and 35 health for
   `$250 + ($25 × fighter level)`. Treatments never exceed resource maximums
-  and do not consume a training session.
+  and do not consume a training session. Recovery treatments run through a
+  blue two-to-five-second activity meter, then hold the exact energy and health
+  restored on screen until the player returns to training.
 - Live countdowns on the Training and Hustle pages show the time remaining
   until their daily limits reset at the player's next local midnight.
 
