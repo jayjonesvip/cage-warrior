@@ -186,6 +186,10 @@ generated league.
   better Health enter at 100% Condition; 70–89% enters at 95%, 50–69% at 88%,
   and 20–49% at 78%. Below 20 Health still fails medical clearance, making a
   quick turnaround while hurt possible but meaningfully dangerous.
+- Entering below full Health enables a hidden injury roll on every damaging
+  opponent hit. At most one injury can occur per fight; it immediately halves
+  current Condition, appears in the fight feed and toast, reduces every
+  effective attribute by one, and persists until the next local midnight.
 - Each confirmed opponent strike or takedown directly removes 1 persistent
   Health while its existing fight damage continues to reduce Condition. A
   knockdown removes 4 Health, then a losing KO/TKO removes 12 additional
@@ -423,7 +427,7 @@ generated league.
   risky session.
   Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
-  by 10% or at least one point, whichever is greater. Injuries clear at the
+  by one point. Injuries clear at the
   player's next local midnight and never carry into a new day. While injured,
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.

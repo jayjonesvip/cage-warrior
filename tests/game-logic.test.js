@@ -402,9 +402,9 @@ test('recovery treatments require one available opportunity and clamp restored r
   assert.deepEqual(logic.applyRecovery({energy:95,maxEnergy:100,health:70,maxHealth:100},massage),{energy:5,health:25});
 });
 
-test('training injuries reduce every effective attribute by ten percent or at least one point',()=>{
+test('daily injuries reduce every effective attribute by one point',()=>{
   assert.equal(logic.injuredStat(5,true),4);
-  assert.equal(logic.injuredStat(20,true),18);
+  assert.equal(logic.injuredStat(20,true),19);
   assert.ok(Math.abs(logic.injuredStat(8.66,true)-7.66)<.000001);
   assert.equal(logic.injuredStat(1,true),1);
   assert.equal(logic.injuredStat(8.66,false),8.66);
@@ -429,6 +429,16 @@ test('landed opponent offense directly damages persistent health',()=>{
   assert.equal(logic.liveFightHealthDamage({finish:'KO'}),12);
   assert.equal(logic.liveFightHealthDamage({finish:'TKO'}),12);
   assert.equal(logic.liveFightHealthDamage({finish:'SUBMISSION'}),8);
+});
+
+test('hurt fighters risk one fight injury on landed opponent damage',()=>{
+  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:true}),.02);
+  assert.equal(logic.liveFightInjuryChance({eligible:false,landed:true}),0);
+  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:false}),0);
+  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:true,injured:true}),0);
+  assert.equal(logic.fightInjuryCondition(80),40);
+  assert.equal(logic.fightInjuryCondition(37),18.5);
+  assert.equal(logic.fightInjuryCondition(240),100);
 });
 
 test('blackjack values aces correctly, caps bets, and pays standard outcomes',()=>{
