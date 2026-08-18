@@ -341,6 +341,18 @@ test('Coach Vega improves training and reduces explicit injury risk without XP',
   assert.equal(logic.trainingInjuryChance(true,true),.20);
 });
 
+test('daily opponent wins reduce repeat XP without counting losses',()=>{
+  assert.deepEqual(logic.opponentXpTier(0),{wins:0,multiplier:1,hypeChange:8,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'});
+  assert.deepEqual(logic.opponentXpTier(1),{wins:1,multiplier:.25,hypeChange:8,tier:'repeat',shortLabel:'25% XP',tapeLabel:'25% XP · REPEAT WIN',resultLabel:'REPEAT WIN · 25%'});
+  assert.deepEqual(logic.opponentXpTier(2),{wins:2,multiplier:0,hypeChange:-7,tier:'exhausted',shortLabel:'NO XP · $0 · -7 HYPE',tapeLabel:'NO XP · $0 PURSE · -7 HYPE',resultLabel:'NO XP · $0 · -7 HYPE'});
+  assert.equal(logic.opponentFightPurse(500,0),500);
+  assert.equal(logic.opponentFightPurse(500,1),500);
+  assert.equal(logic.opponentFightPurse(500,2),0);
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:1}),{xp:16,category:'standard_repeat',modifiers:['REPEAT WIN · 25% XP']});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:2}),{xp:0,category:'standard_exhausted',modifiers:['OPPONENT XP EXHAUSTED · NO XP']});
+  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,opponentWinsToday:0}).xp,23);
+});
+
 test('training cooldowns scale with workout gains and sparring intensity',()=>{
   assert.equal(logic.trainingCooldownDuration({type:'training',gain:1}),60000);
   assert.equal(logic.trainingCooldownDuration({type:'training',gain:2}),120000);

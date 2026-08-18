@@ -328,6 +328,10 @@ generated league.
 - When the ten-fight daily allowance is exhausted, otherwise available fighter
   cards take on the locked presentation and replace **See Matchup** with
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
+- Each opponent has a daily XP curve: the first win pays full XP, the second
+  win pays 25%, and the third matchup that day pays no XP, no fight purse, and
+  costs 7 Hype even when won. Losses do not advance the curve, and opponent
+  cards, the Tale of the Tape, and results show the tier.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The dedicated card
   shows champion identity, record, level, defenses, player status, and one clear
