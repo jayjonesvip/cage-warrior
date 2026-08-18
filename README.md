@@ -371,7 +371,13 @@ generated league.
   a device-specific celebration effect fails, the awarded collectible remains
   saved and the result dialog recovers instead of blocking the career.
 - Owned items appear as fixed 2:3 collectible cards, two across on mobile,
-  with full-card Common, Rare, Epic, and Legendary treatments.
+  with full-card Common, Rare, Epic, and Legendary treatments. Tapping a card,
+  or using Enter or Space from the keyboard, flips it to show its description.
+- Collectibles are ready for optional disclosed product placements through the
+  `sponsored`, `brand`, `sponsorDescription`, `qrAsset`, `promoCode`, and
+  `campaignEnds` fields. QR campaign content is rendered only when `qrAsset`
+  is present, and cards never create clickable external links. The current
+  collectible catalog contains no sponsored placements.
 - Fight Gear starts with a two-slot active loadout and expands to four slots at
   Level 8. Attempting to exceed the current limit opens a focused Loadout Full
   dialog explaining the limit and unlock. Bling, Lifestyle, Property, and Rides
