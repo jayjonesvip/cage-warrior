@@ -167,7 +167,9 @@ generated league.
   Focus is capped at 50–100% and affects initiative, strike execution, and the
   quality of adaptive game-plan changes for that fight only. The Focus screen
   reuses the full-bleed fight-plan locker room and shows the percentage in the
-  final-moments label instead of a separate meter.
+  final-moments label instead of a separate meter. Its result card presents the
+  final tier and Focus percentage as the primary hierarchy, with only the net
+  change in a compact accent badge.
 - Mom and Wife each have 16 possible texts, Tommy has 10, and Carl and Grandma
   have 4 each; every contact's pool is evenly split between positive and
   negative outcomes. Messages come from a shuffled, saved 50-card deck, so
