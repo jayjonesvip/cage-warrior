@@ -87,7 +87,7 @@ const gearItems = [
   {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. A cold can keeps camp moving.',energyRegen:.02},
   {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
   {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.149'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.151'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
   {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
@@ -121,8 +121,9 @@ const trainDefs = [
 ];
 
 const sparringDefs = [
-  {id:'light-sparring',icon:'🥋',title:'Light Sparring',text:'Technical rounds at a controlled pace. Improve one random skill without taking damage.',cost:10,gain:1,skills:1},
-  {id:'heavy-sparring',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills, but expect to absorb some damage.',cost:20,gain:1,skills:2,damage:[3,9]}
+  {id:'light-sparring',tier:'light',icon:'🥋',title:'Light Sparring',text:'Low-contact technical rounds. Improve one random skill without taking damage.',cost:5,gain:1,skills:1,durationMs:2000},
+  {id:'medium-sparring',tier:'medium',asset:'hard-sparring',icon:'🥊',title:'Medium Sparring',text:'Elevated live rounds. Improve one random skill by two points without taking damage.',cost:10,gain:2,skills:1,durationMs:4000},
+  {id:'heavy-sparring',tier:'heavy',icon:'🤼',title:'Heavy Sparring',text:'Hard live rounds. Improve two random skills by two points, but expect to absorb some damage.',cost:20,gain:2,skills:2,damage:[3,9],durationMs:6000}
 ];
 
 const trainingInjuryDefs = [

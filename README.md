@@ -414,13 +414,16 @@ generated league.
   to 25% of available Cash, then plays a persisted hand with Hit or Stand.
   Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
   wager. There are no splits, doubles, or insurance.
-- Basic training costs energy and allows four daily sessions. Sparring is a
-  separate two-session daily track: Light Sparring costs 10 energy and improves
-  one random skill without health damage, while Heavy Sparring costs 20 energy,
-  improves two random skills, and risks 3–9 health.
+- Basic training costs energy and allows four daily sessions. All sparring
+  levels share a separate two-session daily track. Light Sparring costs 5
+  energy and adds +1 to one random skill, Medium Sparring costs 10 energy and
+  adds +2 to one random skill, and Heavy Sparring costs 20 energy, adds +2 to
+  two random skills, and risks 3–9 health. Light and Medium sparring do not
+  cause direct health damage. Their activity meters run for two, four, and six
+  seconds respectively, then reveal and highlight the exact attributes awarded.
 - Training gains are whole points. A +1 gym workout begins a one-minute recovery
   cooldown, while a +2 gain (including trainer-assisted workouts) takes two
-  minutes. Light Sparring takes two minutes and Heavy Sparring takes four.
+  minutes. Light and Medium Sparring take two minutes; Heavy Sparring takes four.
   Training again before the timer ends requires confirmation, extends the
   cooldown by the new activity's duration, and triggers a hidden injury roll.
   Escaping that injury earns a +0.25 No Pain bonus on every stat improved by the
@@ -434,7 +437,7 @@ generated league.
 - Coach Vega is an optional training upgrade that improves training gains,
   raises perfect-session odds from 17% to 27%, and reduces overtraining injury
   risk from 33% to 20%. His fee is `$250 + ($75 × fighter level)` per session,
-  including each Light or Heavy Sparring session.
+  including each Light, Medium, or Heavy Sparring session.
 - The Training page also has a Recovery Room with one paid treatment
   opportunity. Every completed fight makes one treatment available; unused
   opportunities never accumulate. An Ice Bath restores 25 energy, a Sauna
