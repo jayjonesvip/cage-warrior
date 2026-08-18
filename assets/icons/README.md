@@ -146,7 +146,8 @@ file, use a hard refresh if the browser previously cached the missing image.
 | Filename | Item |
 | --- | --- |
 | `victory-bucket.png` | Victory Chicken Bucket |
-| `fight-fuel-protein.png` | Fight Fuel Protein |
+| `fight-fuel-protein.png` | ALLMAX ISOFLEX sponsored product cutout |
+| `fight-fuel-protein-qr.png` | ALLMAX ISOFLEX affiliate campaign QR |
 | `flagship-phone.png` | Flagship Phone |
 | `concert-grand.png` | Concert Grand Piano |
 | `sky-blue-scooter.png` | Sky Blue Scooter |

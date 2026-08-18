@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.137';
+  const ICON_ASSET_VERSION = '2.5.138';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -274,7 +274,7 @@
     {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. A cold can keeps camp moving.',energyRegen:.02},
     {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
     {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
-    {id:'fight-fuel-protein',category:'Lifestyle',name:'Fight Fuel Protein',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Camp nutrition on demand. +0.03 health every recovery tick.',healthRegen:.03},
+    {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.138'},
     {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
     {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
     {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
@@ -858,7 +858,7 @@
     }).join('');
   }
   function collectibleBackHtml(item,rarity){
-    const sponsored=item.sponsored===true,sponsorName=sponsored?escapeHtml(item.brand||item.name):'',sponsorDescription=sponsored&&item.sponsorDescription?`<p>${escapeHtml(item.sponsorDescription)}</p>`:'',sponsorLabel=sponsored?'<span class="sponsored-collectible-label">SPONSORED COLLECTIBLE</span>':'',perk=sponsored?`<div class="collectible-perk"><small>IN-GAME PERK</small><b>${escapeHtml(item.desc)}</b></div>`:`<p>${escapeHtml(item.desc)}</p>`,qr=item.qrAsset?`<div class="collectible-qr"><img src="${escapeHtml(item.qrAsset)}" alt="${escapeHtml(item.brand||item.name)} campaign QR code"><small>SCAN OR SAVE</small>${item.promoCode?`<b>CODE · ${escapeHtml(item.promoCode)}</b>`:''}${item.campaignEnds?`<span>ENDS ${escapeHtml(item.campaignEnds)}</span>`:''}</div>`:'';
+    const sponsored=item.sponsored===true,sponsorName=sponsored?escapeHtml(item.brand||item.name):'',sponsorDescription=sponsored&&item.sponsorDescription?`<p>${escapeHtml(item.sponsorDescription)}</p>`:'',sponsorLabel=sponsored?'<span class="sponsored-collectible-label">SPONSORED COLLECTIBLE</span>':'',perk=sponsored?`<div class="collectible-perk"><small>IN-GAME PERK</small><b>${escapeHtml(item.desc)}</b></div>`:`<p>${escapeHtml(item.desc)}</p>`,qr=item.qrAsset?`<div class="collectible-qr"><img src="${escapeHtml(item.qrAsset)}" alt="${escapeHtml(item.brand||item.name)} campaign QR code"><small>SCAN OR SAVE</small>${item.sponsorDisclosure?`<em>${escapeHtml(item.sponsorDisclosure)}</em>`:''}${item.promoCode?`<b>CODE · ${escapeHtml(item.promoCode)}</b>`:''}${item.campaignEnds?`<span>ENDS ${escapeHtml(item.campaignEnds)}</span>`:''}</div>`:'';
     return `<div class="collectible-side collectible-back" aria-hidden="true"><div class="gear-top"><span class="rarity-tag">${rarity}</span><span class="gear-count">×${gearCount(item.id)}</span></div><div class="collectible-back-copy">${sponsorLabel}<h3>${sponsorName||escapeHtml(item.name)}</h3>${sponsorDescription}${perk}${qr}</div><div class="collectible-flip-hint">TAP TO RETURN</div></div>`;
   }
   function renderGear(){

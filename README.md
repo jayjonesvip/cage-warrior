@@ -375,10 +375,10 @@ generated league.
   with full-card Common, Rare, Epic, and Legendary treatments. Tapping a card,
   or using Enter or Space from the keyboard, flips it to show its description.
 - Collectibles are ready for optional disclosed product placements through the
-  `sponsored`, `brand`, `sponsorDescription`, `qrAsset`, `promoCode`, and
-  `campaignEnds` fields. QR campaign content is rendered only when `qrAsset`
-  is present, and cards never create clickable external links. The current
-  collectible catalog contains no sponsored placements.
+  `sponsored`, `brand`, `sponsorDescription`, `sponsorDisclosure`, `qrAsset`,
+  `promoCode`, and `campaignEnds` fields. QR campaign content is rendered only
+  when `qrAsset` is present, and cards never create clickable external links.
+  ALLMAX ISOFLEX is the first disclosed pilot placement.
 - Fight Gear starts with a two-slot active loadout and expands to four slots at
   Level 8. Attempting to exceed the current limit opens a focused Loadout Full
   dialog explaining the limit and unlock. Bling, Lifestyle, Property, and Rides
@@ -386,7 +386,8 @@ generated league.
 - The collectible pool also includes early-career and status drops such as a
   used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
   shoes, a full-length fur coat, motorcycles, a scooter, camp food and
-  supplements, a flagship phone, a diamond grill, and a concert grand piano.
+  supplements, including the disclosed ALLMAX ISOFLEX pilot placement, a
+  flagship phone, a diamond grill, and a concert grand piano.
   Small Gym Dog is a separate Common card from the existing Rare Gym Dog.
   Collectibles support same-name PNG artwork in `assets/icons/` through their
   stable item IDs.
