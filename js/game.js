@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.128';
+  const ICON_ASSET_VERSION = '2.5.129';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -897,7 +897,7 @@
       const hasHistory=(o.meetings||0)>0,tauntable=status==='rival'&&!available,rivalFight=available&&(o.winsVsPlayer||0)>0,rivalry=o.meetings>=2,purse=payoutForOpponent(o),networkLocation=o.network?networkOpponentLocation(o):null,region=networkLocation?`${networkLocation.name} ${networkLocation.region}`:(o.country?`${o.country} CIRCUIT`:'CAGE CIRCUIT'),matchup=hasHistory?`${rivalry?'RIVAL · ':''}YOU ${o.lossesToPlayer||0}-${o.winsVsPlayer||0}`:'FIRST MEETING';
       const btn=dailyExhausted?'DAILY LIMIT REACHED<br><small>NEW FIGHTS AT LOCAL MIDNIGHT</small>':status==='locked'?`🔒 UNLOCKS AT LEVEL ${o.tier}`:rivalFight?'RUN IT BACK':'SEE MATCHUP';
       const action=tauntable?`<button class="fight-btn taunt" data-taunt-key="${o.key}">TAUNT<br><small>FOR A RIVAL FIGHT</small></button>`:dailyExhausted?`<button class="fight-btn locked daily-limit" disabled>${btn}</button>`:`<button class="fight-btn ${status}" data-fight-key="${o.key}" ${!available?'disabled':''}>${btn}</button>`;
-      const safeName=escapeHtml(o.name),safeStyle=escapeHtml(o.tag||'UNKNOWN STYLE'),networkHandle=o.network?escapeHtml(o.networkHandle):'';
+      const safeName=escapeHtml(o.name),safeStyle=escapeHtml(o.tag||'UNKNOWN STYLE');
       return `<article class="opponent ${status} ${o.network?'network':''} ${rivalFight?'rematch':''} ${dailyExhausted?'daily-exhausted':''}" data-card-flip="true" data-card-name="${safeName}" tabindex="0" aria-label="${safeName} fighter card${dailyExhausted?', daily fight limit reached':rivalFight?', rival fight available':tauntable?', taunt available':''}. Tap for details." aria-pressed="false">
         <div class="opponent-flip">
           <div class="opponent-side opponent-front" aria-hidden="false">
@@ -906,7 +906,7 @@
               <img class="opp-sprite" src="${silhouette}" alt="${safeName} ${o.network?'portrait':'silhouette'}" loading="lazy">
               ${rivalFight?`<span class="rematch-banner">${gameIcon('rematch','⚡')} RIVAL FIGHT</span>`:''}
             </div>
-            <div class="opp-title"><h3>${safeName}</h3><span class="opp-identity">${o.network?`@${networkHandle}`:`LEVEL ${o.tier}`}<i>•</i><b>${safeStyle}</b></span></div>
+            <div class="opp-title"><h3>${safeName}</h3><span class="opp-identity">LVL ${o.tier}<i>•</i><b>${safeStyle}</b></span></div>
             <div class="flip-hint">TAP FOR DETAILS</div>
             ${action}
           </div>
