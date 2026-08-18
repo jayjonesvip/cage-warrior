@@ -25,6 +25,9 @@ and `js/fight-focus.js`; and `js/game.js` coordinates those features with the ca
   entry action never resets or replaces the recovered local save.
 - Championship loading remains non-blocking and personalizes a returning
   champion's status without adding another panel to the front door.
+- A deliberately small **Origins of Cage Grind** link preserves the recovered
+  CageWars.net history, screenshots, historical mechanics, and current-system
+  distinction without competing with the career entry action.
 - `landing_view` and `landing_enter` remain the primary funnel events.
 
 ### Responsive desktop interface
