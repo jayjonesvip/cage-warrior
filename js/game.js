@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.140';
+  const ICON_ASSET_VERSION = '2.5.141';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -99,52 +99,6 @@
     {id:'grappler',icon:'🔒',name:'GRAPPLER',text:'+1 Power and Cardio. Better takedowns, control, and submissions.',stats:{power:1,cardio:1},plan:'grappler'}
   ];
   function normalizeMajorArchetype(value){return ['control','submission','wrestleBox','wrestle','wrestler','grappler'].includes(value)?'grappler':['pressure','counter','brawler','trickster','technician','endurance','tank','cardio','striker'].includes(value)?'striker':''}
-  const fighterAvatars = [
-    {id:'fighter-01',asset:'assets/avatars/fighter-avatar-01.png',stats:{power:8,speed:6,chin:2,cardio:4}},
-    {id:'fighter-02',asset:'assets/avatars/fighter-avatar-02.png',stats:{power:7,speed:6,chin:3,cardio:4}},
-    {id:'fighter-03',asset:'assets/avatars/fighter-avatar-03.png',stats:{power:8,speed:4,chin:4,cardio:4}},
-    {id:'fighter-04',asset:'assets/avatars/fighter-avatar-04.png',stats:{power:7,speed:5,chin:5,cardio:3}},
-    {id:'fighter-05',asset:'assets/avatars/fighter-avatar-05.png',stats:{power:6,speed:8,chin:2,cardio:4}},
-    {id:'fighter-06',asset:'assets/avatars/fighter-avatar-06.png',stats:{power:5,speed:8,chin:3,cardio:4}},
-    {id:'fighter-07',asset:'assets/avatars/fighter-avatar-07.png',stats:{power:4,speed:8,chin:4,cardio:4}},
-    {id:'fighter-08',asset:'assets/avatars/fighter-avatar-08.png',stats:{power:6,speed:7,chin:5,cardio:2}},
-    {id:'fighter-09',asset:'assets/avatars/fighter-avatar-09.png',stats:{power:5,speed:7,chin:6,cardio:2}},
-    {id:'fighter-10',asset:'assets/avatars/fighter-avatar-10.png',stats:{power:4,speed:7,chin:7,cardio:2}},
-    {id:'fighter-11',asset:'assets/avatars/fighter-avatar-11.png',stats:{power:4,speed:6,chin:8,cardio:2}},
-    {id:'fighter-12',asset:'assets/avatars/fighter-avatar-12.png',stats:{power:3,speed:6,chin:8,cardio:3}},
-    {id:'fighter-13',asset:'assets/avatars/fighter-avatar-13.png',stats:{power:2,speed:6,chin:8,cardio:4}},
-    {id:'fighter-14',asset:'assets/avatars/fighter-avatar-14.png',stats:{power:3,speed:5,chin:7,cardio:5}},
-    {id:'fighter-15',asset:'assets/avatars/fighter-avatar-15.png',stats:{power:4,speed:5,chin:6,cardio:5}},
-    {id:'fighter-16',asset:'assets/avatars/fighter-avatar-16.png',stats:{power:5,speed:5,chin:5,cardio:5}},
-    {id:'fighter-17',asset:'assets/avatars/fighter-avatar-17.png',stats:{power:6,speed:5,chin:4,cardio:5}},
-    {id:'fighter-18',asset:'assets/avatars/fighter-avatar-18.png',stats:{power:7,speed:4,chin:3,cardio:6}},
-    {id:'fighter-19',asset:'assets/avatars/fighter-avatar-19.png',stats:{power:6,speed:3,chin:4,cardio:7}},
-    {id:'fighter-20',asset:'assets/avatars/fighter-avatar-20.png',stats:{power:5,speed:2,chin:5,cardio:8}},
-    {id:'fighter-21',asset:'assets/avatars/fighter-avatar-21.png',stats:{power:8,speed:3,chin:6,cardio:3}},
-    {id:'fighter-22',asset:'assets/avatars/fighter-avatar-22.png',stats:{power:7,speed:4,chin:6,cardio:3}},
-    {id:'fighter-23',asset:'assets/avatars/fighter-avatar-23.png',stats:{power:6,speed:7,chin:4,cardio:3}},
-    {id:'fighter-24',asset:'assets/avatars/fighter-avatar-24.png',stats:{power:8,speed:2,chin:8,cardio:2}},
-    {id:'fighter-25',asset:'assets/avatars/fighter-avatar-25.png',stats:{power:8,speed:2,chin:7,cardio:3}},
-    {id:'fighter-26',asset:'assets/avatars/fighter-avatar-26.png',stats:{power:7,speed:5,chin:6,cardio:2}},
-    {id:'fighter-27',asset:'assets/avatars/fighter-avatar-27.png',stats:{power:4,speed:8,chin:3,cardio:5}},
-    {id:'fighter-28',asset:'assets/avatars/fighter-avatar-28.png',stats:{power:3,speed:6,chin:5,cardio:6}},
-    {id:'fighter-29',asset:'assets/avatars/fighter-avatar-29.png',stats:{power:7,speed:7,chin:4,cardio:2}},
-    {id:'fighter-30',asset:'assets/avatars/fighter-avatar-30.png',stats:{power:3,speed:8,chin:4,cardio:5}},
-    {id:'fighter-31',asset:'assets/avatars/fighter-avatar-31.png',stats:{power:4,speed:7,chin:3,cardio:6}},
-    {id:'fighter-32',asset:'assets/avatars/fighter-avatar-32.png',stats:{power:8,speed:3,chin:7,cardio:2}},
-    {id:'fighter-33',asset:'assets/avatars/fighter-avatar-33.png',stats:{power:7,speed:6,chin:5,cardio:2}},
-    {id:'fighter-34',asset:'assets/avatars/fighter-avatar-34.png',stats:{power:6,speed:6,chin:3,cardio:5}},
-    {id:'fighter-35',asset:'assets/avatars/fighter-avatar-35.png',stats:{power:6,speed:4,chin:7,cardio:3}},
-    {id:'fighter-36',asset:'assets/avatars/fighter-avatar-36.png',stats:{power:7,speed:3,chin:5,cardio:5}},
-    {id:'fighter-37',asset:'assets/avatars/fighter-avatar-37.png',stats:{power:8,speed:2,chin:6,cardio:4}},
-    {id:'fighter-38',asset:'assets/avatars/fighter-avatar-38.png',stats:{power:6,speed:6,chin:5,cardio:3}},
-    {id:'fighter-39',asset:'assets/avatars/fighter-avatar-39.png',stats:{power:5,speed:5,chin:8,cardio:2}},
-    {id:'fighter-40',asset:'assets/avatars/fighter-avatar-40.png',stats:{power:8,speed:4,chin:6,cardio:2}},
-    {id:'fighter-41',asset:'assets/avatars/fighter-avatar-41.png',stats:{power:8,speed:6,chin:4,cardio:2}},
-    {id:'fighter-42',asset:'assets/avatars/fighter-avatar-42.png',stats:{power:5,speed:8,chin:5,cardio:2}},
-    {id:'fighter-43',asset:'assets/avatars/fighter-avatar-43.png',stats:{power:7,speed:2,chin:4,cardio:7}},
-    {id:'fighter-44',asset:'assets/avatars/fighter-avatar-44.png',stats:{power:4,speed:4,chin:5,cardio:7}}
-  ];
   const TRAINING_INJURY_IDS=new Set(['knee','shoulder','elbow','ribs','ankle','back','hand','neck']);
   state = loadState();
   const fighterCities = [
