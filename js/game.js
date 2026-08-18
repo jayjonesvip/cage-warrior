@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.126';
+  const ICON_ASSET_VERSION = '2.5.127';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -87,6 +87,8 @@
   let identityManualValue='';
   let retirementPending=false;
   let pendingTrainingAction=null;
+  let activeHustleShift=null;
+  let hustleShiftTimer=null;
   let pendingCeoPresentation=null;
   let pendingTitleLossPresentation=null;
   let cageDiceChoice='under';
@@ -1000,8 +1002,12 @@
     if(quote.reason==='full'){toast('Your energy and health are already full.','#78dfff');return}
     state.cash-=quote.cashCost;state.treatmentAvailable=false;const restored=LOGIC.applyRecovery(state,treatment);trackEvent('recovery_completed',{treatment_id:treatment.id,cash_spent:quote.cashCost,energy_restored:Math.round(restored.energy),health_restored:Math.round(restored.health)});initAudio();sfx.train();toast(`${treatment.title.toUpperCase()} · +${Math.round(restored.energy)} energy${restored.health?` · +${Math.round(restored.health)} health`:''}`,'#78dfff');updateUI();
   }
+  function resolveHustleShift(){
+    hustleShiftTimer=null;if(!activeHustleShift)return;const {totalCash,bonusText}=activeHustleShift,result=$('#hustleShiftResult');$('#hustleShiftTitle').textContent='SHIFT COMPLETE';$('#hustleShiftStatus').textContent=`${sessionsLeft('hustle',3)} shift${sessionsLeft('hustle',3)===1?'':'s'} left today.`;$('#hustleShiftMeter').setAttribute('aria-valuenow','100');result.innerHTML=`<b>+$${totalCash} CASH</b><span>${bonusText||'SHIFT COMPLETE · NO BONUS THIS TIME'}</span>`;result.hidden=false;$('#collectHustleShift').hidden=false;sfx.coin();requestAnimationFrame(()=>$('#collectHustleShift').focus());
+  }
+  function closeHustleShift(){if(hustleShiftTimer||!activeHustleShift)return;activeHustleShift=null;const modal=$('#hustleShiftModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap()}
   function handleHustle(i){
-    ensureDailyCounters();if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash);receiveMoney(cash);trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:cash,energy_spent:a.cost});sfx.coin();toast(`+$${cash} cash · ${sessionsLeft('hustle',3)} shifts left`,'#77d13e');updateUI();
+    ensureDailyCounters();if(activeHustleShift)return;if(state.level>=5){toast('SIDE JOBS END AT LEVEL 5 · YOU ARE A FULL-TIME FIGHTER','#78dfff');return}if(sessionsLeft('hustle',3)<1){toast('No hustle shifts left today.','#ff766d');return}const a=hustleDefs[i];if(!a||!spendEnergy(a.cost))return;initAudio();state.dailyCounters.hustle++;const cash=rint(...a.cash),bonus=LOGIC.hustleBonus(a.id,Math.random(),Math.random());receiveMoney(cash);let bonusText='',bonusCash=0,powerBonus=0,hypeBonus=0;if(bonus.type==='cash'){bonusCash=bonus.amount;receiveMoney(bonusCash);bonusText=`LUCKY FIND · +$${bonusCash} SPARE CHANGE`}if(bonus.type==='power'){powerBonus=bonus.amount;state.stats.power+=powerBonus;bonusText='EXTRA-HEAVY FREIGHT · +0.50 POWER'}if(bonus.type==='hype'){const before=state.hype;state.hype=clamp(state.hype+bonus.amount,0,100);hypeBonus=state.hype-before;bonusText=hypeBonus?`RECOGNIZED AT THE DOOR · +${hypeBonus}% HYPE`:'RECOGNIZED AT THE DOOR · HYPE ALREADY MAXED'}const totalCash=cash+bonusCash;activeHustleShift={action:a,totalCash,bonusText};trackEvent('hustle_completed',{hustle_id:a.id,cash_earned:totalCash,base_cash:cash,bonus_cash:bonusCash,power_bonus:powerBonus,hype_bonus:hypeBonus,energy_spent:a.cost});const modal=$('#hustleShiftModal'),meter=$('#hustleShiftMeter');$('#hustleShiftTitle').textContent=a.title.toUpperCase();$('#hustleShiftStatus').textContent='Working... keep your head down and finish the shift.';$('#hustleShiftIcon').innerHTML=gameIcon(a.id,a.icon);$('#hustleShiftResult').hidden=true;$('#hustleShiftResult').innerHTML='';$('#collectHustleShift').hidden=true;meter.classList.remove('working');meter.setAttribute('aria-valuenow','0');modal.classList.add('open');modal.setAttribute('aria-hidden','false');updateUI();void meter.offsetWidth;requestAnimationFrame(()=>meter.classList.add('working'));hustleShiftTimer=setTimeout(resolveHustleShift,1450);
   }
   function handlePublicity(i){
     ensureDailyCounters();const a=publicityDefs[i];if(!a)return;
@@ -1621,6 +1627,7 @@
   $('#autographRun').addEventListener('click',runAutographSigning);
   $('#autographCancel').addEventListener('click',closeAutographModal);
   $('#autographModal').addEventListener('click',e=>{if(e.target===$('#autographModal'))closeAutographModal()});
+  $('#collectHustleShift').addEventListener('click',closeHustleShift);$('#hustleShiftModal').addEventListener('click',e=>{if(e.target===$('#hustleShiftModal'))closeHustleShift()});$('#hustleShiftModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeHustleShift()});
   $('#blackjackDeal').addEventListener('click',dealBlackjack);$('#blackjackHit').addEventListener('click',hitBlackjack);$('#blackjackStand').addEventListener('click',playBlackjackDealer);$('#blackjackClose').addEventListener('click',closeBlackjack);
   $('#blackjackModal').addEventListener('click',e=>{if(e.target===$('#blackjackModal'))closeBlackjack()});$('#blackjackModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeBlackjack()});
   $('#cageDiceRoll').addEventListener('click',rollCageDice);$('#cageDiceClose').addEventListener('click',closeCageDice);$('#cageDiceModal').addEventListener('click',e=>{if(e.target===$('#cageDiceModal'))closeCageDice()});$('#cageDiceModal').addEventListener('keydown',e=>{if(e.key==='Escape')closeCageDice()});

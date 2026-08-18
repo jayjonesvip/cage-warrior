@@ -355,6 +355,15 @@ test('successful overtraining earns a quarter-point no-pain bonus',()=>{
   assert.equal(logic.trainingRiskBonus(true,false),.25);
 });
 
+test('side-job bonus rolls stay at twenty-five percent with bounded rewards',()=>{
+  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.25,0),{type:'',amount:0});
+  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.2499,0),{type:'cash',amount:2});
+  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',0,.999999),{type:'cash',amount:50});
+  assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:.5});
+  assert.deepEqual(logic.hustleBonus('nightclub-door',0,0),{type:'hype',amount:2});
+  assert.deepEqual(logic.hustleBonus('nightclub-door',0,.999999),{type:'hype',amount:4});
+});
+
 test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
   assert.equal(logic.trainingCost({cost:8},0),8);
   assert.equal(logic.trainingCost({cost:8},2),12);
