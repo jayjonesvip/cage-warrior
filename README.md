@@ -332,7 +332,8 @@ generated league.
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
 - Each opponent has a daily XP curve: the first win pays full XP, the second
   win pays 25%, and the third matchup that day pays no XP, no fight purse, and
-  costs 7 Hype even when won. Losses do not advance the curve, and opponent
+  costs 7 Hype even when won. That zero-XP win cannot award a collectible or
+  advance collectible-drop pity. Losses do not advance the curve, and opponent
   cards, the Tale of the Tape, and results show the tier.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The dedicated card

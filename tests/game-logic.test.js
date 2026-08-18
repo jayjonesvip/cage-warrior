@@ -348,6 +348,9 @@ test('daily opponent wins reduce repeat XP without counting losses',()=>{
   assert.equal(logic.opponentFightPurse(500,0),500);
   assert.equal(logic.opponentFightPurse(500,1),500);
   assert.equal(logic.opponentFightPurse(500,2),0);
+  assert.equal(logic.fightDropEligible(0),true);
+  assert.equal(logic.fightDropEligible(1),true);
+  assert.equal(logic.fightDropEligible(2),false);
   assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:1}),{xp:16,category:'standard_repeat',modifiers:['REPEAT WIN · 25% XP']});
   assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:2}),{xp:0,category:'standard_exhausted',modifiers:['OPPONENT XP EXHAUSTED · NO XP']});
   assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,opponentWinsToday:0}).xp,23);
