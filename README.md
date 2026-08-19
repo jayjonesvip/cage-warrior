@@ -92,7 +92,7 @@ generated league.
   fight, and results display the player's color alongside the opponent's color.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
-  CageReporter publishes the retirement, the name remains permanently reserved,
+  the verified CEO publishes the retirement, the name remains permanently reserved,
   and the game returns to the first fighter-creation step. Historical title
   results remain in the public record, while the newly claimed fighter starts
   with fresh title-shot eligibility against the current champion. If the public
@@ -267,23 +267,25 @@ generated league.
   claims it atomically, silently tries another generated combination on a
   collision, and never releases claimed or retired names for reuse. Legacy
   lowercase identities remain valid and permanently reserved.
-- Cage Feed has its own bottom-navigation icon. New timeline entries add a
-  numbered red unread badge, and opening the Feed marks the visible posts read.
+- Cage Feed has its own bottom-navigation icon. Its numbered red badge counts
+  unread mentions only; opening the **Mentions** view marks those posts read.
 - The top-bar audience line shows both Followers and Following. Following is the
   live count of ranked fighter profiles in the shared Cage Feed roster.
-- The timeline owns the Feed explanation and scrolls inside its own card.
-  Generic composer controls are removed; interaction begins by tapping a real
-  fighter's avatar and opening their public profile. Feed and fighter-profile
-  copy uses a larger mobile text scale for easier reading.
+- The timeline scrolls above a persistent two-action dock for **Call Out** and
+  **Show Respect**. Each action opens a
+  searchable ranked-fighter picker, generates a category-specific draft, and
+  requires a preview confirmation before publishing. A new draft can be drawn
+  without spending the daily allowance. Every Feed profile is clickable and
+  read-only; posting exists only in the action dock. The desktop Feed fills the
+  available workspace instead of retaining a narrow reading-column cap.
 - `@handles` use highlighted mention styling. Posts addressed to the current
   fighter receive an amber edge and can be isolated with the Feed's **Mentions**
   filter. Targeted fighter posts use the stored profile ID, while official posts
   are matched against the current fighter's exact `@handle`.
-- Fights, win streaks, losses, appearances, autograph signings, and sponsor
-  deals generate contextual `CageReporter` coverage. Wins earned while carrying
-  a training injury receive dedicated headlines questioning whether fighting
-  hurt was courageous, reckless, or both. The global feed emphasizes
-  ranked fighters' canned posts instead of filling the timeline with fake fans.
+- `CageReporter` publishes exactly one contextual result for each eligible
+  career fight. The strongest available angle wins: an injured victory, streak,
+  ordinary win, or loss. Appearances, autograph signings, and sponsor deals do
+  not generate Reporter coverage.
 - The verified `@CageGrindCEO` account uses the CEO's office portrait and a
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
   career and the first exceptional performance bonus without allowing arbitrary
@@ -291,18 +293,20 @@ generated league.
   only by the database-owned global belt workflow.
 - Tapping the CEO portrait opens his verified public profile with his executive
   bio. The official account does not accept fighter-message interactions.
-- CageReporter uses a dedicated newsroom portrait and verified profile. Reporter
-  avatars are clickable, but the official account is read-only and does not
-  expose fighter-message interactions. Career reports address the featured
-  fighter by `@handle`, so they appear in that fighter's Mentions filter.
+- CageReporter uses a dedicated newsroom portrait and verified read-only
+  profile. Career reports address the featured fighter by `@handle`, so they
+  appear in that fighter's Mentions filter.
+- Each endorsement brand has a verified, clickable, read-only sponsor profile.
+  Accepting a new contract creates one sponsor-owned signing announcement
+  targeted to the fighter's permanent profile ID. Sponsor announcements do not
+  consume the fighter's daily posting allowance.
 - Every sanctioned title shot receives an official CEO announcement. Outside
   the championship picture, only qualifying upsets and knockout finishes have
   a deterministic 10% chance at one modest CEO cash and Hype bonus per local day.
-- A fighter profile offers exactly three randomized, personalized message
-  drafts presented as text-style composers with explicit **Send** buttons. The
-  roughly 50-message pool covers callouts, props, welcomes, respect, and putting
-  another fighter on notice. A confirmed post awards 5–12 Followers and 1–3
-  Hype. Supabase enforces five direct fighter interactions per UTC day;
+- The action dock draws personalized drafts from a 20-message pool covering
+  callouts and respect. The CEO alone
+  welcomes new fighters. A confirmed post awards 5–12 Followers and 1–3 Hype.
+  Supabase enforces five direct fighter interactions per UTC day;
   `CageReporter` career coverage does not use that allowance. These social posts
   do not fabricate an accepted online fight.
 

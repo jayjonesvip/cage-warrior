@@ -49,6 +49,7 @@ const resumeOwnedIdentityMigration = fs.readFileSync('supabase/migrations/202608
 const fortyFourAvatarMigration = fs.readFileSync('supabase/migrations/20260817190000_expand_fighter_avatars_to_44.sql', 'utf8');
 const expandedHometownsMigration = fs.readFileSync('supabase/migrations/20260818120000_expand_fighter_hometowns.sql', 'utf8');
 const themedHometownsMigration = fs.readFileSync('supabase/migrations/20260819120000_expand_fighter_hometowns.sql', 'utf8');
+const feedActionsMigration = fs.readFileSync('supabase/migrations/20260819130000_feed_actions_and_sponsors.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
@@ -192,7 +193,7 @@ test('the branded landing page gates the game and offers the correct career entr
   assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER →<\/button>/);
   assert.match(page, /FREE TO PLAY[\s\S]*NO DOWNLOAD[\s\S]*PLAY INSTANTLY/);
   assert.match(page, /<a class="landing-origin" href="origins\.html">THE ORIGINS OF CAGE GRIND<\/a>/);
-  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.169" alt="" aria-hidden="true"/);
+  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.171" alt="" aria-hidden="true"/);
   assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
   assert.match(landingScript, /logic\.careerLandingMode\(state\)/);
   assert.match(script, /CONTINUE CAREER/);
@@ -315,7 +316,9 @@ test('real Cage Feed fighters expose validated avatars and public bios', () => {
   assert.match(page, /id="fighterBioModal"/);
   assert.match(script, /data-feed-profile=/);
   assert.match(script, /function fighterBioSentence\(profile\)/);
-  assert.match(script, /profile\.id===state\.socialProfileId/);
+  assert.match(script, /profile\?\.id===state\.socialProfileId/);
+  assert.match(script, /USE THE FEED ACTIONS TO POST TO THIS FIGHTER/);
+  assert.doesNotMatch(script, /data-fighter-interaction/);
   assert.match(script, /REAL CAGE GRIND FIGHTER|fighterBioAvatar/);
   assert.match(css, /\.feed-avatar\.fighter-photo/);
 });
@@ -560,10 +563,10 @@ test('scalable copy pools are separated from gameplay logic', () => {
   assert.ok(stringsData.social.account.length >= 3);
   assert.ok(stringsData.social.cycles.fightWin.length >= 3);
   assert.ok(stringsData.social.interactions.callout.messages.length >= 5);
-  assert.ok(stringsData.social.interactions.props.messages.length >= 5);
+  assert.ok(stringsData.social.interactions.respect.messages.length >= 5);
   assert.match(script, /STRINGS\.fightCommentary\[landed\?'hit':'miss'\]\[type\]/);
   assert.match(script, /STRINGS\.social\.account\[0\]/);
-  assert.match(script, /definitions=STRINGS\.social\.interactions/);
+  assert.match(script, /definition=STRINGS\.social\.interactions\[kind\]/);
   assert.doesNotMatch(script, /snaps a jab through the guard|First follow\. Let’s see where this goes/);
 });
 
@@ -589,7 +592,7 @@ test('career identity keeps hometown informational and uses one shared real-play
   assert.match(sharedUi, /requiredLevel=Math\.max\(1,Math\.floor\(Number\(champ\.champion_level\)\)\|\|1\)/);
   assert.match(sharedUi, /TITLE SHOT AVAILABLE · CHAMPION LEVEL \$\{requiredLevel\}/);
   assert.match(sharedUi, /REACH LEVEL \$\{requiredLevel\} TO CHALLENGE/);
-  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.169/);
+  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.171/);
   assert.match(cageChampionshipMigration, /viewer\.level>=champion\.level/);
   for (const city of ['boston','atlanta','san-francisco','denver']) assert.match(expandedHometownsMigration,new RegExp(`'${city}'`));
   assert.match(expandedHometownsMigration, /drop constraint if exists cage_profiles_city[\s\S]*add constraint cage_profiles_city/);
@@ -607,7 +610,7 @@ test('the simplified World Championship is a daily server-authoritative flow', (
   assert.match(css, /\.championship-hub\.locked \.championship-heading\{min-height:88px/);
   assert.match(css, /\.championship-hub\.locked \.championship-icon\{width:min\(48%,176px\);height:112%;opacity:\.08\}/);
   for (const action of ['CHALLENGE FOR TITLE','DEFEND YOUR TITLE','FIGHT FOR THE TITLE','DEFEND THE TITLE','RECLAIM THE TITLE']) assert.match(script,new RegExp(action));
-  assert.match(page, /id="worldTitleCard"[\s\S]*Career Opponents/);
+  assert.match(page, /DAILY FIGHTS RESET IN[\s\S]*id="worldTitleCard"[\s\S]*>Opponents/);
   assert.match(page, /WORLD CHAMPIONSHIP BOUT/);
   assert.match(script, /function championshipOpponent\(\)/);
   assert.match(script, /selected_challenger/);
@@ -840,8 +843,8 @@ test('career fights use a reversible tale-of-the-tape preview before locker-room
   assert.match(script, /function beginFightPlan\(\)/);
   assert.match(script, /function confirmFightPlan\(\)/);
   assert.match(script, /beginFightPlan\(\)/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.169"\)[^}]*background-position:center 62%/);
-  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.169"\)[^}]*background-position:center,center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.171"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.171"\)[^}]*background-position:center,center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
   assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
   assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
@@ -935,7 +938,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(script, /showFightStage\('liveStage'\).*beginPlannedFight\(\)/);
   assert.match(page, /FINAL MOMENTS BEFORE THE WALKOUT · FOCUS <b id="focusValue">82%<\/b>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.169"/);
+  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.171"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(page, /class="fight-plan-card focus-encounter" id="focusEncounter"/);
   assert.match(script, /box\.className='fight-plan-card focus-encounter'/);
@@ -959,12 +962,12 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(css, /\.focus-result-tier\{[^}]*font-size:21px[^}]*letter-spacing:2px/);
   assert.match(css, /\.focus-final-score>b\{[^}]*font-size:34px[^}]*text-shadow:0 0 13px #58d8e85c/);
   assert.match(css, /\.focus-delta\{[^}]*border-radius:999px[^}]*color:#73dda8/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.169/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.169/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.169/);
-  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.169/);
-  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.169/);
-  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.169/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.171/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.171/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.171/);
+  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.171/);
+  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.171/);
+  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.171/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -990,7 +993,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
   assert.match(originsPage, /BUILD A FIGHTER\. LIVE THE CAREER\./);
   assert.match(originsPage, /https:\/\/web\.archive\.org\/web\/20111007174242\/http:\/\/www\.cagewars\.net\//);
   assert.match(fs.readFileSync('sitemap.xml', 'utf8'), /<loc>https:\/\/cagegrind\.com\/origins\.html<\/loc>/);
-  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.169/);
+  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.171/);
   assert.match(originsCss, /\.lineage-grid\{display:grid;grid-template-columns:1fr 1fr/);
   assert.match(originsCss, /body\{[^}]*overflow-x:hidden/);
   assert.match(originsCss, /h2\{[^}]*overflow-wrap:anywhere/);
@@ -1007,7 +1010,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
     assert.match(serviceWorker, new RegExp(`'\\./${asset.replaceAll('/', '\\/').replaceAll('.', '\\.')}'`));
   }
   assert.match(serviceWorker, /'\.\/origins\.html'/);
-  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.169'/);
+  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.171'/);
 });
 
 test('collectible cards flip to optional sponsored details without empty QR space', () => {
@@ -1137,7 +1140,7 @@ test('home career guide teaches the four-step loop with compact artwork cards', 
 test('rendered icons support stable per-file image overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.169'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.171'/);
   assert.match(script, /function gameIcon\(name,fallback,extension='png'\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.\$\{extension\}\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
@@ -1234,7 +1237,7 @@ test('top-bar identity, money, XP, and Hype rows share matching alignment', () =
   assert.match(css, /\.money\{margin-left:auto\}\.money>b\{font-size:18px\}/);
 });
 
-test('Cage Feed combines career reports with avatar-driven fighter interactions', () => {
+test('Cage Feed combines one-per-fight reports with dock-driven fighter interactions', () => {
   assert.doesNotMatch(html, /Latest Buzz|homeFeedPreview|homeFeedStatus/);
   assert.match(html, /data-screen="feed"/);
   assert.match(html, /id="socialTimeline"/);
@@ -1245,26 +1248,32 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(html, /\.feed-post-head b\{[^}]*font-size:11px/);
   assert.match(html, /\.feed-post-head span\{[^}]*font-size:9\.5px/);
   assert.match(html, /\.feed-page-note\{[^}]*font-size:9\.5px/);
-  assert.match(html, /\.fighter-message-text\{[^}]*font-size:12px/);
+  assert.match(page, /class="feed-action-dock"[\s\S]*data-feed-intent="callout"[\s\S]*data-feed-intent="respect"/);
+  assert.doesNotMatch(page, /data-feed-intent="(?:props|watching|welcome)"/);
+  assert.match(page, /id="fighterPostModal"[\s\S]*id="fighterPostSearch"[\s\S]*id="fighterPostDraft"[\s\S]*id="fighterPostSend"/);
   assert.match(html, /\.fighter-bio-dialog \.loadout-dialog-kicker\{font-size:9\.5px\}/);
   assert.match(html, /\.fighter-bio-dialog \.modal-run\{font-size:14px\}/);
   assert.doesNotMatch(page, /social-composer|socialActions|Make Your Post|feed-compose-head/);
   assert.match(html, /\.screen\[data-screen="feed"\]\.active\{display:flex/);
   assert.match(css, /\.screen\[data-screen="feed"\]\.active\{padding-bottom:8px\}/);
   assert.doesNotMatch(html, /class="feed-back"/);
-  assert.match(script, /socialAccountCreated:false,socialFeed:\[\],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0/);
+  assert.match(script, /socialLastMentionSerial:0[\s\S]*socialLastRemoteMentionPostId:0/);
   assert.match(script, /function socialUnreadCount\(\)/);
-  assert.match(script, /currentScreen==='feed'\)\{state\.socialLastReadSerial=state\.socialSerial/);
+  assert.match(script, /feedPostMentionsPlayer\(post\)[\s\S]*state\.socialLastMentionSerial/);
+  assert.match(script, /currentScreen==='feed'&&feedFilter==='mentions'/);
   assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
   assert.match(script, /function feedPostMentionsPlayer\(post\)/);
   assert.match(script, /targetProfileId&&targetProfileId===state\.socialProfileId/);
   assert.match(script, /part\.slice\(1\)\.toLowerCase\(\)===ownHandle/);
   assert.match(script, /function renderFeedText\(post\)/);
   assert.match(script, /split\(\/\(@\[A-Za-z\]\[A-Za-z0-9_\]\{2,31\}\)\/g\)/);
-  assert.match(script, /mentions=posts\.filter\(feedPostMentionsPlayer\),visiblePosts=feedFilter==='mentions'\?mentions:posts/);
+  assert.match(script, /mentions=posts\.filter\(feedPostMentionsPlayer\)/);
+  assert.match(script, /visiblePosts=feedFilter==='mentions'\?mentions:posts/);
   assert.match(script, /data-feed-filter/);
   assert.match(css, /\.feed-post\.mentioned-post\{[^}]*box-shadow:inset 3px 0 #e7a839/);
   assert.match(css, /\.feed-mention\.self\{[^}]*color:#ffc85f/);
+  assert.match(css, /\.feed-page-card \.feed-list\{flex:1 1 auto;align-content:start;grid-auto-rows:max-content\}/);
+  assert.match(css, /@media \(min-width:1100px\)\{\.screen\[data-screen="feed"\]\.active\{align-items:stretch\}[\s\S]*?\.feed-page-card\{width:100%;max-width:none/);
   assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#socialTimeline'\)\.scrollTo\(\{top:0,behavior:'smooth'\}\)\)/);
   assert.match(script, /function createSocialAccount\(\)/);
   assert.match(strings, /Hello, fight fans! Stay tuned—the climb starts now/);
@@ -1276,36 +1285,33 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(script, /function drawSocialHeadline\(key,entries\)/);
   assert.match(script, /reporter-posts\|\$\{state\.socialProfileId\|\|state\.name\}\|\$\{key\}\|\$\{batch\}/);
   assert.match(script, /return deck\[count%deck\.length\]/);
-  for (const key of ['fightWin','fightInjuredWin','fightLoss','appearance','viralAppearance','autographFree','autographStandard','autographExpensive','sponsor']) {
+  for (const key of ['fightWin','fightInjuredWin','fightLoss']) {
     assert.ok(stringsData.social.cycles[key].filter(entry=>entry.profile==='media').length>=3,`${key} should have a reporter headline deck`);
   }
   assert.ok(stringsData.social.cycles.fightStreakHeadline.length>=3);
-  assert.match(script, /data\.injury\?addHeadline\('fightInjuredWin',cycles\.fightInjuredWin,values\):addHeadline\('fightWin',cycles\.fightWin,values\)/);
+  assert.match(script, /const key=data\.injury\?'fightInjuredWin':data\.winStreak>=2\?'fightStreak':'fightWin'/);
   assert.match(script, /injury:win\?currentTrainingInjury\(\)\?\.name\|\|'':''/);
   assert.match(strings, /COURAGEOUS OR STUPID\? \{name\} fought through a \{injury\}/);
   assert.match(script, /openSocialCycle\('fight'/);
-  assert.match(script, /openSocialCycle\('appearance'/);
-  assert.match(script, /openSocialCycle\('autograph'/);
-  assert.match(script, /openSocialCycle\('sponsor'/);
-  assert.match(page, /Tap a fighter or the CEO's avatar/);
+  assert.doesNotMatch(script, /openSocialCycle\('appearance'|openSocialCycle\('autograph'|openSocialCycle\('sponsor'/);
   assert.match(page, /id="fighterBioInteractions"/);
-  assert.match(script, /function fighterInteractionChoices\(profile\)/);
-  assert.match(script, /pool\.slice\(dealt,dealt\+3\)/);
+  assert.match(script, /function fighterInteractionDraft\(kind,profile,offset=0\)/);
+  assert.match(script, /function renderFighterPostResults\(\)/);
+  assert.match(script, /function openFighterPostComposer\(kind\)/);
   assert.match(script, /sharedSocialInteractionsRemaining/);
-  assert.match(script, /data-fighter-interaction/);
-  assert.match(script, /function handleFighterInteraction\(choiceId,target\)/);
+  assert.match(script, /data-fighter-post-target/);
+  assert.match(script, /function handleFighterInteraction\(choice,target\)/);
   assert.match(script, /loadInteractionAllowance\(\)/);
   assert.match(strings, /interactions:\s*\{/);
-  for (const kind of ['CALL THEM OUT','GIVE THEM PROPS','WELCOME THEM','SHOW RESPECT','PUT THEM ON NOTICE']) assert.match(strings, new RegExp(kind));
+  for (const kind of ['CALL THEM OUT','SHOW RESPECT']) assert.match(strings, new RegExp(kind));
+  assert.doesNotMatch(strings, /label:'(?:WELCOME THEM|GIVE THEM PROPS|PUT THEM ON NOTICE)'/);
   const interactionMessages=Object.values(stringsData.social.interactions).flatMap(definition=>definition.messages);
-  assert.equal(interactionMessages.length,50);
-  assert.match(script, /class="fighter-message-text" role="textbox" aria-readonly="true"/);
-  assert.match(script, /class="fighter-message-send"/);
-  assert.match(script, />SEND<\/button>/);
-  assert.match(css, /\.fighter-message-composer\{display:grid;grid-template-columns:minmax\(0,1fr\) 58px/);
+  assert.equal(interactionMessages.length,20);
+  assert.match(script, /USE THE FEED ACTIONS TO POST TO THIS FIGHTER/);
+  assert.doesNotMatch(script, /data-fighter-interaction/);
   assert.match(script, /LOGIC\.socialInteractionReward/);
   assert.match(script, /followers_gained:followersGained,hype_gained:hypeGained/);
-  assert.match(script, /saveState\(\);closeFighterBio\(\);await connectSharedSocial\(true\);updateUI\(\)/);
+  assert.match(script, /closeFighterPostComposer\(\);await connectSharedSocial\(true\);updateUI\(\)/);
   assert.match(cageInteractionMigration, /get_cage_interactions_remaining/);
   assert.match(cageInteractionMigration, /return greatest\(0, 5 - v_used\)/);
   assert.match(cageInteractionMigration, /post_kind in \('callout','props','welcome','respect','watching'\)/);
@@ -1321,13 +1327,12 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(readme, /five direct\s+fighter interactions per UTC day/i);
 });
 
-test('canned fighter posts use one non-repeating shuffled daily deck', () => {
-  const choices=script.match(/function fighterInteractionChoices\(profile\)\{[\s\S]*?\n  \}/)?.[0]||'';
-  assert.match(choices, /dailyDeckSeed=hashSeed\(`fighter-posts\|\$\{state\.socialProfileId\|\|state\.name\}\|\$\{todayKey\(\)\}`\)/);
-  assert.match(choices, /seededRandom\(dailyDeckSeed\)/);
-  assert.match(choices, /dealt=Math\.max\(0,5-sharedSocialInteractionsRemaining\)\*3/);
-  assert.match(choices, /pool\.slice\(dealt,dealt\+3\)/);
-  assert.doesNotMatch(choices, /profile\.id.*dailyDeckSeed|dailyDeckSeed.*profile\.id/);
+test('fighter post drafts shuffle without repetition inside the selected intent', () => {
+  const choices=script.match(/function fighterInteractionDraft\(kind,profile,offset=0\)\{[^\n]+/)?.[0]||'';
+  assert.match(choices, /definition=STRINGS\.social\.interactions\[kind\]/);
+  assert.match(choices, /profile\.id\}\|\$\{kind\}\|\$\{todayKey\(\)\}/);
+  assert.match(choices, /seededRandom/);
+  assert.match(choices, /offset\)%order\.length/);
 });
 
 test('Cage Grind CEO is verified while championship announcements stay database-owned', () => {
@@ -1339,7 +1344,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(page, /id="ceoResultSpotlight"/);
   assert.match(page, /class="card championship-hub career-after-setup" id="worldTitleCard"[^>]*aria-live="polite"/);
   assert.ok(page.indexOf('id="worldTitleCard"') > page.indexOf('data-screen="fight"'));
-  assert.ok(page.indexOf('id="worldTitleCard"') < page.indexOf('DAILY FIGHTS RESET IN'));
+  assert.ok(page.indexOf('id="worldTitleCard"') > page.indexOf('DAILY FIGHTS RESET IN'));
   assert.ok(page.indexOf('id="worldTitleCard"') > page.indexOf('class="card retirement-card"'));
   assert.doesNotMatch(page, /id="careerIdentityCard"[^\n]*World Championship/);
   assert.match(sharedUi, /model\.kicker='REIGNING WORLD CHAMPION';model\.headline='YOU ARE THE WORLD CHAMPION'/);
@@ -1353,7 +1358,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(script, /class="championship-icon">\$\{gameIcon\('title-world','👑'\)\}/);
   assert.doesNotMatch(page, /landing-champion:after\{content:"♛"/);
   assert.doesNotMatch(script, /'👑 YOU HOLD THE BELT'/);
-  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.169/g);
+  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.171/g);
   assert.match(css, /\.feed-post\.ceo\{/);
   assert.match(css, /\.feed-verified\{/);
   assert.match(css, /\.ceo-office-photo\{/);
@@ -1389,7 +1394,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(cageCeoMigration, /'cagegrindceo','ceo',v_body,v_event_key/i);
   assert.match(cageCeoMigration, /post_kind not in \('reporter','ceo'\)/i);
   assert.match(cageCeoMigration, /grant execute on function public\.publish_cage_ceo_post\(text\) to authenticated/i);
-  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.169/);
+  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.171/);
 });
 
 test('hometown colors persist with fighters across the game presentation', () => {
@@ -1428,7 +1433,7 @@ test('hometown colors persist with fighters across the game presentation', () =>
 
 test('CageReporter has a verified clickable read-only profile', () => {
   assert.ok(fs.existsSync('assets/cage-reporter.jpg'));
-  assert.match(strings, /author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets\/cage-reporter\.jpg\?v=2\.5\.169',verified:true,bio:/);
+  assert.match(strings, /author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets\/cage-reporter\.jpg\?v=2\.5\.171',verified:true,bio:/);
   assert.match(script, /reporterProfile=STRINGS\.social\.profiles\.media/);
   assert.match(script, /verified:Boolean\(officialProfile\?\.verified\)/);
   assert.match(script, /data-reporter-profile/);
@@ -1436,14 +1441,14 @@ test('CageReporter has a verified clickable read-only profile', () => {
   assert.match(script, /function renderReporterBioDetails\(\)/);
   assert.match(script, /activeBioProfileId==='official-reporter'\?renderReporterBioDetails\(\)/);
   assert.match(script, /VERIFIED OFFICIAL ACCOUNT · READ ONLY/);
-  assert.match(script, /text:'@\{name\} has joined the global fight conversation\.'/);
+  assert.doesNotMatch(script, /profile:'media',text:'@\{name\} has joined the global fight conversation\.'/);
   assert.match(script, /reporterValues=Object\.assign\(\{\},values,\{name:`@\$\{String\(values\.name\|\|name\)\.replace\(\/\^@\//);
   assert.match(script, /kind:'reporter',body:post\.text,targetProfileId:state\.socialProfileId/);
   assert.match(css, /\.feed-avatar\.reporter-photo\{/);
   assert.match(css, /\.reporter-profile \.fighter-bio-dialog\{/);
   assert.match(css, /\.reporter-bio-official\{/);
-  assert.match(serviceWorker, /\.\/assets\/cage-reporter\.jpg\?v=2\.5\.169/);
-  assert.match(readme, /CageReporter uses a dedicated newsroom portrait and verified profile/);
+  assert.match(serviceWorker, /\.\/assets\/cage-reporter\.jpg\?v=2\.5\.171/);
+  assert.match(readme, /CageReporter uses a dedicated newsroom portrait and verified read-only/);
 });
 
 test('championship action spans the championship card on desktop', () => {
@@ -1724,7 +1729,7 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.match(deal, /state\.cash-=bet/);
   assert.ok(fs.existsSync('assets/cage-dice.jpg'));
   assert.match(page, /id="cageDiceModal"/);
-  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.169/);
+  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.171/);
   assert.match(page, /data-dice-choice="under"[\s\S]*data-dice-choice="over"[\s\S]*data-dice-choice="seven"[\s\S]*data-dice-choice="doubles"/);
   assert.match(script, /function cageDiceIcon\(\)[\s\S]*icon-fallback">🎲/);
   assert.match(script, /sessionsLeft\('cageDice',1\)/);
@@ -1742,7 +1747,7 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.doesNotMatch(script, /REVIEW ROLL/);
   assert.match(script, /state\.blackjackHand\?\.status==='settled'/);
   assert.match(script, /if\(state\.cageDiceResult\|\|sessionsLeft\('cageDice',1\)<1\)/);
-  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.169/);
+  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.171/);
   assert.match(page, /id="horseRaceModal"[\s\S]*UNDERGROUND BUZZ · ONE RACE DAILY/);
   assert.match(page, /id="horseRaceField"[\s\S]*id="horseRaceBet"[\s\S]*id="horseRaceTrack"[\s\S]*id="horseRaceFinish"/);
   assert.match(script, /racingUnlocked=state\.level>=6/);
@@ -1807,7 +1812,15 @@ test('endorsements unlock as one crash-safe sequential offer', () => {
   assert.ok(script.indexOf('const ENDORSEMENT_IDS') < script.indexOf('state = loadState()'), 'endorsement migration data must exist before saved state loads');
   assert.match(script, /state\.endorsementHistory=\[\.\.\.new Set\(\[\.\.\.history,d\.id\]\)\]/);
   assert.match(script, /changeFollowers\(Math\.round\(d\.fansPerFight\*\.5\)\);trackEvent\('endorsement_signed'/);
-  assert.match(script, /saveState\(\);openSocialCycle\('sponsor'/);
+  assert.match(script, /saveState\(\);publishSponsorSigning\(d\)/);
+  assert.match(script, /function sponsorFeedProfile\(sponsorId\)/);
+  assert.match(script, /function openSponsorBio\(sponsorId\)/);
+  assert.match(script, /data-sponsor-profile/);
+  assert.match(supabaseClient, /publish_cage_sponsor_post/);
+  assert.match(cageSocial, /publishSponsorPost/);
+  assert.match(feedActionsMigration, /add column if not exists sponsor_id text/i);
+  assert.match(feedActionsMigration, /create or replace function public\.publish_cage_sponsor_post\(p_sponsor_id text\)/i);
+  assert.match(feedActionsMigration, /post_kind not in \('reporter','ceo','sponsor'\)/i);
 });
 
 test('level ups receive a dedicated promotion celebration', () => {

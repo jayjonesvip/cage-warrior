@@ -95,8 +95,9 @@
       return database.settleCageChampionshipChallenge({challenge_id:challengeId,challenger_id:challengerId,challenger_won:challengerWon});
     }
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
+    async function publishSponsorPost(sponsorId){return database.insertCageSponsorPost(sponsorId)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

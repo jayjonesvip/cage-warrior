@@ -52,8 +52,8 @@ globalThis.CAGE_STRINGS = {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.169',verified:true,bio:'Cage Grind’s official fight desk. Reports results, rivalries, milestones, and the stories shaping every career.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.169',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.171',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.171',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -71,6 +71,7 @@ globalThis.CAGE_STRINGS = {
       debut:{profile:'ceo',text:'Welcome to Cage Grind, @{name}. Build a record worth putting under the bright lights.'},
       performanceBonus:{profile:'ceo',text:'I noticed that performance, @{name}. A bonus is already on the way.'}
     },
+    sponsorSigning:'Welcome @{name} to the {brand} team. We are proud to back the next stage of the climb.',
     cycles: {
       fightWin: [
         {profile:'media',text:'RESULT: {name} gets past {opponent} by {finish}.{titleSuffix}'},
@@ -101,46 +102,6 @@ globalThis.CAGE_STRINGS = {
         {profile:'rival',author:'{opponent}',text:'Respect for taking the fight, {name}. But tonight belonged to me.'},
         {profile:'hater',text:'The hype train needed brakes. {name} just found them.'},
         {profile:'fan',text:'Losses happen. Still here, still following, and waiting for the comeback.'}
-      ],
-      appearance: [
-        {profile:'media',text:'OUTSIDE THE CAGE: {name} stopped by {title} as the profile continues to grow.'},
-        {profile:'media',text:'{title} welcomed {name} today for a break from fight-camp business.'},
-        {profile:'media',text:'{name} made an appearance on {title}. The fight world is starting to notice.'},
-        {profile:'fan',text:'Saw {name} making the rounds today. Good energy and no fake superstar routine.'},
-        {profile:'hater',text:'Another appearance? I would rather see {name} book a fight.'}
-      ],
-      viralAppearance: [
-        {profile:'media',text:'TRENDING: The {name} appearance on {title} is taking over the fight timeline.'},
-        {profile:'media',text:'{name} went from cage prospect to viral name after a huge moment on {title}.'},
-        {profile:'media',text:'{name} made an appearance on {title}. The fight world is starting to notice.'},
-        {profile:'fan',text:'That {name} clip is everywhere. The timeline belongs to a cage fighter today.'},
-        {profile:'hater',text:'Another appearance? I would rather see {name} book a fight.'}
-      ],
-      autographFree: [
-        {profile:'media',text:'FAN REPORT: {name} met the crowd and signed {signatures} autographs free of charge.'},
-        {profile:'media',text:'{name} stayed for the fans today, finishing a free signing with {signatures} autographs.'},
-        {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
-        {profile:'fan',text:'{name} signed for free and stayed until the line was done. That is how you build real followers.'}
-      ],
-      autographStandard: [
-        {profile:'media',text:'{name} met supporters and completed {signatures} autographs at today\'s signing.'},
-        {profile:'media',text:'APPEARANCE REPORT: {signatures} fans left with an autograph from {name}.'},
-        {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
-        {profile:'fan',text:'Met {name} today. Worth the wait and actually talked to the fans.'}
-      ],
-      autographExpensive: [
-        {profile:'media',text:'The premium ${price} signing from {name} drew {signatures} autograph buyers today.'},
-        {profile:'media',text:'BUSINESS OUTSIDE THE CAGE: {name} completed {signatures} autographs at ${price} each.'},
-        {profile:'media',text:'{name} signed {signatures} autographs at today’s appearance.'},
-        {profile:'hater',text:'Charging ${price} for an autograph? {name} is speed-running the unfollow button.'}
-      ],
-      sponsor: [
-        {profile:'media',text:'SIGNED: {name} welcomes {brand} as the latest sponsor backing the climb.'},
-        {profile:'media',text:'{brand} has struck a new sponsorship deal with rising fighter {name}.'},
-        {profile:'media',text:'PARTNERSHIP NEWS: {name} and {brand} make their fight sponsorship official.'},
-        {profile:'media',text:'{brand} signs {name} to a new fight contract.'},
-        {profile:'fan',text:'From unknown rookie to sponsored fighter. {name} is building something.'},
-        {profile:'hater',text:'A sponsor check does not improve your takedown defense, {name}.'}
       ]
     },
     interactions: {
@@ -159,36 +120,6 @@ globalThis.CAGE_STRINGS = {
           '@{handle}, you bring the record. I will bring the pressure. Let us make it official.'
         ]
       },
-      props: {
-        label:'GIVE THEM PROPS',
-        messages:[
-          'Real recognizes real. @{handle} has been putting in serious work.',
-          'Respect to @{handle}. That record was not built by taking easy nights.',
-          '@{handle} keeps showing up prepared. The sport needs more of that.',
-          'Credit where it is due: @{handle} is building a run worth watching.',
-          'Strong work from @{handle}. Nothing fake about that climb.',
-          '@{targetName} keeps answering every question the cage asks. Respect.',
-          'That last performance put @{handle} on my radar for all the right reasons.',
-          'No shortcuts in this game. @{handle} clearly understands that.',
-          'The tape does not lie—@{handle} has been getting better every fight.',
-          'Flowers while they can hear them: @{handle} is doing serious work.'
-        ]
-      },
-      welcome: {
-        label:'WELCOME THEM',
-        messages:[
-          'Welcome to the Cage Grind feed, @{handle}. The whole roster is watching now.',
-          '@{handle} just joined the conversation. Welcome to the noise.',
-          'Good to see @{handle} on the feed. Now give everybody a fight to talk about.',
-          'Welcome, @{handle}. Keep the posts honest and the fights violent.',
-          'Another ranked fighter enters the timeline. Welcome, @{handle}.',
-          'Welcome aboard, @{handle}. The feed just got a little more dangerous.',
-          '@{targetName} is here. Somebody warn the matchmakers the timeline has teeth now.',
-          'Glad to see @{handle} join us. The grind is better with ranked fighters in it.',
-          'New name on the feed, proven name in the cage. Welcome, @{handle}.',
-          'Welcome to Cage Grind, @{handle}. Talk your talk and back it up under the lights.'
-        ]
-      },
       respect: {
         label:'SHOW RESPECT',
         messages:[
@@ -202,21 +133,6 @@ globalThis.CAGE_STRINGS = {
           'Every fighter knows the hours nobody sees. Salute to @{handle} for putting them in.',
           '@{targetName}, keep representing your city and your gym the right way.',
           'There is room for rivalry and respect. @{handle} has earned the second one today.'
-        ]
-      },
-      watching: {
-        label:'PUT THEM ON NOTICE',
-        messages:[
-          'I have been watching @{handle}. There are openings in that game.',
-          '@{handle} is climbing fast. Good—the division needs pressure.',
-          'Keep an eye on @{handle}. That name is going to matter soon.',
-          '@{handle}, I see the momentum. I am watching where it goes.',
-          'The roster is getting interesting. @{handle} might be part of the reason.',
-          '@{handle} is collecting wins. I am collecting notes.',
-          'The rankings move differently when @{targetName} starts making noise.',
-          'I watched the tape on @{handle}. Talented, dangerous, and definitely beatable.',
-          '@{handle}, enjoy the momentum. Every contender has somebody studying them.',
-          'The division noticed @{handle}. Now let us see how they handle the spotlight.'
         ]
       }
     }
