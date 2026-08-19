@@ -126,8 +126,9 @@ generated league.
 - An active endorsement appears in the Home hero directly beneath Cage Status,
   showing the sponsor brand and the number of contracted fights remaining.
 - Endorsements form a sequential sponsor ladder beginning with Bob's Auto Shop
-  at Level 2, followed by larger brands at 2,500, 10,000, 30,000, 80,000, and
-  200,000 Followers. Only the next brand may offer a contract, so crossing
+  at Level 2, followed by Gary's Bar & Grill at Level 3 and 500 Followers, then
+  larger brands at 2,500, 10,000, 30,000, 80,000, and 200,000 Followers. Only
+  the next brand may offer a contract, so crossing
   several milestones at once never produces competing offers. Older saves
   repair incomplete sponsor history before rendering or accepting deals.
 - A rotating promoter ticker leads the unlocked Home screen and teaches the
