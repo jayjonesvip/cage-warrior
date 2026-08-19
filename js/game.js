@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.174';
+  const ICON_ASSET_VERSION = '2.5.175';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -629,7 +629,7 @@
       if(data.win){const key=data.injury?'fightInjuredWin':data.winStreak>=2?'fightStreak':'fightWin',entries=key==='fightStreak'?cycles.fightStreakHeadline:cycles[key];addHeadline(key,entries,values)}
       else addHeadline('fightLoss',cycles.fightLoss,values);
     }
-    const reporterPosts=posts.filter(post=>post.profile==='media');if(reporterPosts.length){addSocialPosts(reporterPosts);saveState();queueSharedPosts(reporterPosts.map(post=>({kind:'reporter',body:post.text,targetProfileId:state.socialProfileId})))}
+    const reporterPosts=posts.filter(post=>post.profile==='media');if(reporterPosts.length){addSocialPosts(reporterPosts);saveState();queueSharedPosts(reporterPosts.map(post=>({kind:'reporter',body:post.text})))}
   }
   function feedAge(post){if(post.createdAt){const seconds=Math.max(0,Math.floor((Date.now()-new Date(post.createdAt).getTime())/1000));if(seconds<60)return 'NOW';if(seconds<3600)return `${Math.floor(seconds/60)}M`;if(seconds<86400)return `${Math.floor(seconds/3600)}H`;return `${Math.floor(seconds/86400)}D`}const age=Math.max(0,state.socialCycle-(Number(post.cycle)||0));return age===0?'NOW':age===1?'1 EVENT AGO':`${age} EVENTS AGO`}
   function renderFeedText(post){const ownHandle=String(state.name||'').toLowerCase();return String(post.text||'').split(/(@[A-Za-z][A-Za-z0-9_]{2,31})/g).map(part=>/^@[A-Za-z][A-Za-z0-9_]{2,31}$/.test(part)?`<span class="feed-mention${part.slice(1).toLowerCase()===ownHandle?' self':''}">${escapeHtml(part)}</span>`:escapeHtml(part)).join('')}
