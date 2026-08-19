@@ -168,6 +168,13 @@ generated league.
   Round 3. High Focus improves the execution of those switches while low Focus
   can turn adaptation into hesitation. The fight then runs as one uninterrupted
   full simulation, with no coach fee or routine mid-fight decision prompts.
+- Fight-plan quality is evaluated against the actual matchup rather than a
+  universal preferred combination. Relative Power, Speed, Chin, Cardio,
+  archetypes, and Focus determine whether the plan creates an **Edge**, stays
+  **Even**, or leaves the fighter **Exposed**. Its influence is strongest when
+  the fighters are evenly rated and deliberately smaller in physical
+  mismatches. The live feed identifies the most important tactical effect and
+  the result screen records the final plan grade.
 - Every booked fight generates a fight-only **Focus** rating from 75–90%. Half
   of walkouts receive an unread text from Mom, the fighter's wife, brother
   Tommy, Agent Carl, or Grandma. Reading it reveals one of 50 messages with a meaningful boost or distraction; ignoring

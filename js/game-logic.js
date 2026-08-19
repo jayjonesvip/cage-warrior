@@ -387,6 +387,16 @@
     return ratings;
   }
 
+  function fightPlanAssessment({player={},opponent={},plan={},fighterStyle='striker',opponentStyle='striker',focus=80,adaptationScale=.5}={}){
+    const stat=(source,key)=>Math.max(1,finite(source?.[key],1)),p={power:stat(player,'power'),speed:stat(player,'speed'),chin:stat(player,'chin'),cardio:stat(player,'cardio')},o={power:stat(opponent,'power'),speed:stat(opponent,'speed'),chin:stat(opponent,'chin'),cardio:stat(opponent,'cardio')};
+    const cardioEdge=p.cardio-o.cardio,speedEdge=p.speed-o.speed,paceSignal=clamp(cardioEdge/4+(p.cardio-8)/12,-1,1),pace=plan.pace==='fast'?paceSignal:-paceSignal;
+    const aggressionSignal=clamp((p.power-o.chin)/4-(o.power-p.chin)/6+cardioEdge/10-speedEdge/10,-1,1),offense=plan.offense==='aggressive'?aggressionSignal:-aggressionSignal;
+    const responseStyle=opponentStyle==='grappler'?'striker':'grappler',needsAdapt=fighterStyle!==responseStyle,execution=clamp((finite(focus,80)-70)/20,-1,1),lowFocusBonus=clamp((70-finite(focus,80))/40,0,.25);
+    const tacticsRaw=plan.tactics==='adapt'?(needsAdapt?execution:-.65):(needsAdapt?-.15:.85)+lowFocusBonus,tactics=tacticsRaw*(plan.tactics==='adapt'?clamp(finite(adaptationScale,.5),0,1):1);
+    const score=clamp((pace+offense+tactics)/3,-1,1),playerAverage=(p.power+p.speed+p.chin+p.cardio)/4,opponentAverage=(o.power+o.speed+o.chin+o.cardio)/4,closeness=clamp(1-Math.abs(playerAverage-opponentAverage)/10,.35,1),modifier=clamp(score*.12*closeness,-.12,.12),grade=score>=.2?'EDGE':score<=-.2?'EXPOSED':'EVEN',components={pace,offense,tactics},axis=Object.entries(components).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]))[0]?.[0]||'pace';
+    return {grade,score,modifier,closeness,axis,components};
+  }
+
   function shouldPersistCareer(retirementPending,saveWasKnown=false,currentRaw=undefined){
     return retirementPending!==true&&!(saveWasKnown===true&&currentRaw===null);
   }
@@ -462,5 +472,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,fightPlanAssessment,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

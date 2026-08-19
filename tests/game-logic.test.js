@@ -510,6 +510,28 @@ test('endorsement progression exposes only the next unsigned deal',()=>{
   assert.equal(logic.nextEndorsementId(ids,['bobs-auto','volt','ironhide','apex']),'');
 });
 
+test('fight plans reward scouting, punish stacked mistakes, and matter most in close matchups',()=>{
+  const plan={pace:'fast',offense:'aggressive',tactics:'adapt'};
+  const prepared=logic.fightPlanAssessment({
+    player:{power:14,speed:11,chin:10,cardio:14},opponent:{power:10,speed:11,chin:10,cardio:11},
+    plan,fighterStyle:'striker',opponentStyle:'striker',focus:95
+  });
+  const careless=logic.fightPlanAssessment({
+    player:{power:10,speed:10,chin:8,cardio:7},opponent:{power:12,speed:10,chin:12,cardio:11},
+    plan,fighterStyle:'striker',opponentStyle:'striker',focus:60
+  });
+  const physicalMismatch=logic.fightPlanAssessment({
+    player:{power:20,speed:20,chin:20,cardio:20},opponent:{power:8,speed:8,chin:8,cardio:8},
+    plan,fighterStyle:'striker',opponentStyle:'striker',focus:95
+  });
+  assert.equal(prepared.grade,'EDGE');
+  assert.ok(prepared.modifier>.06);
+  assert.equal(careless.grade,'EXPOSED');
+  assert.ok(careless.modifier<-.05);
+  assert.ok(physicalMismatch.modifier<prepared.modifier);
+  assert.equal(logic.fightPlanAssessment({player:{power:11,speed:11,chin:11,cardio:11},opponent:{power:11,speed:11,chin:11,cardio:11},plan,fighterStyle:'striker',opponentStyle:'striker',focus:95,adaptationScale:0}).components.tactics,0);
+});
+
 test('daily counters use local calendar dates, reset once, and clamp tampered limits',()=>{
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
