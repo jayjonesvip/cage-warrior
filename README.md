@@ -287,6 +287,10 @@ generated league.
   only by the database-owned global belt workflow.
 - Tapping the CEO portrait opens his verified public profile with his executive
   bio. The official account does not accept fighter-message interactions.
+- CageReporter uses a dedicated newsroom portrait and verified profile. Reporter
+  avatars are clickable, but the official account is read-only and does not
+  expose fighter-message interactions. Career reports address the featured
+  fighter by `@handle`, so they appear in that fighter's Mentions filter.
 - Every sanctioned title shot receives an official CEO announcement. Outside
   the championship picture, only qualifying upsets and knockout finishes have
   a deterministic 10% chance at one modest CEO cash and Hype bonus per local day.
