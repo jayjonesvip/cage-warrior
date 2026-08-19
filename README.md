@@ -271,7 +271,8 @@ generated league.
   copy uses a larger mobile text scale for easier reading.
 - `@handles` use highlighted mention styling. Posts addressed to the current
   fighter receive an amber edge and can be isolated with the Feed's **Mentions**
-  filter, using the stored target profile rather than a text-only guess.
+  filter. Targeted fighter posts use the stored profile ID, while official posts
+  are matched against the current fighter's exact `@handle`.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. Wins earned while carrying
   a training injury receive dedicated headlines questioning whether fighting
