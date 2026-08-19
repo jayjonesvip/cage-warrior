@@ -427,15 +427,15 @@ generated league.
   Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
   wager. There are no splits, doubles, or insurance.
 - Basic training costs energy and allows four daily sessions. All sparring
-  levels share a separate two-session daily track. Light Sparring costs 5
-  energy and adds +1 to one random skill, Medium Sparring costs 10 energy and
-  adds +2 to one random skill, and Heavy Sparring costs 20 energy, adds +2 to
-  two random skills, and risks 3–9 health. Light and Medium sparring do not
-  cause direct health damage. Their activity meters run for two, four, and six
+  levels share a separate two-session daily track. Technical Sparring costs 5
+  energy and adds +1 to one random skill without health damage. Live Sparring
+  costs 10 energy, adds +2 to one random skill, and costs 1–3 health. Hard
+  Sparring costs 20 energy, adds +2 to two random skills, and costs 3–9 health.
+  Their activity meters run for two, four, and six
   seconds respectively, then reveal and highlight the exact attributes awarded.
 - Training gains are whole points. A +1 gym workout begins a one-minute recovery
   cooldown, while a +2 gain (including trainer-assisted workouts) takes two
-  minutes. Light and Medium Sparring take two minutes; Heavy Sparring takes four.
+  minutes. Technical and Live Sparring take two minutes; Hard Sparring takes four.
   Training again before the timer ends requires confirmation, extends the
   cooldown by the new activity's duration, and triggers a hidden injury roll.
   Escaping that injury earns a +0.25 No Pain bonus on every stat improved by the
@@ -449,14 +449,14 @@ generated league.
 - Coach Vega is an optional training upgrade that improves training gains,
   raises perfect-session odds from 17% to 27%, and reduces overtraining injury
   risk from 33% to 20%. His fee is `$250 + ($75 × fighter level)` per session,
-  including each Light, Medium, or Heavy Sparring session.
+  including each Technical, Live, or Hard Sparring session.
 - The Training page also has a Recovery Room with one paid treatment
   opportunity. Every completed fight makes one treatment available; unused
-  opportunities never accumulate. An Ice Bath restores 25 energy, a Sauna
-  restores 15 energy and 12 health, and a Sports Massage restores 5 energy and
-  25 health. Standard treatment costs `$40 + ($15 × fighter level)`. Premium
-  Cryotherapy restores 20 energy and 35 health for
-  `$250 + ($25 × fighter level)`. Treatments never exceed resource maximums
+  opportunities never accumulate. An Ice Bath restores 25 energy for
+  `$25 + ($10 × fighter level)`. A Sauna restores 15 energy and 15 health for
+  `$50 + ($15 × fighter level)`. A Sports Massage restores 5 energy and 30
+  health for `$75 + ($20 × fighter level)`. Premium Cryotherapy restores 25
+  energy and 40 health for `$175 + ($30 × fighter level)`. Treatments never exceed resource maximums
   and do not consume a training session. Recovery treatments run through a
   blue two-to-five-second activity meter, then hold the exact energy and health
   restored on screen until the player returns to training.
