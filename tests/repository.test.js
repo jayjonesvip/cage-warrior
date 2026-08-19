@@ -47,6 +47,7 @@ const manualIdentityMigration = fs.readFileSync('supabase/migrations/20260815143
 const twoArchetypeMigration = fs.readFileSync('supabase/migrations/20260815200000_two_major_archetypes.sql', 'utf8');
 const resumeOwnedIdentityMigration = fs.readFileSync('supabase/migrations/20260817153000_resume_owned_fighter_identity.sql', 'utf8');
 const fortyFourAvatarMigration = fs.readFileSync('supabase/migrations/20260817190000_expand_fighter_avatars_to_44.sql', 'utf8');
+const expandedHometownsMigration = fs.readFileSync('supabase/migrations/20260818120000_expand_fighter_hometowns.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
@@ -190,7 +191,7 @@ test('the branded landing page gates the game and offers the correct career entr
   assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER →<\/button>/);
   assert.match(page, /FREE TO PLAY[\s\S]*NO DOWNLOAD[\s\S]*PLAY INSTANTLY/);
   assert.match(page, /<a class="landing-origin" href="origins\.html">THE ORIGINS OF CAGE GRIND<\/a>/);
-  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.161" alt="" aria-hidden="true"/);
+  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.163" alt="" aria-hidden="true"/);
   assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
   assert.match(landingScript, /logic\.careerLandingMode\(state\)/);
   assert.match(script, /CONTINUE CAREER/);
@@ -566,10 +567,10 @@ test('scalable copy pools are separated from gameplay logic', () => {
 });
 
 test('career identity keeps hometown informational and uses one shared real-player championship', () => {
-  for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND', 'SEATTLE', 'NEW ORLEANS', 'HAWAII']) {
+  for (const city of ['PHOENIX', 'LOS ANGELES', 'CHICAGO', 'NEW YORK', 'MIAMI', 'HOUSTON', 'CLEVELAND', 'SEATTLE', 'NEW ORLEANS', 'HAWAII', 'BOSTON', 'ATLANTA', 'SAN FRANCISCO', 'DENVER']) {
     assert.match(script, new RegExp(`name:'${city}'`));
   }
-  for (const region of ['SOUTHWEST', 'WEST COAST', 'MIDWEST', 'NORTHEAST', 'SOUTHEAST', 'GULF COAST', 'GREAT LAKES', 'PACIFIC NORTHWEST', 'DEEP SOUTH', 'PACIFIC ISLANDS']) {
+  for (const region of ['SOUTHWEST', 'WEST COAST', 'MIDWEST', 'NORTHEAST', 'SOUTHEAST', 'GULF COAST', 'GREAT LAKES', 'PACIFIC NORTHWEST', 'DEEP SOUTH', 'PACIFIC ISLANDS', 'MOUNTAIN WEST']) {
     assert.match(script, new RegExp(`region:'${region}'`));
   }
   assert.match(html, /Fighting Out Of/);
@@ -587,8 +588,11 @@ test('career identity keeps hometown informational and uses one shared real-play
   assert.match(sharedUi, /requiredLevel=Math\.max\(1,Math\.floor\(Number\(champ\.champion_level\)\)\|\|1\)/);
   assert.match(sharedUi, /TITLE SHOT AVAILABLE · CHAMPION LEVEL \$\{requiredLevel\}/);
   assert.match(sharedUi, /REACH LEVEL \$\{requiredLevel\} TO CHALLENGE/);
-  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.161/);
+  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.163/);
   assert.match(cageChampionshipMigration, /viewer\.level>=champion\.level/);
+  for (const city of ['boston','atlanta','san-francisco','denver']) assert.match(expandedHometownsMigration,new RegExp(`'${city}'`));
+  assert.match(expandedHometownsMigration, /drop constraint if exists cage_profiles_city[\s\S]*add constraint cage_profiles_city/);
+  assert.match(expandedHometownsMigration, /create or replace function public\.claim_cage_identity/);
 });
 
 test('the simplified World Championship is a daily server-authoritative flow', () => {
@@ -721,7 +725,7 @@ test('identity names share substantial CapitalCase color and descriptor pools', 
   assert.ok(!pools.weather.includes('Gale'));
   assert.deepEqual(
     JSON.parse(JSON.stringify(pools.cityCodes)),
-    {phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL'}
+    {phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL',boston:'BOS',atlanta:'ATL','san-francisco':'SFO',denver:'DEN'}
   );
   const openers = [...pools.colors, ...pools.origins];
   const descriptors = [...pools.weather, ...pools.animals, ...pools.combat];
@@ -832,8 +836,8 @@ test('career fights use a reversible tale-of-the-tape preview before locker-room
   assert.match(script, /function beginFightPlan\(\)/);
   assert.match(script, /function confirmFightPlan\(\)/);
   assert.match(script, /beginFightPlan\(\)/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.161"\)[^}]*background-position:center 62%/);
-  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.161"\)[^}]*background-position:center,center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.163"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.163"\)[^}]*background-position:center,center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
   assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
   assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
@@ -927,7 +931,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(script, /showFightStage\('liveStage'\).*beginPlannedFight\(\)/);
   assert.match(page, /FINAL MOMENTS BEFORE THE WALKOUT · FOCUS <b id="focusValue">82%<\/b>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.161"/);
+  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.163"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(page, /class="fight-plan-card focus-encounter" id="focusEncounter"/);
   assert.match(script, /box\.className='fight-plan-card focus-encounter'/);
@@ -951,12 +955,12 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(css, /\.focus-result-tier\{[^}]*font-size:21px[^}]*letter-spacing:2px/);
   assert.match(css, /\.focus-final-score>b\{[^}]*font-size:34px[^}]*text-shadow:0 0 13px #58d8e85c/);
   assert.match(css, /\.focus-delta\{[^}]*border-radius:999px[^}]*color:#73dda8/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.161/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.161/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.161/);
-  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.161/);
-  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.161/);
-  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.161/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.163/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.163/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.163/);
+  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.163/);
+  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.163/);
+  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.163/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -982,7 +986,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
   assert.match(originsPage, /BUILD A FIGHTER\. LIVE THE CAREER\./);
   assert.match(originsPage, /https:\/\/web\.archive\.org\/web\/20111007174242\/http:\/\/www\.cagewars\.net\//);
   assert.match(fs.readFileSync('sitemap.xml', 'utf8'), /<loc>https:\/\/cagegrind\.com\/origins\.html<\/loc>/);
-  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.161/);
+  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.163/);
   assert.match(originsCss, /\.lineage-grid\{display:grid;grid-template-columns:1fr 1fr/);
   assert.match(originsCss, /body\{[^}]*overflow-x:hidden/);
   assert.match(originsCss, /h2\{[^}]*overflow-wrap:anywhere/);
@@ -999,7 +1003,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
     assert.match(serviceWorker, new RegExp(`'\\./${asset.replaceAll('/', '\\/').replaceAll('.', '\\.')}'`));
   }
   assert.match(serviceWorker, /'\.\/origins\.html'/);
-  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.161'/);
+  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.163'/);
 });
 
 test('collectible cards flip to optional sponsored details without empty QR space', () => {
@@ -1129,7 +1133,7 @@ test('home career guide teaches the four-step loop with compact artwork cards', 
 test('rendered icons support stable per-file image overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.161'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.163'/);
   assert.match(script, /function gameIcon\(name,fallback,extension='png'\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.\$\{extension\}\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
@@ -1230,6 +1234,7 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.doesNotMatch(html, /Latest Buzz|homeFeedPreview|homeFeedStatus/);
   assert.match(html, /data-screen="feed"/);
   assert.match(html, /id="socialTimeline"/);
+  assert.match(html, /data-feed-filter="all"[\s\S]*data-feed-filter="mentions"[\s\S]*id="feedMentionCount"/);
   assert.match(html, /data-nav="feed"[\s\S]*data-icon-name="nav-feed"[\s\S]*id="feedNavBadge"/);
   assert.match(html, /class="card feed-page-card"[\s\S]*class="feed-page-note"[\s\S]*id="socialTimeline"/);
   assert.match(html, /\.feed-post p\{[^}]*font-size:10\.5px/);
@@ -1247,6 +1252,13 @@ test('Cage Feed combines career reports with avatar-driven fighter interactions'
   assert.match(script, /function socialUnreadCount\(\)/);
   assert.match(script, /currentScreen==='feed'\)\{state\.socialLastReadSerial=state\.socialSerial/);
   assert.match(script, /navBadge\.textContent=unread>99\?'99\+':String\(unread\)/);
+  assert.match(script, /targetProfileId=String\(post\.target_profile_id\|\|''\),mentioned=!!targetProfileId&&targetProfileId===state\.socialProfileId/);
+  assert.match(script, /function renderFeedText\(post\)/);
+  assert.match(script, /split\(\/\(@\[A-Za-z\]\[A-Za-z0-9_\]\{2,31\}\)\/g\)/);
+  assert.match(script, /mentions=posts\.filter\(post=>post\.mentioned\),visiblePosts=feedFilter==='mentions'\?mentions:posts/);
+  assert.match(script, /data-feed-filter/);
+  assert.match(css, /\.feed-post\.mentioned-post\{[^}]*box-shadow:inset 3px 0 #e7a839/);
+  assert.match(css, /\.feed-mention\.self\{[^}]*color:#ffc85f/);
   assert.match(script, /requestAnimationFrame\(\(\)=>\$\('#socialTimeline'\)\.scrollTo\(\{top:0,behavior:'smooth'\}\)\)/);
   assert.match(script, /function createSocialAccount\(\)/);
   assert.match(strings, /Hello, fight fans! Stay tuned—the climb starts now/);
@@ -1335,7 +1347,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(script, /class="championship-icon">\$\{gameIcon\('title-world','👑'\)\}/);
   assert.doesNotMatch(page, /landing-champion:after\{content:"♛"/);
   assert.doesNotMatch(script, /'👑 YOU HOLD THE BELT'/);
-  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.161/g);
+  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.163/g);
   assert.match(css, /\.feed-post\.ceo\{/);
   assert.match(css, /\.feed-verified\{/);
   assert.match(css, /\.ceo-office-photo\{/);
@@ -1371,7 +1383,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(cageCeoMigration, /'cagegrindceo','ceo',v_body,v_event_key/i);
   assert.match(cageCeoMigration, /post_kind not in \('reporter','ceo'\)/i);
   assert.match(cageCeoMigration, /grant execute on function public\.publish_cage_ceo_post\(text\) to authenticated/i);
-  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.161/);
+  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.163/);
 });
 
 test('championship action spans the championship card on desktop', () => {
@@ -1652,7 +1664,7 @@ test('Underground Buzz keeps persistent once-daily blackjack and Cage Dice', () 
   assert.match(deal, /state\.cash-=bet/);
   assert.ok(fs.existsSync('assets/cage-dice.jpg'));
   assert.match(page, /id="cageDiceModal"/);
-  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.161/);
+  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.163/);
   assert.match(page, /data-dice-choice="under"[\s\S]*data-dice-choice="over"[\s\S]*data-dice-choice="seven"[\s\S]*data-dice-choice="doubles"/);
   assert.match(script, /function cageDiceIcon\(\)[\s\S]*icon-fallback">🎲/);
   assert.match(script, /sessionsLeft\('cageDice',1\)/);
@@ -1670,7 +1682,7 @@ test('Underground Buzz keeps persistent once-daily blackjack and Cage Dice', () 
   assert.doesNotMatch(script, /REVIEW ROLL/);
   assert.match(script, /state\.blackjackHand\?\.status==='settled'/);
   assert.match(script, /if\(state\.cageDiceResult\|\|sessionsLeft\('cageDice',1\)<1\)/);
-  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.161/);
+  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.163/);
 });
 
 test('zero remaining limit badges use the red exhausted state', () => {

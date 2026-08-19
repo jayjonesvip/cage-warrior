@@ -55,7 +55,8 @@ generated league.
 
 - New careers complete four permanent Home-screen choices in order. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
-  Miami, Houston, Cleveland, Seattle, New Orleans, or Hawaii. Next, choose one of
+  Miami, Houston, Cleveland, Seattle, New Orleans, Hawaii, Boston, Atlanta,
+  San Francisco, or Denver. Next, choose one of
   40 fighter avatar cards. New Orleans belongs to the Deep South title region;
   Hawaii belongs to the Pacific Islands.
   Finally, choose one of two permanent MMA archetypes: **Striker** for stand-up
@@ -83,8 +84,8 @@ generated league.
   nationality/origin terms), plus 23 weather/force, 35 animal, and 28 combat
   terms. Exact repeated words are excluded, producing 6,534 combinations per
   city and 65,340 across all ten
-  hometowns. City endings are PHX, LAX, CHI,
-  NYC, MIA, HOU, CLE, SEA, NOLA, and HNL.
+  hometowns. City endings are PHX, LAX, CHI, NYC, MIA, HOU, CLE, SEA, NOLA,
+  HNL, BOS, ATL, SFO, and DEN.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,
@@ -268,6 +269,9 @@ generated league.
   Generic composer controls are removed; interaction begins by tapping a real
   fighter's avatar and opening their public profile. Feed and fighter-profile
   copy uses a larger mobile text scale for easier reading.
+- `@handles` use highlighted mention styling. Posts addressed to the current
+  fighter receive an amber edge and can be isolated with the Feed's **Mentions**
+  filter, using the stored target profile rather than a text-only guess.
 - Fights, win streaks, losses, appearances, autograph signings, and sponsor
   deals generate contextual `CageReporter` coverage. Wins earned while carrying
   a training injury receive dedicated headlines questioning whether fighting
