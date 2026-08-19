@@ -2135,14 +2135,13 @@ test('confirmed opponent offense deducts persistent health during the live fight
 });
 
 test('fighting below full health can cause one visible daily injury', () => {
-  assert.match(html, /id="fightInjuryWarning"[^>]*data-recovery-route[^>]*hidden[\s\S]*Fighting when you are not at full strength incurs a small chance of injury\.[\s\S]*GO TO RECOVERY/);
+  assert.match(html, /id="fightInjuryWarning"[^>]*hidden[\s\S]*Fighting when you are not at full strength incurs a small chance of injury\./);
+  assert.doesNotMatch(html, /data-recovery-route|GO TO RECOVERY/);
   assert.match(css, /\.fight-injury-warning\{[^}]*border:1px solid #b98624[^}]*background:linear-gradient\(135deg,#3a2b0c,#161006\)/);
   assert.match(css, /\.fight-injury-warning>span\{[^}]*place-items:center[^}]*padding-bottom:2px[^}]*color:#ffc44d[^}]*line-height:1/);
   assert.match(css, /\.action-line\.fight-injury\{[^}]*border-left:4px solid #ff6574/);
   assert.match(script, /fightInjuryWarning'\)\.hidden=state\.health>=state\.maxHealth/);
-  assert.match(script, /function goToRecovery\(\)\{navTo\('train'\);requestAnimationFrame\(\(\)=>\$\('#recoveryRoomCard'\)\?\.scrollIntoView\(\{behavior:'smooth',block:'start'\}\)\)\}/);
-  assert.match(script, /const recoveryRoute=e\.target\.closest\('\[data-recovery-route\]'\);if\(recoveryRoute\)\{goToRecovery\(\);return\}/);
-  assert.match(css, /\.fight-injury-warning:focus-visible\{outline:2px solid #ffd36a/);
+  assert.doesNotMatch(script, /goToRecovery|data-recovery-route/);
   assert.match(script, /injuryEligible:state\.health<state\.maxHealth&&!currentTrainingInjury\(\)/);
   assert.match(script, /LOGIC\.liveFightInjuryChance\(\{eligible:!!sim\?\.injuryEligible,landed,injured:!!sim\?\.fightInjury\}\)/);
   assert.match(script, /sim\.playerCondition=LOGIC\.fightInjuryCondition\(sim\.playerCondition\)/);

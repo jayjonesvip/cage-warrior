@@ -678,7 +678,6 @@
     sfx.tap();updateUI();if(screen==='fight'&&state.nameLocked)queueMicrotask(()=>connectSharedSocial(true));const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
 
-  function goToRecovery(){navTo('train');requestAnimationFrame(()=>$('#recoveryRoomCard')?.scrollIntoView({behavior:'smooth',block:'start'}))}
   function fightExitGuarded(){return !!(fight&&combatLocked&&!fight.ended&&state.pendingFight)}
   function openForfeitFightDialog(){const modal=$('#forfeitFightModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');$('#keepFightingBtn').focus()}
   function closeForfeitFightDialog(){const modal=$('#forfeitFightModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
@@ -1508,7 +1507,6 @@
     const fp=e.target.closest('[data-fight-plan]');if(fp){chooseCornerPlan(fp.dataset.fightPlan);return}
     const flip=e.target.closest('[data-card-flip]');if(flip&&!e.target.closest('button')){toggleOpponentCard(flip);return}
     const collectibleFlip=e.target.closest('[data-collectible-flip]');if(collectibleFlip&&!e.target.closest('button')){toggleCollectibleCard(collectibleFlip);return}
-    const recoveryRoute=e.target.closest('[data-recovery-route]');if(recoveryRoute){goToRecovery();return}
     const nav=e.target.closest('[data-nav]');if(nav){navTo(nav.dataset.nav);return}
     const go=e.target.closest('[data-go]');if(go){navTo(go.dataset.go);return}
     const tt=e.target.closest('#trainerToggle');if(tt){state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
