@@ -9,7 +9,8 @@ Cage Grind is a mobile-first, single-player combat-career game. Open
 The page uses ordinary, ordered scripts with no bundler. Shared presentation
 lives in `css/styles.css`; the landing screen has its own `css/landing.css` and
 `js/landing.js`; fight planning and fight-focus flows live in `js/fight-plan.js`
-and `js/fight-focus.js`; and `js/game.js` coordinates those features with the career.
+and `js/fight-focus.js`; Underground Buzz lives in `js/underground-buzz.js`; and
+`js/game.js` coordinates those features with the career.
 
 ### Landing page
 
@@ -541,9 +542,9 @@ The game uses static HTML, CSS, and ordinary scripts without a build step.
 tests. `js/definitions.js` owns the data-only catalogs for fighter avatars,
 collectibles, training, sparring, odd jobs, recovery, publicity, endorsements,
 fight plans, and fight moments. `js/game.js` remains the coordinator;
-`js/landing.js`, `js/fight-plan.js`,
-and `js/fight-focus.js` own their feature flows and receive state/UI callbacks from
-the coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and
+`js/landing.js`, `js/fight-plan.js`, `js/fight-focus.js`, and
+`js/underground-buzz.js` own their feature flows and receive state/UI callbacks
+from the coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and
 message data, while `js/strings.js` groups the remaining opponent, commentary,
 Cage Feed, username, and ticker copy. Script order in `index.html` and the
 service-worker precache list must keep data and feature modules ahead of
