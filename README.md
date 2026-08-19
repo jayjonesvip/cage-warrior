@@ -81,10 +81,10 @@ generated league.
   `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Manual handles are
   3–32 characters, start with a letter, and use only letters, numbers, or an
   underscore. Every hometown uses
-  the same 76 opening words (colors, former wildcard modifiers, and 24
-  nationality/origin terms), plus 23 weather/force, 35 animal, and 28 combat
-  terms. Exact repeated words are excluded, producing 6,534 combinations per
-  city and 130,680 across all 20 hometowns. City endings are PHX, LAX, CHI,
+  the same 82 opening words (48 color/attitude terms and 34 nationality/origin
+  terms), plus 29 weather/force, 37 animal, and 37 combat terms. Exact repeated
+  words are excluded, producing 8,443 combinations per city and 168,860 across
+  all 20 hometowns. City endings are PHX, LAX, CHI,
   NYC, MIA, HOU, CLE, SEA, NOLA, HNL, BOS, ATL, SFO, DEN, TPA, PHL, SAT,
   LAS, PDX, and BWI. Each hometown also owns a persistent accent color that
   follows its fighter across Home, the Cage Feed, public profiles, ranked cards,
@@ -303,7 +303,7 @@ generated league.
 - Every sanctioned title shot receives an official CEO announcement. Outside
   the championship picture, only qualifying upsets and knockout finishes have
   a deterministic 10% chance at one modest CEO cash and Hype bonus per local day.
-- The action dock draws personalized drafts from a 20-message pool covering
+- The action dock draws personalized drafts from a 28-message pool covering
   callouts and respect. The CEO alone
   welcomes new fighters. A confirmed post awards 5–12 Followers and 1–3 Hype.
   Supabase enforces five direct fighter interactions per UTC day;

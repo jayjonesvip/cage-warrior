@@ -43,7 +43,8 @@ combat: [
   'Gladiator', 'Cannon', 'Blade', 'Anvil', 'Breaker', 'Monster',
   'Demon', 'Devil', 'Destroyer', 'Assassin', 'Executioner', 'Butcher',
   'Hitman', 'Enforcer', 'Obliterator', 'Rampage', 'Onslaught', 'Warpath'
-],    cityCodes: {
+],
+    cityCodes: {
       phoenix:'PHX','los-angeles':'LAX',chicago:'CHI','new-york':'NYC',miami:'MIA',houston:'HOU',cleveland:'CLE',seattle:'SEA','new-orleans':'NOLA',hawaii:'HNL',boston:'BOS',atlanta:'ATL','san-francisco':'SFO',denver:'DEN','tampa-bay':'TPA',philadelphia:'PHL','san-antonio':'SAT','las-vegas':'LAS',portland:'PDX',baltimore:'BWI'
     }
   },
@@ -73,7 +74,7 @@ opponentNames: {
     {code:'ARM', first:['Armen','Gor','Hayk','Levon','Narek','Suren','Tigran','Vardan','Arman','David'], last:['Petrosyan','Sargsyan','Hakobyan','Grigoryan','Avetisyan','Karapetyan','Mkrtchyan','Hovhannisyan','Gevorgyan','Manukyan']},
     {code:'COL', first:['Andres','Camilo','Daniel','Felipe','Juan','Luis','Miguel','Nicolas','Santiago','Sebastian'], last:['Garcia','Rodriguez','Martinez','Lopez','Hernandez','Gonzalez','Perez','Sanchez','Ramirez','Torres']},
     {code:'ARG', first:['Agustin','Bruno','Facundo','Franco','Joaquin','Lucas','Mateo','Nicolas','Santiago','Tomas'], last:['Gonzalez','Rodriguez','Fernandez','Lopez','Martinez','Perez','Sanchez','Romero','Diaz','Alvarez']},
-    {code:'NED', first:['Bas','Daan','Finn','Jasper','Lars','Luuk','Max','Noah','Sem','Thijs'], last:['de Jong','Jansen','de Vries','Bakker','Visser','Smit','Meijer','de Boer','Mulder','Bos']},
+    {code:'NED', first:['Bas','Daan','Finn','Jasper','Lars','Luuk','Max','Noah','Sem','Thijs'], last:['DeJong','Jansen','DeVries','Bakker','Visser','Smit','Meijer','DeBoer','Mulder','Bos']},
     {code:'SAM', first:['Afa','Junior','Leki','Malo','Manu','Pele','Sione','Tala','Tevita','Toa'], last:['Afoa','Faamausili','Leota','Mataele','Pulu','Samoa','Tofa','Umaga','Vea','Williams']}
   ]
 },
@@ -98,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.172',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.172',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.173',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.173',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -123,7 +124,7 @@ opponentNames: {
     {profile:'media', text:'RESULT: {name} defeats {opponent} by {finish}.{titleSuffix}'},
     {profile:'media', text:'{name} takes the win over {opponent} by {finish}.{titleSuffix}'},
     {profile:'media', text:'OFFICIAL: {name} gets past {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'{name} leaves with the victory after finishing {opponent} by {finish}.{titleSuffix}'},
+    {profile:'media', text:'{name} leaves with the victory after defeating {opponent} by {finish}.{titleSuffix}'},
     {profile:'media', text:'Another win for {name}. {opponent} falls by {finish}.{titleSuffix}'},
     {profile:'media', text:'{name} handles business against {opponent}, earning the win by {finish}.{titleSuffix}'},
     {profile:'rival', author:'{opponent}', text:'Enjoy the win, {name}. If they book it again, I know what changes.'},
@@ -149,7 +150,7 @@ opponentNames: {
     {profile:'media', text:'{opponent} defeats {name} by {finish}.'},
     {profile:'media', text:'OFFICIAL: {name} comes up short against {opponent} by {finish}.'},
     {profile:'media', text:'{opponent} hands {name} a loss by {finish}.'},
-    {profile:'media', text:'{name} drops the decision to {opponent} by {finish}. Attention turns to the next camp.'},
+    {profile:'media', text:'{name} comes up short as {opponent} wins by {finish}. Attention turns to the next camp.'},
     {profile:'rival', author:'{opponent}', text:'Respect for taking the fight, {name}. But tonight belonged to me.'},
     {profile:'hater', text:'The hype train needed brakes. {name} just found them.'},
     {profile:'fan', text:'Losses happen. Still here, still following, and waiting for the comeback.'}
@@ -195,6 +196,7 @@ interactions: {
     ]
   }
 },
+  },
   corner: {
     states: {
       ahead: {
@@ -227,7 +229,7 @@ interactions: {
   ticker: [
     'Listen, kid: round costs climb with your career. Keep enough ready for all three.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
-    'Ice bath, sauna, or massage—one treatment a day. Recovery costs cash because comfort is for contenders.',
+    'One treatment unlocks after each completed fight, kid. Use it or lose it—the opportunities do not stack.',
     'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
     'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
     'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',
@@ -237,7 +239,7 @@ interactions: {
     'Fourth win without a CEO gift? Keep winning. The boss eventually notices everybody.',
     'Duplicate gear looks impressive, kid, but the perk still only counts once.',
     'One Daily Drop, every day. Free cash, free energy, collectible included. Do not ask who paid.',
-    'Coach Vega wants $35 plus $20 per level. Talent is temporary; invoices are forever.',
+    'Coach Vega wants $250 plus $75 per level. Talent is temporary; invoices are forever.',
     'Before Level 5, side gigs keep the lights on. After that, you are a full-time fighter—act like one.',
     'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
     'CageGrindCEO: Records get attention. Finishes get phone calls.',
