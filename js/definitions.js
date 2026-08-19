@@ -87,7 +87,7 @@ const gearItems = [
   {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. A cold can keeps camp moving.',energyRegen:.02},
   {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
   {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.164'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.165'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
   {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
@@ -142,6 +142,21 @@ const hustleDefs = [
   {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],meterSeconds:2},
   {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],meterSeconds:2},
   {id:'rideshare-driver',asset:'rideshare-driver',extension:'jpg',icon:'🚗',title:'Rideshare Driver',text:'Drive a random 12–32 mile route at $3 per mile.',cost:6,miles:[12,32],ratePerMile:3,meterSeconds:2}
+];
+
+const horseRaceProfiles = [
+  {id:'midnight-bell',name:'Midnight Bell',clue:'Fast from the gate.',style:'front',color:'#63d4ff'},
+  {id:'southpaw-sally',name:'Southpaw Sally',clue:'Strong through the final stretch.',style:'closer',color:'#ff6b72'},
+  {id:'neon-thunder',name:'Neon Thunder',clue:'Explosive pace, uneven form.',style:'volatile',color:'#d38cff'},
+  {id:'iron-hoof',name:'Iron Hoof',clue:'Steady from wire to wire.',style:'steady',color:'#c9d3df'},
+  {id:'desert-ghost',name:'Desert Ghost',clue:'Patient runner with a late kick.',style:'closer',color:'#f2c46d'},
+  {id:'final-round',name:'Final Round',clue:'Likes to control the early pace.',style:'front',color:'#67dfaa'},
+  {id:'blue-corner',name:'Blue Corner',clue:'Reliable when the pack tightens.',style:'steady',color:'#538dff'},
+  {id:'knockout-rose',name:'Knockout Rose',clue:'Dangerous burst, difficult to read.',style:'volatile',color:'#ff76bd'},
+  {id:'long-count',name:'Long Count',clue:'Built to keep grinding late.',style:'closer',color:'#f08c55'},
+  {id:'main-event',name:'Main Event',clue:'Usually breaks clean and leads early.',style:'front',color:'#ffe05d'},
+  {id:'phoenix-fire',name:'Phoenix Fire',clue:'Can rally after a slow opening.',style:'closer',color:'#ff934f'},
+  {id:'cage-rattler',name:'Cage Rattler',clue:'Unpredictable but never out of it.',style:'volatile',color:'#8ce36f'}
 ];
 
 const recoveryDefs = [

@@ -101,7 +101,7 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,horseRace:0,publicity:0,recovery:0};
     return {
       date:today,
       fight:clamp(nonNegativeWhole(counters.fight),0,10),
@@ -110,6 +110,7 @@
       hustle:clamp(nonNegativeWhole(counters.hustle),0,2),
       blackjack:clamp(nonNegativeWhole(counters.blackjack),0,1),
       cageDice:clamp(nonNegativeWhole(counters.cageDice),0,1),
+      horseRace:clamp(nonNegativeWhole(counters.horseRace),0,1),
       publicity:clamp(nonNegativeWhole(counters.publicity),0,1),
       recovery:clamp(nonNegativeWhole(counters.recovery),0,1)
     };
@@ -283,6 +284,34 @@
     const selected=['under','over','seven','doubles'].includes(choice)?choice:'under',multiplier={under:2,over:2,seven:5,doubles:6}[selected];
     const won=selected==='under'?total<7:selected==='over'?total>7:selected==='seven'?total===7:doubles,payout=won?wager*multiplier:0;
     return {die1:first,die2:second,total,doubles,choice:selected,multiplier,won,payout,profit:payout-wager};
+  }
+
+  function horseRaceBetLimit(cash){return Math.floor(Math.max(0,finite(cash))*.25)}
+
+  function horseRacePayout(bet,odds,won){
+    const wager=Math.max(0,whole(bet)),fractionalOdds=[2,3,4,5,7,11].includes(whole(odds))?whole(odds):2,payout=won?wager*(fractionalOdds+1):0;
+    return {won:!!won,odds:fractionalOdds,payout,profit:payout-wager};
+  }
+
+  function horseRaceField(seed,profiles){
+    const source=Array.isArray(profiles)?profiles.filter(profile=>profile&&typeof profile.id==='string'&&profile.id&&typeof profile.name==='string'&&profile.name.trim()):[];
+    if(source.length<6)return [];
+    let value=whole(seed)>>>0;const random=()=>{value+=0x6D2B79F5;let n=value;n=Math.imul(n^n>>>15,n|1);n^=n+Math.imul(n^n>>>7,n|61);return ((n^n>>>14)>>>0)/4294967296};
+    const shuffled=source.map(profile=>Object.assign({},profile));for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}
+    const odds=[2,3,4,5,7,11];for(let i=odds.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[odds[i],odds[j]]=[odds[j],odds[i]]}
+    return shuffled.slice(0,6).map((profile,index)=>Object.assign(profile,{lane:index+1,odds:odds[index]}));
+  }
+
+  function horseRaceFinish(field,rolls=[]){
+    const remaining=Array.isArray(field)?field.filter(horse=>horse&&typeof horse.id==='string'&&[2,3,4,5,7,11].includes(whole(horse.odds))).map(horse=>({id:horse.id,odds:whole(horse.odds)})):[];
+    if(remaining.length!==6||new Set(remaining.map(horse=>horse.id)).size!==6)return [];
+    const order=[];
+    while(remaining.length){
+      const weights=remaining.map(horse=>1/(horse.odds+1)),total=weights.reduce((sum,weight)=>sum+weight,0),roll=clamp(finite(rolls[order.length],.5),0,.999999),target=roll*total;let cumulative=0,index=remaining.length-1;
+      for(let i=0;i<remaining.length;i++){cumulative+=weights[i];if(target<cumulative){index=i;break}}
+      order.push(remaining[index].id);remaining.splice(index,1);
+    }
+    return order;
   }
 
   function payoutForOpponent(opponent,level){
@@ -472,5 +501,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,fightPlanAssessment,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,fightPlanAssessment,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

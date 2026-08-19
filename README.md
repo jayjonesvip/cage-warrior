@@ -115,9 +115,11 @@ generated league.
   from two to six seconds and reveal their results only when the meter completes.
 - Underground Buzz previews its locked games as future opportunities. Backroom
   Blackjack unlocks at Level 2, and Cage Dice unlocks at Level 4 with one daily
-  roll on under seven, over seven, exactly seven, or doubles. Both games cap a
-  wager at 25% of available Cash. Cage Dice uses `assets/cage-dice.jpg`, with a
-  built-in dice fallback if the artwork cannot load.
+  roll on under seven, over seven, exactly seven, or doubles. Underground Racing
+  unlocks at Level 6 with one daily win bet on a generated six-horse field. All
+  three games cap a wager at 25% of available Cash. Cage Dice uses
+  `assets/cage-dice.jpg`, with a built-in dice fallback if the artwork cannot
+  load.
 - Fighter selection places each transparent portrait over a blue arena-light
   gradient, with a brighter keyboard-focus and hover treatment around the card.
 - The Home hero shows a championship-aware career rank. Levels 1–2 are Rookie;
@@ -432,6 +434,12 @@ generated league.
   to 25% of available Cash, then plays a persisted hand with Hit or Stand.
   Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
   wager. There are no splits, doubles, or insurance.
+- Underground Racing is independently available once per local day at Level 6.
+  Six horses receive a daily set of traditional fractional odds from 2/1 through
+  11/1, along with a short running-form clue. The player makes a win-only wager
+  up to 25% of available Cash and watches an eight-second six-lane race. The
+  interface shows the exact total return before the bet is placed; a winning
+  2/1 wager returns the original stake plus twice that amount in profit.
 - Basic training costs energy and allows four daily sessions. All sparring
   levels share a separate two-session daily track. Technical Sparring costs 5
   energy and adds +1 to one random skill without health damage. Live Sparring
@@ -474,8 +482,10 @@ generated league.
 Progress is stored locally in the browser with `localStorage`. Save migration
 preserves existing fighters, hometown identity, avatar and base allocation,
 generated rosters, rivalries, collections, loadouts, Cash, and
-Career Earnings. An in-progress blackjack hand is also persisted so a refresh
-cannot consume the wager without allowing the player to finish. Legacy
+Career Earnings. An in-progress blackjack hand is persisted so a refresh cannot
+consume the wager without allowing the player to finish. Horse-racing wagers,
+finish orders, and payouts are saved before their animation begins, preventing
+refresh rerolls while allowing the completed race to be reviewed. Legacy
 Pressure Fighter, Counter-Striker, Brawler, Trickster, Technician, and
 Endurance identities map to Striker. Control Grappler, Submission Hunter,
 Wrestle-Boxer, and older wrestling identities map to Grappler. Old opponent

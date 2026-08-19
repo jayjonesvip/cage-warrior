@@ -462,6 +462,26 @@ test('Cage Dice caps wagers and settles every supported bet',()=>{
   assert.equal(logic.cageDiceOutcome(3,4,'doubles',20).payout,0);
 });
 
+test('horse racing builds a stable daily field, weights favorites, and pays fractional odds',()=>{
+  const profiles=Array.from({length:8},(_,index)=>({id:`horse-${index}`,name:`Horse ${index}`,clue:'Form clue',style:'steady',color:'#fff'}));
+  const field=logic.horseRaceField(12345,profiles),repeat=logic.horseRaceField(12345,profiles),different=logic.horseRaceField(54321,profiles);
+  assert.deepEqual(field,repeat);
+  assert.notDeepEqual(field,different);
+  assert.equal(field.length,6);
+  assert.equal(new Set(field.map(horse=>horse.id)).size,6);
+  assert.deepEqual([...field.map(horse=>horse.odds)].sort((a,b)=>a-b),[2,3,4,5,7,11]);
+  assert.equal(logic.horseRaceBetLimit(403),100);
+  assert.deepEqual(logic.horseRacePayout(50,2,true),{won:true,odds:2,payout:150,profit:100});
+  assert.deepEqual(logic.horseRacePayout(50,11,false),{won:false,odds:11,payout:0,profit:-50});
+  const favoriteFirst=logic.horseRaceFinish(field.map((horse,index)=>Object.assign({},horse,{odds:index===0?2:[3,4,5,7,11][index-1]})),[0,0,0,0,0,0]);
+  assert.equal(favoriteFirst.length,6);
+  assert.equal(favoriteFirst[0],field[0].id);
+  assert.equal(new Set(favoriteFirst).size,6);
+  const orderedField=field.map((horse,index)=>Object.assign({},horse,{odds:[2,3,4,5,7,11][index]})),wins=Object.fromEntries(orderedField.map(horse=>[horse.id,0]));
+  for(let i=0;i<6000;i++)wins[logic.horseRaceFinish(orderedField,[i/6000,.1,.2,.3,.4,.5])[0]]++;
+  assert.ok(wins[orderedField[0].id]>wins[orderedField[5].id]*3);
+});
+
 test('score helpers expose a trailing player for the final-ten-second decision',()=>{
   const rounds=[{scoreP:9,scoreO:10},{scoreP:10,scoreO:9},{scoreP:9,scoreO:10}];
   assert.deepEqual(logic.fightScore(rounds),{player:28,opponent:29});
@@ -536,8 +556,8 @@ test('daily counters use local calendar dates, reset once, and clamp tampered li
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
   assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,cageDice:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,cageDice:7,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,cageDice:1,publicity:1,recovery:1});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,cageDice:1,horseRace:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,horseRace:0,publicity:0,recovery:0});
+  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,cageDice:7,horseRace:8,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,cageDice:1,horseRace:1,publicity:1,recovery:1});
   assert.equal(logic.dailyCountersFor({date:today,hustle:99},today).hustle,2);
 });
 
