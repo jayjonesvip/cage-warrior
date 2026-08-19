@@ -56,8 +56,9 @@ generated league.
 - New careers complete four permanent Home-screen choices in order. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
   Miami, Houston, Cleveland, Seattle, New Orleans, Hawaii, Boston, Atlanta,
-  San Francisco, or Denver. Next, choose one of
-  40 fighter avatar cards. New Orleans belongs to the Deep South title region;
+  San Francisco, Denver, Tampa Bay, Philadelphia, San Antonio, Las Vegas,
+  Portland, or Baltimore. Next, choose one of
+  44 fighter avatar cards. New Orleans belongs to the Deep South title region;
   Hawaii belongs to the Pacific Islands.
   Finally, choose one of two permanent MMA archetypes: **Striker** for stand-up
   offense and knockout pressure, or **Grappler** for takedowns, control, and
@@ -83,9 +84,12 @@ generated league.
   the same 76 opening words (colors, former wildcard modifiers, and 24
   nationality/origin terms), plus 23 weather/force, 35 animal, and 28 combat
   terms. Exact repeated words are excluded, producing 6,534 combinations per
-  city and 65,340 across all ten
-  hometowns. City endings are PHX, LAX, CHI, NYC, MIA, HOU, CLE, SEA, NOLA,
-  HNL, BOS, ATL, SFO, and DEN.
+  city and 130,680 across all 20 hometowns. City endings are PHX, LAX, CHI,
+  NYC, MIA, HOU, CLE, SEA, NOLA, HNL, BOS, ATL, SFO, DEN, TPA, PHL, SAT,
+  LAS, PDX, and BWI. Each hometown also owns a persistent accent color that
+  follows its fighter across Home, the Cage Feed, public profiles, ranked cards,
+  the World Championship, and fight presentation. Tale of the Tape, the live
+  fight, and results display the player's color alongside the opponent's color.
 - Home includes a deliberately red **Retire Fighter** action. Its confirmation
   warns that the local career, record, Cash, gear, and progress will be lost.
   CageReporter publishes the retirement, the name remains permanently reserved,
