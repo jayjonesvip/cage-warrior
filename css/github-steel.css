@@ -432,3 +432,196 @@ textarea:focus,
     transition: none;
   }
 }
+
+/* Polish pass: system typography for utility UI; display type stays on fight-night moments. */
+.card-title,
+.shop-head b,
+.choice h3,
+.opponent h3,
+.action h3,
+.gear h3,
+.trainer-card h3,
+.fight-plan h3,
+.career-guide-heading h2,
+.social-action b,
+.navbtn {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.card-title,
+.shop-head b {
+  letter-spacing: .04em;
+}
+
+/* Small supporting copy remains quiet, but clears the low-contrast threshold. */
+:root {
+  --muted: #9aa7b3;
+}
+
+.card-title small,
+.shop-head small,
+.choice p,
+.opponent p,
+.action p,
+.gear p,
+.trainer-card p,
+.section-note,
+.loadout-note,
+.feed-page-note,
+.social-action small,
+.feed-post-head span,
+.feed-post-head time,
+.top-progress,
+.hud-resource span,
+.hud-attribute span {
+  color: #9aa7b3;
+}
+
+/* Numbers do not jump horizontally as live game state changes. */
+.money,
+.top-progress,
+.hud-resource b,
+.hud-attribute b,
+.daily-reset-clock strong,
+.career-token b,
+.limit-pill,
+.level-tag,
+.tape-purse,
+.tape-attribute-value,
+.live-score,
+.rewards,
+.blackjack-bankroll,
+.app-update-version,
+.horse-pick strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One shared geometry and role system for controls. */
+.choice-action,
+.feed-open,
+.fight-btn,
+.daily,
+.action,
+.gear button,
+.trainer-toggle,
+.tape-action,
+.corner-plan-btn,
+.crisis-btn,
+.last-chance-btn,
+.continue-btn,
+.details-toggle,
+.modal-run,
+.modal-cancel,
+.sim-control,
+.fighter-message-send,
+.focus-continue,
+.fight-plan-confirm,
+.level-up-continue,
+.retire-career-btn,
+.retire-confirm {
+  border-radius: 6px;
+}
+
+.retire-career-btn,
+.retire-confirm {
+  border-color: #f85149 !important;
+  background: #b62324 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 0 #010409 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+.retire-career-btn:hover,
+.retire-confirm:hover {
+  border-color: #ff7b72 !important;
+  background: #da3633 !important;
+}
+
+/* Keep each underground game identifiable without returning to glossy panels. */
+.blackjack-dialog,
+.cage-dice-dialog,
+.horse-race-dialog {
+  background: #161b22;
+  box-shadow: 0 8px 24px #010409;
+}
+
+.blackjack-bankroll span,
+.blackjack-bet,
+.blackjack-seat,
+.cage-dice-bankroll span,
+.cage-dice-bet,
+.cage-dice-choice,
+.cage-dice-pair,
+.horse-race-bankroll span,
+.horse-race-bet,
+.horse-pick,
+.horse-race-return,
+.horse-finish-row {
+  background-color: #0d1117;
+  background-image: none;
+  box-shadow: none;
+}
+
+.blackjack-action:not(:disabled),
+.cage-dice-action:not(:disabled),
+.horse-race-action:not(:disabled) {
+  border-color: #8b949e !important;
+  background: #21262d !important;
+  box-shadow: 0 1px 0 #010409 !important;
+}
+
+.cage-dice-choice.active,
+.horse-pick.active {
+  background-image: none;
+  box-shadow: 0 0 0 1px currentColor;
+}
+
+.trainer-toggle,
+.trainer-toggle.active,
+.trainer-toggle.active .switch-track {
+  background-image: none;
+  box-shadow: none;
+}
+
+.trainer-toggle.active {
+  border-color: #388bfd;
+  background-color: #1f6feb;
+}
+
+.trainer-toggle.active .switch-track {
+  border-color: #79c0ff;
+  background-color: #0d419d;
+}
+
+/* Desktop pointers get a restrained lift; touch interactions stay stable. */
+@media (hover: hover) and (pointer: fine) {
+  .choice,
+  .opponent,
+  .action,
+  .gear,
+  .social-action,
+  .horse-pick,
+  .cage-dice-choice {
+    transition: border-color .12s ease, background-color .12s ease, transform .12s ease;
+  }
+
+  .choice:hover,
+  .opponent:hover,
+  .action:hover,
+  .gear:hover,
+  .social-action:hover,
+  .horse-pick:hover,
+  .cage-dice-choice:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.choice:active,
+.opponent:active,
+.action:active,
+.social-action:active,
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
