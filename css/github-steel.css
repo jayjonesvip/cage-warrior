@@ -22,7 +22,7 @@
   --button-primary-border: #388bfd;
   --button-primary-shadow: 0 1px 0 #010409;
   --button-secondary: #21262d;
-  --button-secondary-border: #8b949e;
+  --button-secondary-border: #484f58;
   --button-secondary-shadow: 0 1px 0 #010409;
   --fighter-accent: #58a6ff;
 }
@@ -317,7 +317,7 @@ a:focus-visible,
 .details-toggle:hover,
 .feed-filter-bar button:hover,
 .sim-control:hover {
-  border-color: #8c9aa8;
+  border-color: #6e7681;
   background: #30363d;
 }
 
@@ -567,7 +567,7 @@ textarea:focus,
 .blackjack-action:not(:disabled),
 .cage-dice-action:not(:disabled),
 .horse-race-action:not(:disabled) {
-  border-color: #8b949e !important;
+  border-color: #484f58 !important;
   background: #21262d !important;
   box-shadow: 0 1px 0 #010409 !important;
 }
