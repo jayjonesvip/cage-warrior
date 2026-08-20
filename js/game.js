@@ -1071,7 +1071,7 @@
         const pInitiative=clamp(.5+(P.speed-O.speed)*.022+(P.cardio-O.cardio)*.008+initiativeMod+edge+tendencyInitiative+paceInitiative+focusMod*.7,.14,.86);
         const side=Math.random()<pInitiative?'player':'opp',A=side==='player'?P:O,D=side==='player'?O:P,aStats=rs[side],attackingStyle=side==='player'?plan.id:sim.o.tendency;
         const type=side==='player'?plannedTechnique(attackingStyle,gamePlan.offense):techniqueFor(attackingStyle,Math.random());aStats.attempted++;
-        const fatiguePlan=side==='player'?(fastPace?1.35:.7)*(aggressiveOffense?1.12:.9):1,roundFatigue=((round-1)*.025+ex*Math.max(0,10-A.cardio)*.0018)*fatiguePlan;
+        const fatiguePlan=side==='player'?(fastPace?1.35:.7)*(aggressiveOffense?1.12:.9):1,cardioTax=LOGIC.cardioImbalanceFatigue(A),roundFatigue=((round-1)*.025+ex*(Math.max(0,10-A.cardio)*.0018+cardioTax))*fatiguePlan;
         let chance=.53+(A.speed-D.speed)*.018+(A.cardio-D.cardio)*.006-roundFatigue+rand(-.11,.11);
         if(type==='takedown')chance=.43+(A.power+A.speed-D.chin-D.cardio)*.012+rand(-.10,.10);
         if(side==='player'){

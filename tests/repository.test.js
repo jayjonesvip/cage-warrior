@@ -2238,6 +2238,7 @@ test('planned fights charge a level-based rate per started round and run without
 test('pace and offense settings change exchanges, fatigue, accuracy, damage, and knockdowns', () => {
   assert.match(script, /const exchanges=fastPace\?rint\(9,11\):rint\(6,7\)/);
   assert.match(script, /paceInitiative=fastPace\?clamp\(\(P\.cardio-O\.cardio\)\*\.018\+\(P\.cardio-8\)\*\.008,-\.12,\.14\):0/);
+  assert.match(script, /cardioTax=LOGIC\.cardioImbalanceFatigue\(A\)/);
   assert.match(script, /fastPace\?1\.35:\.7/);
   assert.match(script, /offense==='conservative'.*type='jab'/);
   assert.match(script, /aggressiveOffense\?-\.045:\.05/);

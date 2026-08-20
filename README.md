@@ -168,7 +168,9 @@ generated league.
 - Slow pace creates fewer exchanges and reduces accumulated cardio fatigue.
   Fast pace creates more exchanges and gains initiative when the fighter has
   both strong cardio and a cardio edge, but magnifies fatigue when that edge is
-  missing. Conservative offense favors jabs, accuracy, and defense at the cost
+  missing. Power or Speed that reaches roughly double Cardio also accelerates
+  fatigue; ordinary specialist builds are unaffected, while extreme explosive
+  builds need Cardio investment to sustain their output. Conservative offense favors jabs, accuracy, and defense at the cost
   of damage and knockdowns; Aggressive offense favors power shots and finish
   attempts while sacrificing accuracy and creating counter opportunities.
 - Stick to Style uses the permanent signature archetype and its full

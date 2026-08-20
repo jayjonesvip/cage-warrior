@@ -552,6 +552,14 @@ test('fight plans reward scouting, punish stacked mistakes, and matter most in c
   assert.equal(logic.fightPlanAssessment({player:{power:11,speed:11,chin:11,cardio:11},opponent:{power:11,speed:11,chin:11,cardio:11},plan,fighterStyle:'striker',opponentStyle:'striker',focus:95,adaptationScale:0}).components.tactics,0);
 });
 
+test('explosive builds fatigue faster when Power or Speed greatly exceeds Cardio',()=>{
+  assert.equal(logic.cardioImbalanceFatigue({power:12,speed:10,cardio:8}),0);
+  assert.equal(logic.cardioImbalanceFatigue({power:14,speed:10,cardio:8}),0);
+  assert.ok(Math.abs(logic.cardioImbalanceFatigue({power:16,speed:10,cardio:8})-.003)<1e-12);
+  assert.ok(Math.abs(logic.cardioImbalanceFatigue({power:10,speed:16,cardio:8})-.003)<1e-12);
+  assert.equal(logic.cardioImbalanceFatigue({power:40,speed:10,cardio:5}),.018);
+});
+
 test('daily counters use local calendar dates, reset once, and clamp tampered limits',()=>{
   const localDate=new Date(2026,0,2,0,30);
   const today=logic.localDateKey(localDate);
