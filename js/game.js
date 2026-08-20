@@ -20,7 +20,7 @@
   const formatStat = value => Number.isFinite(Number(value))?Number(value).toFixed(2):'0.00';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.176';
+  const ICON_ASSET_VERSION = '2.5.177';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function cageDiceIcon(){return `<span class="game-icon cage-dice-logo" data-game-icon="cage-dice" aria-hidden="true"><span class="icon-fallback">🎲</span><img class="icon-asset" src="assets/cage-dice.jpg?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
@@ -873,7 +873,10 @@
     trackEvent('training_completed',{training_id:a.id,coach_used:coach,perfect_session:perfect,overtraining:recovery.overtraining,injury_id:recovery.injury?.id||'none',energy_spent:quote.energyCost,cash_spent:quote.cashCost,stat_gain:totalGain,risk_bonus:riskBonus,sessions_used:quote.sessions});updateUI();
   }
   function modalMeterSummary(label,value,detail=''){
-    return `<div class="cost-reward"><small>${label}</small><b>${value}</b>${detail?`<span>${detail}</span>`:''}</div>`;
+    const rewardLabel=item=>item.includes('FOLLOWER')?'NEW FOLLOWERS':item.includes('ENERGY')?(item.startsWith('-')?'ENERGY SPENT':'ENERGY RESTORED'):item.includes('HEALTH')?(item.includes('LOST')?'HEALTH LOST':'HEALTH RESTORED'):item.includes('POWER')?'POWER GAIN':item.includes('SPEED')?'SPEED GAIN':item.includes('CHIN')?'CHIN GAIN':item.includes('CARDIO')?'CARDIO GAIN':item.includes('$')?(item.startsWith('-')?'CASH SPENT':'CASH EARNED'):'RESULT';
+    const items=String(value).split(' · ').filter(Boolean);
+    const tiles=items.map(item=>`<span class="meter-reward-tile"><em>${rewardLabel(item)}</em><strong>${item}</strong></span>`).join('');
+    return `<div class="cost-reward"><small>${label}</small><b>${value}</b><div class="meter-reward-grid" aria-hidden="true">${tiles}</div>${detail?`<span>${detail}</span>`:''}</div>`;
   }
   function handleSparring(i,cooldownConfirmed=false){
     ensureDailyCounters();const a=sparringDefs[i],coach=state.trainerOn;if(!a||activeSparringSession)return;if(currentTrainingInjury()){toast('Sparring is closed until your injury heals at midnight.','#ff6875');return}if(trainingCooldownRemaining()>0&&!cooldownConfirmed){openTrainingCooldownWarning('sparring',i);return}const repeatCount=state.dailyCounters.sparring;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('sparring',2));
