@@ -12,6 +12,7 @@ const CORE_ASSETS=[
   './css/shared.css?v=2.5.179',
   './css/styles.css?v=2.5.179',
   './css/landing.css?v=2.5.179',
+  './css/github-steel.css?v=2.5.179',
   './css/origins.css?v=2.5.179',
   './js/game-logic.js?v=2.5.179',
   './js/shared-ui.js?v=2.5.179',

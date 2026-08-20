@@ -1,0 +1,434 @@
+/*
+ * GitHub + blue/steel visual experiment.
+ * Loaded after the core styles so this branch can be removed as one layer.
+ */
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel2: #21262d;
+  --line: #30363d;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --red: #2f81f7;
+  --red2: #1f6feb;
+  --gold: #79c0ff;
+  --green: #3fb950;
+  --blue: #58a6ff;
+  --purple: #a5a9f0;
+  --cta-text: #fff;
+  --cta-weight: 700;
+  --cta-shadow: none;
+  --button-primary: #1f6feb;
+  --button-primary-border: #388bfd;
+  --button-primary-shadow: 0 1px 0 #010409;
+  --button-secondary: #21262d;
+  --button-secondary-border: #8b949e;
+  --button-secondary-shadow: 0 1px 0 #010409;
+  --fighter-accent: #58a6ff;
+}
+
+html,
+body {
+  background: #010409;
+  color: var(--text);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease, transform .12s ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
+
+#app {
+  border-color: #30363d;
+  background: #0d1117;
+}
+
+#app::before {
+  display: none;
+}
+
+.topbar {
+  border-bottom-color: #30363d;
+  background: #161b22;
+  box-shadow: 0 1px 0 #010409;
+}
+
+.logo {
+  filter: drop-shadow(0 2px 2px #010409);
+}
+
+.identity .name,
+.money > b,
+.top-progress b {
+  font-weight: 700;
+}
+
+.identity .sub,
+.top-progress,
+.money .top-progress b {
+  color: #8c9aa8;
+}
+
+.resource-hud {
+  border-bottom-color: #30363d;
+  background: #0d1117;
+  box-shadow: 0 1px 0 #010409;
+}
+
+.hud-resource,
+.hud-attribute {
+  border-color: #30363d;
+  border-radius: 6px;
+  background: #161b22;
+}
+
+.hud-resource span,
+.hud-attribute span {
+  color: #8b949e;
+}
+
+.hud-meter,
+.hud-attribute .mini {
+  border-color: #30363d;
+  background: #010409;
+  box-shadow: none;
+}
+
+.energy-hud .hud-meter i,
+.health-hud .hud-meter i,
+.hud-attribute .mini i {
+  background: #2f81f7;
+}
+
+.main {
+  background: #0d1117;
+}
+
+.card,
+.tape-card,
+.result-card,
+.shop-section,
+.trainer-card,
+.feed-page-card,
+.social-composer,
+.gig-modal,
+.fight-plan-card,
+.live-card {
+  border-color: #30363d;
+  border-radius: 6px;
+  background-color: #161b22;
+  background-image: none;
+  box-shadow: 0 1px 0 #010409;
+}
+
+.card-title,
+.tape-title,
+.live-title,
+.shop-head,
+.career-card .card-title,
+.social-composer-status,
+.feed-filter-bar {
+  border-color: #30363d;
+  background: #21262d;
+}
+
+.card-title,
+.tape-title b,
+.live-title b,
+.shop-head b {
+  color: #f0f6fc;
+  letter-spacing: .35px;
+}
+
+.ticker,
+.daily-reset-clock,
+.section-note,
+.feed-page-note,
+.focus-unread,
+.blackjack-result {
+  border-color: #30363d;
+  border-radius: 6px;
+  background: #0d1117;
+  color: #8b949e;
+}
+
+.choice,
+.action,
+.opponent,
+.gear,
+.social-action,
+.feed-post,
+.career-token,
+.build-option,
+.avatar-option,
+.city-option,
+.fight-plan-setting,
+.focus-phone,
+.focus-thread {
+  border-color: #30363d;
+  border-radius: 6px;
+  background: #0d1117;
+  box-shadow: none;
+}
+
+.choice:hover,
+.action:hover,
+.opponent:hover,
+.gear:hover,
+.social-action:hover {
+  border-color: #8c9aa8;
+  background: #161b22;
+}
+
+.choice.selected,
+.build-option.selected,
+.avatar-option.selected,
+.city-option.selected,
+.opponent.selected {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 1px #58a6ff;
+}
+
+.feed-post {
+  border-bottom-color: #30363d;
+}
+
+.feed-post.player-post,
+.feed-post.mentioned-post {
+  background: #111d2e;
+}
+
+.feed-avatar,
+.social-action .social-action-icon {
+  border-color: #3d5266;
+  background: #21262d;
+  box-shadow: none;
+}
+
+.feed-post-head b,
+.feed-post p,
+.social-action b {
+  color: #c9d1d9;
+}
+
+.feed-mention,
+.social-action em,
+.limit-pill,
+.level-tag,
+.daily-reset-clock strong {
+  color: #58a6ff;
+}
+
+.bottomnav {
+  border-color: #30363d;
+  background: #161b22;
+  box-shadow: 0 -1px 0 #010409;
+}
+
+.navbtn {
+  color: #8b949e;
+}
+
+.navbtn:hover {
+  border-color: #30363d;
+  background: #21262d;
+  color: #f0f6fc;
+}
+
+.navbtn.active {
+  color: #f0f6fc;
+  background: #21262d;
+  box-shadow: inset 0 2px #2f81f7;
+}
+
+.install-offer button:not(:disabled),
+.choice.red .choice-action,
+.choice:not(.red) .choice-action,
+.choice.hustle .choice-action,
+.choice.legacy .choice-action,
+.feed-open,
+.fight-btn:not(:disabled):not(.locked):not(.title):not(.taunt),
+.gear.collectible-card:not(.equipped) .gear-footer .equip-btn,
+.trainer-toggle.active,
+.tape-action.fight:not(:disabled),
+.corner-plan-btn.signature,
+.crisis-btn.haymaker:not(:disabled),
+.last-chance-btn.haymaker:not(:disabled),
+.continue-btn,
+.modal-run:not(:disabled),
+.fighter-message-send:not(:disabled),
+.focus-continue,
+.fight-plan-confirm,
+.landing-enter {
+  border: 1px solid #388bfd;
+  border-radius: 6px;
+  background: #1f6feb;
+  color: #fff;
+  box-shadow: 0 1px 0 #010409;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.install-offer button:not(:disabled):hover,
+.choice-action:hover,
+.feed-open:hover,
+.fight-btn:not(:disabled):hover,
+.continue-btn:hover,
+.modal-run:not(:disabled):hover,
+.focus-continue:hover,
+.fight-plan-confirm:hover,
+.landing-enter:hover {
+  background: #2f81f7;
+  border-color: #58a6ff;
+  box-shadow: 0 1px 0 #010409;
+  transform: none;
+}
+
+.modal-cancel,
+.tape-action:not(.fight),
+.details-toggle,
+.trainer-toggle:not(.active),
+.feed-filter-bar button,
+.sim-control,
+.fighter-name-actions button {
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #c9d1d9;
+  box-shadow: 0 1px 0 #010409;
+  text-shadow: none;
+}
+
+.modal-cancel:hover,
+.tape-action:not(.fight):hover,
+.details-toggle:hover,
+.feed-filter-bar button:hover,
+.sim-control:hover {
+  border-color: #8c9aa8;
+  background: #30363d;
+}
+
+.feed-filter-bar button.active,
+.sim-control.active {
+  border-color: #388bfd;
+  background: #1f6feb;
+  color: #fff;
+  box-shadow: none;
+}
+
+button:disabled {
+  border-color: #30363d !important;
+  background: #21262d !important;
+  color: #6e7681 !important;
+  box-shadow: none !important;
+}
+
+.modal-overlay,
+#resultModal,
+#fightOverlay {
+  background-color: rgba(1, 4, 9, .86);
+}
+
+input,
+select,
+textarea,
+.blackjack-bet input {
+  border-color: #30363d;
+  border-radius: 6px;
+  background: #0d1117;
+  color: #f0f6fc;
+  box-shadow: inset 0 1px 0 #010409;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.blackjack-bet input:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(56, 139, 253, .22);
+}
+
+.landing-page {
+  color: #f0f6fc;
+  background: #0d1117;
+}
+
+.landing-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#21262d 1px, transparent 1px), linear-gradient(90deg, #21262d 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: .28;
+  pointer-events: none;
+}
+
+.landing-card {
+  border-color: #30363d;
+  border-radius: 8px;
+  background: #161b22;
+  box-shadow: 0 16px 48px #010409;
+  backdrop-filter: none;
+}
+
+.landing-card::before {
+  background: linear-gradient(135deg, rgba(56, 139, 253, .08), transparent 42%);
+}
+
+.landing-logo {
+  filter: drop-shadow(0 4px 8px #010409);
+}
+
+.landing-card h1 {
+  color: #f0f6fc;
+  text-shadow: none;
+}
+
+.landing-card h1 .accent,
+.landing-page[data-mode="returning"] .landing-card h1 .accent {
+  color: #58a6ff;
+  text-shadow: none;
+}
+
+.landing-description {
+  color: #8b949e;
+}
+
+.landing-details {
+  color: #8c9aa8;
+}
+
+.landing-origin {
+  color: #58a6ff;
+}
+
+@media (min-width: 1100px) {
+  .bottomnav {
+    box-shadow: 1px 0 0 #010409;
+  }
+
+  .navbtn.active {
+    border-color: #30363d;
+    background: #21262d;
+    box-shadow: inset 3px 0 #2f81f7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}
