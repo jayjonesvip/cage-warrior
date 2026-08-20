@@ -1,14 +1,15 @@
 (function(root,factory){
-  const api=factory();
+  const api=factory(root);
   if(typeof module==='object'&&module.exports)module.exports=api;
   root.CAGE_LOGIC=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(root){
   'use strict';
 
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   const finite=(value,fallback=0)=>{if(value===null||value==='')return fallback;const number=Number(value);return Number.isFinite(number)?number:fallback};
   const whole=(value,fallback=0)=>Math.floor(finite(value,fallback));
   const nonNegativeWhole=(value,fallback=0)=>Math.max(0,whole(value,fallback));
+  const fightRule=(path,fallback)=>root.CAGE_FIGHT_RULES?.number(path,fallback)??fallback;
 
   function localDateKey(value=new Date()){
     const date=value instanceof Date?value:new Date(value);
@@ -138,7 +139,11 @@
 
   function fightRoundCost(level){
     const careerLevel=Math.max(1,whole(level,1));
-    return Math.min(10,5+Math.ceil(careerLevel/2));
+    if(careerLevel<=2)return fightRule('energyCosts.levelsOneThroughTwoPerStartedRound',6);
+    if(careerLevel<=4)return fightRule('energyCosts.levelsThreeThroughFourPerStartedRound',7);
+    if(careerLevel<=6)return fightRule('energyCosts.levelsFiveThroughSixPerStartedRound',8);
+    if(careerLevel<=8)return fightRule('energyCosts.levelsSevenThroughEightPerStartedRound',9);
+    return fightRule('energyCosts.levelNineAndHigherPerStartedRound',10);
   }
 
   function bookFight(state,key,cost=15,startedAt=Date.now(),requiredEnergy=cost){
@@ -228,25 +233,25 @@
 
   function startingFightCondition(health,maxHealth){
     const healthPercent=clamp(finite(health)/Math.max(1,finite(maxHealth,100))*100,0,100);
-    if(healthPercent>=90)return 100;
-    if(healthPercent>=70)return 95;
-    if(healthPercent>=50)return 88;
-    return 78;
+    if(healthPercent>=fightRule('startingCondition.fullConditionMinimumHealthPercent',90))return fightRule('startingCondition.fullCondition',100);
+    if(healthPercent>=fightRule('startingCondition.slightlyReducedConditionMinimumHealthPercent',70))return fightRule('startingCondition.slightlyReducedCondition',95);
+    if(healthPercent>=fightRule('startingCondition.reducedConditionMinimumHealthPercent',50))return fightRule('startingCondition.reducedCondition',88);
+    return fightRule('startingCondition.badlyReducedCondition',78);
   }
 
   function liveFightHealthDamage({landed=false,knockdown=false,finish=''}={}){
     const result=String(finish||'').toUpperCase();
-    if(result==='SUBMISSION')return 8;
-    if(result.includes('KO'))return 12;
-    if(knockdown)return 4;
-    return landed?1:0;
+    if(result==='SUBMISSION')return fightRule('persistentHealthDamage.submissionLoss',8);
+    if(result.includes('KO'))return fightRule('persistentHealthDamage.knockoutOrTechnicalKnockoutLoss',12);
+    if(knockdown)return fightRule('persistentHealthDamage.knockdown',4);
+    return landed?fightRule('persistentHealthDamage.landedAttack',1):0;
   }
 
   function liveFightInjuryChance({eligible=false,landed=false,injured=false}={}){
     return eligible&&landed&&!injured?.02:0;
   }
 
-  function fightInjuryCondition(condition){return clamp(finite(condition)*.5,0,100)}
+  function fightInjuryCondition(condition){return clamp(finite(condition)*fightRule('persistentHealthDamage.injuryConditionMultiplier',.5),0,100)}
 
   function blackjackHandValue(cards){
     const hand=Array.isArray(cards)?cards:[];
@@ -322,19 +327,20 @@
   }
 
   function winFightCash({basePurse,hype=0,cashBonus=0,winStreak=0,upset=false,rivalry=false,variance=1}){
-    const streakBonus=Math.min(.25,Math.max(0,nonNegativeWhole(winStreak)-1)*.05);
-    return Math.round(Math.max(0,finite(basePurse))*(1+finite(hype)/130)*(1+finite(cashBonus)/100)*(1+streakBonus+(upset?.25:0)+(rivalry?.15:0))*finite(variance,1));
+    const streakBonus=Math.min(fightRule('cashAndExperienceRewards.maximumWinStreakPurseBonus',.25),Math.max(0,nonNegativeWhole(winStreak)-1)*fightRule('cashAndExperienceRewards.winStreakPurseBonusPerAdditionalWin',.05));
+    return Math.round(Math.max(0,finite(basePurse))*(1+finite(hype)/fightRule('cashAndExperienceRewards.hypePurseDivisor',130))*(1+finite(cashBonus)/100)*(1+streakBonus+(upset?fightRule('cashAndExperienceRewards.upsetVictoryPurseBonus',.25):0)+(rivalry?fightRule('cashAndExperienceRewards.rivalryPurseBonus',.15):0))*finite(variance,1));
   }
 
-  function lossFightCash(basePurse){return Math.round(Math.max(0,finite(basePurse))*.08)}
+  function lossFightCash(basePurse){return Math.round(Math.max(0,finite(basePurse))*fightRule('cashAndExperienceRewards.lossPurseMultiplier',.08))}
 
   function xpRequirement(level){return 80+Math.max(1,whole(level,1))*40}
 
   function opponentXpTier(winsToday=0){
     const wins=nonNegativeWhole(winsToday);
-    if(wins>=2)return {wins,multiplier:0,hypeChange:-7,tier:'exhausted',shortLabel:'NO XP · $0 · -7 HYPE',tapeLabel:'NO XP · $0 PURSE · -7 HYPE',resultLabel:'NO XP · $0 · -7 HYPE'};
-    if(wins===1)return {wins,multiplier:.25,hypeChange:8,tier:'repeat',shortLabel:'25% XP',tapeLabel:'25% XP · REPEAT WIN',resultLabel:'REPEAT WIN · 25%'};
-    return {wins:0,multiplier:1,hypeChange:8,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'};
+    if(wins>=2){const hypeChange=fightRule('cashAndExperienceRewards.exhaustedOpponentHypeChange',-7),hypeLabel=`${hypeChange>0?'+':''}${hypeChange} HYPE`;return {wins,multiplier:0,hypeChange,tier:'exhausted',shortLabel:`NO XP · $0 · ${hypeLabel}`,tapeLabel:`NO XP · $0 PURSE · ${hypeLabel}`,resultLabel:`NO XP · $0 · ${hypeLabel}`}}
+    const hypeGain=fightRule('cashAndExperienceRewards.winHypeGain',8),repeatMultiplier=fightRule('cashAndExperienceRewards.secondWinAgainstSameOpponentExperienceMultiplier',.25),repeatPercent=Math.round(repeatMultiplier*100);
+    if(wins===1)return {wins,multiplier:repeatMultiplier,hypeChange:hypeGain,tier:'repeat',shortLabel:`${repeatPercent}% XP`,tapeLabel:`${repeatPercent}% XP · REPEAT WIN`,resultLabel:`REPEAT WIN · ${repeatPercent}%`};
+    return {wins:0,multiplier:1,hypeChange:hypeGain,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'};
   }
 
   function opponentFightPurse(basePurse,winsToday=0){return opponentXpTier(winsToday).tier==='exhausted'?0:Math.max(0,whole(basePurse))}
@@ -344,15 +350,15 @@
   function fightXp({playerLevel=1,opponentLevel=1,won=false,forfeited=false,upset=false,ranked=false,championship=false,titleWon=false,rival=false,opponentWinsToday=0}={}){
     if(forfeited)return {xp:0,category:'forfeit',modifiers:['FORFEIT · NO XP']};
     const fighterLevel=Math.max(1,whole(playerLevel,1)),opponent=Math.max(1,whole(opponentLevel,1));
-    const earlyCareerBonus=Math.max(0,20-opponent*5),baseVictory=26+opponent*9+earlyCareerBonus;
+    const earlyCareerBonus=Math.max(0,fightRule('cashAndExperienceRewards.earlyCareerExperienceBonusMaximum',20)-opponent*fightRule('cashAndExperienceRewards.earlyCareerExperienceBonusReductionPerOpponentLevel',5)),baseVictory=fightRule('cashAndExperienceRewards.victoryBaseExperiencePoints',26)+opponent*fightRule('cashAndExperienceRewards.victoryExperiencePointsPerOpponentLevel',9)+earlyCareerBonus;
     const reduced=!!rival||opponent<fighterLevel,reductionReason=rival?'RIVAL FIGHT · 50% XP':'PAST-LEVEL FIGHT · 50% XP';
-    let amount=baseVictory*(upset&&won?1.25:1)*(reduced?.5:1)*(won?1:.375);
+    let amount=baseVictory*(upset&&won?fightRule('cashAndExperienceRewards.upsetVictoryExperienceMultiplier',1.25):1)*(reduced?fightRule('cashAndExperienceRewards.pastLevelOrRivalExperienceMultiplier',.5):1)*(won?1:fightRule('cashAndExperienceRewards.lossExperienceMultiplier',.375));
     const modifiers=[];
     if(reduced)modifiers.push(reductionReason);
-    if(championship){amount*=1.3;modifiers.push('WORLD TITLE BOUT BONUS +30%')}
-    else if(ranked){amount*=1.2;modifiers.push('RANKED FIGHT BONUS +20%')}
-    const beltBonus=championship&&won&&titleWon?25:0;
-    if(beltBonus)modifiers.push('WORLD TITLE WON +25 XP');
+    if(championship){const multiplier=fightRule('cashAndExperienceRewards.championshipFightExperienceMultiplier',1.3);amount*=multiplier;modifiers.push(`WORLD TITLE BOUT BONUS +${Math.round((multiplier-1)*100)}%`)}
+    else if(ranked){const multiplier=fightRule('cashAndExperienceRewards.rankedFightExperienceMultiplier',1.2);amount*=multiplier;modifiers.push(`RANKED FIGHT BONUS +${Math.round((multiplier-1)*100)}%`)}
+    const beltBonus=championship&&won&&titleWon?fightRule('cashAndExperienceRewards.worldTitleVictoryExperienceBonus',25):0;
+    if(beltBonus)modifiers.push(`WORLD TITLE WON +${beltBonus} XP`);
     const repeatTier=opponentXpTier(opponentWinsToday),earned=Math.max(0,Math.round(amount)+beltBonus);
     if(repeatTier.tier==='repeat')modifiers.push('REPEAT WIN · 25% XP');
     else if(repeatTier.tier==='exhausted')modifiers.push('OPPONENT XP EXHAUSTED · NO XP');
@@ -416,6 +422,11 @@
     return ratings;
   }
 
+  function generatedOpponentBaseRating(level){
+    const tier=Math.max(1,whole(level,1)),base=fightRule('computerGeneratedOpponentDifficulty.baseAttributeRatingAtLevelOne',4),linearGain=fightRule('computerGeneratedOpponentDifficulty.linearAttributeRatingGainPerLevel',1.9),growthStart=fightRule('computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel',4),growthMultiplier=fightRule('computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel',1.04),compoundingLevels=Math.max(0,tier-growthStart+1);
+    return (base+(tier-1)*linearGain)*Math.pow(growthMultiplier,compoundingLevels);
+  }
+
   function fightPlanAssessment({player={},opponent={},plan={},fighterStyle='striker',opponentStyle='striker',focus=80,adaptationScale=.5}={}){
     const stat=(source,key)=>Math.max(1,finite(source?.[key],1)),p={power:stat(player,'power'),speed:stat(player,'speed'),chin:stat(player,'chin'),cardio:stat(player,'cardio')},o={power:stat(opponent,'power'),speed:stat(opponent,'speed'),chin:stat(opponent,'chin'),cardio:stat(opponent,'cardio')};
     const cardioEdge=p.cardio-o.cardio,speedEdge=p.speed-o.speed,paceSignal=clamp(cardioEdge/4+(p.cardio-8)/12,-1,1),pace=plan.pace==='fast'?paceSignal:-paceSignal;
@@ -428,7 +439,7 @@
 
   function cardioImbalanceFatigue(fighter={}){
     const cardio=Math.max(1,finite(fighter.cardio,1)),explosive=Math.max(cardio,finite(fighter.power,cardio),finite(fighter.speed,cardio)),ratio=explosive/cardio;
-    return clamp((ratio-1.75)*.012,0,.018);
+    return clamp((ratio-fightRule('fatigue.powerOrSpeedToCardioRatioThreshold',1.75))*fightRule('fatigue.imbalancePenaltyPerRatioPoint',.012),0,fightRule('fatigue.maximumImbalancePenaltyPerExchange',.018));
   }
 
   function shouldPersistCareer(retirementPending,saveWasKnown=false,currentRaw=undefined){
@@ -506,5 +517,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightRoundCost,bookFight,chargePendingFightEnergy,availableFightEnergy,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingCooldownDuration,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

@@ -341,6 +341,15 @@ test('Coach Vega improves training and reduces explicit injury risk without XP',
   assert.equal(logic.trainingInjuryChance(true,true),.20);
 });
 
+test('computer-generated opponents compound after the opening career levels',()=>{
+  const levelOne=logic.generatedOpponentBaseRating(1),levelThree=logic.generatedOpponentBaseRating(3),levelFour=logic.generatedOpponentBaseRating(4),levelTen=logic.generatedOpponentBaseRating(10);
+  assert.equal(levelOne,4);
+  assert.equal(levelThree,7.8);
+  assert.ok(Math.abs(levelFour-10.088)<.000001);
+  assert.ok(levelTen>(4+9*1.9)*1.3);
+  assert.ok(levelFour-levelThree>levelThree-logic.generatedOpponentBaseRating(2));
+});
+
 test('daily opponent wins reduce repeat XP without counting losses',()=>{
   assert.deepEqual(logic.opponentXpTier(0),{wins:0,multiplier:1,hypeChange:8,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'});
   assert.deepEqual(logic.opponentXpTier(1),{wins:1,multiplier:.25,hypeChange:8,tier:'repeat',shortLabel:'25% XP',tapeLabel:'25% XP · REPEAT WIN',resultLabel:'REPEAT WIN · 25%'});

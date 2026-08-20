@@ -2,6 +2,18 @@
 
 This guide describes the player-facing rules for booking, planning, and resolving fights in Cage Grind.
 
+## Editable balance configuration
+
+The live numeric balance values are stored in `fight-rules.json`. Its property names are deliberately descriptive, and every section includes context and safe editing ranges so the file can be handed to an artificial intelligence chat without requiring the rest of the codebase.
+
+Only change numeric values. Do not rename properties or remove the descriptive properties whose names begin with an underscore. Probabilities are decimals from zero through one, while multipliers use one as the unchanged baseline. The browser validates supported values and falls back to built-in defaults for missing, malformed, out-of-range, or internally inconsistent settings. The game also falls back safely when it is opened directly from `index.html` and the browser prevents local JavaScript from loading a separate JSON file.
+
+The scheduled round count is currently fixed at three because the adaptation and final-round decision systems have explicit three-round behavior. Other supported values can be adjusted within their documented safe ranges and checked with `npm test`.
+
+A useful request to send with the file is:
+
+> Adjust the attached Cage Grind fight rules to accomplish the following balance goal: [describe the desired player experience]. Preserve every property and all descriptive context, change only supported numeric values, remain inside each documented safe range, keep minimum values at or below their matching maximum values, and return the complete valid JSON file with a concise summary of the gameplay effects.
+
 ## Fight eligibility
 
 A fighter may book a fight when all of the following are true:
@@ -34,6 +46,8 @@ A fight that ends early does not charge Energy for unstarted rounds.
 - **Chin** reduces incoming damage and knockdown danger.
 - **Cardio** supports sustained accuracy, initiative, control, and fast-paced fighting.
 
+Ordinary gym training is limited to three sessions per local day. Sparring has a separate two-session limit because it carries additional Health and injury risk. Both counters reset at local midnight.
+
 ### Cardio imbalance
 
 Ordinary specialist builds are allowed without an extra penalty. Additional fatigue begins when the fighter's higher Power or Speed rating exceeds Cardio by more than 75%.
@@ -45,6 +59,10 @@ Ordinary specialist builds are allowed without an extra penalty. Additional fati
 - The same rule applies to player fighters and opponents.
 
 This means a fighter can specialize heavily in Power or Speed, but needs enough Cardio to sustain that advantage across a full fight.
+
+### Computer-generated opponent growth
+
+Fictional career opponents use ordinary linear attribute growth through the opening levels. Starting at Level 4, their base attributes also receive a 1.04 compounding multiplier for each level. This raises the pressure gradually at first and becomes meaningful in the later career. It does not copy the player's current build, and it does not alter real Cage Network fighters.
 
 ## Fight plan
 

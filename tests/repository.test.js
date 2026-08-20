@@ -923,7 +923,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(page, /id="focusStage"/);
   assert.doesNotMatch(page, /focusMeterFill|focusTier|focus-hud|focus-meter/);
   assert.match(page, /id="liveFocusText"/);
-  assert.match(script, /fight\.focusBase=rint\(75,90\)/);
+  assert.match(script, /fight\.focusBase=rint\(fightRule\('focus\.startingMinimum',75\),fightRule\('focus\.startingMaximum',90\)\)/);
   assert.match(script, /quiet=Math\.random\(\)<\.5/);
   assert.match(fightFocusScript, /function messages\(\)/);
   assert.match(fightFocusScript, /function draw\(all\)/);
@@ -940,10 +940,10 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(script, /class="focus-option-hint">Open the message/);
   assert.match(script, /class="focus-option-hint">Leave it unread/);
   assert.match(script, /data-focus-choice="music"/);
-  assert.match(script, /Math\.random\(\)<\.20/);
-  assert.match(script, /fight\.focus\+=rint\(4,10\)/);
-  assert.match(script, /fight\.focus=Math\.max\(fight\.focus,92\)/);
-  assert.match(script, /fight\.focus=clamp\(Math\.round\(fight\.focus\),50,100\)/);
+  assert.match(script, /Math\.random\(\)<fightRule\('focus\.musicPerfectFocusProbability',\.2\)/);
+  assert.match(script, /fight\.focus\+=rint\(fightRule\('focus\.musicMinimumGain',4\),fightRule\('focus\.musicMaximumGain',10\)\)/);
+  assert.match(script, /fight\.focus=Math\.max\(fight\.focus,fightRule\('focus\.meditationMinimumFocus',92\)\)/);
+  assert.match(script, /fight\.focus=clamp\(Math\.round\(fight\.focus\),fightRule\('focus\.absoluteMinimum',50\),fightRule\('focus\.absoluteMaximum',100\)\)/);
   assert.match(script, /function fightFocusModifier\(sim=fight\)/);
   assert.match(script, /chance\+=edge\*\.72\+focusMod/);
   assert.match(script, /fightFocusModifier\(fight\)/);
@@ -1659,7 +1659,9 @@ test('training separates daily sparring from post-fight recovery opportunities',
     assert.equal(fs.existsSync(file), true);
     assert.equal(pngTopLeftAlpha(file), 0, `${asset} artwork should have a transparent background`);
   }
-  assert.match(script, /sessionsLeft\('sparring',2\)/);
+  assert.match(script, /DAILY_TRAINING_LIMIT=fightRule\('dailyDevelopmentLimits\.ordinaryAttributeTrainingSessionLimit',3\)/);
+  assert.match(script, /DAILY_SPARRING_LIMIT=fightRule\('dailyDevelopmentLimits\.sparringSessionLimit',2\)/);
+  assert.match(script, /sessionsLeft\('sparring',DAILY_SPARRING_LIMIT\)/);
   assert.match(script, /sparring-\$\{a\.tier\}/);
   assert.match(script, /gameIcon\(a\.asset\|\|a\.id,a\.icon\)/);
   assert.match(page, /id="sparringSessionModal"[\s\S]*id="sparringSessionMeter"[\s\S]*id="sparringSessionResult"[\s\S]*BACK TO TRAINING/);
@@ -1834,7 +1836,7 @@ test('career fights have a ten-fight daily cap', () => {
   assert.match(page, /DAILY FIGHTS RESET IN/);
   assert.match(page, /id="fightLimitText">10 FIGHTS LEFT/);
   assert.ok(page.indexOf('id="rosterSummary"') < page.indexOf('id="fightLimitText"'));
-  assert.match(script, /DAILY_FIGHT_LIMIT=10/);
+  assert.match(script, /DAILY_FIGHT_LIMIT=fightRule\('fightStructure\.dailyFightLimit',10\)/);
   assert.match(script, /sessionsLeft\('fight',DAILY_FIGHT_LIMIT\)/);
   assert.match(script, /state\.dailyCounters\.fight\+\+/);
 });
@@ -1906,7 +1908,8 @@ test('XP is fight-only across definitions, handlers, results, and analytics', ()
   assert.match(script,/xpResult=LOGIC\.fightXp\(/);
   assert.match(script,/if\(xp\)gainXp\(xp\)/);
   assert.match(script,/xp_earned:xp,xp_category:xpResult\.category/);
-  for(const copy of ['PAST-LEVEL FIGHT · 50% XP','RIVAL FIGHT · 50% XP','RANKED FIGHT BONUS +20%','WORLD TITLE BOUT BONUS +30%','WORLD TITLE WON +25 XP','FORFEIT · NO XP'])assert.match(logic,new RegExp(copy.replace(/[+]/g,'\\+')));
+  for(const copy of ['PAST-LEVEL FIGHT · 50% XP','RIVAL FIGHT · 50% XP','FORFEIT · NO XP'])assert.match(logic,new RegExp(copy.replace(/[+]/g,'\\+')));
+  for(const path of ['rankedFightExperienceMultiplier','championshipFightExperienceMultiplier','worldTitleVictoryExperienceBonus'])assert.match(logic,new RegExp(`cashAndExperienceRewards\\.${path}`));
   assert.match(readme,/XP is earned through fights\. Training improves attributes, hustles earn[\s\S]*cash, and publicity builds Followers and Hype\./);
 });
 
@@ -2222,7 +2225,7 @@ test('major incoming damage triggers the blood-sport particle burst', () => {
 });
 
 test('planned fights charge a level-based rate per started round and run without routine pauses', () => {
-  assert.match(script, /FIGHT_ROUNDS=3/);
+  assert.match(script, /FIGHT_ROUNDS=fightRule\('fightStructure\.scheduledRounds',3\)/);
   assert.match(script, /currentFightRoundCost=\(\)=>LOGIC\.fightRoundCost\(state\.level\)/);
   assert.match(script, /currentFightClearance=\(\)=>currentFightRoundCost\(\)\*FIGHT_ROUNDS/);
   assert.match(script, /LOGIC\.bookFight\(state,o\.key,roundCost,Date\.now\(\),clearance\)/);
@@ -2237,10 +2240,12 @@ test('planned fights charge a level-based rate per started round and run without
 });
 
 test('pace and offense settings change exchanges, fatigue, accuracy, damage, and knockdowns', () => {
-  assert.match(script, /const exchanges=fastPace\?rint\(9,11\):rint\(6,7\)/);
+  assert.match(script, /exchangeCounts\.fastPaceMinimum/);
+  assert.match(script, /exchangeCounts\.slowPaceMaximum/);
   assert.match(script, /paceInitiative=fastPace\?clamp\(\(P\.cardio-O\.cardio\)\*\.018\+\(P\.cardio-8\)\*\.008,-\.12,\.14\):0/);
   assert.match(script, /cardioTax=LOGIC\.cardioImbalanceFatigue\(A\)/);
-  assert.match(script, /fastPace\?1\.35:\.7/);
+  assert.match(script, /fatigue\.fastPaceMultiplier/);
+  assert.match(script, /fatigue\.slowPaceMultiplier/);
   assert.match(script, /offense==='conservative'.*type='jab'/);
   assert.match(script, /aggressiveOffense\?-\.045:\.05/);
   assert.match(script, /aggressiveOffense\?1\.16:\.86/);

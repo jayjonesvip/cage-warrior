@@ -9,11 +9,13 @@ const CORE_ASSETS=[
   './',
   './index.html',
   './origins.html',
+  './fight-rules.json',
   './css/shared.css?v=2.5.179',
   './css/styles.css?v=2.5.179',
   './css/landing.css?v=2.5.179',
   './css/github-steel.css?v=2.5.179',
   './css/origins.css?v=2.5.179',
+  './js/fight-rules.js?v=2.5.179',
   './js/game-logic.js?v=2.5.179',
   './js/shared-ui.js?v=2.5.179',
   './js/fight-focus-contacts.js?v=2.5.179',
@@ -117,6 +119,10 @@ self.addEventListener('fetch',event=>{
   const url=new URL(request.url);if(url.origin!==self.location.origin)return;
   if(url.pathname.endsWith('/app-version.json')){
     event.respondWith(fetch(request,{cache:'no-store'}).catch(()=>caches.match(request)));
+    return;
+  }
+  if(url.pathname.endsWith('/fight-rules.json')){
+    event.respondWith(networkFirst(request));
     return;
   }
   event.respondWith(request.mode==='navigate'?networkFirst(request):cacheFirst(request));

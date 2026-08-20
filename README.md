@@ -160,7 +160,10 @@ generated league.
   at the center of the interaction.
 - Every generated opponent uses the same Striker-or-Grappler system. Their card,
   tale of the tape, attributes, scouting report, and in-fight behavior all
-  reflect that archetype.
+  reflect that archetype. Generated career-opponent attributes retain their
+  original linear curve through Level 3, then receive a 1.04 compounding
+  multiplier per level beginning at Level 4. Real Cage Network snapshots do
+  not use this fictional-opponent difficulty curve.
 - Every booked fight begins with a locker-room **Fight Plan**. Players set a
   **Slow** or **Fast** pace, choose **Conservative** or **Aggressive** offense,
   and decide whether to **Stick to Style** or **Adapt**. The last locked-in
@@ -455,7 +458,7 @@ generated league.
   up to 25% of available Cash and watches an eight-second six-lane race. The
   interface shows the exact total return before the bet is placed; a winning
   2/1 wager returns the original stake plus twice that amount in profit.
-- Basic training costs energy and allows four daily sessions. All sparring
+- Basic training costs energy and allows three daily sessions. All sparring
   levels share a separate two-session daily track. Technical Sparring costs 5
   energy and adds +1 to one random skill without health damage. Live Sparring
   costs 10 energy, adds +2 to one random skill, and costs 1–3 health. Hard
