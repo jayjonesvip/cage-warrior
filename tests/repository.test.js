@@ -1732,7 +1732,7 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(page, /id="recoveryLimitText"/);
   assert.match(page, /id="recoveryActions"/);
   assert.match(script, /usableTreatment=recoveryOptions\.some\(\(\{quote\}\)=>quote\.ok\)/);
-  assert.match(script, /!treatmentReady\?'FIGHT TO UNLOCK':usableTreatment\?'TREATMENT READY':resourcesFull\?'RESOURCES FULL':'NEED CASH'/);
+  assert.match(script, /setLimitBadge\('#recoveryLimitText',!treatmentReady\?'FIGHT TO UNLOCK':usableTreatment\?'TREATMENT READY':resourcesFull\?'RESOURCES FULL':'NEED CASH'\)/);
   assert.match(script, /id:'ice-bath'.*energy:25,health:0,feeBase:25,feePerLevel:10/);
   assert.match(script, /id:'sauna'.*energy:15,health:15,feeBase:50,feePerLevel:15/);
   assert.match(script, /id:'massage'.*energy:5,health:30,feeBase:75,feePerLevel:20/);
@@ -1815,7 +1815,7 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
 
 test('zero remaining limit badges use the red exhausted state', () => {
   assert.match(script, /function setLimitBadge\(selector,text\)/);
-  assert.match(script, /classList\.toggle\('exhausted',\/\^0\\b\.\*\\bLEFT\$\/\.test\(text\)\)/);
+  assert.match(script, /classList\.toggle\('exhausted',\/\^0\\b\.\*\\bLEFT\$\/\.test\(text\)\|\|text==='FIGHT TO UNLOCK'/);
   for (const id of ['trainLimitText','sparringLimitText','hustleLimitText','undergroundLimitText','publicityLimitText','fightLimitText']) {
     assert.match(script,new RegExp(`setLimitBadge\\('#${id}'`));
   }
