@@ -1805,6 +1805,8 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.match(css, /\.horse-review-link\{[^}]*color:#6ed7ff/);
   assert.match(css, /\.horse-race-track\{/);
   assert.match(css, /\.horse-marker\{[^}]*transition:left \.7s ease-in-out/);
+  assert.match(script, /class="horse-marker" src="assets\/racehorse-right\.png\?v=2\.5\.179"/);
+  assert.match(serviceWorker, /\.\/assets\/racehorse-right\.png\?v=2\.5\.179/);
   assert.match(css, /prefers-reduced-motion:reduce/);
 });
 

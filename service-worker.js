@@ -41,6 +41,7 @@ const CORE_ASSETS=[
   './assets/cage-grind-ceo.jpg?v=2.5.179',
   './assets/cage-reporter.jpg?v=2.5.179',
   './assets/cage-dice.jpg?v=2.5.179',
+  './assets/racehorse-right.png?v=2.5.179',
   './assets/cage-grind-octagon-transparent.png',
   './assets/cage-overlay.png',
   './assets/home-fight.png',
