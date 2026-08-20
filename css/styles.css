@@ -92,6 +92,7 @@
   .tape-xp-status{grid-column:1/-1;margin-top:-2px;text-align:center;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:950;letter-spacing:.65px}
   .tape-xp-status.full{color:#71d9ff}.tape-xp-status.repeat{color:#ffc35d}.tape-xp-status.exhausted{color:#84909c}
   .modal-meter-result small{display:block;color:var(--meter-accent);font-family:system-ui,sans-serif;font-size:8.5px;font-weight:850;letter-spacing:.35px}
+  .modal-meter[aria-valuenow="100"]{display:none}.modal-meter[aria-valuenow="100"]+.modal-meter-result{margin-top:18px}
   .gear.collectible-card{perspective:1100px;cursor:pointer}
   .gear.collectible-card:focus-visible{outline:2px solid var(--rarity-bright);outline-offset:2px}
   .collectible-flip{position:absolute;inset:8px;transform-style:preserve-3d;transition:transform .46s cubic-bezier(.2,.72,.2,1)}

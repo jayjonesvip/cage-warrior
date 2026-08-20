@@ -1667,6 +1667,7 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(script, /RANDOM SKILL REWARD/);
   assert.match(script, /flashTrainingStats\(skills\)/);
   assert.match(css, /\.modal-meter>i\{[^}]*transition:width var\(--modal-meter-duration\) linear/);
+  assert.match(css, /\.modal-meter\[aria-valuenow="100"\]\{display:none\}/);
   assert.doesNotMatch(css, /\.modal-meter>span/);
   assert.match(css, /\.hud-attribute\.stat-rewarded\{animation:statRewarded/);
   assert.match(script, /state\.dailyCounters\.sparring\+=quote\.sessions/);
