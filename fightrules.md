@@ -184,7 +184,7 @@ A win can award:
 - Followers.
 - Hype.
 - Streak, upset, or rivalry bonuses.
-- A possible CEO gear gift.
+- A possible sealed Cage Grind collectible drop.
 
 Hype increases win payouts and Followers. Upsets are wins against an opponent whose combined ratings are at least 4 points higher.
 

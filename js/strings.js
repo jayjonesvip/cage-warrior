@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.186',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.186',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.189',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.189',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -236,7 +236,7 @@ interactions: {
     'Set the plan before the walkout: pace, offense, and whether you trust your style or adapt.',
     'Adapting takes focus, kid. Round one reads him, round two adjusts, round three owns the answer.',
     'No shop, no refunds. You want gear, you win fights and hope the drop lands in your locker.',
-    'Fourth win without a CEO gift? Keep winning. The boss eventually notices everybody.',
+    'Fourth win without a collectible drop? Keep winning. The sealed pack is guaranteed.',
     'Duplicate gear looks impressive, kid, but the perk still only counts once.',
     'One Daily Drop, every day. Free cash, one Energy cell, collectible included. Do not ask who paid.',
     'Coach Vega wants $250 plus $75 per level. Talent is temporary; invoices are forever.',

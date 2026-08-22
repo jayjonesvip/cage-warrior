@@ -231,8 +231,9 @@ generated league.
   haymaker decisions do not add another Energy charge. Existing Health and
   medical-clearance rules still apply.
 - Fighters can complete up to 10 fights per local calendar day. The Fight page
-  shows the remaining bouts and a live countdown to the local-midnight reset;
-  nonzero Energy and medical clearance remain the primary pacing limits.
+  shows the remaining bouts, then reveals the live local-midnight countdown only
+  after all 10 fights are used; nonzero Energy and medical clearance remain the
+  primary pacing limits.
 - Watch fights normally or use 2× speed. There is no result skip and no routine
   interruption once the cage door closes. Each round-number interlude remains
   visible for two seconds; before Rounds 2 and 3 it carries the cumulative
@@ -400,18 +401,17 @@ generated league.
 
 ### Collectible drops
 
-- Fight-win collectibles arrive as gifts from the CEO after the player catches
-  his attention. Daily and install drops remain separately branded rewards;
+- Fight-win, Daily, and install collectibles arrive in sealed Cage Grind packs;
   equipment is never purchased.
 - The home-screen Daily Drop awards Cash, one 25% Energy segment, and one deterministic,
   level-eligible collectible every day. It does not reset fight-drop pity.
 - Collectible card artwork is emphasized within the fixed two-column card
   layout, while the Daily Drop uses the same high-contrast label treatment as
   other primary actions.
-- A win has a 33% base chance to earn a CEO gift. Upsets, rivalries, and KO/TKO
+- A win has a 33% base chance to earn a collectible drop. Upsets, rivalries, and KO/TKO
   finishes improve the chance, up to 75%.
-- The fourth win without a CEO gift guarantees one. Winning a title guarantees
-  a specially labeled CEO title gift of at least Rare quality.
+- The fourth win without a collectible drop guarantees one. Winning a title
+  guarantees a Championship Drop of at least Rare quality.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
 - The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
@@ -498,8 +498,9 @@ generated league.
   permits the action; 0% disables it. The Daily
   Drop and level-up recovery also restore exactly one 25% segment, keeping the
   entire Energy economy on the same battery intervals.
-- Live countdowns on the Training and Hustle pages show the time remaining
-  until their daily limits reset at the player's next local midnight.
+- Live countdowns on the Training and Hustle pages appear when their currently
+  available daily activities are exhausted, showing the time remaining until
+  the player's next local midnight.
 
 ### Persistence
 
