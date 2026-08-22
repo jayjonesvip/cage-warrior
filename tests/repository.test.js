@@ -200,7 +200,7 @@ test('the branded landing page gates the game and offers the correct career entr
   assert.match(page, /id="landingEnterBtn"[^>]*>START YOUR CAREER →<\/button>/);
   assert.match(page, /FREE TO PLAY[\s\S]*NO DOWNLOAD[\s\S]*PLAY INSTANTLY/);
   assert.match(page, /<a class="landing-origin" href="origins\.html">THE ORIGINS OF CAGE GRIND<\/a>/);
-  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.179" alt="" aria-hidden="true"/);
+  assert.match(page, /<main class="landing-card">[\s\S]*class="landing-watermark" src="assets\/app-icon-512\.png\?v=2\.5\.186" alt="" aria-hidden="true"/);
   assert.match(page, /class="landing-logo" src="assets\/cage-grind-logo\.png" alt="Cage Grind"/);
   assert.match(css, /\.landing-logo\{display:block;[^}]*width:min\(72%,360px\);[^}]*drop-shadow/);
   assert.match(css, /body\.landing-active #app\{visibility:hidden;pointer-events:none\}/);
@@ -601,7 +601,7 @@ test('career identity keeps hometown informational and uses one shared real-play
   assert.match(sharedUi, /requiredLevel=Math\.max\(1,Math\.floor\(Number\(champ\.champion_level\)\)\|\|1\)/);
   assert.match(sharedUi, /TITLE SHOT AVAILABLE · CHAMPION LEVEL \$\{requiredLevel\}/);
   assert.match(sharedUi, /REACH LEVEL \$\{requiredLevel\} TO CHALLENGE/);
-  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.179/);
+  assert.match(serviceWorker, /\.\/assets\/icons\/title-world\.png\?v=2\.5\.186/);
   assert.match(cageChampionshipMigration, /viewer\.level>=champion\.level/);
   for (const city of ['boston','atlanta','san-francisco','denver']) assert.match(expandedHometownsMigration,new RegExp(`'${city}'`));
   assert.match(expandedHometownsMigration, /drop constraint if exists cage_profiles_city[\s\S]*add constraint cage_profiles_city/);
@@ -825,7 +825,7 @@ test('career fights use a reversible tale-of-the-tape preview before locker-room
   assert.match(html, /id="tapePurse">\$0<\/strong><small class="tape-purse-hint">TAP FOR BREAKDOWN/);
   assert.match(html, /id="tapeBreakdown" hidden/);
   assert.match(html, /role="dialog" aria-modal="true"/);
-  assert.match(html, /class="tape-energy" id="tapeEnergy">18 REQUIRED · 6 PER STARTED ROUND/);
+  assert.match(html, /class="tape-energy" id="tapeEnergy">ABOVE 0% REQUIRED · UP TO ONE CELL USED/);
   assert.match(html, /YOUR LOCKER-ROOM PLAN CONTROLS THE ENTIRE FIGHT/);
   assert.match(html, /id="tapeBackBtn"[^>]*>GO BACK</);
   assert.match(html, /id="tapeFightBtn"[^>]*>SET FIGHT PLAN<\/button>/);
@@ -856,8 +856,8 @@ test('career fights use a reversible tale-of-the-tape preview before locker-room
   assert.match(script, /function beginFightPlan\(\)/);
   assert.match(script, /function confirmFightPlan\(\)/);
   assert.match(script, /beginFightPlan\(\)/);
-  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.179"\)[^}]*background-position:center 62%/);
-  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.179"\)[^}]*background-position:center,center 62%/);
+  assert.match(css, /\.live-card\{[^}]*background-image:url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.186"\)[^}]*background-position:center 62%/);
+  assert.match(css, /\.live-card\.decision-active\{[^}]*background-image:linear-gradient\(#030914f6,#030914f6\),url\("\.\.\/assets\/cage-grind-octagon-transparent\.png\?v=2\.5\.186"\)[^}]*background-position:center,center 62%/);
   assert.match(css, /\.action-feed\{[^}]*background:#030914e0/);
   assert.doesNotMatch(css, /\.card,\.tape-card,\.live-card,\.result-card\{[^}]*background:/);
   assert.match(css, /\.card,\.tape-card,\.result-card\{[^}]*background:linear-gradient\(160deg,#101b2b,#05080e 76%\)\}\.live-card\{border-color:#233d61\}/);
@@ -951,7 +951,7 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(script, /showFightStage\('liveStage'\).*beginPlannedFight\(\)/);
   assert.match(page, /FINAL MOMENTS BEFORE THE WALKOUT · FOCUS <b id="focusValue">82%<\/b>/);
   assert.doesNotMatch(page, /FIGHT-ONLY STAT/);
-  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.179"/);
+  assert.match(page, /id="focusStage"[\s\S]*class="fight-plan-locker-room"[\s\S]*class="fight-plan-locker-art" src="assets\/focus-locker-room\.jpg\?v=2\.5\.186"/);
   assert.match(page, /<span>LOCKER ROOM<\/span>/);
   assert.match(page, /class="fight-plan-card focus-encounter" id="focusEncounter"/);
   assert.match(script, /box\.className='fight-plan-card focus-encounter'/);
@@ -975,12 +975,12 @@ test('booked fights resolve a 50-50 locker-room Focus encounter after planning',
   assert.match(css, /\.focus-result-tier\{[^}]*font-size:21px[^}]*letter-spacing:2px/);
   assert.match(css, /\.focus-final-score>b\{[^}]*font-size:34px[^}]*text-shadow:0 0 13px #58d8e85c/);
   assert.match(css, /\.focus-delta\{[^}]*border-radius:999px[^}]*color:#73dda8/);
-  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.179/);
-  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.179/);
-  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.179/);
-  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.179/);
-  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.179/);
-  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.179/);
+  assert.match(serviceWorker, /\.\/assets\/focus-locker-room\.jpg\?v=2\.5\.186/);
+  assert.match(serviceWorker, /\.\/assets\/contact-mom\.jpg\?v=2\.5\.186/);
+  assert.match(serviceWorker, /\.\/assets\/contact-wife\.jpg\?v=2\.5\.186/);
+  assert.match(serviceWorker, /\.\/assets\/contact-brother-tommy\.png\?v=2\.5\.186/);
+  assert.match(serviceWorker, /\.\/assets\/contact-agent-carl\.png\?v=2\.5\.186/);
+  assert.match(serviceWorker, /\.\/assets\/contact-grandma\.jpg\?v=2\.5\.186/);
   assert.match(readme, /fight-only \*\*Focus\*\* rating from 75–90%/);
 });
 
@@ -1006,7 +1006,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
   assert.match(originsPage, /BUILD A FIGHTER\. LIVE THE CAREER\./);
   assert.match(originsPage, /https:\/\/web\.archive\.org\/web\/20111007174242\/http:\/\/www\.cagewars\.net\//);
   assert.match(fs.readFileSync('sitemap.xml', 'utf8'), /<loc>https:\/\/cagegrind\.com\/origins\.html<\/loc>/);
-  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.179/);
+  assert.match(originsPage, /css\/origins\.css\?v=2\.5\.186/);
   assert.match(originsCss, /\.lineage-grid\{display:grid;grid-template-columns:1fr 1fr/);
   assert.match(originsCss, /body\{[^}]*overflow-x:hidden/);
   assert.match(originsCss, /h2\{[^}]*overflow-wrap:anywhere/);
@@ -1023,7 +1023,7 @@ test('the landing page preserves Cage Grind history without treating the old gam
     assert.match(serviceWorker, new RegExp(`'\\./${asset.replaceAll('/', '\\/').replaceAll('.', '\\.')}'`));
   }
   assert.match(serviceWorker, /'\.\/origins\.html'/);
-  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.179'/);
+  assert.match(serviceWorker, /'\.\/css\/origins\.css\?v=2\.5\.186'/);
 });
 
 test('collectible cards flip to optional sponsored details without empty QR space', () => {
@@ -1153,7 +1153,7 @@ test('home career guide teaches the four-step loop with compact artwork cards', 
 test('rendered icons support stable per-file image overrides with fallbacks', () => {
   assert.ok(fs.existsSync('assets/icons/README.md'));
   assert.match(script, /const ICON_ASSET_PATH = 'assets\/icons\/'/);
-  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.179'/);
+  assert.match(script, /const ICON_ASSET_VERSION = '2\.5\.186'/);
   assert.match(script, /function gameIcon\(name,fallback,extension='png'\)/);
   assert.match(script, /src="\$\{ICON_ASSET_PATH\}\$\{name\}\.\$\{extension\}\?v=\$\{ICON_ASSET_VERSION\}"/);
   assert.match(script, /classList\.add\('asset-ready'\)/);
@@ -1177,7 +1177,7 @@ test('home ticker teaches current mechanics in a shady promoter voice', () => {
   const heroPosition = html.indexOf('<div class="hero">', homeStart);
   assert.ok(tickerPosition > homeStart && tickerPosition < identityPosition && tickerPosition < heroPosition, 'ticker should lead the unlocked Home screen');
   assert.match(html.slice(homeStart, identityPosition), /class="card career-after-setup"/);
-  assert.ok(stringsData.ticker.some(line => /round costs climb with your career/i.test(line)));
+  assert.ok(stringsData.ticker.some(line => /every job, workout, and fight uses up to one battery cell.*anything above empty/i.test(line)));
   assert.ok(stringsData.ticker.some(line => /20 health before a bout/.test(line)));
   assert.match(script, /const tickerLines=STRINGS\.ticker/);
   const ticker = stringsData.ticker.join('\n');
@@ -1213,6 +1213,19 @@ test('fighter attributes share the persistent condition HUD across game screens'
   assert.doesNotMatch(html, /homeAttributes|trainStatGrid/);
 });
 
+test('Energy uses four battery cells and turns red at twenty-five percent or empty', () => {
+  assert.match(page, /class="energy-battery" id="energyBattery"[\s\S]*?<i class="charged"><\/i><i class="charged"><\/i><i class="charged"><\/i><i class="charged"><\/i>/);
+  assert.match(script, /\$\('#energyHud'\)\.classList\.toggle\('critical',state\.energy<=ENERGY_SEGMENT\)/);
+  assert.match(css, /\.hud-resource\.critical \.energy-battery i\.charged\{[^}]*#ff6973/);
+  assert.match(css, /\.energy-hud\.critical \.energy-battery\{[^}]*border-color:#ff4c59[^}]*0 0 11px #ff3344a8/);
+  assert.match(css, /\.energy-hud\.critical \.energy-battery::after\{[^}]*background:#ff4c59/);
+  assert.match(logic, /if\(available<=0\|\|amount<=0\)return 0/);
+  assert.match(logic, /if\(state\.energy<=0\)return \{ok:false,reason:'energy'/);
+  assert.match(script, /state\.energy<=0\|\|hustleLeft<1/);
+  assert.match(script, /energyLow=state\.energy<=0/);
+  assert.match(script, /\$\('#autographRun'\)\.disabled=state\.energy<=0/);
+});
+
 test('fighter stats always display with two decimal places', () => {
   assert.match(script, /const formatStat = value => Number\.isFinite\(Number\(value\)\)\?Number\(value\)\.toFixed\(2\):'0\.00'/);
   assert.match(script, /\$\('#'\+k\+'Stat'\)\.textContent=formatStat\(value\)/);
@@ -1241,6 +1254,11 @@ test('XP and Hype live in the top bar without a duplicate Home resource card', (
   assert.doesNotMatch(html.slice(headerStart,headerEnd), /FOLLOWERS|FOLLOWING|fansText|followingText/);
   assert.doesNotMatch(html, /card bars|id="energyBar"|id="healthBar"|id="xpBar"|id="hypeBar"/);
   assert.doesNotMatch(script, /\$\('#(?:energy|health|xp|hype)Bar'\)/);
+});
+
+test('the active World Champion rank is gold in the top identity line', () => {
+  assert.match(script, /rankText\.classList\.toggle\('world-champion',careerRank==='WORLD CHAMPION'\)/);
+  assert.match(gameCss, /\.identity \.sub #rankText\.world-champion\{color:#ffd66e;font-weight:950/);
 });
 
 test('top-bar identity, money, XP, and Hype rows share matching alignment', () => {
@@ -1375,7 +1393,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(script, /class="championship-icon">\$\{gameIcon\('title-world','👑'\)\}/);
   assert.doesNotMatch(page, /landing-champion:after\{content:"♛"/);
   assert.doesNotMatch(script, /'👑 YOU HOLD THE BELT'/);
-  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.179/g);
+  assert.match(page, /assets\/cage-grind-ceo\.jpg\?v=2\.5\.186/g);
   assert.match(css, /\.feed-post\.ceo\{/);
   assert.match(css, /\.feed-verified\{/);
   assert.match(css, /\.ceo-office-photo\{/);
@@ -1411,7 +1429,7 @@ test('Cage Grind CEO is verified while championship announcements stay database-
   assert.match(cageCeoMigration, /'cagegrindceo','ceo',v_body,v_event_key/i);
   assert.match(cageCeoMigration, /post_kind not in \('reporter','ceo'\)/i);
   assert.match(cageCeoMigration, /grant execute on function public\.publish_cage_ceo_post\(text\) to authenticated/i);
-  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.179/);
+  assert.match(serviceWorker, /\.\/assets\/cage-grind-ceo\.jpg\?v=2\.5\.186/);
 });
 
 test('hometown colors persist with fighters across the game presentation', () => {
@@ -1450,7 +1468,7 @@ test('hometown colors persist with fighters across the game presentation', () =>
 
 test('CageReporter has a verified clickable read-only profile', () => {
   assert.ok(fs.existsSync('assets/cage-reporter.jpg'));
-  assert.match(strings, /author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets\/cage-reporter\.jpg\?v=2\.5\.179',verified:true,bio:/);
+  assert.match(strings, /author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets\/cage-reporter\.jpg\?v=2\.5\.186',verified:true,bio:/);
   assert.match(script, /reporterProfile=STRINGS\.social\.profiles\.media/);
   assert.match(script, /verified:Boolean\(officialProfile\?\.verified\)/);
   assert.match(script, /data-reporter-profile/);
@@ -1467,7 +1485,7 @@ test('CageReporter has a verified clickable read-only profile', () => {
   assert.match(css, /\.feed-avatar\.reporter-photo\{/);
   assert.match(css, /\.reporter-profile \.fighter-bio-dialog\{/);
   assert.match(css, /\.reporter-bio-official\{/);
-  assert.match(serviceWorker, /\.\/assets\/cage-reporter\.jpg\?v=2\.5\.179/);
+  assert.match(serviceWorker, /\.\/assets\/cage-reporter\.jpg\?v=2\.5\.186/);
   assert.match(readme, /CageReporter uses a dedicated newsroom portrait and verified read-only/);
 });
 
@@ -1568,8 +1586,8 @@ test('Hype bonuses are visible on the matchup and publicity is limited to one da
   assert.match(script, /id:'expo'.*meterSeconds:5/);
   assert.match(script, /id:'tv-spot'.*meterSeconds:6/);
   assert.match(script, /publicitySessionTimer=setTimeout\(resolvePublicitySession,duration\)/);
-  assert.match(script, /activePublicitySession=\{action:a,rewardText:/);
-  assert.match(script, /modalMeterSummary\('COST',`-\$\{action\.cost\} ENERGY`/);
+  assert.match(script, /activePublicitySession=\{action:a,energySpent,rewardText:/);
+  assert.match(script, /modalMeterSummary\('COST',`-\$\{energySpent\} ENERGY`/);
   assert.match(script, /modalMeterSummary\('REWARD',rewardText,detail\)/);
 });
 
@@ -1675,17 +1693,18 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(script, /state\.dailyCounters\.sparring\+=quote\.sessions/);
   assert.match(script, /const sparring=e\.target\.closest\('\[data-sparring\]'\)/);
   assert.doesNotMatch(script, /id:'hard-sparring'/);
-  assert.match(script, /MIN_TRAINING_COOLDOWN_MS=60000/);
-  assert.match(script, /function applyTrainingCooldown\(durationMs,coach=false\)/);
-  assert.match(script, /state\.trainingCooldownUntil=\(overtraining\?Math\.max\(now,state\.trainingCooldownUntil\):now\)\+duration/);
-  assert.match(script, /LOGIC\.trainingCooldownDuration\(\{type:'training',gain\}\)/);
-  assert.match(script, /LOGIC\.trainingCooldownDuration\(\{type:'sparring',skills:a\.skills\}\)/);
-  assert.match(script, /LOGIC\.trainingInjuryChance\(overtraining,coach\)/);
+  assert.doesNotMatch(script, /trainingCooldown|TrainingCooldown|COOL DOWN/);
+  assert.doesNotMatch(page, /trainingCooldownModal|RECOVERY WARNING/);
+  assert.match(script, /function applyRepeatTrainingRisk\(repeatCount=0,coach=false\)/);
+  assert.match(script, /LOGIC\.trainingInjuryChance\(repeated,coach\)/);
   assert.match(script, /LOGIC\.injuredStat\(v,!!state\.trainingInjury\)/);
-  assert.match(script, /locked=!!injury\|\|state\.energy<cost/);
+  assert.match(script, /locked=!!injury\|\|state\.energy<=0/);
   assert.match(script, /TRAINING CLOSED UNTIL MIDNIGHT/);
   assert.match(script, /SPARRING CLOSED UNTIL MIDNIGHT/);
   assert.match(page, /id="recoverySessionModal"[\s\S]*id="recoverySessionMeter"[\s\S]*id="recoverySessionResult"[\s\S]*BACK TO TRAINING/);
+  assert.match(page, /id="recoverySessionActions"[\s\S]*id="exitRecoveryResult"[^>]*>EXIT<[\s\S]*id="collectRecoveryResult"/);
+  assert.match(script, /canRestAgain\?'REST AGAIN · \+25%'/);
+  assert.match(script, /exitRecoveryResult'\)\.addEventListener\('click',closeRecoverySession\)/);
   assert.match(script, /id:'ice-bath'.*meterSeconds:2/);
   assert.match(script, /id:'sauna'.*meterSeconds:3/);
   assert.match(script, /id:'massage'.*meterSeconds:4/);
@@ -1701,12 +1720,13 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(script, /class="cost-reward"><small>\$\{label\}<\/small><b>\$\{value\}<\/b>/);
   assert.match(script, /modalMeterSummary\('COST',costText,'SESSION IN PROGRESS'\)/);
   assert.match(script, /modalMeterSummary\('REWARD',rewards,details\)/);
-  assert.match(script, /modalMeterSummary\('COST',`-\$\$\{cashCost\}`,'TREATMENT IN PROGRESS'\)/);
-  assert.match(script, /modalMeterSummary\('REWARD',rewardText,'RESOURCES RESTORED'\)/);
+  assert.match(script, /modalMeterSummary\(treatment\.freeRest\?'RECOVERY':'COST'/);
+  assert.match(script, /modalMeterSummary\('REWARD',rewardText,treatment\.freeRest\?'BATTERY RECHARGED':'HEALTH RESTORED'\)/);
   assert.match(page, /id="recoverySessionKicker">RECOVERY IN PROGRESS<\/small>[\s\S]*id="recoverySessionTitle">TREATMENT/);
-  assert.match(script, /\$\('#recoverySessionKicker'\)\.textContent='RECOVERY COMPLETE'/);
+  assert.match(script, /\$\('#recoverySessionKicker'\)\.textContent=treatment\.freeRest\?'REST COMPLETE':'RECOVERY COMPLETE'/);
   assert.match(script, /\$\('#recoverySessionTitle'\)\.textContent=`\$\{treatment\.title\.toUpperCase\(\)\} FINISHED\.`/);
-  assert.match(script, /\$\('#recoverySessionStatus'\)\.textContent='Treatment collected\.'/);
+  assert.match(script, /restored\. Rest again or exit when ready/);
+  assert.match(script, /treatment\.freeRest\?\(canRestAgain\?'One segment restored/);
   assert.match(css, /\.hud-resource\.resource-restored\{animation:resourceRestored/);
   assert.match(script, /class="meter-reward-tile"><em>\$\{rewardLabel\(item\)\}<\/em><strong>\$\{item\}<\/strong>/);
   assert.match(css, /\.meter-reward-grid\{display:grid;grid-template-columns:repeat\(auto-fit,minmax\(120px,260px\)\);justify-content:center/);
@@ -1715,14 +1735,11 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(script, /if\(currentTrainingInjury\(\)\)\{toast\('Training is closed until your injury heals at midnight\.'/);
   assert.match(script, /if\(currentTrainingInjury\(\)\)\{toast\('Sparring is closed until your injury heals at midnight\.'/);
   assert.match(page, /id="trainingInjuryBanner" hidden/);
-  assert.match(page, /Gym cooldowns last one minute for a \+1 gain and two minutes for a \+2 gain/);
-  assert.match(page, /id="trainingCooldownModal"[\s\S]*NEVERMIND[\s\S]*NO PAIN, NO GAIN/);
-  assert.match(script, /trainingCooldownRemaining\(\)>0&&!cooldownConfirmed/);
-  assert.match(script, /LOGIC\.trainingRiskBonus\(recovery\.overtraining,!!recovery\.injury\)/);
+  assert.match(page, /Every gym or sparring session uses up to 25% Energy and is disabled only when Energy reaches 0%/);
+  assert.match(script, /LOGIC\.trainingRiskBonus\(recovery\.repeated,!!recovery\.injury\)/);
   assert.match(script, /NO PAIN BONUS \+0\.25/);
   assert.doesNotMatch(page, /33%/);
-  assert.match(css, /\.action\.training-cooldown\{[^}]*border-color:#9a5428/);
-  assert.match(css, /\.action \.cost \.training-cooldown-clock\[hidden\]\{display:none!important\}/);
+  assert.doesNotMatch(css, /training-cooldown/);
   assert.match(css, /\.action\.injury-locked:disabled\{[^}]*opacity:\.72/);
   assert.match(css, /\.hud-attributes-row\.injured \.hud-attribute\{[^}]*border-color:#852b38/);
   assert.match(css, /\.action h3\{[^}]*white-space:nowrap;overflow:hidden;text-overflow:ellipsis/);
@@ -1731,11 +1748,16 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(page, /class="card recovery-card" id="recoveryRoomCard"/);
   assert.match(page, /id="recoveryLimitText"/);
   assert.match(page, /id="recoveryActions"/);
-  assert.match(script, /usableTreatment=recoveryOptions\.some\(\(\{quote\}\)=>quote\.ok\)/);
-  assert.match(script, /setLimitBadge\('#recoveryLimitText',!treatmentReady\?'FIGHT TO UNLOCK':usableTreatment\?'TREATMENT READY':resourcesFull\?'RESOURCES FULL':'NEED CASH'\)/);
-  assert.match(script, /id:'ice-bath'.*energy:25,health:0,feeBase:25,feePerLevel:10/);
-  assert.match(script, /id:'sauna'.*energy:15,health:15,feeBase:50,feePerLevel:15/);
-  assert.match(script, /id:'massage'.*energy:5,health:30,feeBase:75,feePerLevel:20/);
+  assert.match(script, /class="recovery-gain">\$\{gain\}<\/span>/);
+  assert.match(script, /class="recovery-gains">\$\{gains\}<\/b>/);
+  assert.match(css, /\.recovery-gains\{[^}]*display:flex!important;[^}]*flex-wrap:wrap;[^}]*justify-content:flex-end/);
+  assert.match(css, /\.recovery-gain\{white-space:nowrap\}/);
+  assert.match(script, /usableTreatment=recoveryOptions\.some\(\(\{a,quote\}\)=>!a\.freeRest&&quote\.ok\)/);
+  assert.match(script, /setLimitBadge\('#recoveryLimitText',restAvailable\?'REST AVAILABLE':!treatmentReady\?'FIGHT TO UNLOCK':usableTreatment\?'TREATMENT READY':'HEALTH FULL'\)/);
+  assert.match(script, /id:'rest'.*energy:25,health:0,feeBase:0,feePerLevel:0,meterSeconds:10,freeRest:true/);
+  assert.match(script, /id:'ice-bath'.*energy:25,health:10,feeBase:25,feePerLevel:10/);
+  assert.match(script, /id:'sauna'.*energy:25,health:15,feeBase:50,feePerLevel:15/);
+  assert.match(script, /id:'massage'.*energy:25,health:30,feeBase:75,feePerLevel:20/);
   assert.match(script, /id:'cryotherapy'.*energy:25,health:40,feeBase:175,feePerLevel:30/);
   assert.match(script, /function recoveryFee\(treatment\)/);
   assert.match(script, /LOGIC\.recoveryQuote/);
@@ -1743,7 +1765,8 @@ test('training separates daily sparring from post-fight recovery opportunities',
   assert.match(script, /treatmentAvailable:true/);
   assert.match(script, /state\.treatmentAvailable=false/);
   assert.match(script, /state\.dailyCounters\.fight\+\+;state\.treatmentAvailable=true/);
-  assert.match(page, /One paid treatment is available after each completed fight and treatment opportunities never accumulate/);
+  assert.match(page, /Free Rest always restores 25% Energy after ten seconds and can be repeated until the battery is full/);
+  assert.match(page, /One paid combined Energy and Health treatment is available after each completed fight and treatment opportunities never accumulate/);
 });
 
 test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and horse racing', () => {
@@ -1765,7 +1788,7 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.match(deal, /state\.cash-=bet/);
   assert.ok(fs.existsSync('assets/cage-dice.jpg'));
   assert.match(page, /id="cageDiceModal"/);
-  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.179/);
+  assert.match(page, /assets\/cage-dice\.jpg\?v=2\.5\.186/);
   assert.match(page, /data-dice-choice="under"[\s\S]*data-dice-choice="over"[\s\S]*data-dice-choice="seven"[\s\S]*data-dice-choice="doubles"/);
   assert.match(page, /id="cageDiceBet"[^>]*disabled/);
   assert.match(script, /let cageDiceChoice=''/);
@@ -1787,7 +1810,7 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.doesNotMatch(script, /REVIEW ROLL/);
   assert.match(script, /state\.blackjackHand\?\.status==='settled'/);
   assert.match(script, /if\(state\.cageDiceResult\|\|sessionsLeft\('cageDice',1\)<1\)/);
-  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.179/);
+  assert.match(serviceWorker, /\.\/assets\/cage-dice\.jpg\?v=2\.5\.186/);
   assert.match(page, /id="horseRaceModal"[\s\S]*UNDERGROUND BUZZ · ONE RACE DAILY/);
   assert.match(page, /id="horseRaceField"[\s\S]*id="horseRaceBet"[\s\S]*id="horseRaceTrack"[\s\S]*id="horseRaceFinish"/);
   assert.match(page, /id="horseRaceBet"[^>]*disabled/);
@@ -1808,8 +1831,8 @@ test('Underground Buzz keeps persistent once-daily blackjack, Cage Dice, and hor
   assert.match(css, /\.horse-review-link\{[^}]*color:#6ed7ff/);
   assert.match(css, /\.horse-race-track\{/);
   assert.match(css, /\.horse-marker\{[^}]*transition:left \.7s ease-in-out/);
-  assert.match(script, /class="horse-marker" src="assets\/racehorse-right\.png\?v=2\.5\.179"/);
-  assert.match(serviceWorker, /\.\/assets\/racehorse-right\.png\?v=2\.5\.179/);
+  assert.match(script, /class="horse-marker" src="assets\/racehorse-right\.png\?v=2\.5\.186"/);
+  assert.match(serviceWorker, /\.\/assets\/racehorse-right\.png\?v=2\.5\.186/);
   assert.match(css, /prefers-reduced-motion:reduce/);
 });
 
@@ -1883,7 +1906,7 @@ test('level ups receive a dedicated promotion celebration', () => {
   assert.doesNotMatch(script, /newTitles=milestoneDefs\.filter/);
   assert.doesNotMatch(script, /fullRestore=milestoneDefs\.some/);
   assert.match(script, /LOGIC\.applyLevelUpResources\(state,false\)/);
-  assert.match(script, /up to 30 energy and 25 health per level/);
+  assert.match(script, /one Energy segment and up to 25 Health per level/);
   assert.doesNotMatch(script, /state\.energy=state\.maxEnergy;state\.maxHealth\+=5;state\.health=state\.maxHealth/);
   assert.match(script, /modal\._burstTimer=setTimeout\(confettiBurst,620\)/);
   assert.match(script, /function closeLevelUp\(\).*clearTimeout\(modal\._burstTimer\).*stopConfetti\(\)/);
@@ -1908,7 +1931,7 @@ test('XP is fight-only across definitions, handlers, results, and analytics', ()
   assert.match(script,/xpResult=LOGIC\.fightXp\(/);
   assert.match(script,/if\(xp\)gainXp\(xp\)/);
   assert.match(script,/xp_earned:xp,xp_category:xpResult\.category/);
-  for(const copy of ['PAST-LEVEL FIGHT · 50% XP','RIVAL FIGHT · 50% XP','FORFEIT · NO XP'])assert.match(logic,new RegExp(copy.replace(/[+]/g,'\\+')));
+  for(const copy of ['LOWER-LEVEL OPPONENT · NO XP','SAME-DAY RUNBACK · 50% XP','FORFEIT · NO XP'])assert.match(logic,new RegExp(copy.replace(/[+]/g,'\\+')));
   for(const path of ['rankedFightExperienceMultiplier','championshipFightExperienceMultiplier','worldTitleVictoryExperienceBonus'])assert.match(logic,new RegExp(`cashAndExperienceRewards\\.${path}`));
   assert.match(readme,/XP is earned through fights\. Training improves attributes, hustles earn[\s\S]*cash, and publicity builds Followers and Hype\./);
 });
@@ -1959,7 +1982,7 @@ test('the collectible drop pool includes early-career and status cards', () => {
   }
   assert.match(script, /id:'used-car'.*rarity:'COMMON'.*minLevel:1/);
   assert.match(script, /id:'mma-shorts'.*category:'Fight Gear'.*assetExt:'jpg'.*rarity:'COMMON'.*minLevel:1.*stat:'speed',bonus:1/);
-  assert.match(script, /id:'energy-drink'.*category:'Lifestyle'.*assetExt:'jpg'.*rarity:'COMMON'.*minLevel:1.*energyRegen:\.02/);
+  assert.match(script, /id:'energy-drink'.*category:'Lifestyle'.*assetExt:'jpg'.*rarity:'COMMON'.*minLevel:1.*healthRegen:\.02/);
   for (const id of ['mma-shorts', 'energy-drink']) {
     assert.equal(fs.existsSync(`assets/icons/${id}.jpg`), true, `${id} artwork should exist`);
     assert.match(serviceWorker, new RegExp(`assets/icons/${id}\\.jpg\\?v=`));
@@ -2007,7 +2030,7 @@ test('daily drop guarantees a deterministic collectible without resetting fight 
   assert.match(script, /gearDrop=awardDailyCollectible\(today\)/);
   assert.match(script, /COLLECTIBLE CARD READY/);
   assert.match(script, /rewardXpLabel'\)\.textContent='Collectible'/);
-  assert.match(readme, /Daily Drop awards Cash, energy, and one deterministic/);
+  assert.match(readme, /Daily Drop awards Cash, one 25% Energy segment, and one deterministic/);
 });
 
 test('fight result action celebrates wins without labeling losses as reward claims', () => {
@@ -2045,7 +2068,7 @@ test('exhausted daily fights hide matchup actions behind a reset state', () => {
 test('opponent cards, matchup preview, and results disclose daily repeat XP', () => {
   assert.match(html, /id="tapeXpStatus">FULL XP · FIRST WIN TODAY/);
   assert.match(script, /dailyOpponentWins:\{date:'',wins:\{\}\}/);
-  assert.match(script, /state\.dailyOpponentWins\.wins\[o\.key\]=Math\.min\(2,winsToday\+1\)/);
+  assert.match(script, /state\.dailyOpponentWins\.wins\[o\.key\]=LOGIC\.nextOpponentXpStage\(winsToday,win\)/);
   assert.match(script, /if\(hasHistory\)matchupAction='RUN IT BACK'/);
   assert.match(script, /xpTier\.shortLabel/);
   assert.match(script, /xpStatus\.textContent=xpTier\.tapeLabel/);
@@ -2224,17 +2247,17 @@ test('major incoming damage triggers the blood-sport particle burst', () => {
   assert.match(readme, /Major incoming damage.*blood-sport particle burst/s);
 });
 
-test('planned fights charge a level-based rate per started round and run without routine pauses', () => {
+test('planned fights allow nonzero Energy, spend up to one cell, and run without routine pauses', () => {
   assert.match(script, /FIGHT_ROUNDS=fightRule\('fightStructure\.scheduledRounds',3\)/);
-  assert.match(script, /currentFightRoundCost=\(\)=>LOGIC\.fightRoundCost\(state\.level\)/);
-  assert.match(script, /currentFightClearance=\(\)=>currentFightRoundCost\(\)\*FIGHT_ROUNDS/);
-  assert.match(script, /LOGIC\.bookFight\(state,o\.key,roundCost,Date\.now\(\),clearance\)/);
-  assert.match(script, /fight\.roundCost=roundCost/);
-  assert.match(script, /\$\('#tapeEnergy'\)\.textContent=`\$\{clearance\} REQUIRED · \$\{roundCost\} PER STARTED ROUND`/);
-  assert.match(readme, /Levels 1–2 cost\s+6 energy per started round, Levels 3–4 cost 7/);
-  assert.match(script, /LOGIC\.chargePendingFightEnergy/);
-  assert.match(script, /for\(let round=1;round<=FIGHT_ROUNDS&&!fight\.winner;round\+\+\)/);
-  assert.match(script, /if\(round>1&&!chargeFightEnergy/);
+  assert.match(script, /FIGHT_ENERGY_COST=fightRule\('energyEconomy\.fightEnergyCost',25\)/);
+  assert.match(script, /MINIMUM_ACTION_ENERGY_EXCLUSIVE=fightRule\('energyEconomy\.minimumEnergyToStartConsumingActionExclusive',0\)/);
+  assert.match(script, /hasActionEnergy=\(\)=>state\.energy>MINIMUM_ACTION_ENERGY_EXCLUSIVE/);
+  assert.match(script, /LOGIC\.bookFight\(state,o\.key,FIGHT_ENERGY_COST,Date\.now\(\),MINIMUM_ACTION_ENERGY_EXCLUSIVE\)/);
+  assert.match(script, /\$\('#tapeEnergy'\)\.textContent='ABOVE 0% REQUIRED · UP TO ONE CELL USED'/);
+  assert.match(script, /energy_spent:booking\.energySpent/);
+  assert.match(readme, /book a fight with any Energy above 0%/i);
+  assert.doesNotMatch(script, /chargeFightEnergy|energy_per_round/);
+  assert.match(script, /for\(let round=1;round<=FIGHT_ROUNDS&&!fight\.winner;round\+\+\)simulateRound/);
   assert.match(script, /fight\.timeline=fight\.timeline\.filter\(item=>item\.type!=='fightMoment'&&item\.type!=='lastChance'\)/);
   assert.match(readme, /one uninterrupted\s+full simulation/);
 });

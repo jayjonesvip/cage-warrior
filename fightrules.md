@@ -20,24 +20,34 @@ A fighter may book a fight when all of the following are true:
 
 - At least one of the daily 10 fights remains.
 - Health is at least 20.
-- Enough Energy is available to clear all three scheduled rounds.
+- The Energy battery is fully charged at 100%.
 - No other fight is already pending.
 
 The daily fight limit resets at local midnight. World Championship opportunities use their own UTC-day limit.
 
-## Energy cost
+## Energy battery
 
-Every fight is scheduled for three rounds. Energy is charged only when a round begins.
+Energy has a fixed maximum of 100% and is always stored in four 25% segments.
 
-| Career level | Energy per round | Three-round clearance |
-| --- | ---: | ---: |
-| 1–2 | 6 | 18 |
-| 3–4 | 7 | 21 |
-| 5–6 | 8 | 24 |
-| 7–8 | 9 | 27 |
-| 9+ | 10 | 30 |
+| Activity | Energy change |
+| --- | ---: |
+| Fight | Up to −25%; requires Energy above 0% |
+| Gym training or sparring | Up to −25%; requires Energy above 0% |
+| Odd Job | Up to −25%; requires Energy above 0% |
+| Career Spotlight appearance | Up to −25%; requires Energy above 0% |
+| Free 10-second Rest | +25% |
+| Daily Drop | +25% |
+| Level promotion | +25% |
 
-A fight that ends early does not charge Energy for unstarted rounds.
+A fight may begin with any Energy above 0% and spends up to one battery segment
+when it is booked; a fighter with less than 25% spends the remaining Energy.
+The existing minimum-Health medical-clearance rule still applies. Career level,
+an early finish, and haymaker choices do not add another cost. Every other
+Energy-consuming activity uses up to one full segment. Any Energy above 0%
+permits the action and 0% disables it. Energy does not recover
+passively or while the game is closed. Rest is free and repeatable until the
+battery reaches 100%. Every paid treatment also restores one 25% Energy segment
+alongside its Health boost.
 
 ## Fighter attributes
 
@@ -194,10 +204,11 @@ A loss resets the win streak and reduces Hype.
 - World Championship fight: +30% XP instead of the ranked bonus.
 - Winning the World Championship: +25 additional XP.
 - Upset victory: +25% XP.
-- Past-level or ordinary rival fight: 50% XP.
-- First win over an opponent that day: full XP.
-- Second win over the same opponent that day: 25% XP.
-- Further wins after two that day: no XP, no purse, and a Hype penalty.
+- Opponent below the player's current level: 0 XP.
+- Same-level or higher-level opponent through the first win that day: full XP.
+- One same-day runback after the first win over that opponent: 50% XP.
+- Every later fight against that opponent on the same day: 0 XP.
+- Later same-day fights also have no purse and carry a Hype penalty when won.
 
 ## World Championship
 

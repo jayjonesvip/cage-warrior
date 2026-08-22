@@ -82,20 +82,20 @@ const gearItems = [
   {id:'diamond-cluster-ring',category:'Bling',name:'Diamond Cluster Ring',icon:'💍',rarity:'EPIC',minLevel:8,desc:'+12% followers from fight wins. A full face of championship-grade ice.',prestige:12},
   {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
 
-  // Lifestyle — improves passive recovery
-  {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. Roadwork hurts a little less.',energyRegen:.02},
-  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 energy every recovery tick. A cold can keeps camp moving.',energyRegen:.02},
+  // Lifestyle — improves passive health recovery; Energy is restored only in whole battery segments.
+  {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 health every recovery tick. Roadwork hurts a little less.',healthRegen:.02},
+  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 health every recovery tick. A cold can keeps camp moving.',healthRegen:.02},
   {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
   {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.179'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.186'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
-  {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 energy every recovery tick.',energyRegen:.04},
+  {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 health every recovery tick.',healthRegen:.04},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
   {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
   {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
-  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 energy every recovery tick.',energyRegen:.15},
-  {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +0.12 energy and +0.06 health per tick.',energyRegen:.12,healthRegen:.06},
-  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.20 energy and +0.10 health per tick.',energyRegen:.20,healthRegen:.10},
+  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 health every recovery tick.',healthRegen:.15},
+  {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +0.18 health every recovery tick.',healthRegen:.18},
+  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.30 health every recovery tick.',healthRegen:.30},
 
   // Property & rides — money and prestige
   {id:'used-car',category:'Property & Rides',name:'Used Car',icon:'🚗',rarity:'COMMON',minLevel:1,desc:'+1% fight money. It starts most of the time.',cashBonus:1},
@@ -106,11 +106,11 @@ const gearItems = [
   {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Camp now includes open-water recovery.',cashBonus:2,prestige:3},
   {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. Fast water, faster entrances.',cashBonus:5,prestige:6},
   {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
-  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better recovery.',cashBonus:10,energyRegen:.10,healthRegen:.05},
+  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better health recovery.',cashBonus:10,healthRegen:.15},
   {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight followers.',cashBonus:15,prestige:12},
   {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+16% fight money, +18% fight followers, and smoother recovery.',cashBonus:16,prestige:18,healthRegen:.08},
-  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and less travel fatigue.',cashBonus:20,prestige:15,energyRegen:.10},
-  {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and recovery.',cashBonus:25,prestige:20,energyRegen:.15,healthRegen:.12}
+  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and better health recovery.',cashBonus:20,prestige:15,healthRegen:.10},
+  {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and health recovery.',cashBonus:25,prestige:20,healthRegen:.27}
 ];
 
 const trainDefs = [
@@ -138,10 +138,10 @@ const trainingInjuryDefs = [
 ];
 
 const hustleDefs = [
-  {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:7,cash:[55,90],meterSeconds:2},
-  {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:9,cash:[85,135],meterSeconds:2},
-  {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:5,cash:[35,70],meterSeconds:2},
-  {id:'rideshare-driver',asset:'rideshare-driver',extension:'jpg',icon:'🚗',title:'Rideshare Driver',text:'Drive a random 12–32 mile route at $3 per mile.',cost:6,miles:[12,32],ratePerMile:3,meterSeconds:2}
+  {id:'unload-freight',icon:'📦',title:'Unload Freight',text:'Honest work. Low risk, low glamour.',cost:25,cash:[55,90],meterSeconds:2},
+  {id:'nightclub-door',icon:'🚪',title:'Nightclub Door',text:'Look scary for four hours.',cost:25,cash:[85,135],meterSeconds:2},
+  {id:'corner-gym-cleanup',icon:'🔧',title:'Corner Gym Cleanup',text:'Mop sweat. Find loose change.',cost:25,cash:[35,70],meterSeconds:2},
+  {id:'rideshare-driver',asset:'rideshare-driver',extension:'jpg',icon:'🚗',title:'Rideshare Driver',text:'Drive a random 12–32 mile route at $3 per mile.',cost:25,miles:[12,32],ratePerMile:3,meterSeconds:2}
 ];
 
 const horseRaceProfiles = [
@@ -160,19 +160,20 @@ const horseRaceProfiles = [
 ];
 
 const recoveryDefs = [
-  {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores a larger burst of energy.',energy:25,health:0,feeBase:25,feePerLevel:10,meterSeconds:2},
-  {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores energy and helps the body heal.',energy:15,health:15,feeBase:50,feePerLevel:15,meterSeconds:3},
-  {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery repairs the damage from hard rounds.',energy:5,health:30,feeBase:75,feePerLevel:20,meterSeconds:4},
-  {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium whole-body recovery for a fast return to the cage.',energy:25,health:40,feeBase:175,feePerLevel:30,meterSeconds:5}
+  {id:'rest',icon:'🔋',title:'Rest',text:'Take ten seconds and restore one Energy battery segment.',energy:25,health:0,feeBase:0,feePerLevel:0,meterSeconds:10,freeRest:true},
+  {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores one Energy cell and takes the edge off fight damage.',energy:25,health:10,feeBase:25,feePerLevel:10,meterSeconds:2},
+  {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores one Energy cell and helps the body heal.',energy:25,health:15,feeBase:50,feePerLevel:15,meterSeconds:3},
+  {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery restores one Energy cell and repairs hard-round damage.',energy:25,health:30,feeBase:75,feePerLevel:20,meterSeconds:4},
+  {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium recovery restores one Energy cell and delivers the largest Health boost.',energy:25,health:40,feeBase:175,feePerLevel:30,meterSeconds:5}
 ];
 
 const publicityDefs = [
-  {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:6,cash:[80,190],fans:[25,75],payout:'$80–190',meterSeconds:2},
-  {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:10,autograph:true,payout:'UNKNOWN',meterSeconds:3},
-  {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:10,cash:[350,900],fans:[70,190],payout:'$350–900',meterSeconds:3},
-  {id:'commercial',icon:'🎬',title:'Regional Commercial',text:'Shoot an ad. Solid payday with a chance for the clip to go viral.',minLevel:6,minFans:1500,cost:15,cash:[900,2400],fans:[120,360],viral:.18,payout:'$900–2.4K',meterSeconds:4},
-  {id:'expo',icon:'🏟️',title:'National Fitness Expo',text:'Featured guest appearance with photos, interviews, and a packed signing line.',minLevel:8,minFans:5000,cost:20,cash:[3500,8000],fans:[450,1100],payout:'$3.5K–8K',meterSeconds:5},
-  {id:'tv-spot',icon:'📺',title:'Prime-Time Sports Segment',text:'National television appearance. One good quote can change your career.',minLevel:10,minFans:15000,cost:24,cash:[9000,18000],fans:[1200,3000],viral:.28,payout:'$9K–18K',meterSeconds:6}
+  {id:'podcast',icon:'🎙️',title:'Local Fight Podcast',text:'Tell stories, call your shot, and turn listeners into followers.',minLevel:3,minFans:200,cost:25,cash:[80,190],fans:[25,75],payout:'$80–190',meterSeconds:2},
+  {id:'autographs',icon:'✍️',title:'Autograph Signing',text:'Choose $0–$50 per autograph. Price controls turnout, money, and follower reaction.',minLevel:4,minFans:300,cost:25,autograph:true,payout:'UNKNOWN',meterSeconds:3},
+  {id:'trade-show',icon:'🎟️',title:'Trade Show Appearance',text:'Meet supporters at a combat-sports booth and turn handshakes into followers.',minLevel:5,minFans:750,cost:25,cash:[350,900],fans:[70,190],payout:'$350–900',meterSeconds:3},
+  {id:'commercial',icon:'🎬',title:'Regional Commercial',text:'Shoot an ad. Solid payday with a chance for the clip to go viral.',minLevel:6,minFans:1500,cost:25,cash:[900,2400],fans:[120,360],viral:.18,payout:'$900–2.4K',meterSeconds:4},
+  {id:'expo',icon:'🏟️',title:'National Fitness Expo',text:'Featured guest appearance with photos, interviews, and a packed signing line.',minLevel:8,minFans:5000,cost:25,cash:[3500,8000],fans:[450,1100],payout:'$3.5K–8K',meterSeconds:5},
+  {id:'tv-spot',icon:'📺',title:'Prime-Time Sports Segment',text:'National television appearance. One good quote can change your career.',minLevel:10,minFans:15000,cost:25,cash:[9000,18000],fans:[1200,3000],viral:.28,payout:'$9K–18K',meterSeconds:6}
 ];
 
 const endorsementDefs = [

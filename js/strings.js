@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.179',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.179',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.186',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.186',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -227,9 +227,9 @@ interactions: {
   },
 
   ticker: [
-    'Listen, kid: round costs climb with your career. Keep enough ready for all three.',
+    'Listen, kid: every job, workout, and fight uses up to one battery cell. Anything above empty gets you through the door.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
-    'One treatment unlocks after each completed fight, kid. Use it or lose it—the opportunities do not stack.',
+    'Rest is free: ten seconds buys back one battery cell. You can fight with any Energy above zero, but empty means no clearance.',
     'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
     'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
     'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',
@@ -238,7 +238,7 @@ interactions: {
     'No shop, no refunds. You want gear, you win fights and hope the drop lands in your locker.',
     'Fourth win without a CEO gift? Keep winning. The boss eventually notices everybody.',
     'Duplicate gear looks impressive, kid, but the perk still only counts once.',
-    'One Daily Drop, every day. Free cash, free energy, collectible included. Do not ask who paid.',
+    'One Daily Drop, every day. Free cash, one Energy cell, collectible included. Do not ask who paid.',
     'Coach Vega wants $250 plus $75 per level. Talent is temporary; invoices are forever.',
     'Before Level 5, side gigs keep the lights on. After that, you are a full-time fighter—act like one.',
     'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',

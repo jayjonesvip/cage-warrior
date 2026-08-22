@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.5.179" />
+<meta name="app-version" content="2.5.186" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -42,10 +42,10 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="css/styles.css?v=2.5.179">
-<link rel="stylesheet" href="css/shared.css?v=2.5.179">
-<link rel="stylesheet" href="css/landing.css?v=2.5.179">
-<link rel="stylesheet" href="css/github-steel.css?v=2.5.179">
+<link rel="stylesheet" href="css/styles.css?v=2.5.186">
+<link rel="stylesheet" href="css/shared.css?v=2.5.186">
+<link rel="stylesheet" href="css/landing.css?v=2.5.186">
+<link rel="stylesheet" href="css/github-steel.css?v=2.5.186">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <body class="landing-active">
 <section class="landing-page" id="landingPage" aria-labelledby="landingTitle">
   <main class="landing-card">
-    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.5.179" alt="" aria-hidden="true">
+    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.5.186" alt="" aria-hidden="true">
     <img class="landing-logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <p class="landing-eyebrow" id="landingEyebrow">THE FIGHT STARTS NOW</p>
     <h1 id="landingTitle"><span id="landingTitleLead">BUILD. FIGHT.</span><br><span class="accent" id="landingTitleAccent">BECOME.</span></h1>
@@ -110,7 +110,7 @@
   <section class="resource-hud" aria-label="Current fighter condition and attributes" hidden>
     <div class="hud-condition-row">
       <div class="hud-resource energy-hud" id="energyHud">
-        <span>ENERGY</span><div class="hud-meter"><i id="hudEnergyBar"></i></div><b id="hudEnergyText">100/100</b><em id="hudEnergyDelta"></em>
+        <span>ENERGY</span><div class="energy-battery" id="energyBattery" role="img" aria-label="Energy 100 percent"><i class="charged"></i><i class="charged"></i><i class="charged"></i><i class="charged"></i></div><b id="hudEnergyText">100%</b><em id="hudEnergyDelta"></em>
       </div>
       <div class="hud-resource health-hud" id="healthHud">
         <span>HEALTH</span><div class="hud-meter"><i id="hudHealthBar"></i></div><b id="hudHealthText">100/100</b><em id="hudHealthDelta"></em>
@@ -126,7 +126,7 @@
 
   <main class="main">
     <section class="screen active" data-screen="home">
-      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: round costs climb with your career. Keep enough ready for all three.</span></div></div>
+      <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Listen, kid: every job, workout, and fight uses up to one battery cell. Anything above empty gets you through the door.</span></div></div>
 
       <section class="card install-offer career-after-setup" id="installOffer" hidden aria-live="polite">
         <span class="install-offer-icon" data-icon-name="install-app" data-icon-fallback="↓">↓</span>
@@ -182,7 +182,7 @@
       <div class="card"><div class="card-title">Iron District Gym <span class="limit-pill" id="trainLimitText">4 SESSIONS LEFT</span></div><div class="action-list" id="trainActions"></div></div>
       <div class="card sparring-card"><div class="card-title">Sparring <span class="limit-pill" id="sparringLimitText">2 SESSIONS LEFT</span></div><div class="action-list" id="sparringActions"></div></div>
       <div class="card recovery-card" id="recoveryRoomCard"><div class="card-title">Recovery Room <span class="limit-pill" id="recoveryLimitText">TREATMENT READY</span></div><div class="action-list" id="recoveryActions"></div></div>
-      <div class="section-note">Gym cooldowns last one minute for a +1 gain and two minutes for a +2 gain, including trainer-assisted workouts. Light and Medium sparring require two minutes; Heavy sparring requires four. Training again before recovery ends requires confirmation, extends the cooldown, and may cause an injury lasting until local midnight; avoiding injury earns +0.25 on every improved stat. Basic drills allow four sessions per day and all sparring levels share the same two-session limit. One paid treatment is available after each completed fight and treatment opportunities never accumulate.</div>
+      <div class="section-note">Every gym or sparring session uses up to 25% Energy and is disabled only when Energy reaches 0%. Repeat sessions can cause an injury lasting until local midnight; avoiding injury earns +0.25 on every improved stat. Basic drills allow three sessions per day and all sparring levels share the same two-session limit. Free Rest always restores 25% Energy after ten seconds and can be repeated until the battery is full. One paid combined Energy and Health treatment is available after each completed fight and treatment opportunities never accumulate.</div>
     </section>
 
     <section class="screen" data-screen="fight">
@@ -234,7 +234,7 @@
       <div class="signing-result" id="autographResult"></div>
       <div class="modal-actions">
         <button class="modal-cancel" id="autographCancel">CANCEL</button>
-        <button class="modal-run" id="autographRun">RUN SIGNING · 10 ENERGY</button>
+        <button class="modal-run" id="autographRun">RUN SIGNING · 25% ENERGY</button>
       </div>
     </div>
   </div>
@@ -268,7 +268,10 @@
       <p id="recoverySessionStatus">Let the corner team do its work.</p>
       <div class="modal-meter" id="recoverySessionMeter" role="progressbar" aria-label="Recovery treatment progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
       <div class="modal-meter-result" id="recoverySessionResult" aria-live="polite"></div>
-      <div class="modal-actions single-action"><button class="modal-run" id="collectRecoveryResult" type="button" hidden>BACK TO TRAINING</button></div>
+      <div class="modal-actions single-action" id="recoverySessionActions">
+        <button class="modal-cancel" id="exitRecoveryResult" type="button" hidden>EXIT</button>
+        <button class="modal-run" id="collectRecoveryResult" type="button" hidden>BACK TO TRAINING</button>
+      </div>
     </div>
   </div>
 
@@ -290,16 +293,6 @@
       <p id="retireCareerWarning">CageReporter will announce the retirement. Your local career, record, cash, gear, and progress will be permanently removed. Your fighter name will never be available again.</p>
       <div class="retirement-warning">THIS CANNOT BE UNDONE</div>
       <div class="modal-actions"><button class="modal-cancel" id="cancelRetireBtn" type="button">KEEP FIGHTING</button><button class="retire-confirm" id="confirmRetireBtn" type="button">RETIRE FIGHTER</button></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="trainingCooldownModal" aria-hidden="true">
-    <div class="gig-modal training-cooldown-dialog" role="dialog" aria-modal="true" aria-labelledby="trainingCooldownTitle" aria-describedby="trainingCooldownWarning">
-      <span class="training-cooldown-kicker">RECOVERY WARNING</span>
-      <h2 id="trainingCooldownTitle">Your fighter is still cooling down</h2>
-      <p id="trainingCooldownWarning">Training again now extends the cooldown and risks an injury that lasts until local midnight.</p>
-      <div class="training-cooldown-remaining"><small>CURRENT COOLDOWN</small><b id="trainingCooldownWarningClock">0:00</b></div>
-      <div class="modal-actions"><button class="modal-cancel" id="cancelCooldownTraining" type="button">NEVERMIND</button><button class="modal-run" id="confirmCooldownTraining" type="button">NO PAIN, NO GAIN</button></div>
     </div>
   </div>
 
@@ -344,7 +337,7 @@
     <div class="gig-modal cage-dice-dialog" role="dialog" aria-modal="true" aria-labelledby="cageDiceTitle" aria-describedby="cageDiceRules">
       <span class="cage-dice-kicker">UNDERGROUND BUZZ · ONE ROLL DAILY</span>
       <h2 id="cageDiceTitle">Cage <span>Dice</span></h2>
-      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.179" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
+      <div class="cage-dice-brand"><span aria-hidden="true">🎲</span><img src="assets/cage-dice.jpg?v=2.5.186" alt="Dice and cash in the underground Cage Dice alley" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></div>
       <p id="cageDiceRules">Choose one outcome, set a whole-dollar wager, and roll two dice. Under and over exclude seven.</p>
       <div class="blackjack-bankroll cage-dice-bankroll"><span>YOUR CASH <b id="cageDiceCash">$0</b></span><span>MAX BET <b id="cageDiceMaxBet">$0</b></span></div>
       <div id="cageDiceSetup">
@@ -411,7 +404,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.179" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.5.186" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -454,7 +447,7 @@
       <div class="level-up-number"><small>LEVEL</small><strong id="levelUpNumber">2</strong></div>
       <h2 id="levelUpTitle">CLUB FIGHTER</h2>
       <div class="level-up-from" id="levelUpFrom">LEVEL 1 → LEVEL 2</div>
-      <div class="level-up-rewards"><div class="level-up-reward"><b id="levelUpEnergy">+3</b><small>MAX ENERGY</small></div><div class="level-up-reward"><b id="levelUpHealth">+5</b><small>MAX HEALTH</small></div><div class="level-up-reward"><b id="levelUpCash">+$200</b><small>CAREER BONUS</small></div></div>
+      <div class="level-up-rewards"><div class="level-up-reward"><b id="levelUpEnergy">+25%</b><small>ENERGY RESTORED</small></div><div class="level-up-reward"><b id="levelUpHealth">+5</b><small>MAX HEALTH</small></div><div class="level-up-reward"><b id="levelUpCash">+$200</b><small>CAREER BONUS</small></div></div>
       <p class="level-up-note" id="levelUpNote">Your corner restored up to 30 energy and 25 health. New competition is now available.</p>
       <button class="level-up-continue" id="levelUpContinue" type="button">CONTINUE CAREER</button>
     </div>
@@ -490,14 +483,14 @@
         <section class="tape-breakdown-sheet" role="dialog" aria-modal="true" aria-labelledby="tapeBreakdownTitle">
           <header><div><small>FIGHT TERMS</small><h2 id="tapeBreakdownTitle">PURSE BREAKDOWN</h2></div><button id="tapeBreakdownClose" type="button" aria-label="Close purse breakdown">×</button></header>
           <div class="tape-breakdown-total"><small>BASE PURSE</small><strong id="tapeBreakdownPurse">$0</strong></div>
-          <div class="tape-breakdown-rows"><div><span>HYPE BONUS</span><b id="tapeHypeBonus">0% HYPE · +0% WINNINGS</b></div><div><span>FOLLOWER BOOST</span><b id="tapeBreakdownFollowers">+0% ON A WIN</b></div><div><span>FIGHT FORMAT</span><b id="tapeBreakdownMode">PLANNED FULL SIM · KEEP 100%</b></div><div><span>ENERGY TERMS</span><b class="tape-energy" id="tapeEnergy">18 REQUIRED · 6 PER STARTED ROUND</b></div></div>
+          <div class="tape-breakdown-rows"><div><span>HYPE BONUS</span><b id="tapeHypeBonus">0% HYPE · +0% WINNINGS</b></div><div><span>FOLLOWER BOOST</span><b id="tapeBreakdownFollowers">+0% ON A WIN</b></div><div><span>FIGHT FORMAT</span><b id="tapeBreakdownMode">PLANNED FULL SIM · KEEP 100%</b></div><div><span>ENERGY TERMS</span><b class="tape-energy" id="tapeEnergy">ABOVE 0% REQUIRED · UP TO ONE CELL USED</b></div></div>
           <p id="tapeBreakdownHaymaker">YOUR LOCKER-ROOM PLAN CONTROLS THE ENTIRE FIGHT.</p><p id="tapeBreakdownNetwork" hidden>RANKED FIGHTS USE AN AI-CONTROLLED SNAPSHOT. THE RANKED FIGHTER'S PUBLIC RECORD IS UNAFFECTED.</p>
         </section>
       </div>
 
       <div class="sim-stage hidden" id="planStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.5.179" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.5.186" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>BUILD THE FIGHT PLAN</small></div>
           <div class="fight-plan-card">
             <span class="fight-plan-kicker">FINAL INSTRUCTIONS</span>
@@ -516,7 +509,7 @@
 
       <div class="sim-stage hidden" id="focusStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.5.179" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.5.186" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MOMENTS BEFORE THE WALKOUT · FOCUS <b id="focusValue">82%</b></small></div>
           <div class="fight-plan-card focus-encounter" id="focusEncounter"></div>
         </div>
@@ -546,7 +539,7 @@
     <div class="official-judges" id="officialJudges" hidden></div>
     <p id="resultLine">You gave the crowd something to remember.</p>
     <div class="championship-result-status" id="championshipResultStatus" hidden role="status" aria-live="polite"></div>
-    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.179" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.5.186" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
     <div class="rewards"><div class="rewardbox"><b id="rewardCash">+$0</b><small id="rewardCashLabel">Earnings</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="result-bonuses" id="resultBonuses" hidden></div>
     <div class="loot" id="lootBox" style="display:none"></div>
@@ -559,20 +552,20 @@
   </div></div>
 </div>
 
-<script src="js/fight-rules.js?v=2.5.179"></script>
-<script src="js/game-logic.js?v=2.5.179"></script>
-<script src="js/shared-ui.js?v=2.5.179"></script>
-<script src="js/fight-focus-contacts.js?v=2.5.179"></script>
-<script src="js/strings.js?v=2.5.179"></script>
-<script src="js/analytics.js?v=2.5.179"></script>
-<script src="js/supabase-client.js?v=2.5.179"></script>
-<script src="js/cage-social.js?v=2.5.179"></script>
-<script src="js/landing.js?v=2.5.179"></script>
-<script src="js/fight-focus.js?v=2.5.179"></script>
-<script src="js/fight-plan.js?v=2.5.179"></script>
-<script src="js/underground-buzz.js?v=2.5.179"></script>
-<script src="js/definitions.js?v=2.5.179"></script>
-<script src="js/game.js?v=2.5.179"></script>
-<script src="js/pwa.js?v=2.5.179"></script>
+<script src="js/fight-rules.js?v=2.5.186"></script>
+<script src="js/game-logic.js?v=2.5.186"></script>
+<script src="js/shared-ui.js?v=2.5.186"></script>
+<script src="js/fight-focus-contacts.js?v=2.5.186"></script>
+<script src="js/strings.js?v=2.5.186"></script>
+<script src="js/analytics.js?v=2.5.186"></script>
+<script src="js/supabase-client.js?v=2.5.186"></script>
+<script src="js/cage-social.js?v=2.5.186"></script>
+<script src="js/landing.js?v=2.5.186"></script>
+<script src="js/fight-focus.js?v=2.5.186"></script>
+<script src="js/fight-plan.js?v=2.5.186"></script>
+<script src="js/underground-buzz.js?v=2.5.186"></script>
+<script src="js/definitions.js?v=2.5.186"></script>
+<script src="js/game.js?v=2.5.186"></script>
+<script src="js/pwa.js?v=2.5.186"></script>
 </body>
 </html>

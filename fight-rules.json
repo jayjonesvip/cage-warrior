@@ -35,18 +35,30 @@
       "sparringSessionLimit": "0 through 10"
     }
   },
-  "energyCosts": {
-    "_description": "Energy charged when each round starts. A fight ending early does not charge unstarted rounds.",
+  "energyEconomy": {
+    "_description": "The four-segment battery economy. Every consuming action uses up to one twenty-five-point segment and may begin with any Energy above zero. Zero Energy disables the action.",
     "_safeRanges": {
-      "allRoundCosts": "1 through 30",
-      "desperationHaymakerExtraEnergy": "0 through 30"
+      "maximumEnergy": "Currently fixed at 100 so the battery always has four equal segments",
+      "energySegmentSize": "Currently fixed at 25 so every action and recovery remains on a battery segment",
+      "fightEnergyCost": "Currently fixed at 25",
+      "minimumEnergyToStartConsumingActionExclusive": "Currently fixed at 0, meaning any Energy above zero permits an Energy-consuming action",
+      "trainingEnergyCost": "Currently fixed at 25",
+      "oddJobEnergyCost": "Currently fixed at 25",
+      "publicityEnergyCost": "Currently fixed at 25",
+      "restEnergyRestored": "Currently fixed at 25",
+      "restDurationSeconds": "1 through 60",
+      "dailyDropEnergyRestored": "Currently fixed at 25"
     },
-    "levelsOneThroughTwoPerStartedRound": 6,
-    "levelsThreeThroughFourPerStartedRound": 7,
-    "levelsFiveThroughSixPerStartedRound": 8,
-    "levelsSevenThroughEightPerStartedRound": 9,
-    "levelNineAndHigherPerStartedRound": 10,
-    "desperationHaymakerExtraEnergy": 5
+    "maximumEnergy": 100,
+    "energySegmentSize": 25,
+    "fightEnergyCost": 25,
+    "minimumEnergyToStartConsumingActionExclusive": 0,
+    "trainingEnergyCost": 25,
+    "oddJobEnergyCost": 25,
+    "publicityEnergyCost": 25,
+    "restEnergyRestored": 25,
+    "restDurationSeconds": 10,
+    "dailyDropEnergyRestored": 25
   },
   "exchangeCounts": {
     "_description": "Inclusive number of simulated exchanges in each round.",
@@ -168,9 +180,9 @@
     "rankedFightExperienceMultiplier": 1.2,
     "championshipFightExperienceMultiplier": 1.3,
     "upsetVictoryExperienceMultiplier": 1.25,
-    "pastLevelOrRivalExperienceMultiplier": 0.5,
+    "lowerLevelOpponentExperienceMultiplier": 0,
     "worldTitleVictoryExperienceBonus": 25,
-    "secondWinAgainstSameOpponentExperienceMultiplier": 0.25,
+    "sameDayRunbackExperienceMultiplier": 0.5,
     "winHypeGain": 8,
     "exhaustedOpponentHypeChange": -7,
     "maximumWinStreakPurseBonus": 0.25,
@@ -188,9 +200,9 @@
       "rankedFightExperienceMultiplier": "0 through 3",
       "championshipFightExperienceMultiplier": "0 through 3",
       "upsetVictoryExperienceMultiplier": "0 through 3",
-      "pastLevelOrRivalExperienceMultiplier": "0 through 1",
+      "lowerLevelOpponentExperienceMultiplier": "Currently fixed at 0 so opponents below the player's level never award experience",
       "worldTitleVictoryExperienceBonus": "0 through 500",
-      "secondWinAgainstSameOpponentExperienceMultiplier": "0 through 1",
+      "sameDayRunbackExperienceMultiplier": "Currently fixed at 0.5 so the one same-day runback after a win awards half experience",
       "hypeChanges": "-100 through 100",
       "maximumWinStreakPurseBonus": "0 through 2",
       "winStreakPurseBonusPerAdditionalWin": "0 through 1",

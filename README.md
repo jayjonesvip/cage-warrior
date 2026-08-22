@@ -112,7 +112,7 @@ generated league.
   bonus chance: gym cleanup can uncover $2–$50 in spare change, extra-heavy
   freight adds 0.50 Power, and recognition at the nightclub door adds 2–4%
   Hype. Rideshare Driver pays $3 per randomly assigned mile across a 12–32 mile
-  route, with a 25% chance to restore 5 Energy from resting between fares.
+  route, with a 25% chance to restore one 25% Energy segment from resting between fares.
 - Odd Jobs, sparring, Recovery Room treatments, and Career Spotlight appearances
   share one modal-meter layout: title, body, a stationary centered icon over the
   filling meter, and a two-column Reward / Cost panel. Meter length is stored in
@@ -145,8 +145,9 @@ generated league.
   fight agent.
 - The persistent top HUD keeps all four fighter attributes in one compact row
   directly beneath energy and health across every unlocked game screen.
-- Energy and Health meter lines turn red whenever the resource falls below 25%
-  so a dangerous condition is visible at a glance.
+- Energy is a four-cell battery displayed at 0%, 25%, 50%, 75%, or 100%.
+  Health retains its continuous meter. Critical resource styling turns red
+  below 25% so a dangerous condition is visible at a glance.
 - XP sits beneath level and rank in the top-left identity block, while Hype
   sits beneath Cash and Followers on the right. The redundant Home resource
   card is removed.
@@ -224,13 +225,14 @@ generated league.
   the result screen reports the total fight damage.
 - Major incoming damage (4 or more persistent Health) triggers a brief,
   stylized blood-sport particle burst over the live fight. Routine shots do not.
-- Fight energy scales with the player's current career level: Levels 1–2 cost
-  6 energy per started round, Levels 3–4 cost 7, Levels 5–6 cost 8, Levels
-  7–8 cost 9, and Level 9 onward costs 10. Three-round clearance therefore
-  ranges from 18 to 30 energy. Only rounds that actually begin are charged.
+- A fighter may book a fight with any Energy above 0%; 0% Energy blocks the
+  fight. Booking spends up to one 25% battery cell, so a fighter below 25%
+  enters at 0% afterward. Career level, scheduled length, early finishes, and
+  haymaker decisions do not add another Energy charge. Existing Health and
+  medical-clearance rules still apply.
 - Fighters can complete up to 10 fights per local calendar day. The Fight page
   shows the remaining bouts and a live countdown to the local-midnight reset;
-  energy and medical clearance remain the primary pacing limits.
+  nonzero Energy and medical clearance remain the primary pacing limits.
 - Watch fights normally or use 2× speed. There is no result skip and no routine
   interruption once the cage door closes. Each round-number interlude remains
   visible for two seconds; before Rounds 2 and 3 it carries the cumulative
@@ -252,9 +254,9 @@ generated league.
   while starting a new career-history window.
 - Generated progression continues beyond level 15.
 - Level-ups trigger a dedicated promotion celebration showing the new level
-  and rank, cumulative max-energy and max-health gains, partial recovery,
-  career bonus, and newly available competition. Every level restores up to 30
-  energy and 25 health. Celebration effects share one bounded canvas loop,
+  and rank, max-health gains, partial recovery, career bonus, and newly
+  available competition. Maximum Energy remains 100%; every level restores
+  one 25% Energy segment and up to 25 Health. Celebration effects share one bounded canvas loop,
   respect reduced-motion preferences, and stop when their result dialog closes
   so repeated rewards cannot accumulate background animation work.
 
@@ -348,10 +350,11 @@ generated league.
 - Regular opponents never retire. Every defeated fighter persists in the
   **Past Rivals** collection. A free taunt guarantees that rival
   accepts one more fight; the bout uses the player's current level-based round
-  cost, pays half purse, and awards 50% fight XP. Winning closes the offer
+  cost and pays half purse. It awards no XP when below the player's level;
+  otherwise it follows the same daily XP curve. Winning closes the offer
   until another taunt, while losing keeps **Run It Back** immediately available.
-- Current-level and higher-level opponents award full base fight XP. Ordinary
-  rivals and past-level opponents award 50%. Completed ranked fights add 20%;
+- Current-level and higher-level opponents award full base fight XP before the
+  first win that day. Lower-level opponents always award 0 XP. Completed ranked fights add 20%;
   World Championship bouts add 30% instead of stacking the ranked bonus. A
   first World Championship victory adds 25 XP, while title defenses do not.
   The level-scaled `26 + (opponent level × 9)` victory formula is unchanged
@@ -369,17 +372,19 @@ generated league.
   a separate action and does not trigger the flip.
 - An available opponent's **See Matchup** button opens a reversible Tale of the
   Tape preview without displaying the purse on the roster action. The preview
-  spends no energy and explains the current level-based clearance and round
-  cost directly beneath the purse. It then offers **Go Back** or **Set Fight
-  Plan**; the first round's energy is charged only after the fight is booked.
+  spends no Energy and explains that any Energy above 0% permits booking.
+  It then offers **Go Back** or **Set Fight Plan**; up to one cell is charged
+  only after the fight is booked.
 - When the ten-fight daily allowance is exhausted, otherwise available fighter
   cards take on the locked presentation and replace **See Matchup** with
   **Daily Limit Reached — New Fights at Local Midnight** until the reset.
-- Each opponent has a daily XP curve: the first win pays full XP, the second
-  win pays 25%, and the third matchup that day pays no XP, no fight purse, and
-  costs 7 Hype even when won. That zero-XP win cannot award a collectible or
-  advance collectible-drop pity. Losses do not advance the curve, and opponent
-  cards, the Tale of the Tape, and results show the tier.
+- Each same-level or higher-level opponent has a daily XP curve: fights remain
+  at full XP until the first win, that win unlocks one 50% XP same-day runback,
+  and every later fight that day pays 0 XP. The runback is consumed whether it
+  ends in a win or loss. Later fights also pay no purse and cost 7 Hype even
+  when won; those zero-XP wins cannot award a collectible or advance
+  collectible-drop pity. Opponent cards, the Tale of the Tape, and results
+  show the tier.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The dedicated card
   shows champion identity, record, level, defenses, player status, and one clear
@@ -398,7 +403,7 @@ generated league.
 - Fight-win collectibles arrive as gifts from the CEO after the player catches
   his attention. Daily and install drops remain separately branded rewards;
   equipment is never purchased.
-- The home-screen Daily Drop awards Cash, energy, and one deterministic,
+- The home-screen Daily Drop awards Cash, one 25% Energy segment, and one deterministic,
   level-eligible collectible every day. It does not reset fight-drop pity.
 - Collectible card artwork is emphasized within the fixed two-column card
   layout, while the Daily Drop uses the same high-contrast label treatment as
@@ -410,7 +415,7 @@ generated league.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
 - The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
-  that adds 0.02 Energy per recovery tick.
+  that adds 0.02 Health per recovery tick.
 - Duplicate copies increase the collectible quantity but never stack the
   item's perk.
 - Drop reveals validate their reward data before rendering. If a stale item or
@@ -458,20 +463,18 @@ generated league.
   up to 25% of available Cash and watches an eight-second six-lane race. The
   interface shows the exact total return before the bet is placed; a winning
   2/1 wager returns the original stake plus twice that amount in profit.
-- Basic training costs energy and allows three daily sessions. All sparring
-  levels share a separate two-session daily track. Technical Sparring costs 5
-  energy and adds +1 to one random skill without health damage. Live Sparring
-  costs 10 energy, adds +2 to one random skill, and costs 1–3 health. Hard
-  Sparring costs 20 energy, adds +2 to two random skills, and costs 3–9 health.
+- Every basic training or sparring session uses up to 25% Energy and is
+  disabled only at 0%. Basic training
+  allows three daily sessions, while all sparring levels share a separate
+  two-session daily track. Technical Sparring adds +1 to one random skill
+  without Health damage. Live Sparring adds +2 to one random skill and costs
+  1–3 Health. Hard Sparring adds +2 to two random skills and costs 3–9 Health.
   Their activity meters run for two, four, and six
   seconds respectively, then reveal and highlight the exact attributes awarded.
-- Training gains are whole points. A +1 gym workout begins a one-minute recovery
-  cooldown, while a +2 gain (including trainer-assisted workouts) takes two
-  minutes. Technical and Live Sparring take two minutes; Hard Sparring takes four.
-  Training again before the timer ends requires confirmation, extends the
-  cooldown by the new activity's duration, and triggers a hidden injury roll.
+- Training gains are whole points and there is no timed cooldown or cooldown
+  confirmation. A repeat gym or sparring session triggers a hidden injury roll.
   Escaping that injury earns a +0.25 No Pain bonus on every stat improved by the
-  risky session.
+  repeat session.
   Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
   by one point. Injuries clear at the
@@ -479,19 +482,22 @@ generated league.
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.
 - Coach Vega is an optional training upgrade that improves training gains,
-  raises perfect-session odds from 17% to 27%, and reduces overtraining injury
+  raises perfect-session odds from 17% to 27%, and reduces repeat-session injury
   risk from 33% to 20%. His fee is `$250 + ($75 × fighter level)` per session,
   including each Technical, Live, or Hard Sparring session.
-- The Training page also has a Recovery Room with one paid treatment
-  opportunity. Every completed fight makes one treatment available; unused
-  opportunities never accumulate. An Ice Bath restores 25 energy for
-  `$25 + ($10 × fighter level)`. A Sauna restores 15 energy and 15 health for
-  `$50 + ($15 × fighter level)`. A Sports Massage restores 5 energy and 30
-  health for `$75 + ($20 × fighter level)`. Premium Cryotherapy restores 25
-  energy and 40 health for `$175 + ($30 × fighter level)`. Treatments never exceed resource maximums
-  and do not consume a training session. Recovery treatments run through a
-  blue two-to-five-second activity meter, then hold the exact energy and health
-  restored on screen until the player returns to training.
+- The Training page also has a Recovery Room. **Rest** is always free, takes 10
+  seconds, restores exactly one 25% Energy segment, and can be repeated until
+  the battery is full. Energy does not regenerate passively or while offline.
+  Paid treatments restore one 25% Energy cell plus Health. Every completed fight makes one
+  treatment available and unused opportunities never accumulate: Ice Bath
+  restores 10 Health, Sauna 15, Sports Massage 30, and Cryotherapy 40 at their
+  existing level-scaled prices. Recovery never exceeds the resource maximum
+  and does not consume a training session.
+- Every Energy-consuming action—fights, training, sparring, Odd Jobs, and
+  Career Spotlight appearances—uses up to 25% Energy. Any Energy above 0%
+  permits the action; 0% disables it. The Daily
+  Drop and level-up recovery also restore exactly one 25% segment, keeping the
+  entire Energy economy on the same battery intervals.
 - Live countdowns on the Training and Hustle pages show the time remaining
   until their daily limits reset at the player's next local midnight.
 

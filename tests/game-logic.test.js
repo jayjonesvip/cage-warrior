@@ -94,38 +94,40 @@ test('resources and counters are clamped during save migration',()=>{
   assert.equal(state.hype,100);
   assert.equal(state.cash,0);
   assert.equal(state.fans,0);
+  assert.equal(state.maxEnergy,100);
   assert.deepEqual(state.stats,{power:1,speed:5,chin:8,cardio:9});
   assert.deepEqual(state.roster,[opponent]);
-  assert.equal(state.pendingFight.cost,35);
+  assert.equal(state.pendingFight.cost,100);
+  const segmented=normalize({energy:82,maxEnergy:160});
+  assert.equal(segmented.energy,75);
+  assert.equal(segmented.maxEnergy,100);
 });
 
-test('fight booking charges ten per started round and protects the scheduled reserve',()=>{
-  const state={energy:40,maxEnergy:100,pendingFight:null};
-  assert.equal(logic.bookFight(state,'opponent-1',10,1000,30).ok,true);
-  assert.equal(state.energy,30);
-  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:10,startedAt:1000});
-  assert.equal(logic.bookFight(state,'opponent-1',10,1001,30).reason,'pending');
-  assert.equal(logic.chargePendingFightEnergy(state,10),true);
-  assert.equal(logic.chargePendingFightEnergy(state,10),true);
-  assert.equal(state.energy,10);
-  assert.equal(state.pendingFight.cost,30);
-  assert.equal(logic.availableFightEnergy(state,0,10),10);
-  assert.equal(logic.chargePendingFightEnergy(state,5),true);
-  assert.equal(state.pendingFight.cost,35);
-  assert.equal(state.energy,5);
+test('fight booking permits any Energy above zero and spends up to one battery cell',()=>{
+  const state={energy:25,maxEnergy:100,pendingFight:null};
+  assert.equal(logic.bookFight(state,'opponent-1',25,1000,0).ok,true);
+  assert.equal(state.energy,0);
+  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:25,startedAt:1000});
+  assert.equal(logic.bookFight(state,'opponent-1',25,1001,25).reason,'pending');
   state.pendingFight=null;
-  assert.equal(logic.bookFight(state,'opponent-2',10,1002,30).reason,'energy');
-  assert.equal(state.energy,5);
+  assert.equal(logic.bookFight(state,'opponent-2',25,1002,0).reason,'energy');
+  assert.equal(state.energy,0);
+  const lowEnergy={energy:10,maxEnergy:100,pendingFight:null};
+  const lowEnergyBooking=logic.bookFight(lowEnergy,'opponent-3',25,1003,0);
+  assert.equal(lowEnergyBooking.ok,true);
+  assert.equal(lowEnergyBooking.energySpent,10);
+  assert.equal(lowEnergy.energy,0);
+  assert.deepEqual(lowEnergy.pendingFight,{key:'opponent-3',cost:10,startedAt:1003});
 });
 
 test('level-up resource helper supports ordinary recovery and explicit full recovery',()=>{
   const ordinary={energy:10,maxEnergy:100,health:20,maxHealth:100};
   logic.applyLevelUpResources(ordinary,false);
-  assert.deepEqual(ordinary,{energy:40,maxEnergy:103,health:45,maxHealth:105});
+  assert.deepEqual(ordinary,{energy:25,maxEnergy:100,health:45,maxHealth:105});
 
   const milestone={energy:10,maxEnergy:100,health:20,maxHealth:100};
   logic.applyLevelUpResources(milestone,true);
-  assert.deepEqual(milestone,{energy:103,maxEnergy:103,health:105,maxHealth:105});
+  assert.deepEqual(milestone,{energy:100,maxEnergy:100,health:105,maxHealth:105});
 });
 
 test('resource warning state begins only below twenty-five percent',()=>{
@@ -136,18 +138,12 @@ test('resource warning state begins only below twenty-five percent',()=>{
   assert.equal(logic.resourceIsCritical(-20,100),true);
 });
 
-test('fight energy rises by career tier and caps at ten per round',()=>{
-  const expected=new Map([[1,6],[2,6],[3,7],[4,7],[5,8],[6,8],[7,9],[8,9],[9,10],[10,10],[15,10]]);
-  for(const [level,cost] of expected)assert.equal(logic.fightRoundCost(level),cost,`level ${level}`);
-  assert.equal(logic.fightRoundCost(0),6);
-  assert.equal(logic.fightRoundCost('bad'),6);
-
-  const rookie={energy:18,maxEnergy:100,pendingFight:null},rookieCost=logic.fightRoundCost(1);
-  assert.equal(logic.bookFight(rookie,'rookie-opponent',rookieCost,1000,rookieCost*3).ok,true);
-  assert.equal(logic.chargePendingFightEnergy(rookie,rookieCost),true);
-  assert.equal(logic.chargePendingFightEnergy(rookie,rookieCost),true);
-  assert.equal(rookie.energy,0);
-  assert.equal(rookie.pendingFight.cost,18);
+test('fight energy is a level-independent one-cell cost',()=>{
+  assert.equal(logic.fightEnergyCost(),25);
+  const rookie={energy:100,maxEnergy:100,pendingFight:null},fightCost=logic.fightEnergyCost();
+  assert.equal(logic.bookFight(rookie,'rookie-opponent',fightCost,1000,0).ok,true);
+  assert.equal(rookie.energy,75);
+  assert.equal(rookie.pendingFight.cost,25);
 });
 
 test('fight and rematch payouts preserve existing formulas',()=>{
@@ -169,10 +165,10 @@ test('fight XP covers current-level wins, higher-level upsets, losses, and forfe
   assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,forfeited:true}),{xp:0,category:'forfeit',modifiers:['FORFEIT · NO XP']});
 });
 
-test('past-level and ordinary rival fights award half XP without double reduction',()=>{
-  assert.deepEqual(logic.fightXp({playerLevel:5,opponentLevel:4,won:true}),{xp:31,category:'reduced',modifiers:['PAST-LEVEL FIGHT · 50% XP']});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,rival:true}),{xp:31,category:'reduced',modifiers:['RIVAL FIGHT · 50% XP']});
-  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:4,won:true,rival:true}).xp,31);
+test('lower-level opponents award no XP while same-level rivals retain full XP',()=>{
+  assert.deepEqual(logic.fightXp({playerLevel:5,opponentLevel:4,won:true}),{xp:0,category:'lower_level',modifiers:['LOWER-LEVEL OPPONENT · NO XP']});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,rival:true}),{xp:62,category:'standard',modifiers:[]});
+  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:4,won:true,rival:true}).xp,0);
 });
 
 test('ranked and championship XP bonuses do not stack',()=>{
@@ -324,7 +320,8 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   const action={cost:20,sessions:2,gain:2};
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');
   assert.equal(logic.trainingQuote({cash:100,energy:50},action,true,75,4).reason,'cash');
-  assert.equal(logic.trainingQuote({cash:500,energy:10},action,true,75,4).reason,'energy');
+  assert.equal(logic.trainingQuote({cash:500,energy:0},action,true,75,4).reason,'energy');
+  assert.deepEqual(logic.trainingQuote({cash:500,energy:10},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
   assert.deepEqual(logic.trainingQuote({cash:500,energy:50},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
   assert.equal(logic.trainingGain(2,false,false),2);
   assert.equal(logic.trainingGain(2,true,true),3);
@@ -350,9 +347,9 @@ test('computer-generated opponents compound after the opening career levels',()=
   assert.ok(levelFour-levelThree>levelThree-logic.generatedOpponentBaseRating(2));
 });
 
-test('daily opponent wins reduce repeat XP without counting losses',()=>{
+test('daily opponent progression grants one half-XP runback after the first win',()=>{
   assert.deepEqual(logic.opponentXpTier(0),{wins:0,multiplier:1,hypeChange:8,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'});
-  assert.deepEqual(logic.opponentXpTier(1),{wins:1,multiplier:.25,hypeChange:8,tier:'repeat',shortLabel:'25% XP',tapeLabel:'25% XP · REPEAT WIN',resultLabel:'REPEAT WIN · 25%'});
+  assert.deepEqual(logic.opponentXpTier(1),{wins:1,multiplier:.5,hypeChange:8,tier:'repeat',shortLabel:'50% XP',tapeLabel:'50% XP · SAME-DAY RUNBACK',resultLabel:'RUNBACK · 50% XP'});
   assert.deepEqual(logic.opponentXpTier(2),{wins:2,multiplier:0,hypeChange:-7,tier:'exhausted',shortLabel:'NO XP · $0 · -7 HYPE',tapeLabel:'NO XP · $0 PURSE · -7 HYPE',resultLabel:'NO XP · $0 · -7 HYPE'});
   assert.equal(logic.opponentFightPurse(500,0),500);
   assert.equal(logic.opponentFightPurse(500,1),500);
@@ -360,17 +357,25 @@ test('daily opponent wins reduce repeat XP without counting losses',()=>{
   assert.equal(logic.fightDropEligible(0),true);
   assert.equal(logic.fightDropEligible(1),true);
   assert.equal(logic.fightDropEligible(2),false);
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:1}),{xp:16,category:'standard_repeat',modifiers:['REPEAT WIN · 25% XP']});
+  assert.deepEqual(logic.opponentXpTier(0,3,4),{wins:0,multiplier:0,hypeChange:8,tier:'lower_level',shortLabel:'NO XP · LOWER LEVEL',tapeLabel:'NO XP · LOWER-LEVEL OPPONENT',resultLabel:'LOWER LEVEL · NO XP'});
+  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:1}),{xp:31,category:'standard_repeat',modifiers:['SAME-DAY RUNBACK · 50% XP']});
   assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:2}),{xp:0,category:'standard_exhausted',modifiers:['OPPONENT XP EXHAUSTED · NO XP']});
   assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,opponentWinsToday:0}).xp,23);
+  assert.equal(logic.nextOpponentXpStage(0,false),0);
+  assert.equal(logic.nextOpponentXpStage(0,true),1);
+  assert.equal(logic.nextOpponentXpStage(1,false),2);
+  assert.equal(logic.nextOpponentXpStage(1,true),2);
+  assert.equal(logic.nextOpponentXpStage(2,true),2);
 });
 
-test('training cooldowns scale with workout gains and sparring intensity',()=>{
-  assert.equal(logic.trainingCooldownDuration({type:'training',gain:1}),60000);
-  assert.equal(logic.trainingCooldownDuration({type:'training',gain:2}),120000);
-  assert.equal(logic.trainingCooldownDuration({type:'training',gain:3}),120000);
-  assert.equal(logic.trainingCooldownDuration({type:'sparring',skills:1}),120000);
-  assert.equal(logic.trainingCooldownDuration({type:'sparring',skills:2}),240000);
+test('Energy actions spend up to one cell and only zero Energy blocks them',()=>{
+  const partial={energy:10,maxEnergy:100};
+  assert.equal(logic.spendEnergy(partial,25),10);
+  assert.equal(partial.energy,0);
+  assert.equal(logic.spendEnergy(partial,25),0);
+  const fullCell={energy:50,maxEnergy:100};
+  assert.equal(logic.spendEnergy(fullCell,25),25);
+  assert.equal(fullCell.energy,25);
 });
 
 test('successful overtraining earns a quarter-point no-pain bonus',()=>{
@@ -386,12 +391,12 @@ test('side-job bonus rolls stay at twenty-five percent with bounded rewards',()=
   assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:.5});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,0),{type:'hype',amount:2});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,.999999),{type:'hype',amount:4});
-  assert.deepEqual(logic.hustleBonus('rideshare-driver',0,.5),{type:'energy',amount:5});
+  assert.deepEqual(logic.hustleBonus('rideshare-driver',0,.5),{type:'energy',amount:25});
 });
 
-test('repeated training and sparring sessions ramp the cost and damage instead of staying flat',()=>{
-  assert.equal(logic.trainingCost({cost:8},0),8);
-  assert.equal(logic.trainingCost({cost:8},2),12);
+test('training stays at one battery cell while repeated sparring damage increases',()=>{
+  assert.equal(logic.trainingCost({cost:8},0),25);
+  assert.equal(logic.trainingCost({cost:8},2),25);
   assert.equal(logic.trainingGain(1,false,false,0),1);
   assert.equal(logic.trainingGain(1,false,false,2),1);
   assert.equal(Number.isInteger(logic.trainingGain(1,true,true,2)),true);
@@ -399,16 +404,16 @@ test('repeated training and sparring sessions ramp the cost and damage instead o
   assert.ok(logic.sparringDamage(3,2)>3);
 });
 
-test('recovery treatments require one available opportunity and clamp restored resources',()=>{
-  const ice={energy:25,health:0},sauna={energy:15,health:12},massage={energy:5,health:25},state={cash:100,energy:82,maxEnergy:100,health:94,maxHealth:100};
+test('recovery treatments add one Energy cell with their Health boost',()=>{
+  const ice={energy:25,health:10},sauna={energy:25,health:15},massage={energy:25,health:30},state={cash:100,energy:75,maxEnergy:100,health:94,maxHealth:100};
   assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');
   assert.equal(logic.recoveryQuote({...state,cash:40},ice,55,false).reason,'cash');
   assert.equal(logic.recoveryQuote({cash:100,energy:100,maxEnergy:100,health:100,maxHealth:100},sauna,55,false).reason,'full');
   assert.equal(logic.recoveryQuote(state,sauna,55,false).ok,true);
-  assert.deepEqual(logic.applyRecovery(state,sauna),{energy:15,health:6});
-  assert.equal(state.energy,97);
+  assert.deepEqual(logic.applyRecovery(state,sauna),{energy:25,health:6});
+  assert.equal(state.energy,100);
   assert.equal(state.health,100);
-  assert.deepEqual(logic.applyRecovery({energy:95,maxEnergy:100,health:70,maxHealth:100},massage),{energy:5,health:25});
+  assert.deepEqual(logic.applyRecovery({energy:75,maxEnergy:100,health:70,maxHealth:100},massage),{energy:25,health:30});
 });
 
 test('daily injuries reduce every effective attribute by one point',()=>{
@@ -417,6 +422,15 @@ test('daily injuries reduce every effective attribute by one point',()=>{
   assert.ok(Math.abs(logic.injuredStat(8.66,true)-7.66)<.000001);
   assert.equal(logic.injuredStat(1,true),1);
   assert.equal(logic.injuredStat(8.66,false),8.66);
+});
+
+test('free Rest restores exactly one repeatable Energy segment',()=>{
+  const rest={energy:25,health:0},state={cash:0,energy:50,maxEnergy:100,health:100,maxHealth:100};
+  assert.equal(logic.recoveryQuote(state,rest,0,false).ok,true);
+  assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
+  assert.equal(state.energy,75);
+  assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
+  assert.equal(logic.recoveryQuote(state,rest,0,false).reason,'full');
 });
 
 test('persistent health sets a tiered starting fight condition',()=>{
