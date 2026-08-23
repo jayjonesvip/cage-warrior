@@ -59,13 +59,13 @@ test('selectStoredState falls back to the last useful legacy save when all newer
 });
 
 test('an older save keeps progression and fills newer resource fields',()=>{
-  const state=normalize({version:4,name:'OLD SAVE',level:4,xp:73,wins:7,losses:2,cash:900,stats:{power:11}});
+  const state=normalize({version:4,name:'OLD SAVE',level:4,xp:73,wins:7,losses:2,cash:900,stats:{power:11.25,speed:6.64}});
   assert.equal(state.level,4);
   assert.equal(state.xp,73);
   assert.equal(state.wins,7);
   assert.equal(state.losses,2);
   assert.equal(state.careerEarnings,900);
-  assert.deepEqual(state.stats,{power:11,speed:5,chin:5,cardio:5});
+  assert.deepEqual(state.stats,{power:11,speed:7,chin:5,cardio:5});
   assert.equal(state.maxEnergy,100);
   assert.equal(state.health,100);
 });
@@ -321,21 +321,20 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');
   assert.equal(logic.trainingQuote({cash:100,energy:50},action,true,75,4).reason,'cash');
   assert.equal(logic.trainingQuote({cash:500,energy:0},action,true,75,4).reason,'energy');
-  assert.deepEqual(logic.trainingQuote({cash:500,energy:10},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
+  assert.equal(logic.trainingQuote({cash:500,energy:10},action,true,75,4).reason,'energy');
   assert.deepEqual(logic.trainingQuote({cash:500,energy:50},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
   assert.equal(logic.trainingGain(2,false,false),2);
   assert.equal(logic.trainingGain(2,true,true),3);
   assert.equal(logic.trainingGain(1,false,true),2);
 });
 
-test('Coach Vega improves training and reduces explicit injury risk without XP',()=>{
+test('Coach Vega improves gym training without changing sparring rules',()=>{
   assert.equal(logic.trainingGain(1,false,false),1);
   assert.equal(logic.trainingGain(1,true,false),2);
   assert.equal(logic.trainingPerfectChance(false),.17);
   assert.equal(logic.trainingPerfectChance(true),.27);
-  assert.equal(logic.trainingInjuryChance(false,false),0);
-  assert.equal(logic.trainingInjuryChance(true,false),.33);
-  assert.equal(logic.trainingInjuryChance(true,true),.20);
+  assert.equal(logic.trainingInjuryChance,undefined);
+  assert.equal(logic.trainingRiskBonus,undefined);
 });
 
 test('computer-generated opponents compound after the opening career levels',()=>{
@@ -378,42 +377,44 @@ test('Energy actions spend up to one cell and only zero Energy blocks them',()=>
   assert.equal(fullCell.energy,25);
 });
 
-test('successful overtraining earns a quarter-point no-pain bonus',()=>{
-  assert.equal(logic.trainingRiskBonus(false,false),0);
-  assert.equal(logic.trainingRiskBonus(true,true),0);
-  assert.equal(logic.trainingRiskBonus(true,false),.25);
+test('sparring requires exact Energy and enough Health for its worst outcome',()=>{
+  const live={cost:50,damage:[1,25]};
+  const hard={cost:75,damage:[25,50]};
+  assert.deepEqual(logic.sparringQuote({energy:50,health:26},live,1),{ok:true,reason:'',sessions:1,energyCost:50,maximumHealthCost:25});
+  assert.equal(logic.sparringQuote({energy:49,health:100},live,1).reason,'energy');
+  assert.equal(logic.sparringQuote({energy:100,health:25},live,1).reason,'health');
+  assert.equal(logic.sparringQuote({energy:75,health:50},hard,1).reason,'health');
+  assert.equal(logic.sparringQuote({energy:75,health:51},hard,0).reason,'limit');
 });
 
 test('side-job bonus rolls stay at twenty-five percent with bounded rewards',()=>{
   assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.25,0),{type:'',amount:0});
   assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.2499,0),{type:'cash',amount:2});
   assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',0,.999999),{type:'cash',amount:50});
-  assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:.5});
+  assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:1});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,0),{type:'hype',amount:2});
   assert.deepEqual(logic.hustleBonus('nightclub-door',0,.999999),{type:'hype',amount:4});
   assert.deepEqual(logic.hustleBonus('rideshare-driver',0,.5),{type:'energy',amount:25});
 });
 
-test('training stays at one battery cell while repeated sparring damage increases',()=>{
+test('gym training stays at one battery cell without repeat scaling',()=>{
   assert.equal(logic.trainingCost({cost:8},0),25);
   assert.equal(logic.trainingCost({cost:8},2),25);
   assert.equal(logic.trainingGain(1,false,false,0),1);
   assert.equal(logic.trainingGain(1,false,false,2),1);
   assert.equal(Number.isInteger(logic.trainingGain(1,true,true,2)),true);
-  assert.equal(logic.sparringDamage(3,0),3);
-  assert.ok(logic.sparringDamage(3,2)>3);
+  assert.equal(logic.sparringDamage,undefined);
 });
 
-test('recovery treatments add one Energy cell with their Health boost',()=>{
-  const ice={energy:25,health:10},sauna={energy:25,health:15},massage={energy:25,health:30},state={cash:100,energy:75,maxEnergy:100,health:94,maxHealth:100};
-  assert.equal(logic.recoveryQuote(state,ice,55,true).reason,'limit');
-  assert.equal(logic.recoveryQuote({...state,cash:40},ice,55,false).reason,'cash');
-  assert.equal(logic.recoveryQuote({cash:100,energy:100,maxEnergy:100,health:100,maxHealth:100},sauna,55,false).reason,'full');
-  assert.equal(logic.recoveryQuote(state,sauna,55,false).ok,true);
-  assert.deepEqual(logic.applyRecovery(state,sauna),{energy:25,health:6});
-  assert.equal(state.energy,100);
+test('recovery treatments are always purchasable below full Health and restore Health only',()=>{
+  const ice={energy:0,health:10},massage={energy:0,health:25},cryotherapy={energy:0,health:50},state={cash:400,energy:75,maxEnergy:100,health:94,maxHealth:100};
+  assert.equal(logic.recoveryQuote({...state,cash:40},ice,75).reason,'cash');
+  assert.equal(logic.recoveryQuote({cash:400,energy:75,maxEnergy:100,health:100,maxHealth:100},massage,125).reason,'full');
+  assert.equal(logic.recoveryQuote(state,massage,125).ok,true);
+  assert.deepEqual(logic.applyRecovery(state,massage),{energy:0,health:6});
+  assert.equal(state.energy,75);
   assert.equal(state.health,100);
-  assert.deepEqual(logic.applyRecovery({energy:75,maxEnergy:100,health:70,maxHealth:100},massage),{energy:25,health:30});
+  assert.deepEqual(logic.applyRecovery({energy:75,maxEnergy:100,health:70,maxHealth:100},cryotherapy),{energy:0,health:30});
 });
 
 test('daily injuries reduce every effective attribute by one point',()=>{
@@ -426,11 +427,11 @@ test('daily injuries reduce every effective attribute by one point',()=>{
 
 test('free Rest restores exactly one repeatable Energy segment',()=>{
   const rest={energy:25,health:0},state={cash:0,energy:50,maxEnergy:100,health:100,maxHealth:100};
-  assert.equal(logic.recoveryQuote(state,rest,0,false).ok,true);
+  assert.equal(logic.recoveryQuote(state,rest,0).ok,true);
   assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
   assert.equal(state.energy,75);
   assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
-  assert.equal(logic.recoveryQuote(state,rest,0,false).reason,'full');
+  assert.equal(logic.recoveryQuote(state,rest,0).reason,'full');
 });
 
 test('persistent health sets a tiered starting fight condition',()=>{

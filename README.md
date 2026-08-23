@@ -110,7 +110,7 @@ generated league.
   endorsements, and Underground Buzz remain available. Each shift runs through
   a short icon-driven work meter before revealing its pay. Every job has a 25%
   bonus chance: gym cleanup can uncover $2–$50 in spare change, extra-heavy
-  freight adds 0.50 Power, and recognition at the nightclub door adds 2–4%
+  freight adds 1 Power, and recognition at the nightclub door adds 2–4%
   Hype. Rideshare Driver pays $3 per randomly assigned mile across a 12–32 mile
   route, with a 25% chance to restore one 25% Energy segment from resting between fares.
 - Odd Jobs, sparring, Recovery Room treatments, and Career Spotlight appearances
@@ -415,7 +415,7 @@ generated league.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
 - The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
-  that adds 0.02 Health per recovery tick.
+  that adds 0.02 Health every 15 seconds. Collectibles never passively restore Energy.
 - Duplicate copies increase the collectible quantity but never stack the
   item's perk.
 - Drop reveals validate their reward data before rendering. If a stale item or
@@ -463,39 +463,41 @@ generated league.
   up to 25% of available Cash and watches an eight-second six-lane race. The
   interface shows the exact total return before the bet is placed; a winning
   2/1 wager returns the original stake plus twice that amount in profit.
-- Every basic training or sparring session uses up to 25% Energy and is
-  disabled only at 0%. Basic training
-  allows three daily sessions, while all sparring levels share a separate
-  two-session daily track. Technical Sparring adds +1 to one random skill
-  without Health damage. Live Sparring adds +2 to one random skill and costs
-  1–3 Health. Hard Sparring adds +2 to two random skills and costs 3–9 Health.
+- Basic training requires and costs exactly 25% Energy and allows three daily sessions. All
+  sparring levels share one separate daily session. Technical Sparring costs
+  exactly 25% Energy, adds +1 to one random skill, and causes no Health damage.
+  Live Sparring requires and costs 50% Energy, adds +2 to one random skill, and
+  costs a random 1–25 Health. Hard Sparring requires and costs 75% Energy, adds
+  +1 to all four skills, and costs a random 25–50 Health. Live and Hard Sparring
+  are disabled unless the fighter can cover their maximum possible Health loss.
   Their activity meters run for two, four, and six
   seconds respectively, then reveal and highlight the exact attributes awarded.
 - Training gains are whole points and there is no timed cooldown or cooldown
-  confirmation. A repeat gym or sparring session triggers a hidden injury roll.
-  Escaping that injury earns a +0.25 No Pain bonus on every stat improved by the
-  repeat session.
-  Knee, shoulder, elbow,
+  confirmation. Gym drills and sparring never trigger injuries, repeat bonuses,
+  or hidden risk rolls. Injury risk exists only when entering a fight below full
+  Health. Knee, shoulder, elbow,
   rib, ankle, back, hand, and neck injuries reduce all four effective attributes
   by one point. Injuries clear at the
   player's next local midnight and never carry into a new day. While injured,
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.
-- Coach Vega is an optional training upgrade that improves training gains,
-  raises perfect-session odds from 17% to 27%, and reduces repeat-session injury
-  risk from 33% to 20%. His fee is `$250 + ($75 × fighter level)` per session,
-  including each Technical, Live, or Hard Sparring session.
-- The Training page also has a Recovery Room. **Rest** is always free, takes 10
-  seconds, restores exactly one 25% Energy segment, and can be repeated until
-  the battery is full. Energy does not regenerate passively or while offline.
-  Paid treatments restore one 25% Energy cell plus Health. Every completed fight makes one
-  treatment available and unused opportunities never accumulate: Ice Bath
-  restores 10 Health, Sauna 15, Sports Massage 30, and Cryotherapy 40 at their
-  existing level-scaled prices. Recovery never exceeds the resource maximum
-  and does not consume a training session.
-- Every Energy-consuming action—fights, training, sparring, Odd Jobs, and
-  Career Spotlight appearances—uses up to 25% Energy. Any Energy above 0%
-  permits the action; 0% disables it. The Daily
+- Coach Vega is an optional gym upgrade that improves gym gains and raises the
+  perfect-session odds from 17% to 27%. His fee is
+  `$250 + ($75 × fighter level)` per gym session. Coaching never changes a
+  sparring cost, reward, or risk.
+- The Training page shows a dedicated **Rest & Recharge** card above every other
+  section whenever Energy is below 100%. Rest is always free, takes 10 seconds,
+  restores exactly one 25% Energy segment, and can be repeated until the battery
+  is full. Energy does not regenerate passively or while offline.
+  Paid treatments are available whenever Health is below full and restore Health
+  only: Ice Bath restores 10, Sports Massage restores 25, and Cryotherapy restores
+  50. Every restored Health point costs `$3 × fighter level`, giving all three
+  treatments identical value. Treatments are disabled at 100% Health and do not
+  consume a training session.
+- Most Energy-consuming actions—fights, gym training, Odd Jobs, and Career
+  Spotlight appearances—use up to 25% Energy and are disabled at 0%. Sparring
+  is the exception, with exact 25%, 50%, and 75% costs and matching minimum
+  Energy requirements. The Daily
   Drop and level-up recovery also restore exactly one 25% segment, keeping the
   entire Energy economy on the same battery intervals.
 - Live countdowns on the Training and Hustle pages appear when their currently

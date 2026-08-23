@@ -29,14 +29,14 @@
   "dailyDevelopmentLimits": {
     "_description": "Daily limits on actions that permanently increase fighter attributes. Gym training and sparring use separate counters.",
     "ordinaryAttributeTrainingSessionLimit": 3,
-    "sparringSessionLimit": 2,
+    "sparringSessionLimit": 1,
     "_safeRanges": {
       "ordinaryAttributeTrainingSessionLimit": "1 through 10",
       "sparringSessionLimit": "0 through 10"
     }
   },
   "energyEconomy": {
-    "_description": "The four-segment battery economy. Every consuming action uses up to one twenty-five-point segment and may begin with any Energy above zero. Zero Energy disables the action.",
+    "_description": "The four-segment battery economy. Gym training requires and costs one complete twenty-five-point segment. Sparring has exact twenty-five, fifty, or seventy-five point costs defined by its action tier. Other consuming actions may begin with any Energy above zero and spend up to one segment.",
     "_safeRanges": {
       "maximumEnergy": "Currently fixed at 100 so the battery always has four equal segments",
       "energySegmentSize": "Currently fixed at 25 so every action and recovery remains on a battery segment",
@@ -59,6 +59,13 @@
     "restEnergyRestored": 25,
     "restDurationSeconds": 10,
     "dailyDropEnergyRestored": 25
+  },
+  "recoveryEconomy": {
+    "_description": "Health-only Recovery Room pricing. Every treatment charges the same amount per Health point, preventing a discount from repeating smaller treatments.",
+    "_safeRanges": {
+      "dollarsPerHealthPointPerFighterLevel": "1 through 20"
+    },
+    "dollarsPerHealthPointPerFighterLevel": 3
   },
   "exchangeCounts": {
     "_description": "Inclusive number of simulated exchanges in each round.",

@@ -83,19 +83,19 @@ const gearItems = [
   {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
 
   // Lifestyle — improves passive health recovery; Energy is restored only in whole battery segments.
-  {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 health every recovery tick. Roadwork hurts a little less.',healthRegen:.02},
-  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 health every recovery tick. A cold can keeps camp moving.',healthRegen:.02},
-  {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 health every recovery tick.',healthRegen:.01},
-  {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 health every recovery tick.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 health every recovery tick.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.189'},
-  {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 health every recovery tick.',healthRegen:.03},
-  {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 health every recovery tick.',healthRegen:.04},
-  {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 health every recovery tick.',healthRegen:.04},
-  {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 health every recovery tick.',healthRegen:.08},
-  {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 health every recovery tick.',healthRegen:.14},
-  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 health every recovery tick.',healthRegen:.15},
-  {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +0.18 health every recovery tick.',healthRegen:.18},
-  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.30 health every recovery tick.',healthRegen:.30},
+  {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+0.02 Health every 15 seconds. Roadwork hurts a little less.',healthRegen:.02},
+  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 Health every 15 seconds. Does not restore Energy.',healthRegen:.02},
+  {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 Health every 15 seconds.',healthRegen:.01},
+  {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 Health every 15 seconds.',healthRegen:.02},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 Health every 15 seconds.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.201'},
+  {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 Health every 15 seconds.',healthRegen:.03},
+  {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 Health every 15 seconds.',healthRegen:.04},
+  {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 Health every 15 seconds.',healthRegen:.04},
+  {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+0.08 Health every 15 seconds.',healthRegen:.08},
+  {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+0.14 Health every 15 seconds.',healthRegen:.14},
+  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+0.15 Health every 15 seconds.',healthRegen:.15},
+  {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +0.18 Health every 15 seconds.',healthRegen:.18},
+  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+0.30 Health every 15 seconds.',healthRegen:.30},
 
   // Property & rides — money and prestige
   {id:'used-car',category:'Property & Rides',name:'Used Car',icon:'🚗',rarity:'COMMON',minLevel:1,desc:'+1% fight money. It starts most of the time.',cashBonus:1},
@@ -106,11 +106,11 @@ const gearItems = [
   {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',rarity:'RARE',minLevel:4,desc:'+2% fight money and +3% fight followers. Camp now includes open-water recovery.',cashBonus:2,prestige:3},
   {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',rarity:'EPIC',minLevel:7,desc:'+5% fight money and +6% fight followers. Fast water, faster entrances.',cashBonus:5,prestige:6},
   {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+7% fight money and +5% fight followers.',cashBonus:7,prestige:5},
-  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and better health recovery.',cashBonus:10,healthRegen:.15},
+  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% fight money and +0.15 Health every 15 seconds.',cashBonus:10,healthRegen:.15},
   {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+15% fight money and +12% fight followers.',cashBonus:15,prestige:12},
-  {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+16% fight money, +18% fight followers, and smoother recovery.',cashBonus:16,prestige:18,healthRegen:.08},
-  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and better health recovery.',cashBonus:20,prestige:15,healthRegen:.10},
-  {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and health recovery.',cashBonus:25,prestige:20,healthRegen:.27}
+  {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+16% fight money, +18% fight followers, and +0.08 Health every 15 seconds.',cashBonus:16,prestige:18,healthRegen:.08},
+  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% fight money, +15% fight followers, and +0.10 Health every 15 seconds.',cashBonus:20,prestige:15,healthRegen:.10},
+  {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% fight money, +20% fight followers, and +0.27 Health every 15 seconds.',cashBonus:25,prestige:20,healthRegen:.27}
 ];
 
 const trainDefs = [
@@ -121,9 +121,9 @@ const trainDefs = [
 ];
 
 const sparringDefs = [
-  {id:'light-sparring',tier:'light',icon:'🥋',title:'Technical Sparring',text:'Low-contact technical rounds. Improve one random skill without taking damage.',cost:5,gain:1,skills:1,meterSeconds:2},
-  {id:'medium-sparring',tier:'medium',asset:'hard-sparring',icon:'🥊',title:'Live Sparring',text:'Elevated live rounds. Improve one random skill by two points while absorbing light contact.',cost:10,gain:2,skills:1,damage:[1,3],meterSeconds:4},
-  {id:'heavy-sparring',tier:'heavy',icon:'🤼',title:'Hard Sparring',text:'Hard live rounds. Improve two random skills by two points, but expect to absorb some damage.',cost:20,gain:2,skills:2,damage:[3,9],meterSeconds:6}
+  {id:'light-sparring',tier:'light',icon:'🥋',title:'Technical Sparring',text:'Controlled technical rounds. Improve one random skill without taking Health damage.',cost:25,gain:1,skills:1,meterSeconds:2},
+  {id:'medium-sparring',tier:'medium',asset:'hard-sparring',icon:'🥊',title:'Live Sparring',text:'Live rounds with real contact. Improve one random skill by two points and lose 1–25 Health.',cost:50,gain:2,skills:1,damage:[1,25],meterSeconds:4},
+  {id:'heavy-sparring',tier:'heavy',icon:'🤼',title:'Hard Sparring',text:'A punishing full test. Improve every skill by one point and lose 25–50 Health.',cost:75,gain:1,skills:4,damage:[25,50],meterSeconds:6}
 ];
 
 const trainingInjuryDefs = [
@@ -161,10 +161,9 @@ const horseRaceProfiles = [
 
 const recoveryDefs = [
   {id:'rest',icon:'🔋',title:'Rest',text:'Take ten seconds and restore one Energy battery segment.',energy:25,health:0,feeBase:0,feePerLevel:0,meterSeconds:10,freeRest:true},
-  {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores one Energy cell and takes the edge off fight damage.',energy:25,health:10,feeBase:25,feePerLevel:10,meterSeconds:2},
-  {id:'sauna',icon:'♨️',title:'Sauna',text:'Heat recovery restores one Energy cell and helps the body heal.',energy:25,health:15,feeBase:50,feePerLevel:15,meterSeconds:3},
-  {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery restores one Energy cell and repairs hard-round damage.',energy:25,health:30,feeBase:75,feePerLevel:20,meterSeconds:4},
-  {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium recovery restores one Energy cell and delivers the largest Health boost.',energy:25,health:40,feeBase:175,feePerLevel:30,meterSeconds:5}
+  {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores 10 Health.',energy:0,health:10,meterSeconds:2},
+  {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery restores 25 Health.',energy:0,health:25,meterSeconds:4},
+  {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium recovery restores 50 Health.',energy:0,health:50,meterSeconds:5}
 ];
 
 const publicityDefs = [

@@ -88,7 +88,7 @@
     state.hype=clamp(finite(state.hype,defaults.hype),0,100);
     const stats=state.stats&&typeof state.stats==='object'&&!Array.isArray(state.stats)?state.stats:{};
     state.stats={};
-    for(const key of ['power','speed','chin','cardio'])state.stats[key]=Math.max(1,finite(stats[key],defaults.stats[key]));
+    for(const key of ['power','speed','chin','cardio'])state.stats[key]=Math.max(1,Math.round(finite(stats[key],defaults.stats[key])));
     const usableOpponent=entry=>entry&&typeof entry==='object'&&!Array.isArray(entry)&&
       typeof entry.key==='string'&&entry.key&&typeof entry.name==='string'&&entry.name.trim()&&
       ['tier','min','power','speed','chin','cardio','reward','fans'].every(key=>Number.isFinite(entry[key]));
@@ -162,7 +162,7 @@
     const energyCost=Math.max(0,finite(action.cost));
     if(sessionsLeft<sessions)return {ok:false,reason:'limit',sessions,cashCost,energyCost};
     if(state.cash<cashCost)return {ok:false,reason:'cash',sessions,cashCost,energyCost};
-    if(state.energy<=0)return {ok:false,reason:'energy',sessions,cashCost,energyCost};
+    if(state.energy<energyCost)return {ok:false,reason:'energy',sessions,cashCost,energyCost};
     return {ok:true,reason:'',sessions,cashCost,energyCost};
   }
 
@@ -176,15 +176,21 @@
   }
 
   function trainingPerfectChance(coach=false){return coach ? .27 : .17}
-  function trainingInjuryChance(overtraining=false,coach=false){return overtraining?(coach ? .20 : .33):0}
 
-  function trainingRiskBonus(overtraining=false,injured=false){return overtraining&&!injured?.25:0}
+  function sparringQuote(state,action,sessionsLeft){
+    const sessions=1,energyCost=Math.max(0,finite(action.cost));
+    const maximumHealthCost=Array.isArray(action.damage)?Math.max(0,finite(action.damage[1])):0;
+    if(nonNegativeWhole(sessionsLeft)<sessions)return {ok:false,reason:'limit',sessions,energyCost,maximumHealthCost};
+    if(finite(state.energy)<energyCost)return {ok:false,reason:'energy',sessions,energyCost,maximumHealthCost};
+    if(finite(state.health)<=maximumHealthCost)return {ok:false,reason:'health',sessions,energyCost,maximumHealthCost};
+    return {ok:true,reason:'',sessions,energyCost,maximumHealthCost};
+  }
 
   function hustleBonus(actionId,chanceRoll=1,rewardRoll=0){
     if(clamp(finite(chanceRoll,1),0,1)>=.25)return {type:'',amount:0};
     const roll=clamp(finite(rewardRoll,0),0,.999999);
     if(actionId==='corner-gym-cleanup')return {type:'cash',amount:2+Math.floor(roll*49)};
-    if(actionId==='unload-freight')return {type:'power',amount:.5};
+    if(actionId==='unload-freight')return {type:'power',amount:1};
     if(actionId==='nightclub-door')return {type:'hype',amount:2+Math.floor(roll*3)};
     if(actionId==='rideshare-driver')return {type:'energy',amount:energySegmentSize()};
     return {type:'',amount:0};
@@ -195,16 +201,11 @@
     return injured?Math.max(1,rating-1):rating;
   }
 
-  function sparringDamage(baseDamage,repeatCount=0){
-    return Math.max(0,finite(baseDamage)+Math.max(0,nonNegativeWhole(repeatCount))*2);
-  }
-
-  function recoveryQuote(state,treatment,fee,used){
+  function recoveryQuote(state,treatment,fee){
     const cashCost=Math.max(0,whole(fee)),energyGain=Math.max(0,finite(treatment.energy)),healthGain=Math.max(0,finite(treatment.health));
-    if(used)return {ok:false,reason:'limit',cashCost,energyGain,healthGain};
-    if(state.cash<cashCost)return {ok:false,reason:'cash',cashCost,energyGain,healthGain};
     const energyRoom=Math.max(0,finite(state.maxEnergy)-finite(state.energy)),healthRoom=Math.max(0,finite(state.maxHealth)-finite(state.health));
     if(Math.min(energyRoom,energyGain)+Math.min(healthRoom,healthGain)<=0)return {ok:false,reason:'full',cashCost,energyGain,healthGain};
+    if(state.cash<cashCost)return {ok:false,reason:'cash',cashCost,energyGain,healthGain};
     return {ok:true,reason:'',cashCost,energyGain,healthGain};
   }
 
@@ -508,5 +509,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,trainingInjuryChance,trainingRiskBonus,hustleBonus,injuredStat,sparringDamage,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });

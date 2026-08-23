@@ -8,8 +8,9 @@
 
   const defaults={
     fightStructure:{scheduledRounds:3,dailyFightLimit:10,minimumHealthForMedicalClearance:20},
-    dailyDevelopmentLimits:{ordinaryAttributeTrainingSessionLimit:3,sparringSessionLimit:2},
+    dailyDevelopmentLimits:{ordinaryAttributeTrainingSessionLimit:3,sparringSessionLimit:1},
     energyEconomy:{maximumEnergy:100,energySegmentSize:25,fightEnergyCost:25,minimumEnergyToStartConsumingActionExclusive:0,trainingEnergyCost:25,oddJobEnergyCost:25,publicityEnergyCost:25,restEnergyRestored:25,restDurationSeconds:10,dailyDropEnergyRestored:25},
+    recoveryEconomy:{dollarsPerHealthPointPerFighterLevel:3},
     exchangeCounts:{slowPaceMinimum:6,slowPaceMaximum:7,fastPaceMinimum:9,fastPaceMaximum:11},
     computerGeneratedOpponentDifficulty:{baseAttributeRatingAtLevelOne:4,linearAttributeRatingGainPerLevel:1.9,compoundingGrowthStartsAtLevel:4,attributeGrowthMultiplierPerLevel:1.04,opponentCardDifficultyStep:.7,individualAttributeVariationStep:.45},
     fatigue:{laterRoundPenalty:.025,lowCardioTarget:10,lowCardioPenaltyPerExchange:.0018,powerOrSpeedToCardioRatioThreshold:1.75,imbalancePenaltyPerRatioPoint:.012,maximumImbalancePenaltyPerExchange:.018,slowPaceMultiplier:.7,fastPaceMultiplier:1.35,conservativeOffenseMultiplier:.9,aggressiveOffenseMultiplier:1.12},
@@ -23,6 +24,7 @@
     'fightStructure.scheduledRounds':[3,3,true],'fightStructure.dailyFightLimit':[1,50,true],'fightStructure.minimumHealthForMedicalClearance':[1,100],
     'dailyDevelopmentLimits.ordinaryAttributeTrainingSessionLimit':[1,10,true],'dailyDevelopmentLimits.sparringSessionLimit':[0,10,true],
     'energyEconomy.maximumEnergy':[100,100,true],'energyEconomy.energySegmentSize':[25,25,true],'energyEconomy.fightEnergyCost':[25,25,true],'energyEconomy.minimumEnergyToStartConsumingActionExclusive':[0,0,true],'energyEconomy.trainingEnergyCost':[25,25,true],'energyEconomy.oddJobEnergyCost':[25,25,true],'energyEconomy.publicityEnergyCost':[25,25,true],'energyEconomy.restEnergyRestored':[25,25,true],'energyEconomy.restDurationSeconds':[1,60,true],'energyEconomy.dailyDropEnergyRestored':[25,25,true],
+    'recoveryEconomy.dollarsPerHealthPointPerFighterLevel':[1,20,true],
     'exchangeCounts.slowPaceMinimum':[1,30,true],'exchangeCounts.slowPaceMaximum':[1,30,true],'exchangeCounts.fastPaceMinimum':[1,30,true],'exchangeCounts.fastPaceMaximum':[1,30,true],
     'computerGeneratedOpponentDifficulty.baseAttributeRatingAtLevelOne':[1,20],'computerGeneratedOpponentDifficulty.linearAttributeRatingGainPerLevel':[.1,10],'computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel':[2,20,true],'computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel':[1,1.25],'computerGeneratedOpponentDifficulty.opponentCardDifficultyStep':[0,5],'computerGeneratedOpponentDifficulty.individualAttributeVariationStep':[0,3],
     'fatigue.laterRoundPenalty':[0,.2],'fatigue.lowCardioTarget':[1,50],'fatigue.lowCardioPenaltyPerExchange':[0,.05],'fatigue.powerOrSpeedToCardioRatioThreshold':[1,5],'fatigue.imbalancePenaltyPerRatioPoint':[0,.1],'fatigue.maximumImbalancePenaltyPerExchange':[0,.1],'fatigue.slowPaceMultiplier':[.25,3],'fatigue.fastPaceMultiplier':[.25,3],'fatigue.conservativeOffenseMultiplier':[.25,3],'fatigue.aggressiveOffenseMultiplier':[.25,3],

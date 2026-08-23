@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.189',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.189',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.201',verified:true,bio:'Cage Grind’s official fight desk. Publishes one official result report after each eligible fight.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.201',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -227,7 +227,7 @@ interactions: {
   },
 
   ticker: [
-    'Listen, kid: every job, workout, and fight uses up to one battery cell. Anything above empty gets you through the door.',
+    'Listen, kid: gym drills take a full battery cell. Sparring charges extra when the gloves get heavy.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
     'Rest is free: ten seconds buys back one battery cell. You can fight with any Energy above zero, but empty means no clearance.',
     'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
