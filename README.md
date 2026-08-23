@@ -422,7 +422,7 @@ generated league.
 - Drop reveals validate their reward data before rendering. If a stale item or
   a device-specific celebration effect fails, the awarded collectible remains
   saved and the result dialog recovers instead of blocking the career.
-- Owned items appear as fixed 2:3 collectible cards, two across on mobile,
+- Owned items appear as fixed 5:7 collectible cards, two across on mobile,
   with full-card Common, Rare, Epic, and Legendary treatments. Tapping a card,
   or using Enter or Space from the keyboard, flips it to show its description.
 - Collectibles are ready for optional disclosed product placements through the
