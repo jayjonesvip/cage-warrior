@@ -263,9 +263,9 @@ generated league.
 
 ### Cage Feed
 
-- A fighter has no social account and earns no Followers until Cage Feed is
-  opened for the first time. That first visit creates the account, publishes a
-  "Hello, fight fans" introduction, and grants the first Followers.
+- Completing a fighter identity activates Cage Feed, publishes the fighter's
+  introduction, grants the first Followers, and creates a one-time verified
+  CageReporter mention announcing that the fighter signed a Cage Grind contract.
   Existing saved careers that already have Followers are treated as connected
   accounts and keep their audience.
 - Cage Feed uses Supabase for a shared global timeline while the career itself
@@ -291,10 +291,11 @@ generated league.
   fighter receive an amber edge and can be isolated with the Feed's **Mentions**
   filter. Targeted fighter posts use the stored profile ID, while official posts
   are matched against the current fighter's exact `@handle`.
-- `CageReporter` publishes exactly one contextual result for each eligible
-  career fight. The strongest available angle wins: an injured victory, streak,
-  ordinary win, or loss. Appearances, autograph signings, and sponsor deals do
-  not generate Reporter coverage.
+- `CageReporter` publishes one contract-signing announcement when a new fighter
+  is created, then exactly one contextual result for each eligible career fight.
+  The strongest fight angle wins: an injured victory, streak, ordinary win, or
+  loss. Appearances, autograph signings, and sponsor deals do not generate
+  Reporter coverage.
 - The verified `@CageGrindCEO` account uses the CEO's office portrait and a
   distinct black-and-gold treatment. Server-authored CEO posts recognize a new
   career and the first exceptional performance bonus without allowing arbitrary
