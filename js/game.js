@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.204';
+  const ICON_ASSET_VERSION = '2.5.205';
   const DROP_PACK_ASSET = `assets/cage-grind-drop-pack.png?v=${ICON_ASSET_VERSION}`;
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function dropPackIcon(){return `<img class="drop-pack-icon" src="${DROP_PACK_ASSET}" alt="" aria-hidden="true">`}
@@ -667,7 +667,12 @@
     const changed=currentScreen!==screen;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
     if(changed&&historyMode!=='none')writeHistory('screen',historyMode);
     if(screen==='feed')connectSharedSocial(true);else{clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null}
-    sfx.tap();updateUI();if(screen==='fight'&&state.nameLocked)queueMicrotask(()=>connectSharedSocial(true));const page=$$('.screen').find(s=>s.dataset.screen===screen);if(page)page.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
+    sfx.tap();updateUI();if(screen==='fight'&&state.nameLocked)queueMicrotask(()=>connectSharedSocial(true));const appScroll=$('.app-scroll');if(appScroll)appScroll.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
+  }
+
+  function initStickyDashboard(){
+    const root=$('.app-scroll'),sentinel=$('.resource-hud-sentinel'),dashboard=$('.resource-hud');if(!root||!sentinel||!dashboard||!('IntersectionObserver' in window))return;
+    const observer=new IntersectionObserver(entries=>{const entry=entries[0];dashboard.classList.toggle('is-stuck',!entry.isIntersecting&&root.scrollTop>0)},{root,threshold:0});observer.observe(sentinel);
   }
 
   function fightExitGuarded(){return !!(fight&&combatLocked&&!fight.ended&&state.pendingFight)}
@@ -1385,7 +1390,7 @@
   }
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.204" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.205" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1509,7 +1514,7 @@
   window.addEventListener('popstate',handleHistoryNavigation);
   window.addEventListener('beforeunload',saveState);
   window.addEventListener('beforeunload',handleFightBeforeUnload);
-  hydrateStaticIcons();ensureLoadout();ensureRoster();syncCeoCareerEvents();
+  hydrateStaticIcons();initStickyDashboard();ensureLoadout();ensureRoster();syncCeoCareerEvents();
   recoveryReport=applyOfflineRecovery();
   updateUI();
   renderLanding();
