@@ -482,7 +482,7 @@ generated league.
   player's next local midnight and never carry into a new day. While injured,
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.
-- Coach Vega is an optional gym upgrade that improves gym gains and raises the
+- Coach Scrapps is an optional gym upgrade that improves gym gains and raises the
   perfect-session odds from 17% to 27%. His fee is
   `$250 + ($75 × fighter level)` per gym session. Coaching never changes a
   sparring cost, reward, or risk.

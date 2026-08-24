@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.205';
+  const ICON_ASSET_VERSION = '2.5.206';
   const DROP_PACK_ASSET = `assets/cage-grind-drop-pack.png?v=${ICON_ASSET_VERSION}`;
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function dropPackIcon(){return `<img class="drop-pack-icon" src="${DROP_PACK_ASSET}" alt="" aria-hidden="true">`}
@@ -688,11 +688,11 @@
 
   function renderTrain(){
     ensureDailyCounters();
-    const left=sessionsLeft('train',DAILY_TRAINING_LIMIT),sparringLeft=sessionsLeft('sparring',DAILY_SPARRING_LIMIT),coach=state.trainerOn,fee=coachFee(),injury=currentTrainingInjury();
+    const left=sessionsLeft('train',DAILY_TRAINING_LIMIT),sparringLeft=sessionsLeft('sparring',DAILY_SPARRING_LIMIT),coachAvailable=left>0,coach=state.trainerOn&&coachAvailable,fee=coachFee(),injury=currentTrainingInjury();
     $('#trainingResetClock').hidden=!injury&&(left>0||sparringLeft>0);
     const injuryBanner=$('#trainingInjuryBanner');injuryBanner.hidden=!injury;if(injury){$('#trainingInjuryIcon').textContent=injury.icon;$('#trainingInjuryName').textContent=injury.name.toUpperCase()}
     setLimitBadge('#trainLimitText',`${left} SESSION${left===1?'':'S'} LEFT`);
-    const trainerToggle=$('#trainerToggle');trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>COACH ${coach?'ON':'OFF'}</b><small>$${fee} / SESSION</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
+    const trainerToggle=$('#trainerToggle');trainerToggle.disabled=!coachAvailable;trainerToggle.classList.toggle('active',coach);trainerToggle.setAttribute('aria-checked',String(coach));trainerToggle.innerHTML=`<span class="switch-copy"><b>${coachAvailable?`COACH ${coach?'ON':'OFF'}`:'COACH UNAVAILABLE'}</b><small>${coachAvailable?`$${fee} / SESSION`:'NO SESSIONS LEFT'}</small></span><span class="switch-track" aria-hidden="true"><i class="switch-knob"></i></span>`;
     $('#trainActions').innerHTML=trainDefs.map((a,i)=>{const trainRepeat=state.dailyCounters.train,coachCost=coach?fee:0,cost=LOGIC.trainingCost(a,trainRepeat),gain=LOGIC.trainingGain(a.gain,coach,false,trainRepeat),locked=!!injury||state.energy<cost||state.cash<coachCost||left<1,status=injury?'<b>INJURED</b><small>TRAINING CLOSED UNTIL MIDNIGHT</small>':`<b>+${gain} ${a.stat.toUpperCase()}</b><small>${cost}% ENERGY${coach?` &middot; COACH $${coachCost}`:''}</small>`;return `<button class="action${injury?' injury-locked':''}" data-train="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost">${status}</div></button>`}).join('');
     setLimitBadge('#sparringLimitText',`${sparringLeft} SESSION${sparringLeft===1?'':'S'} LEFT`);
     $('#sparringActions').innerHTML=sparringDefs.map((a,i)=>{const quote=LOGIC.sparringQuote(state,a,sparringLeft),risk=a.damage?` &middot; ${a.damage[0]}&ndash;${a.damage[1]} HEALTH`:' &middot; NO HEALTH LOSS',locked=!!injury||!quote.ok,skillLabel=a.skills===4?`+${a.gain} ALL SKILLS`:`+${a.gain} RANDOM SKILL`,blocked=quote.reason==='energy'?`NEEDS ${quote.energyCost}% ENERGY`:quote.reason==='health'?`NEEDS MORE THAN ${quote.maximumHealthCost} HEALTH`:quote.reason==='limit'?'DAILY SPAR USED':'',status=injury?'<b>INJURED</b><small>SPARRING CLOSED UNTIL MIDNIGHT</small>':`<b>${skillLabel}</b><small>${blocked||`${quote.energyCost}% ENERGY${risk}`}</small>`;return `<button class="action sparring-${a.tier}${injury?' injury-locked':''}" data-sparring="${i}" ${locked?'disabled':''}><div class="ico">${gameIcon(a.asset||a.id,a.icon)}</div><div><h3>${a.title}</h3><p>${a.text}</p></div><div class="cost">${status}</div></button>`}).join('');
@@ -879,7 +879,7 @@
   function handleTrain(i){
     ensureDailyCounters();const a=trainDefs[i],coach=state.trainerOn;if(!a)return;if(currentTrainingInjury()){toast('Training is closed until your injury heals at midnight.','#ff6875');return}const repeatCount=state.dailyCounters.train;const action={...a,cost:LOGIC.trainingCost(a,repeatCount)};const quote=LOGIC.trainingQuote(state,action,coach,coachFee(),sessionsLeft('train',DAILY_TRAINING_LIMIT));
     if(quote.reason==='limit'){toast('No training sessions left today.','#ff766d');return}
-    if(quote.reason==='cash'){toast(`Coach Vega costs $${quote.cashCost}. Pick up an odd job first.`,'#ffcc75');return}
+    if(quote.reason==='cash'){toast(`Coach Scrapps costs $${quote.cashCost}. Pick up an odd job first.`,'#ffcc75');return}
     if(quote.reason==='energy'){toast(`Training requires ${quote.energyCost}% Energy.`,'#ff766d');return}
     const energySpent=spendEnergy(quote.energyCost);if(!energySpent)return;initAudio();state.cash-=quote.cashCost;state.dailyCounters.train+=quote.sessions;
     const perfect=Math.random()<LOGIC.trainingPerfectChance(coach),gain=LOGIC.trainingGain(a.gain,coach,perfect,repeatCount);
@@ -1390,7 +1390,7 @@
   }
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.205" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.206" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1445,7 +1445,7 @@
     const collectibleFlip=e.target.closest('[data-collectible-flip]');if(collectibleFlip&&!e.target.closest('button')){toggleCollectibleCard(collectibleFlip);return}
     const nav=e.target.closest('[data-nav]');if(nav){navTo(nav.dataset.nav);return}
     const go=e.target.closest('[data-go]');if(go){navTo(go.dataset.go);return}
-    const tt=e.target.closest('#trainerToggle');if(tt){state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
+    const tt=e.target.closest('#trainerToggle');if(tt){if(tt.disabled)return;state.trainerOn=!state.trainerOn;sfx.tap();updateUI();return}
     const tr=e.target.closest('[data-train]');if(tr){handleTrain(+tr.dataset.train);return}
     const sparring=e.target.closest('[data-sparring]');if(sparring){handleSparring(+sparring.dataset.sparring);return}
     const recovery=e.target.closest('[data-recovery]');if(recovery){handleRecovery(+recovery.dataset.recovery);return}

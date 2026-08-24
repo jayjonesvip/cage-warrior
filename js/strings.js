@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.205',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.205',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.206',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.206',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -240,7 +240,7 @@ interactions: {
     'Fourth win without a collectible drop? Keep winning. The sealed pack is guaranteed.',
     'Duplicate gear looks impressive, kid, but the perk still only counts once.',
     'One Daily Drop, every day. Free cash, one Energy cell, collectible included. Do not ask who paid.',
-    'Coach Vega wants $250 plus $75 per level. Talent is temporary; invoices are forever.',
+    'Coach Scrapps wants $250 plus $75 per level. Talent is temporary; invoices are forever.',
     'Before Level 5, side gigs keep the lights on. After that, you are a full-time fighter—act like one.',
     'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
     'CageGrindCEO: Records get attention. Finishes get phone calls.',
