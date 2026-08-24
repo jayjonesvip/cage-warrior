@@ -503,7 +503,7 @@
       fighters.push({...profile,id,handle,wins,losses,fights,level:Math.max(1,whole(profile?.level,1)),winPercentage:fights?wins/fights:0,isChampion:Boolean(championId&&id===championId||championHandle&&handle.toLowerCase()===championHandle)});
     }
     fighters.sort((a,b)=>Number(b.isChampion)-Number(a.isChampion)||b.level-a.level||b.winPercentage-a.winPercentage||b.fights-a.fights||a.handle.localeCompare(b.handle)||a.id.localeCompare(b.id));
-    return fighters.slice(0,Math.max(1,Math.min(100,whole(limit,25))));
+    return fighters.slice(0,Math.max(1,Math.min(1000,whole(limit,25))));
   }
 
   function normalizeGearDrop(drop,rarities=['COMMON','RARE','EPIC','LEGENDARY']){

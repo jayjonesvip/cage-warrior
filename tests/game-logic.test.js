@@ -125,6 +125,11 @@ test('world rankings are stable, unique, and limited to the requested top count'
   assert.deepEqual(logic.rankFighters(profiles,null,2).map(fighter=>fighter.handle),['Alpha','Zulu']);
 });
 
+test('world rankings can locate a player outside the displayed top twenty-five',()=>{
+  const profiles=Array.from({length:30},(_,index)=>({id:String(index),handle:`Fighter${index}`,level:30-index,wins:1,losses:0}));
+  assert.equal(logic.rankFighters(profiles,null,1000).findIndex(fighter=>fighter.id==='29')+1,30);
+});
+
 test('fight booking permits any Energy above zero and spends up to one battery cell',()=>{
   const state={energy:25,maxEnergy:100,pendingFight:null};
   assert.equal(logic.bookFight(state,'opponent-1',25,1000,0).ok,true);
