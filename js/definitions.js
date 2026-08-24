@@ -87,7 +87,7 @@ const gearItems = [
   {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 Health every 15 seconds. Does not restore Energy.',healthRegen:.02},
   {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 Health every 15 seconds.',healthRegen:.01},
   {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 Health every 15 seconds.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 Health every 15 seconds.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.208'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 Health every 15 seconds.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.209'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 Health every 15 seconds.',healthRegen:.03},
   {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 Health every 15 seconds.',healthRegen:.04},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 Health every 15 seconds.',healthRegen:.04},
@@ -161,6 +161,7 @@ const horseRaceProfiles = [
 
 const recoveryDefs = [
   {id:'rest',icon:'🔋',title:'Rest',text:'Take ten seconds and restore one Energy battery segment.',energy:25,health:0,feeBase:0,feePerLevel:0,meterSeconds:10,freeRest:true},
+  {id:'surgecore-energy-drink',icon:'⚡',title:'Chug Energy Drink',text:'Crack open a Surge Core and restore one Energy battery segment.',energy:25,health:0,flatFee:25,meterSeconds:5},
   {id:'ice-bath',icon:'🧊',title:'Ice Bath',text:'Cold recovery restores 10 Health.',energy:0,health:10,meterSeconds:2},
   {id:'massage',icon:'💆',title:'Sports Massage',text:'Hands-on recovery restores 25 Health.',energy:0,health:25,meterSeconds:4},
   {id:'cryotherapy',icon:'❄️',title:'Cryotherapy',text:'Premium recovery restores 50 Health.',energy:0,health:50,meterSeconds:5}

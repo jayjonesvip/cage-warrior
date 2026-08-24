@@ -93,6 +93,13 @@ file, use a hard refresh if the browser previously cached the missing image.
 | `northline-auto.png` | 🏎️ | Northline Auto |
 | `titan-global.png` | 🌐 | Titan Global |
 
+## Recovery icons
+
+| Filename | Current fallback | Used for |
+| --- | --- | --- |
+| `rest.png` | 🔋 | Standard Rest |
+| `surgecore-energy-drink.png` | ⚡ | Chug Energy Drink |
+
 ## Fight Gear icons
 
 | Filename | Current fallback | Item |

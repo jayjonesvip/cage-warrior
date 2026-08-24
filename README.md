@@ -488,9 +488,10 @@ generated league.
   `$250 + ($75 × fighter level)` per gym session. Coaching never changes a
   sparring cost, reward, or risk.
 - The Training page shows a dedicated **Rest & Recharge** card above every other
-  section whenever Energy is below 100%. Rest is always free, takes 10 seconds,
-  restores exactly one 25% Energy segment, and can be repeated until the battery
-  is full. Energy does not regenerate passively or while offline.
+  section whenever Energy is below 100%. Free Rest takes 10 seconds. Chugging a
+  Surge Core energy drink costs a flat $25 and takes 5 seconds. Either option
+  restores exactly one 25% Energy segment. Energy does not regenerate passively
+  or while offline.
   Paid treatments are available whenever Health is below full and restore Health
   only: Ice Bath restores 10, Sports Massage restores 25, and Cryotherapy restores
   50. Every restored Health point costs `$3 × fighter level`, giving all three

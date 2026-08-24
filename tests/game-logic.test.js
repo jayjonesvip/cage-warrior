@@ -434,6 +434,20 @@ test('free Rest restores exactly one repeatable Energy segment',()=>{
   assert.equal(logic.recoveryQuote(state,rest,0).reason,'full');
 });
 
+test('Surge Core restores one Energy segment for a flat cash fee',()=>{
+  const drink={energy:25,health:0},state={cash:25,energy:50,maxEnergy:100,health:100,maxHealth:100};
+  const quote=logic.recoveryQuote(state,drink,25);
+  assert.equal(quote.ok,true);
+  assert.equal(quote.cashCost,25);
+  assert.equal(quote.energyGain,25);
+  state.cash-=quote.cashCost;
+  assert.deepEqual(logic.applyRecovery(state,drink),{energy:25,health:0});
+  assert.equal(state.cash,0);
+  assert.equal(state.energy,75);
+  assert.equal(logic.recoveryQuote({...state,cash:24},drink,25).reason,'cash');
+  assert.equal(logic.recoveryQuote({...state,cash:25,energy:100},drink,25).reason,'full');
+});
+
 test('persistent health sets a tiered starting fight condition',()=>{
   assert.equal(logic.startingFightCondition(100,100),100);
   assert.equal(logic.startingFightCondition(90,100),100);
