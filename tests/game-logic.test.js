@@ -103,6 +103,28 @@ test('resources and counters are clamped during save migration',()=>{
   assert.equal(segmented.maxEnergy,100);
 });
 
+test('world rankings put the champion first, then sort by level and win percentage',()=>{
+  const profiles=[
+    {id:'a',handle:'LevelTenEven',level:10,wins:5,losses:5},
+    {id:'b',handle:'LevelTenLeader',level:10,wins:9,losses:1},
+    {id:'c',handle:'HigherLevel',level:11,wins:1,losses:9},
+    {id:'champ',handle:'CurrentChamp',level:4,wins:1,losses:8}
+  ];
+  const ranked=logic.rankFighters(profiles,{champion_id:'champ',champion_handle:'CurrentChamp'});
+  assert.deepEqual(ranked.map(fighter=>fighter.id),['champ','c','b','a']);
+  assert.equal(ranked[0].isChampion,true);
+  assert.equal(ranked[2].winPercentage,.9);
+});
+
+test('world rankings are stable, unique, and limited to the requested top count',()=>{
+  const profiles=[
+    {id:'2',handle:'Zulu',level:5,wins:2,losses:0},
+    {id:'1',handle:'Alpha',level:5,wins:2,losses:0},
+    {id:'1',handle:'Duplicate',level:10,wins:10,losses:0}
+  ];
+  assert.deepEqual(logic.rankFighters(profiles,null,2).map(fighter=>fighter.handle),['Alpha','Zulu']);
+});
+
 test('fight booking permits any Energy above zero and spends up to one battery cell',()=>{
   const state={energy:25,maxEnergy:100,pendingFight:null};
   assert.equal(logic.bookFight(state,'opponent-1',25,1000,0).ok,true);

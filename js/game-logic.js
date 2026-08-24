@@ -493,6 +493,19 @@
     return {heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'};
   }
 
+  function rankFighters(profiles,championship=null,limit=25){
+    const championId=String(championship?.champion_id||''),championHandle=String(championship?.champion_handle||'').replace(/^@/,'').toLowerCase(),seen=new Set(),fighters=[];
+    for(const profile of Array.isArray(profiles)?profiles:[]){
+      const id=String(profile?.id||''),handle=String(profile?.handle||'').replace(/^@/,'');
+      if((!id&&!handle)||seen.has(id||handle.toLowerCase()))continue;
+      seen.add(id||handle.toLowerCase());
+      const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses;
+      fighters.push({...profile,id,handle,wins,losses,fights,level:Math.max(1,whole(profile?.level,1)),winPercentage:fights?wins/fights:0,isChampion:Boolean(championId&&id===championId||championHandle&&handle.toLowerCase()===championHandle)});
+    }
+    fighters.sort((a,b)=>Number(b.isChampion)-Number(a.isChampion)||b.level-a.level||b.winPercentage-a.winPercentage||b.fights-a.fights||a.handle.localeCompare(b.handle)||a.id.localeCompare(b.id));
+    return fighters.slice(0,Math.max(1,Math.min(100,whole(limit,25))));
+  }
+
   function normalizeGearDrop(drop,rarities=['COMMON','RARE','EPIC','LEGENDARY']){
     if(!drop||typeof drop!=='object'||!drop.item||typeof drop.item!=='object')return null;
     const item=drop.item,id=typeof item.id==='string'?item.id.trim():'',name=typeof item.name==='string'?item.name.trim():'',category=typeof item.category==='string'?item.category.trim():'';
@@ -509,5 +522,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
