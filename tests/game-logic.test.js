@@ -328,7 +328,7 @@ test('training quote enforces daily, cash, and energy costs before rewards',()=>
   assert.equal(logic.trainingGain(1,false,true),2);
 });
 
-test('Coach Scrapps improves gym training without changing sparring rules',()=>{
+test('the personal trainer improves gym training without changing sparring rules',()=>{
   assert.equal(logic.trainingGain(1,false,false),1);
   assert.equal(logic.trainingGain(1,true,false),2);
   assert.equal(logic.trainingPerfectChance(false),.17);

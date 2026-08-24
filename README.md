@@ -326,8 +326,9 @@ generated league.
   as `MarioLopezMX` or `RandyJonesUSA`, plus attributes, archetypes,
   professional records, and head-to-head history. First and last names come
   from the same country group, so an unrelated suffix is never attached.
-- The **Cage Network** can add up to two recently active, exact-level real
-  fighter profiles beside the three locally generated contenders. These are
+- The **Cage Network** adds every exact-level real fighter profile beside four
+  locally generated contenders in **Recommended**. The **Ranked** filter shows
+  the complete real-fighter ladder from highest level to lowest. These are
   clearly labeled AI-controlled snapshots that use the fighter's public
   identity, portrait, archetype, and record. Their combat ratings are derived
   deterministically from level, avatar allocation, and archetype. Roster cards
@@ -343,7 +344,7 @@ generated league.
 - Opponent style is always visible on roster cards, the Tale of the Tape,
   locker-room Fight Plan, and live fight header so players can make an informed
   tactical choice before the opening bell.
-- The current level always replenishes to three fresh contenders, so the fight
+- The current level always replenishes to four fresh contenders, so the fight
   path cannot run dry before a level-up. Fresh current-level fights pay a full
   purse; past-level fights and rival fights pay half purse.
 - Any available opponent who has beaten the player carries a bright horizontal
@@ -482,7 +483,7 @@ generated league.
   player's next local midnight and never carry into a new day. While injured,
   all gym and sparring actions are locked; recovery, hustles, and fights remain
   available, and fights use the reduced attributes.
-- Coach Scrapps is an optional gym upgrade that improves gym gains and raises the
+- The personal trainer is an optional gym upgrade that improves gym gains and raises the
   perfect-session odds from 17% to 27%. His fee is
   `$250 + ($75 × fighter level)` per gym session. Coaching never changes a
   sparring cost, reward, or risk.
