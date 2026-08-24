@@ -87,7 +87,7 @@ const gearItems = [
   {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+0.02 Health every 15 seconds. Does not restore Energy.',healthRegen:.02},
   {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +0.01 Health every 15 seconds.',healthRegen:.01},
   {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +0.02 Health every 15 seconds.',healthRegen:.02},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 Health every 15 seconds.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.207'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Protein recovery between fights. +0.03 Health every 15 seconds.',healthRegen:.03,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.5.208'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps camp lighter. +0.03 Health every 15 seconds.',healthRegen:.03},
   {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'Sleep tracking, camp planning, no excuses. +0.04 Health every 15 seconds.',healthRegen:.04},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'Cold seafood after a hot fight. +0.04 Health every 15 seconds.',healthRegen:.04},
@@ -178,7 +178,7 @@ const publicityDefs = [
 const endorsementDefs = [
   {id:'bobs-auto',icon:'🔧',brand:"Bob's Auto Shop",product:'Local mechanic and hometown fight sponsor',minLevel:2,minFans:0,signing:100,perFight:40,fansPerFight:5,fights:3},
   {id:'garys-bar-grill',icon:'🔥',brand:"Gary's Bar & Grill",product:'Neighborhood bar, grill, and fight-night sponsor',minLevel:3,minFans:500,signing:300,perFight:90,fansPerFight:12,fights:3},
-  {id:'volt',icon:'⚡',brand:'Volt Energy',product:'Energy drink',minLevel:4,minFans:2500,signing:1200,perFight:350,fansPerFight:35,fights:4},
+  {id:'volt',icon:'⚡',brand:'Surge Core',product:'Performance energy drink',minLevel:4,minFans:2500,signing:1200,perFight:350,fansPerFight:35,fights:4},
   {id:'ironhide',icon:'🥊',brand:'Ironhide Athletics',product:'Gloves and training apparel',minLevel:6,minFans:10000,signing:5500,perFight:1100,fansPerFight:95,fights:5},
   {id:'apex-wireless',icon:'📡',brand:'Apex Wireless',product:'Phones and wireless service',minLevel:8,minFans:30000,signing:18000,perFight:3200,fansPerFight:240,fights:6},
   {id:'northline-auto',icon:'🏎️',brand:'Northline Auto',product:'Performance cars',minLevel:10,minFans:80000,signing:65000,perFight:9500,fansPerFight:650,fights:7},

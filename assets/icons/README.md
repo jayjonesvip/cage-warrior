@@ -87,7 +87,7 @@ file, use a hard refresh if the browser previously cached the missing image.
 | --- | --- | --- |
 | `bobs-auto.png` | 🔧 | Bob's Auto Shop |
 | `garys-bar-grill.png` | 🔥 | Gary's Bar & Grill |
-| `volt.png` | ⚡ | Volt Energy |
+| `volt.png` | ⚡ | Surge Core |
 | `ironhide.png` | 🥊 | Ironhide Athletics |
 | `apex-wireless.png` | 📡 | Apex Wireless |
 | `northline-auto.png` | 🏎️ | Northline Auto |
