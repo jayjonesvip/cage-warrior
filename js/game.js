@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => Number.isInteger(Number(value))?String(Number(value)):Number(value).toFixed(2);
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.5.217';
+  const ICON_ASSET_VERSION = '2.5.218';
   const DROP_PACK_ASSET = `assets/cage-grind-drop-pack.png?v=${ICON_ASSET_VERSION}`;
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function dropPackIcon(){return `<img class="drop-pack-icon" src="${DROP_PACK_ASSET}" alt="" aria-hidden="true">`}
@@ -374,16 +374,16 @@
     return gearRarityOrder[minRank];
   }
   function eligibleGearAtLevel(level,rarity){return gearItems.filter(g=>(g.minLevel||1)<=level&&g.rarity===rarity)}
-  function awardDeterministicGearDrop({opponent,upset=false,rivalry=false,titleWon=false,ko=false}){
+  function awardDeterministicGearDrop({opponent,upset=false,rivalry=false,titleWon=false,ko=false,guaranteed=false}){
     state.gearWinsSinceDrop=LOGIC.nextGearPityCount(state.gearWinsSinceDrop);
     const random=seededRandom(hashSeed(`${state.gearSeed}|${state.wins}|${opponent.key}|${state.level}|gear-v1`)),pity=LOGIC.isGearPity(state.gearWinsSinceDrop),chance=Math.min(.75,.33+(upset?.10:0)+(rivalry?.10:0)+(ko?.05:0));
-    if(!titleWon&&!pity&&random()>=chance)return null;
+    if(!guaranteed&&!titleWon&&!pity&&random()>=chance)return null;
     const minRarity=titleWon?'RARE':'COMMON',minRank=gearRarityOrder.indexOf(minRarity);let rarity=rollGearRarity(state.level,random(),minRarity),rank=gearRarityOrder.indexOf(rarity),pool=eligibleGearAtLevel(state.level,rarity);
     for(let r=rank-1;!pool.length&&r>=minRank;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     for(let r=rank+1;!pool.length&&r<gearRarityOrder.length;r++){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     if(!pool.length)return null;
     const item=pool[Math.floor(random()*pool.length)],isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;state.gearWinsSinceDrop=0;ensureLoadout();
-    return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:titleWon||pity,reason:titleWon?'CHAMPIONSHIP DROP':'FIGHT WIN DROP'};
+    return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:guaranteed||titleWon||pity,reason:guaranteed?'FIRST WIN DROP':titleWon?'CHAMPIONSHIP DROP':'FIGHT WIN DROP'};
   }
   function awardDailyCollectible(date){
     const random=seededRandom(hashSeed(`${state.gearSeed}|${date}|${state.level}|daily-collectible-v1`)),minRank=0;let rarity=rollGearRarity(state.level,random()),rank=gearRarityOrder.indexOf(rarity),pool=eligibleGearAtLevel(state.level,rarity);
@@ -1385,10 +1385,10 @@
 
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
-    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',winsToday=opponentWinsToday(o),xpTier=LOGIC.opponentXpTier(winsToday,o.min,state.level),dropEligible=LOGIC.fightDropEligible(winsToday),isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=fight.healthLost||0,titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival,opponentWinsToday:winsToday});let cash=0,fans=0,xp=xpResult.xp,ceoBonus=0,gearDrop=null;const lootNotes=[];o.meetings=(o.meetings||0)+1;
+    const o=fight.o,basePurse=payoutForOpponent(o),win=fight.winner==='player',firstCareerWin=win&&state.wins===0,winsToday=opponentWinsToday(o),xpTier=LOGIC.opponentXpTier(winsToday,o.min,state.level),dropEligible=LOGIC.fightDropEligible(winsToday),isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=fight.healthLost||0,titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival,opponentWinsToday:winsToday});let cash=0,fans=0,xp=xpResult.xp,ceoBonus=0,gearDrop=null;const lootNotes=[];o.meetings=(o.meetings||0)+1;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);cash=LOGIC.winFightCash({basePurse,hype:state.hype,cashBonus:ownedBonus('cashBonus'),winStreak:state.winStreak,upset,rivalry,variance:rand(.9,1.15)});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));receiveMoney(cash,true);fans=changeFollowers(fans);state.hype=clamp(state.hype+xpTier.hypeChange,0,100);sfx.win();confettiBurst();
-      if(dropEligible)gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO')});ceoBonus=awardCeoPerformanceBonus({upset,ko:fight.method.includes('KO'),titleWon});cash+=ceoBonus;
+      if(dropEligible)gearDrop=awardDeterministicGearDrop({opponent:o,upset,rivalry,titleWon,ko:fight.method.includes('KO'),guaranteed:firstCareerWin});ceoBonus=awardCeoPerformanceBonus({upset,ko:fight.method.includes('KO'),titleWon});cash+=ceoBonus;
       if(o.globalChampionship)lootNotes.push({kind:'milestone',text:'CONFIRMING TITLE RESULT'});if(ceoBonus)lootNotes.push({kind:'milestone',text:`CEO NOTICED · +$${fmt(ceoBonus)} · +3 HYPE`});if(upset)lootNotes.push({kind:'milestone',text:'UPSET BONUS +25%'});if(rivalry)lootNotes.push({kind:'milestone',text:'RIVALRY FIGHT BONUS +15%'});if(state.winStreak>1)lootNotes.push({kind:'streak',text:`${state.winStreak}-FIGHT WIN STREAK`});ensureRoster()
       $('#resultTitle').textContent='YOU WIN';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
@@ -1422,7 +1422,7 @@
   }
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.217" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY DROP';$('#dropClaimMessage').textContent=context.message||'A surprise collectible drop landed after your win.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.5.218" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

@@ -35,6 +35,6 @@ test('the static app loads and caches the editable fight configuration', () => {
   const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
   assert.ok(page.indexOf('js/fight-rules.js') < page.indexOf('js/game-logic.js'));
   assert.match(serviceWorker, /'\.\/fight-rules\.json'/);
-  assert.match(serviceWorker, /'\.\/js\/fight-rules\.js\?v=2\.5\.217'/);
+  assert.match(serviceWorker, /'\.\/js\/fight-rules\.js\?v=2\.5\.218'/);
   assert.match(serviceWorker, /url\.pathname\.endsWith\('\/fight-rules\.json'\)[\s\S]*networkFirst\(request\)/);
 });
