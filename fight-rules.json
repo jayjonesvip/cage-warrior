@@ -14,7 +14,7 @@
     "percentagePoint": "A whole or decimal number on a 0 through 100 scale.",
     "inclusiveMinimumAndMaximum": "Both the stated minimum and maximum may occur."
   },
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "fightStructure": {
     "_description": "Limits and eligibility shared by ordinary, ranked, and championship fights.",
     "_safeRanges": {
@@ -45,8 +45,9 @@
       "trainingEnergyCost": "Currently fixed at 25",
       "oddJobEnergyCost": "Currently fixed at 25",
       "publicityEnergyCost": "Currently fixed at 25",
-      "restEnergyRestored": "Currently fixed at 25",
-      "restDurationSeconds": "1 through 60",
+      "restSecondsPerMissingEnergySegment": "1 through 15; Rest always fills the battery and multiplies this time by the number of missing twenty-five-point segments",
+      "energyDrinkEnergyRestored": "Currently fixed at 25 so one drink restores exactly one battery segment",
+      "energyDrinkDurationSeconds": "1 through 10",
       "dailyDropEnergyRestored": "Currently fixed at 25"
     },
     "maximumEnergy": 100,
@@ -56,8 +57,9 @@
     "trainingEnergyCost": 25,
     "oddJobEnergyCost": 25,
     "publicityEnergyCost": 25,
-    "restEnergyRestored": 25,
-    "restDurationSeconds": 10,
+    "restSecondsPerMissingEnergySegment": 3,
+    "energyDrinkEnergyRestored": 25,
+    "energyDrinkDurationSeconds": 2,
     "dailyDropEnergyRestored": 25
   },
   "recoveryEconomy": {

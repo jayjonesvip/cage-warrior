@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.220',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.220',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.221',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.221',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -230,7 +230,7 @@ interactions: {
   ticker: [
     'Listen, kid: gym drills take a full battery cell. Sparring charges extra when the gloves get heavy.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
-    'Rest is free: ten seconds buys back one battery cell. You can fight with any Energy above zero, but empty means no clearance.',
+    'Rest is free: three seconds per missing battery cell fills you to full. You can fight with any Energy above zero, but empty means no clearance.',
     'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
     'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
     'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',

@@ -9,7 +9,7 @@
   const defaults={
     fightStructure:{scheduledRounds:3,dailyFightLimit:10,minimumHealthForMedicalClearance:20},
     dailyDevelopmentLimits:{ordinaryAttributeTrainingSessionLimit:3,sparringSessionLimit:1},
-    energyEconomy:{maximumEnergy:100,energySegmentSize:25,fightEnergyCost:25,minimumEnergyToStartConsumingActionExclusive:0,trainingEnergyCost:25,oddJobEnergyCost:25,publicityEnergyCost:25,restEnergyRestored:25,restDurationSeconds:10,dailyDropEnergyRestored:25},
+    energyEconomy:{maximumEnergy:100,energySegmentSize:25,fightEnergyCost:25,minimumEnergyToStartConsumingActionExclusive:0,trainingEnergyCost:25,oddJobEnergyCost:25,publicityEnergyCost:25,restSecondsPerMissingEnergySegment:3,energyDrinkEnergyRestored:25,energyDrinkDurationSeconds:2,dailyDropEnergyRestored:25},
     recoveryEconomy:{dollarsPerHealthPointPerFighterLevel:3},
     exchangeCounts:{slowPaceMinimum:6,slowPaceMaximum:7,fastPaceMinimum:9,fastPaceMaximum:11},
     computerGeneratedOpponentDifficulty:{baseAttributeRatingAtLevelOne:4,linearAttributeRatingGainPerLevel:1.9,compoundingGrowthStartsAtLevel:4,attributeGrowthMultiplierPerLevel:1.04,opponentCardDifficultyStep:.7,individualAttributeVariationStep:.45},
@@ -23,7 +23,7 @@
   const specifications={
     'fightStructure.scheduledRounds':[3,3,true],'fightStructure.dailyFightLimit':[1,50,true],'fightStructure.minimumHealthForMedicalClearance':[1,100],
     'dailyDevelopmentLimits.ordinaryAttributeTrainingSessionLimit':[1,10,true],'dailyDevelopmentLimits.sparringSessionLimit':[0,10,true],
-    'energyEconomy.maximumEnergy':[100,100,true],'energyEconomy.energySegmentSize':[25,25,true],'energyEconomy.fightEnergyCost':[25,25,true],'energyEconomy.minimumEnergyToStartConsumingActionExclusive':[0,0,true],'energyEconomy.trainingEnergyCost':[25,25,true],'energyEconomy.oddJobEnergyCost':[25,25,true],'energyEconomy.publicityEnergyCost':[25,25,true],'energyEconomy.restEnergyRestored':[25,25,true],'energyEconomy.restDurationSeconds':[1,60,true],'energyEconomy.dailyDropEnergyRestored':[25,25,true],
+    'energyEconomy.maximumEnergy':[100,100,true],'energyEconomy.energySegmentSize':[25,25,true],'energyEconomy.fightEnergyCost':[25,25,true],'energyEconomy.minimumEnergyToStartConsumingActionExclusive':[0,0,true],'energyEconomy.trainingEnergyCost':[25,25,true],'energyEconomy.oddJobEnergyCost':[25,25,true],'energyEconomy.publicityEnergyCost':[25,25,true],'energyEconomy.restSecondsPerMissingEnergySegment':[1,15,true],'energyEconomy.energyDrinkEnergyRestored':[25,25,true],'energyEconomy.energyDrinkDurationSeconds':[1,10,true],'energyEconomy.dailyDropEnergyRestored':[25,25,true],
     'recoveryEconomy.dollarsPerHealthPointPerFighterLevel':[1,20,true],
     'exchangeCounts.slowPaceMinimum':[1,30,true],'exchangeCounts.slowPaceMaximum':[1,30,true],'exchangeCounts.fastPaceMinimum':[1,30,true],'exchangeCounts.fastPaceMaximum':[1,30,true],
     'computerGeneratedOpponentDifficulty.baseAttributeRatingAtLevelOne':[1,20],'computerGeneratedOpponentDifficulty.linearAttributeRatingGainPerLevel':[.1,10],'computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel':[2,20,true],'computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel':[1,1.25],'computerGeneratedOpponentDifficulty.opponentCardDifficultyStep':[0,5],'computerGeneratedOpponentDifficulty.individualAttributeVariationStep':[0,3],

@@ -452,12 +452,11 @@ test('daily injuries reduce every effective attribute by one point',()=>{
   assert.equal(logic.injuredStat(8.66,false),8.66);
 });
 
-test('free Rest restores exactly one repeatable Energy segment',()=>{
-  const rest={energy:25,health:0},state={cash:0,energy:50,maxEnergy:100,health:100,maxHealth:100};
+test('full Rest restores all missing Energy in one recovery',()=>{
+  const rest={energy:50,health:0},state={cash:0,energy:50,maxEnergy:100,health:100,maxHealth:100};
   assert.equal(logic.recoveryQuote(state,rest,0).ok,true);
-  assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
-  assert.equal(state.energy,75);
-  assert.deepEqual(logic.applyRecovery(state,rest),{energy:25,health:0});
+  assert.deepEqual(logic.applyRecovery(state,rest),{energy:50,health:0});
+  assert.equal(state.energy,100);
   assert.equal(logic.recoveryQuote(state,rest,0).reason,'full');
 });
 
