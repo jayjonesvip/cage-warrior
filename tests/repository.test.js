@@ -52,6 +52,7 @@ const expandedHometownsMigration = fs.readFileSync('supabase/migrations/20260818
 const themedHometownsMigration = fs.readFileSync('supabase/migrations/20260819120000_expand_fighter_hometowns.sql', 'utf8');
 const feedActionsMigration = fs.readFileSync('supabase/migrations/20260819130000_feed_actions_and_sponsors.sql', 'utf8');
 const surgeCoreMigration = fs.readFileSync('supabase/migrations/20260824100000_rename_volt_sponsor_to_surge_core.sql', 'utf8');
+const rankedDefenseChallengerMigration = fs.readFileSync('supabase/migrations/20260825120000_rank_championship_defense_challengers.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
@@ -1531,6 +1532,14 @@ test('championship action spans the championship card on desktop', () => {
   assert.match(css, /@media \(min-width:700px\)\{[^}]*[\s\S]*?\.championship-action\{max-width:none\}/);
   assert.match(css, /\.championship-action-wrap\{grid-template-columns:minmax\(260px,420px\) minmax\(0,1fr\);align-items:stretch;gap:12px;margin-top:7px\}/);
   assert.match(css, /\.championship-action-wrap>small\{display:flex;align-items:center;min-height:36px;padding-left:12px;border-left:1px solid #31506b/);
+});
+
+test('championship defenses select the highest-ranked proven available challenger', () => {
+  assert.match(rankedDefenseChallengerMigration, /create or replace function public\.select_cage_championship_defense_challenger\(/i);
+  assert.match(rankedDefenseChallengerMigration, /coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\)>0/i);
+  assert.match(rankedDefenseChallengerMigration, /order by\s+candidate\.level desc,\s+coalesce\(candidate\.wins,0\)::numeric\s*\/\s*greatest\(coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\),1\) desc,\s+coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\) desc,\s+lower\(candidate\.handle\)/i);
+  assert.equal((rankedDefenseChallengerMigration.match(/public\.select_cage_championship_defense_challenger\(champion\.id,v_today\)|public\.select_cage_championship_defense_challenger\(v_champion\.id,v_today\)/g)||[]).length,2);
+  assert.doesNotMatch(rankedDefenseChallengerMigration, /order by md5\(/i);
 });
 
 test('bottom navigation opens every destination at the top', () => {
