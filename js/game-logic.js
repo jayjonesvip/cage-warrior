@@ -146,39 +146,6 @@
     return fightRule('energyEconomy.fightEnergyCost',25);
   }
 
-  function validFighterAllocation(stats){
-    const keys=['power','speed','chin','cardio'];
-    return !!stats&&keys.every(key=>Number.isInteger(stats[key])&&stats[key]>=2&&stats[key]<=8)&&keys.reduce((sum,key)=>sum+stats[key],0)===20;
-  }
-
-  function suggestedFighterArchetype(stats){
-    if(!validFighterAllocation(stats))return 'striker';
-    const striker=stats.power+stats.speed,grappler=Math.max(stats.chin+stats.cardio,stats.speed+stats.cardio);
-    return grappler>striker?'grappler':'striker';
-  }
-
-  function deterministicDeck(values,seed=0){
-    const deck=[...new Set((Array.isArray(values)?values:[]).filter(value=>typeof value==='string'&&value))];
-    let value=(whole(seed)>>>0)||0x9e3779b9;
-    const random=()=>{value+=0x6D2B79F5;let number=value;number=Math.imul(number^number>>>15,number|1);number^=number+Math.imul(number^number>>>7,number|61);return ((number^number>>>14)>>>0)/4294967296};
-    for(let index=deck.length-1;index>0;index--){const swap=Math.floor(random()*(index+1));[deck[index],deck[swap]]=[deck[swap],deck[index]]}
-    return deck;
-  }
-
-  function debutOpponent({baseStats={},playerArchetype='striker',seed=0,key='rookie-showcase',name='LocalCardFiller'}={}){
-    const stats={},keys=['power','speed','chin','cardio'];let value=(whole(seed)>>>0)||0x85ebca6b;
-    for(const stat of keys){value=Math.imul(value^stat.length,2654435761)>>>0;stats[stat]=Math.max(2,whole(baseStats[stat],5)-(1+value%2))}
-    const archetype=playerArchetype==='grappler'?'striker':'grappler';
-    return {key,name,tier:1,min:1,max:1,...stats,archetype,tendency:archetype,network:false,globalChampionship:false,titleFight:false,rookieShowcase:true};
-  }
-
-  function debutFightRule({firstFightDone=false,opponent=null,fighterStyle='striker',pityCount=0}={}){
-    const active=firstFightDone!==true&&opponent?.rookieShowcase===true,grappler=fighterStyle==='grappler';
-    return {active,guaranteedWin:active,winner:active?'player':'',method:active?(grappler?'SUBMISSION':'TKO'):'',finishRound:active?1:0,finishClock:active?'0:42':'',rewardRarity:active?'COMMON':'',pityCount:clamp(nonNegativeWhole(pityCount),0,4)};
-  }
-
-  function firstFightCompleted(state={},raw=state){return raw?.firstFightDone===true||nonNegativeWhole(state?.wins)+nonNegativeWhole(state?.losses)>0}
-
   function bookFight(state,key,cost=25,startedAt=Date.now(),minimumEnergyExclusive=0){
     if(state.pendingFight)return {ok:false,reason:'pending'};
     const availableEnergy=clamp(finite(state.energy),0,finite(state.maxEnergy,100));
@@ -555,5 +522,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,validFighterAllocation,suggestedFighterArchetype,deterministicDeck,debutOpponent,debutFightRule,firstFightCompleted,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
 });
