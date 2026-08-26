@@ -54,16 +54,18 @@ generated league.
 
 ### Fighting and progression
 
-- New careers complete four permanent Home-screen choices in order. First,
+- New careers begin with a permanent hometown choice. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
   Miami, Houston, Cleveland, Seattle, New Orleans, Hawaii, Boston, Atlanta,
   San Francisco, Denver, Tampa Bay, Philadelphia, San Antonio, Las Vegas,
-  Portland, or Baltimore. Next, choose one of
-  44 fighter avatar cards. New Orleans belongs to the Deep South title region;
-  Hawaii belongs to the Pacific Islands.
-  Finally, choose one of two permanent MMA archetypes: **Striker** for stand-up
-  offense and knockout pressure, or **Grappler** for takedowns, control, and
-  submissions. The last step suggests a fighter identity
+  Portland, or Baltimore. New Orleans belongs to the Deep South title region;
+  Hawaii belongs to the Pacific Islands. The default next step recommends one
+  of 44 valid avatar allocations and preselects one of two permanent MMA archetypes,
+  **Striker** or **Grappler**, from
+  its Power, Speed, Chin, and Cardio profile. **Shuffle Fighter** walks a saved,
+  deterministic 44-card deck without repeats, while **See All Fighters** keeps
+  the complete builder available. **Use This Fighter** permanently locks the
+  avatar and the currently selected archetype together. The last step immediately suggests a fighter identity
   from shared color and weather/dangerous-animal pools, followed by the hometown
   abbreviation. **Shuffle** rerolls it, while **Manual Entry** opens the name card
   as a text field for a custom single-word handle. **Ready** checks the global
@@ -101,7 +103,15 @@ generated league.
   retires while holding the World Championship is permanently announced as a
   retired champion; the belt immediately passes to the highest-ranked active
   fighter using level, win percentage, and total fights.
-- Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
+- Before the first sanctioned fight, Home leads with **Tonight's Fight** and
+  keeps Training, Hustle, and Gear as secondary actions. The featured local-card
+  filler is a persisted Level 1 opponent built below the player's allocation
+  wherever the two-point floor permits and uses the opposite archetype. The
+  normal fight presentation ends in one guaranteed style-consistent debut win,
+  followed by Followers and a guaranteed Common collectible that does not alter
+  fight-drop pity. Progressed saves skip this debut, and retirement makes it
+  available again for the newly claimed career.
+- After the debut, Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually
   obvious. Enabled primary actions use consistent blue fills and bold white

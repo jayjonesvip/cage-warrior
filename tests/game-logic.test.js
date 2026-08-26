@@ -1,6 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
 const logic = require('../js/game-logic.js');
+
+const definitionsContext={};
+vm.runInNewContext(`${fs.readFileSync('js/definitions.js','utf8')}\nglobalThis.__fighterAvatars=fighterAvatars;`,definitionsContext);
+const fighterAvatars=definitionsContext.__fighterAvatars;
 
 const defaults = {
   level:1,xp:0,cash:0,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
@@ -101,6 +107,43 @@ test('resources and counters are clamped during save migration',()=>{
   const segmented=normalize({energy:82,maxEnergy:160});
   assert.equal(segmented.energy,75);
   assert.equal(segmented.maxEnergy,100);
+});
+
+test('recommended fighter deck contains every valid twenty-point avatar once before repeating',()=>{
+  assert.equal(fighterAvatars.length,44);
+  assert.ok(fighterAvatars.every(avatar=>logic.validFighterAllocation(avatar.stats)));
+  const deck=logic.deterministicDeck(fighterAvatars.map(avatar=>avatar.id),84721);
+  assert.equal(deck.length,44);
+  assert.equal(new Set(deck).size,44);
+  assert.deepEqual(logic.deterministicDeck(fighterAvatars.map(avatar=>avatar.id),84721),deck);
+  assert.notEqual(deck.at(-1),deck[0]);
+});
+
+test('recommended archetype favors offense, grappling totals, and striker ties',()=>{
+  assert.equal(logic.suggestedFighterArchetype({power:8,speed:6,chin:2,cardio:4}),'striker');
+  assert.equal(logic.suggestedFighterArchetype({power:2,speed:5,chin:6,cardio:7}),'grappler');
+  assert.equal(logic.suggestedFighterArchetype({power:5,speed:5,chin:5,cardio:5}),'striker');
+});
+
+test('old saves with a professional record skip the guaranteed debut',()=>{
+  assert.equal(logic.firstFightCompleted({wins:1,losses:0},{}),true);
+  assert.equal(logic.firstFightCompleted({wins:0,losses:2},{}),true);
+  assert.equal(logic.firstFightCompleted({wins:0,losses:0},{firstFightDone:true}),true);
+  assert.equal(logic.firstFightCompleted({wins:0,losses:0},{}),false);
+});
+
+test('debut opponent is level one, opposite style, local, and never stronger than the player build',()=>{
+  const baseStats={power:8,speed:6,chin:2,cardio:4},opponent=logic.debutOpponent({baseStats,playerArchetype:'striker',seed:99});
+  assert.equal(opponent.tier,1);assert.equal(opponent.min,1);assert.equal(opponent.max,1);
+  assert.equal(opponent.archetype,'grappler');assert.equal(opponent.network,false);assert.equal(opponent.globalChampionship,false);assert.equal(opponent.titleFight,false);
+  for(const key of ['power','speed','chin','cardio']){assert.ok(opponent[key]>=2);assert.ok(opponent[key]<=baseStats[key])}
+});
+
+test('debut rule guarantees one style-consistent win and preserves fight-drop pity',()=>{
+  const opponent={rookieShowcase:true},striker=logic.debutFightRule({opponent,fighterStyle:'striker',pityCount:3});
+  assert.deepEqual(striker,{active:true,guaranteedWin:true,winner:'player',method:'TKO',finishRound:1,finishClock:'0:42',rewardRarity:'COMMON',pityCount:3});
+  assert.equal(logic.debutFightRule({opponent,fighterStyle:'grappler',pityCount:2}).method,'SUBMISSION');
+  assert.equal(logic.debutFightRule({firstFightDone:true,opponent,fighterStyle:'striker',pityCount:3}).guaranteedWin,false);
 });
 
 test('world rankings put the champion first, then sort by level and win percentage',()=>{
