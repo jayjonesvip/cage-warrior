@@ -97,7 +97,10 @@ generated league.
   and the game returns to the first fighter-creation step. Historical title
   results remain in the public record, while the newly claimed fighter starts
   with fresh title-shot eligibility against the current champion. If the public
-  retirement cannot be recorded, the local career is kept safe.
+  retirement cannot be recorded, the local career is kept safe. A fighter who
+  retires while holding the World Championship is permanently announced as a
+  retired champion; the belt immediately passes to the highest-ranked active
+  fighter using level, win percentage, and total fights.
 - Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
   choice cards. The cards explain each career path while distinct bottom
   buttons perform the actual navigation, so every action remains visually

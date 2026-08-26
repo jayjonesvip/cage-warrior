@@ -53,6 +53,7 @@ const themedHometownsMigration = fs.readFileSync('supabase/migrations/2026081912
 const feedActionsMigration = fs.readFileSync('supabase/migrations/20260819130000_feed_actions_and_sponsors.sql', 'utf8');
 const surgeCoreMigration = fs.readFileSync('supabase/migrations/20260824100000_rename_volt_sponsor_to_surge_core.sql', 'utf8');
 const rankedDefenseChallengerMigration = fs.readFileSync('supabase/migrations/20260825120000_rank_championship_defense_challengers.sql', 'utf8');
+const rankedChampionRetirementSuccessionMigration = fs.readFileSync('supabase/migrations/20260825193000_ranked_champion_retirement_succession.sql', 'utf8');
 const championshipSettlementFunction = fs.readFileSync('supabase/functions/settle-cage-championship/index.ts', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const appVersion = JSON.parse(fs.readFileSync('app-version.json', 'utf8')).version;
@@ -1565,6 +1566,22 @@ test('championship defenses select the highest-ranked proven available challenge
   assert.match(rankedDefenseChallengerMigration, /order by\s+candidate\.level desc,\s+coalesce\(candidate\.wins,0\)::numeric\s*\/\s*greatest\(coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\),1\) desc,\s+coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\) desc,\s+lower\(candidate\.handle\)/i);
   assert.equal((rankedDefenseChallengerMigration.match(/public\.select_cage_championship_defense_challenger\(champion\.id,v_today\)|public\.select_cage_championship_defense_challenger\(v_champion\.id,v_today\)/g)||[]).length,2);
   assert.doesNotMatch(rankedDefenseChallengerMigration, /order by md5\(/i);
+});
+
+test('a retiring champion passes the belt to the highest-ranked active fighter', () => {
+  assert.match(rankedChampionRetirementSuccessionMigration, /create or replace function public\.ensure_cage_champion\(p_former_champion_id uuid default null\)/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /candidate\.retired_at is null\s+and candidate\.id is distinct from p_former_champion_id/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /order by\s+candidate\.level desc,\s+coalesce\(candidate\.wins,0\)::numeric\s*\/\s*greatest\(coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\),1\) desc,\s+coalesce\(candidate\.wins,0\)\+coalesce\(candidate\.losses,0\) desc,\s+lower\(candidate\.handle\),\s+candidate\.id/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /set champion_id=v_profile\.id,[\s\S]*defenses=0/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /v_action := case when p_former_champion_id is null then 'bootstrap' else 'succession' end/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /'global_title_succession_' \|\| v_history_id::text/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /inherits the vacant title as the highest-ranked active fighter/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /create or replace function public\.retire_cage_profile\(\)/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /championship_key='world' and champion_id=v_user_id/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /has retired as Cage Grind World Champion/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /update public\.cage_profiles\s+set retired_at=now\(\),updated_at=now\(\)/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /revoke execute on function public\.ensure_cage_champion\(uuid\) from public, anon, authenticated/i);
+  assert.match(rankedChampionRetirementSuccessionMigration, /grant execute on function public\.retire_cage_profile\(\) to authenticated/i);
 });
 
 test('bottom navigation opens every destination at the top', () => {
