@@ -24,6 +24,23 @@ test('a new game loads with valid default resources',()=>{
   assert.deepEqual(state.stats,{power:5,speed:5,chin:5,cardio:5});
 });
 
+test('fighter attribute rolls always produce an independent valid twenty-point build',()=>{
+  const rolls=[0,.12,.27,.49,.73,.99],builds=rolls.map(value=>logic.rollFighterAllocation(()=>value));
+  for(const build of builds){
+    assert.equal(Object.values(build).reduce((sum,value)=>sum+value,0),20);
+    assert.ok(Object.values(build).every(value=>Number.isInteger(value)&&value>=2&&value<=8));
+    assert.equal(logic.validFighterAllocation(build),true);
+  }
+  assert.ok(new Set(builds.map(build=>JSON.stringify(build))).size>1);
+});
+
+test('fighter attributes automatically determine striker or grappler archetype',()=>{
+  assert.equal(logic.fighterArchetypeFromStats({power:8,speed:2,chin:4,cardio:6}),'striker');
+  assert.equal(logic.fighterArchetypeFromStats({power:2,speed:3,chin:7,cardio:8}),'grappler');
+  assert.equal(logic.fighterArchetypeFromStats({power:5,speed:5,chin:5,cardio:5}),'striker');
+  assert.equal(logic.fighterArchetypeFromStats({power:9,speed:1,chin:5,cardio:5}),'');
+});
+
 test('landing mode distinguishes new, unfinished, and completed careers',()=>{
   assert.equal(logic.careerLandingMode(null),'new');
   assert.equal(logic.careerLandingMode({}),'new');
@@ -554,15 +571,20 @@ test('score helpers expose a trailing player for the final-ten-second decision',
   assert.equal(logic.playerTrailing(rounds),false);
 });
 
-test('gear pity guarantees the fourth win without an earlier drop',()=>{
+test('Victory Pack progress is deterministic and level-gated',()=>{
   let count=0;
-  for(let win=1;win<=3;win++){
-    count=logic.nextGearPityCount(count);
-    assert.equal(logic.isGearPity(count),false);
-  }
-  count=logic.nextGearPityCount(count);
+  count=logic.nextVictoryPackProgress(count);
+  assert.equal(count,1);
+  count=logic.nextVictoryPackProgress(count,2);
+  assert.equal(count,3);
+  assert.equal(logic.victoryPackReady(count),false);
+  count=logic.nextVictoryPackProgress(count);
   assert.equal(count,4);
-  assert.equal(logic.isGearPity(count),true);
+  assert.equal(logic.victoryPackReady(count),true);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:4,repeatEligible:true}),true);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:5,repeatEligible:true}),true);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:3,repeatEligible:true}),false);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:5,repeatEligible:false}),false);
 });
 
 test('gear drop reveal data is normalized without mutating the awarded item',()=>{

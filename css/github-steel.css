@@ -145,6 +145,16 @@ a:focus-visible,
   background: #21262d;
 }
 
+.feed-action-dock {
+  border-color: #30363d;
+  background: #21262d;
+  box-shadow: 0 -1px 0 #010409;
+}
+
+.feed-action-divider {
+  background: #30363d;
+}
+
 .card-title,
 .tape-title b,
 .live-title b,

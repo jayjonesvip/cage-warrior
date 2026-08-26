@@ -33,6 +33,25 @@
     return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
   }
 
+  function validFighterAllocation(stats){
+    const keys=['power','speed','chin','cardio'];
+    return !!stats&&keys.every(key=>Number.isInteger(stats[key])&&stats[key]>=2&&stats[key]<=8)&&keys.reduce((sum,key)=>sum+stats[key],0)===20;
+  }
+
+  function rollFighterAllocation(random=Math.random){
+    const keys=['power','speed','chin','cardio'],stats={power:2,speed:2,chin:2,cardio:2};
+    for(let remaining=12;remaining>0;remaining--){
+      const available=keys.filter(key=>stats[key]<8),value=Number(random()),unit=Number.isFinite(value)?clamp(value,0,.999999999999):0,key=available[Math.floor(unit*available.length)]||available[0];
+      stats[key]++;
+    }
+    return stats;
+  }
+
+  function fighterArchetypeFromStats(stats){
+    if(!validFighterAllocation(stats))return '';
+    return stats.power+stats.speed>=stats.chin+stats.cardio?'striker':'grappler';
+  }
+
   function isBlankCareer(state){
     if(!state||typeof state!=='object')return true;
     return !state.fighterCity&&!state.fighterAvatar&&!state.fighterStyle&&
@@ -483,8 +502,11 @@
     const pick=list=>{const value=Number(random()),unit=Number.isFinite(value)?clamp(value,0,0.999999999999):0;return list[Math.floor(unit*list.length)]||''},opener=pick(first),remaining=second.filter(word=>word!==opener);
     return buildFighterIdentity(opener,pick(remaining.length?remaining:second),cityCode);
   }
-  function nextGearPityCount(value){return Math.min(4,nonNegativeWhole(value)+1)}
-  function isGearPity(value){return nonNegativeWhole(value)>=4}
+  function nextVictoryPackProgress(value,steps=1){return Math.min(4,nonNegativeWhole(value)+clamp(nonNegativeWhole(steps),0,2))}
+  function victoryPackReady(value){return nonNegativeWhole(value)>=4}
+  function victoryPackWinEligible({playerLevel=1,opponentLevel=1,repeatEligible=true}={}){
+    return repeatEligible&&Math.max(1,nonNegativeWhole(opponentLevel))>=Math.max(1,nonNegativeWhole(playerLevel));
+  }
   function nextEndorsementId(ids,history){const completed=new Set(Array.isArray(history)?history:[]);return ids.find(id=>!completed.has(id))||''}
   function landingChampionshipProof(champ,loaded=false,unavailable=false){
     if(champ?.champion_handle){const handle=String(champ.champion_handle).replace(/^@/,'');const defenses=Math.max(0,Number(champ.defenses)||0);return {heading:`@${handle}`,meta:`${defenses} successful title defense${defenses===1?'':'s'}`,state:'loaded'}}
@@ -522,5 +544,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextGearPityCount,isGearPity,nextEndorsementId,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,resourceIsCritical,fightEnergyCost,bookFight,trainingQuote,trainingCost,trainingGain,trainingPerfectChance,sparringQuote,hustleBonus,injuredStat,recoveryQuote,applyRecovery,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,blackjackHandValue,blackjackBetLimit,blackjackOutcome,cageDiceBetLimit,cageDiceOutcome,horseRaceBetLimit,horseRacePayout,horseRaceField,horseRaceFinish,payoutForOpponent,winFightCash,lossFightCash,xpRequirement,opponentXpTier,nextOpponentXpStage,opponentFightPurse,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,nextEndorsementId,normalizeGearDrop};
 });

@@ -54,26 +54,30 @@ generated league.
 
 ### Fighting and progression
 
-- New careers complete four permanent Home-screen choices in order. First,
+- New careers complete three permanent Home-screen steps in order. First,
   choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
   Miami, Houston, Cleveland, Seattle, New Orleans, Hawaii, Boston, Atlanta,
   San Francisco, Denver, Tampa Bay, Philadelphia, San Antonio, Las Vegas,
-  Portland, or Baltimore. Next, choose one of
-  44 fighter avatar cards. New Orleans belongs to the Deep South title region;
-  Hawaii belongs to the Pacific Islands.
-  Finally, choose one of two permanent MMA archetypes: **Striker** for stand-up
-  offense and knockout pressure, or **Grappler** for takedowns, control, and
-  submissions. The last step suggests a fighter identity
+  Portland, or Baltimore. New Orleans belongs to the Deep South title region;
+  Hawaii belongs to the Pacific Islands. Next, **Build Your Fighter** on one
+  focused card. Left and right controls cycle through all 44 portraits, while
+  **Random** jumps to another appearance without changing the attributes.
+  **Shuffle Attributes** rolls an independent Power, Speed, Chin, and Cardio
+  allocation totaling exactly 20, with each value between 2 and 8. Live meters
+  show the roll, and one of two permanent MMA archetypes is calculated above
+  them: offensive totals become **Striker**, while Chin-and-Cardio-led builds become
+  **Grappler**. Ties resolve as Striker. Locking the fighter saves the portrait,
+  allocation, and calculated archetype together, so there is no separate
+  archetype-selection step. The last step suggests a fighter identity
   from shared color and weather/dangerous-animal pools, followed by the hometown
   abbreviation. **Shuffle** rerolls it, while **Manual Entry** opens the name card
   as a text field for a custom single-word handle. **Ready** checks the global
   roster, permanently reserves the unique identity, and starts the career.
-- Every avatar has a unique base allocation across Power, Speed, Chin, and
-  Cardio. Each value is a whole number from 2 through 8 and the four values
-  always total exactly 20. The game validates that allocation before locking
-  the fighter in.
+- Fighter attributes are independent from the chosen portrait. Every roll uses
+  whole numbers from 2 through 8 and totals exactly 20. The game validates the
+  allocation before locking the fighter in.
 - Each selector disappears as soon as its choice is locked. Career systems,
-  the HUD, and navigation remain hidden until hometown, fighter, archetype, and
+  the HUD, and navigation remain hidden until hometown, fighter build, and
   permanent fighter name are complete. The Career Identity card keeps the hometown and archetype
   beside Followers, career earnings, and the live World Championship status; the selected
   avatar remains visible in the Home hero without a duplicate identity row.
@@ -388,8 +392,8 @@ generated league.
   at full XP until the first win, that win unlocks one 50% XP same-day runback,
   and every later fight that day pays 0 XP. The runback is consumed whether it
   ends in a win or loss. Later fights also pay no purse and cost 7 Hype even
-  when won; those zero-XP wins cannot award a collectible or advance
-  collectible-drop pity. Opponent cards, the Tale of the Tape, and results
+  when won; those zero-XP wins cannot award a collectible or advance the
+  Victory Pack meter. Opponent cards, the Tale of the Tape, and results
   show the tier.
 - The shared champion is rendered from the authenticated Supabase profile and
   is never generated or stored in the local career save. The dedicated card
@@ -409,20 +413,24 @@ generated league.
 - Fight-win, Daily, and install collectibles arrive in sealed Cage Grind packs;
   equipment is never purchased.
 - The home-screen Daily Drop awards Cash, one 25% Energy segment, and one deterministic,
-  level-eligible collectible every day. It does not reset fight-drop pity.
+  level-eligible collectible every day. It does not reset Victory Pack progress.
 - Collectible card artwork is emphasized within the fixed two-column card
   layout, while the Daily Drop uses the same high-contrast label treatment as
   other primary actions.
-- A win has a 33% base chance to earn a collectible drop. Upsets, rivalries, and KO/TKO
-  finishes improve the chance, up to 75%.
-- The fourth win without a collectible drop guarantees one. Winning a title
-  guarantees a Championship Drop of at least Rare quality.
+- Victory Packs use a visible deterministic four-segment meter instead of a
+  random drop chance. Eligible wins against same-level or higher-level opponents
+  add one segment; an upset, rivalry win, or KO/TKO adds two. Lower-level and
+  exhausted repeat opponents cannot advance the meter.
+- Completing the fourth segment guarantees a Victory Pack. Winning a title
+  guarantees an immediate Championship Drop of at least Rare quality.
 - Minimum level controls when an item enters the permanent pool. Earlier items
   remain eligible at higher levels.
 - The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
   that adds 0.02 Health every 15 seconds. Collectibles never passively restore Energy.
-- Duplicate copies increase the collectible quantity but never stack the
-  item's perk.
+- Rarity is rolled before the item. If the first item is already owned, every
+  Victory, Daily, or install pack performs one hidden item reroll within that
+  same rarity. A duplicate can still result and increases quantity, but never
+  stacks the item's perk.
 - Drop reveals validate their reward data before rendering. If a stale item or
   a device-specific celebration effect fails, the awarded collectible remains
   saved and the result dialog recovers instead of blocking the career.
@@ -581,7 +589,7 @@ are source copies of the visual artwork. Regression tests live under `tests/` an
 cover script parsing plus behavioral save recovery and migration, resource
 clamping, fight booking and payouts, rival fights, championship states and settlement, opponent availability, training,
 recovery options, blackjack rules and wager limits,
-gear pity, endorsements, daily resets, roster rules, readable text sizing,
+Victory Pack progress, endorsements, daily resets, roster rules, readable text sizing,
 equipment drops, reward reveals, and the Cash/Career Earnings economy.
 
 ## Deployment, search, and installation
