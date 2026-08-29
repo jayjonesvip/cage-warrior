@@ -1,671 +1,217 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const logic = require('../js/game-logic.js');
+'use strict';
 
-const defaults = {
-  level:1,xp:0,cash:0,careerEarnings:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,
-  energy:100,maxEnergy:100,health:100,maxHealth:100,hype:0,
-  stats:{power:5,speed:5,chin:5,cardio:5},roster:[],pendingFight:null,lastSave:0,lastDaily:'',
-  fighterCity:'',fighterAvatar:'',fighterStyle:'',gear:[]
-};
+const test=require('node:test');
+const assert=require('node:assert/strict');
+global.CAGE_FIGHT_RULES=require('../js/fight-rules.js');
+const logic=require('../js/game-logic.js');
 
-function normalize(raw={}){
-  const state=Object.assign(structuredClone(defaults),raw);
-  return logic.normalizeCoreState(state,defaults,raw);
-}
+const defaults={level:1,xp:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,maxEnergy:100,energy:100,maxHealth:100,health:100,hype:0,stats:{power:5,speed:5,chin:5,cardio:5},lastSave:0};
+const state=(overrides={})=>Object.assign(structuredClone(defaults),overrides);
 
-test('a new game loads with valid default resources',()=>{
-  const state=logic.selectStoredState({primary:null,backup:null,legacy:null},normalize,defaults);
-  assert.equal(state.level,1);
-  assert.equal(state.cash,0);
-  assert.equal(state.careerEarnings,0);
-  assert.equal(state.energy,100);
-  assert.equal(state.health,100);
-  assert.deepEqual(state.stats,{power:5,speed:5,chin:5,cardio:5});
+test('core migration preserves career data and adds simplified fields',()=>{
+  const raw={level:4,xp:22,fans:900,wins:8,losses:2,energy:47.9,health:81,stats:{power:9.4,speed:7.6,chin:8,cardio:6},cash:999,careerEarnings:1200,trainerOn:true,trainingInjury:{id:'knee'},roster:[]};
+  const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);
+  assert.equal(migrated.level,4);
+  assert.equal(migrated.wins,8);
+  assert.equal(migrated.energy,47);
+  assert.deepEqual(migrated.stats,{power:9,speed:8,chin:8,cardio:6});
+  assert.equal(migrated.attributePoints,0);
+  assert.ok(Number.isFinite(migrated.energyRecoveryAt));
+  assert.ok(Number.isFinite(migrated.healthRecoveryAt));
+  for(const key of ['cash','careerEarnings','trainerOn','trainingInjury'])assert.equal(key in migrated,false,key);
 });
 
-test('fighter attribute rolls always produce an independent valid twenty-point build',()=>{
-  const rolls=[0,.12,.27,.49,.73,.99],builds=rolls.map(value=>logic.rollFighterAllocation(()=>value));
-  for(const build of builds){
-    assert.equal(Object.values(build).reduce((sum,value)=>sum+value,0),20);
-    assert.ok(Object.values(build).every(value=>Number.isInteger(value)&&value>=2&&value<=8));
-    assert.equal(logic.validFighterAllocation(build),true);
-  }
-  assert.ok(new Set(builds.map(build=>JSON.stringify(build))).size>1);
+test('migration clears interrupted legacy activity sessions',()=>{
+  const raw=state({activeTraining:{endsAt:1},trainingSession:{},activeRecovery:{},recoverySession:{},restSession:{},activeHustle:{},hustleSession:{},publicitySession:{},autographSession:{},activeActivity:'train',activitySession:{}});
+  const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);
+  for(const key of ['activeTraining','trainingSession','activeRecovery','recoverySession','restSession','activeHustle','hustleSession','publicitySession','autographSession','activeActivity','activitySession'])assert.equal(key in migrated,false,key);
 });
 
-test('fighter attributes automatically determine striker or grappler archetype',()=>{
-  assert.equal(logic.fighterArchetypeFromStats({power:8,speed:2,chin:4,cardio:6}),'striker');
-  assert.equal(logic.fighterArchetypeFromStats({power:2,speed:3,chin:7,cardio:8}),'grappler');
-  assert.equal(logic.fighterArchetypeFromStats({power:5,speed:5,chin:5,cardio:5}),'striker');
-  assert.equal(logic.fighterArchetypeFromStats({power:9,speed:1,chin:5,cardio:5}),'');
+test('first-fight tutorial migration hides guidance for established careers',()=>{
+  assert.equal(logic.normalizeCoreState(state({wins:0,losses:0}),defaults,{wins:0,losses:0}).postFightTutorialSeen,false);
+  assert.equal(logic.normalizeCoreState(state({wins:1,losses:0}),defaults,{wins:1,losses:0}).postFightTutorialSeen,true);
+  assert.equal(logic.normalizeCoreState(state({wins:0,losses:0}),defaults,{wins:0,losses:0,postFightTutorialSeen:true}).postFightTutorialSeen,true);
 });
 
-test('landing mode distinguishes new, unfinished, and completed careers',()=>{
-  assert.equal(logic.careerLandingMode(null),'new');
-  assert.equal(logic.careerLandingMode({}),'new');
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix'}),'building');
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:false}),'building');
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
+test('legacy saves seed passive recovery from their existing save timestamp',()=>{
+  const lastSave=Date.now()-5000,raw=state({energy:50,health:50,lastSave});
+  const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);
+  assert.equal(migrated.energyRecoveryAt,lastSave);
+  assert.equal(migrated.healthRecoveryAt,lastSave);
 });
 
-test('partial careers stay building until the full identity is locked and complete',()=>{
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',nameLocked:true}),'building');
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:false}),'building');
-  assert.equal(logic.careerLandingMode({fighterCity:'phoenix',fighterAvatar:'fighter-01',fighterStyle:'brawler',nameLocked:true}),'returning');
+test('Energy remains continuous and is never normalized to battery quarters',()=>{
+  const migrated=logic.normalizeCoreState(state({energy:63.8}),defaults,{energy:63.8});
+  assert.equal(migrated.energy,63);
 });
 
-test('landing championship proof covers loading, champion, vacant, and offline states',()=>{
-  assert.deepEqual(logic.landingChampionshipProof(null,false,false),{heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'});
-  assert.deepEqual(logic.landingChampionshipProof({champion_handle:'BlazingCoyoteCHI',defenses:1},true,false),{heading:'@BlazingCoyoteCHI',meta:'1 successful title defense',state:'loaded'});
-  assert.deepEqual(logic.landingChampionshipProof({champion_handle:'@NightWolf',defenses:3},true,false),{heading:'@NightWolf',meta:'3 successful title defenses',state:'loaded'});
-  assert.deepEqual(logic.landingChampionshipProof(null,true,false),{heading:'THE BELT IS VACANT',meta:'The next reign is waiting',state:'vacant'});
-  assert.deepEqual(logic.landingChampionshipProof(null,true,true),{heading:'TITLE UPDATE OFFLINE',meta:'Champion status unavailable — play anytime',state:'offline'});
+test('passive Energy recovers one point every five seconds',()=>{
+  const fighter=state({energy:90,health:100,energyRecoveryAt:1000,healthRecoveryAt:1000});
+  assert.deepEqual(logic.passiveRecovery(fighter,16000),{energy:3,health:0});
+  assert.equal(fighter.energy,93);
+  assert.equal(fighter.energyRecoveryAt,16000);
 });
 
-test('selectStoredState falls back to the last useful legacy save when all newer slots are blank',()=>{
-  const raw={
-    primary:'{}',
-    backup:'{"fighterCity":"","fighterAvatar":""}',
-    legacy:JSON.stringify({name:'LEGACY FIGHTER',fighterCity:'phoenix',fighterAvatar:'fighter-07',fighterStyle:'counter',nameLocked:true})
-  };
-  const state=logic.selectStoredState(raw,normalize,defaults);
-  assert.equal(state.name,'LEGACY FIGHTER');
-  assert.equal(state.fighterCity,'phoenix');
-  assert.equal(state.fighterStyle,'counter');
+test('equipped gear interval can reduce Energy recovery to four seconds',()=>{
+  const fighter=state({energy:90,health:100,energyRecoveryAt:1000,healthRecoveryAt:1000});
+  const result=logic.passiveRecovery(fighter,13000,28_800_000,{energy:4000});
+  assert.equal(result.energy,3);
+  assert.equal(fighter.energy,93);
 });
 
-test('an older save keeps progression and fills newer resource fields',()=>{
-  const state=normalize({version:4,name:'OLD SAVE',level:4,xp:73,wins:7,losses:2,cash:900,stats:{power:11.25,speed:6.64}});
-  assert.equal(state.level,4);
-  assert.equal(state.xp,73);
-  assert.equal(state.wins,7);
-  assert.equal(state.losses,2);
-  assert.equal(state.careerEarnings,900);
-  assert.deepEqual(state.stats,{power:11,speed:7,chin:5,cardio:5});
-  assert.equal(state.maxEnergy,100);
-  assert.equal(state.health,100);
+test('passive Health recovers one point every minute',()=>{
+  const fighter=state({energy:100,health:90,energyRecoveryAt:1000,healthRecoveryAt:1000});
+  assert.deepEqual(logic.passiveRecovery(fighter,181000),{energy:0,health:3});
+  assert.equal(fighter.health,93);
 });
 
-test('invalid and blank primary saves recover a progressed backup',()=>{
-  const backup=JSON.stringify({name:'BACKUP FIGHTER',level:4,wins:3,fighterCity:'phoenix',fighterAvatar:'fighter-16',fighterStyle:'counter',gear:[]});
-  const invalid=logic.selectStoredState({primary:'{broken',backup,legacy:null},normalize,defaults);
-  const blank=logic.selectStoredState({primary:'{}',backup,legacy:null},normalize,defaults);
-  assert.equal(invalid.name,'BACKUP FIGHTER');
-  assert.equal(blank.name,'BACKUP FIGHTER');
-  assert.equal(blank.level,4);
+test('offline recovery restores both resources without exceeding maximums',()=>{
+  const fighter=state({energy:98,health:99,energyRecoveryAt:1000,healthRecoveryAt:1000});
+  const result=logic.passiveRecovery(fighter,601000);
+  assert.deepEqual(result,{energy:2,health:1});
+  assert.equal(fighter.energy,100);
+  assert.equal(fighter.health,100);
 });
 
-test('blank or invalid saves never replace a useful backup',()=>{
-  assert.equal(logic.shouldBackupRaw('',normalize),false);
-  assert.equal(logic.shouldBackupRaw('{broken',normalize),false);
-  assert.equal(logic.shouldBackupRaw('{}',normalize),false);
-  assert.equal(logic.shouldBackupRaw(JSON.stringify({level:3,wins:2,fighterCity:'miami'}),normalize),true);
+test('offline recovery cap limits long absences',()=>{
+  const fighter=state({energy:0,health:0,energyRecoveryAt:1,healthRecoveryAt:1});
+  const now=100_000_000;
+  logic.passiveRecovery(fighter,now,60_000);
+  assert.equal(fighter.energy,12);
+  assert.equal(fighter.health,1);
 });
 
-test('resources and counters are clamped during save migration',()=>{
-  const opponent={key:'valid',name:'VALID FIGHTER',tier:2,min:2,power:6,speed:5,chin:5,cardio:6,reward:100,fans:20};
-  const state=normalize({energy:-50,maxEnergy:120,health:999,maxHealth:130,hype:250,cash:-40,fans:-1,stats:{power:-3,speed:'bad',chin:8,cardio:9},roster:[null,{key:'partial'},opponent,'bad'],pendingFight:{key:'rival',cost:900}});
-  assert.equal(state.energy,0);
-  assert.equal(state.health,130);
-  assert.equal(state.hype,100);
-  assert.equal(state.cash,0);
-  assert.equal(state.fans,0);
-  assert.equal(state.maxEnergy,100);
-  assert.deepEqual(state.stats,{power:1,speed:5,chin:8,cardio:9});
-  assert.deepEqual(state.roster,[opponent]);
-  assert.equal(state.pendingFight.cost,100);
-  const segmented=normalize({energy:82,maxEnergy:160});
-  assert.equal(segmented.energy,75);
-  assert.equal(segmented.maxEnergy,100);
+test('future timestamps from clock changes do not grant recovery',()=>{
+  const fighter=state({energy:50,health:50,energyRecoveryAt:20_000,healthRecoveryAt:20_000});
+  assert.deepEqual(logic.passiveRecovery(fighter,10_000),{energy:0,health:0});
+  assert.equal(fighter.energyRecoveryAt,10_000);
+  assert.equal(fighter.healthRecoveryAt,10_000);
 });
 
-test('world rankings put the champion first, then sort by level and win percentage',()=>{
-  const profiles=[
-    {id:'a',handle:'LevelTenEven',level:10,wins:5,losses:5},
-    {id:'b',handle:'LevelTenLeader',level:10,wins:9,losses:1},
-    {id:'c',handle:'HigherLevel',level:11,wins:1,losses:9},
-    {id:'champ',handle:'CurrentChamp',level:4,wins:1,losses:8}
-  ];
-  const ranked=logic.rankFighters(profiles,{champion_id:'champ',champion_handle:'CurrentChamp'});
-  assert.deepEqual(ranked.map(fighter=>fighter.id),['champ','c','b','a']);
-  assert.equal(ranked[0].isChampion,true);
-  assert.equal(ranked[2].winPercentage,.9);
+test('full recovery time accounts for a partially elapsed interval',()=>{
+  assert.equal(logic.recoveryTimeRemaining(97,100,1000,5000,3000),13_000);
+  assert.equal(logic.recoveryTimeRemaining(100,100,1000,5000,3000),0);
 });
 
-test('world rankings are stable, unique, and limited to the requested top count',()=>{
-  const profiles=[
-    {id:'2',handle:'Zulu',level:5,wins:2,losses:0},
-    {id:'1',handle:'Alpha',level:5,wins:2,losses:0},
-    {id:'1',handle:'Duplicate',level:10,wins:10,losses:0}
-  ];
-  assert.deepEqual(logic.rankFighters(profiles,null,2).map(fighter=>fighter.handle),['Alpha','Zulu']);
+test('spending Energy starts the charging timestamp when leaving full',()=>{
+  const fighter=state({energyRecoveryAt:100});
+  assert.equal(logic.spendEnergy(fighter,25,5000),25);
+  assert.equal(fighter.energy,75);
+  assert.equal(fighter.energyRecoveryAt,5000);
 });
 
-test('world rankings can locate a player outside the displayed top twenty-five',()=>{
-  const profiles=Array.from({length:30},(_,index)=>({id:String(index),handle:`Fighter${index}`,level:30-index,wins:1,losses:0}));
-  assert.equal(logic.rankFighters(profiles,null,1000).findIndex(fighter=>fighter.id==='29')+1,30);
+test('a legitimate win awards exactly one Attribute Point',()=>{
+  const fighter=state();
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true}),1);
+  assert.equal(fighter.attributePoints,1);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:false}),0);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,forfeited:true}),0);
+  assert.equal(fighter.attributePoints,1);
 });
 
-test('fight booking permits any Energy above zero and spends up to one battery cell',()=>{
-  const state={energy:25,maxEnergy:100,pendingFight:null};
-  assert.equal(logic.bookFight(state,'opponent-1',25,1000,0).ok,true);
-  assert.equal(state.energy,0);
-  assert.deepEqual(state.pendingFight,{key:'opponent-1',cost:25,startedAt:1000});
-  assert.equal(logic.bookFight(state,'opponent-1',25,1001,25).reason,'pending');
-  state.pendingFight=null;
-  assert.equal(logic.bookFight(state,'opponent-2',25,1002,0).reason,'energy');
-  assert.equal(state.energy,0);
-  const lowEnergy={energy:10,maxEnergy:100,pendingFight:null};
-  const lowEnergyBooking=logic.bookFight(lowEnergy,'opponent-3',25,1003,0);
-  assert.equal(lowEnergyBooking.ok,true);
-  assert.equal(lowEnergyBooking.energySpent,10);
-  assert.equal(lowEnergy.energy,0);
-  assert.deepEqual(lowEnergy.pendingFight,{key:'opponent-3',cost:10,startedAt:1003});
+test('Attribute Points assign permanently to one whole-number stat',()=>{
+  const fighter=state({attributePoints:2});
+  assert.equal(logic.assignAttributePoint(fighter,'power'),true);
+  assert.equal(fighter.stats.power,6);
+  assert.equal(fighter.attributePoints,1);
+  assert.equal(logic.assignAttributePoint(fighter,'invalid'),false);
+  assert.equal(logic.assignAttributePoint(fighter,'cardio'),true);
+  assert.equal(logic.assignAttributePoint(fighter,'speed'),false);
+  assert.equal(fighter.stats.cardio,6);
 });
 
-test('level-up resource helper supports ordinary recovery and explicit full recovery',()=>{
-  const ordinary={energy:10,maxEnergy:100,health:20,maxHealth:100};
-  logic.applyLevelUpResources(ordinary,false);
-  assert.deepEqual(ordinary,{energy:25,maxEnergy:100,health:45,maxHealth:105});
-
-  const milestone={energy:10,maxEnergy:100,health:20,maxHealth:100};
-  logic.applyLevelUpResources(milestone,true);
-  assert.deepEqual(milestone,{energy:100,maxEnergy:100,health:105,maxHealth:105});
+test('sponsors advance sequentially from followers',()=>{
+  const sponsors=[{id:'bob',followersRequired:0},{id:'gary',followersRequired:500},{id:'surge',followersRequired:2500}];
+  const progress=logic.sponsorProgress(sponsors,2600,['bob']);
+  assert.equal(progress.active.id,'surge');
+  assert.deepEqual(progress.history,['bob','gary','surge']);
+  assert.equal(progress.next,null);
 });
 
-test('resource warning state begins only below twenty-five percent',()=>{
-  assert.equal(logic.resourceIsCritical(24,100),true);
-  assert.equal(logic.resourceIsCritical(24.99,100),true);
-  assert.equal(logic.resourceIsCritical(25,100),false);
-  assert.equal(logic.resourceIsCritical(26,100),false);
-  assert.equal(logic.resourceIsCritical(-20,100),true);
+test('sponsor migration never moves a career backward',()=>{
+  const sponsors=[{id:'bob',followersRequired:0},{id:'gary',followersRequired:500},{id:'surge',followersRequired:2500}];
+  const progress=logic.sponsorProgress(sponsors,20,['bob','gary']);
+  assert.equal(progress.active.id,'gary');
 });
 
-test('fight energy is a level-independent one-cell cost',()=>{
-  assert.equal(logic.fightEnergyCost(),25);
-  const rookie={energy:100,maxEnergy:100,pendingFight:null},fightCost=logic.fightEnergyCost();
-  assert.equal(logic.bookFight(rookie,'rookie-opponent',fightCost,1000,0).ok,true);
-  assert.equal(rookie.energy,75);
-  assert.equal(rookie.pendingFight.cost,25);
+test('share text includes dynamic finish, record, streak and championship',()=>{
+  const text=logic.fightWinShareText({opponent:'@VasoJoseMX',method:'KO',round:2,record:'8-2',winStreak:4,titleWon:true});
+  assert.match(text,/@VasoJoseMX by KO in round 2/);
+  assert.match(text,/record is now 8-2/);
+  assert.match(text,/4 wins in a row/);
+  assert.match(text,/World Championship/);
+  assert.match(text,/https:\/\/cagegrind\.com/);
 });
 
-test('fight and rematch payouts preserve existing formulas',()=>{
-  const newOpponent={reward:200,tier:3,lossesToPlayer:0};
-  const beatenOpponent={reward:200,tier:2,lossesToPlayer:1};
-  assert.equal(logic.payoutForOpponent(newOpponent,3),200);
-  assert.equal(logic.payoutForOpponent(beatenOpponent,3),100);
-  assert.equal(logic.payoutForOpponent({...beatenOpponent,globalChampionship:true},3),200);
-  assert.equal(logic.winFightCash({basePurse:200,hype:0,cashBonus:0,winStreak:1,variance:1}),200);
-  assert.equal(logic.lossFightCash(200),16);
+test('booking a fight spends up to 25 Energy and blocks duplicate bookings',()=>{
+  const fighter=state({energy:10,pendingFight:null,energyRecoveryAt:0});
+  const booking=logic.bookFight(fighter,'opponent',25,5000);
+  assert.deepEqual(booking,{ok:true,reason:'',energySpent:10});
+  assert.equal(fighter.energy,0);
+  assert.equal(logic.bookFight(fighter,'other',25,6000).reason,'pending');
 });
 
-test('fight XP covers current-level wins, higher-level upsets, losses, and forfeits',()=>{
-  assert.equal(logic.xpRequirement(1),120);
-  assert.equal(logic.xpRequirement(5),280);
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true}),{xp:62,category:'standard',modifiers:[]});
-  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:5,won:true,upset:true}).xp,89);
-  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false}).xp,23);
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,forfeited:true}),{xp:0,category:'forfeit',modifiers:['FORFEIT · NO XP']});
+test('zero Energy cannot start a fight',()=>{
+  const fighter=state({energy:0,pendingFight:null});
+  assert.equal(logic.bookFight(fighter,'opponent',25).reason,'energy');
 });
 
-test('lower-level opponents award no XP while same-level rivals retain full XP',()=>{
-  assert.deepEqual(logic.fightXp({playerLevel:5,opponentLevel:4,won:true}),{xp:0,category:'lower_level',modifiers:['LOWER-LEVEL OPPONENT · NO XP']});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,rival:true}),{xp:62,category:'standard',modifiers:[]});
-  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:4,won:true,rival:true}).xp,0);
+test('daily counters retain only the fight count',()=>{
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-08-28',fight:4,train:3,hustle:2},'2026-08-28'),{date:'2026-08-28',fight:4});
+  assert.deepEqual(logic.dailyCountersFor({},'2026-08-28'),{date:'2026-08-28',fight:0});
 });
 
-test('ranked and championship XP bonuses do not stack',()=>{
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,ranked:true}),{xp:74,category:'ranked',modifiers:['RANKED FIGHT BONUS +20%']});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,ranked:true,championship:true}),{xp:81,category:'championship',modifiers:['WORLD TITLE BOUT BONUS +30%']});
+test('level-up resources raise Health maximum without filling resources',()=>{
+  const fighter=state({energy:31,health:42,maxHealth:100});
+  logic.applyLevelUpResources(fighter);
+  assert.equal(fighter.maxHealth,105);
+  assert.equal(fighter.energy,31);
+  assert.equal(fighter.health,42);
 });
 
-test('winning the belt adds 25 XP once while a title defense does not',()=>{
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,championship:true,titleWon:true}),{xp:106,category:'title_victory',modifiers:['WORLD TITLE BOUT BONUS +30%','WORLD TITLE WON +25 XP']});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,championship:true,titleWon:false}),{xp:81,category:'championship',modifiers:['WORLD TITLE BOUT BONUS +30%']});
-});
-
-test('small early-career fight XP boosts hit the target without changing middle levels',()=>{
-  assert.equal(logic.fightXp({playerLevel:1,opponentLevel:1,won:true}).xp,50);
-  assert.equal(logic.fightXp({playerLevel:2,opponentLevel:2,won:true}).xp,54);
-  assert.equal(logic.fightXp({playerLevel:3,opponentLevel:3,won:true}).xp,58);
-  assert.equal(logic.fightXp({playerLevel:5,opponentLevel:5,won:true}).xp,71);
-});
-
-test('opponent availability covers career fights, the global title, and accepted rematches',()=>{
-  const context={level:5};
-  assert.equal(logic.opponentAvailable({tier:5,lossesToPlayer:0},context),true);
-  assert.equal(logic.opponentAvailable({tier:6,lossesToPlayer:0},context),false);
-  assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:false},context),false);
-  assert.equal(logic.opponentAvailable({tier:2,lossesToPlayer:1,rematchAccepted:true},context),true);
-  assert.equal(logic.opponentGroup({network:true,tier:2,lossesToPlayer:1},context),'passed');
-  assert.equal(logic.opponentAvailable({network:true,tier:2,lossesToPlayer:1},context),true);
-  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true},context),true);
-  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:false},context),false);
-  assert.equal(logic.opponentState({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),'blocked');
-  assert.equal(logic.opponentAvailable({globalChampionship:true,tier:5,challengeEligible:true,titleCooldown:true},context),false);
-  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:5,challengeEligible:true},context),'title');
-  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:3,challengeEligible:true},context),'title');
-  assert.equal(logic.opponentState({globalChampionship:true,championDefense:true,tier:6,challengeEligible:true},context),'title');
-  assert.equal(logic.opponentAvailable({globalChampionship:true,championDefense:true,tier:3,challengeEligible:false,titleCooldown:true},context),false);
-});
-
-test('championship career rank follows rookie, prospect, contender, former champion, and champion priority',()=>{
-  assert.equal(logic.championshipCareerRank(1,null),'ROOKIE');
-  assert.equal(logic.championshipCareerRank(2,{champion_id:'champ',champion_level:5}),'ROOKIE');
-  assert.equal(logic.championshipCareerRank(3,{champion_id:'champ',champion_level:5}),'PROSPECT');
-  assert.equal(logic.championshipCareerRank(6,{champion_id:'champ',champion_level:5}),'TITLE CONTENDER');
-  assert.equal(logic.championshipCareerRank(4,{champion_id:'champ',champion_level:7,former_champion:true}),'FORMER WORLD CHAMPION');
-  assert.equal(logic.championshipCareerRank(2,{champion_id:'self',champion_level:2,is_champion:true,former_champion:true}),'WORLD CHAMPION');
-});
-
-test('simplified championship experience covers contender, champion, rematch, and offline states',()=>{
-  const locked=logic.championshipExperience({champion_level:5,challenge_eligible:false},{level:4});
-  assert.deepEqual(locked,{status:'locked',headline:'WORLD TITLE SHOT LOCKED',action:'REACH LEVEL 5',disabled:true});
-  const eligible=logic.championshipExperience({champion_level:5,challenge_eligible:true},{level:5});
-  assert.deepEqual(eligible,{status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false});
-  assert.deepEqual(logic.championshipExperience({champion_level:5,challenge_eligible:false},{level:6}),{status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false});
-  assert.deepEqual(logic.championshipExperience({champion_level:5,daily_bout_used:true},{level:6}),{status:'used',headline:'TITLE SHOT USED TODAY',action:'AVAILABLE AT MIDNIGHT',disabled:true});
-  assert.deepEqual(logic.championshipExperience({is_champion:true,selected_challenger_id:'challenger'}),{status:'defense',headline:'YOU ARE THE WORLD CHAMPION',action:'DEFEND YOUR TITLE',disabled:false});
-  assert.deepEqual(logic.championshipExperience({is_champion:true,defense_used_today:true}),{status:'defended',headline:'TITLE DEFENDED',action:'NEXT CHALLENGER AVAILABLE TOMORROW',disabled:true});
-  assert.deepEqual(logic.championshipExperience({is_champion:true}),{status:'no-challenger',headline:'YOU ARE THE WORLD CHAMPION',action:'NO CHALLENGER AVAILABLE',disabled:true});
-  assert.deepEqual(logic.championshipExperience({former_champion_rematch:true,daily_bout_used:true}),{status:'rematch-waiting',headline:'TITLE REMATCH AVAILABLE TOMORROW',action:'AVAILABLE AT MIDNIGHT',disabled:true});
-  assert.deepEqual(logic.championshipExperience({former_champion_rematch:true}),{status:'rematch',headline:'TITLE REMATCH AVAILABLE',action:'RECLAIM YOUR TITLE',disabled:false});
-  assert.deepEqual(logic.championshipExperience(null,{networkUnavailable:true}),{status:'unavailable',headline:'CHAMPIONSHIP UPDATE UNAVAILABLE',action:'TRY AGAIN',disabled:false});
-});
-
-test('regular ranked fighters never become championship bouts',()=>{
-  const ranked={network:true,tier:5,lossesToPlayer:0};
-  assert.equal(logic.opponentState(ranked,{level:5}),'current');
-  assert.equal(logic.opponentAvailable(ranked,{level:5}),true);
-  assert.equal(ranked.globalChampionship,undefined);
-});
-
-test('title-rematch wins, losses, and stale settlements use authoritative presentation',()=>{
-  assert.deepEqual(logic.championshipSettlementPresentation({status:'new_champion',mode:'rematch',isChampion:true}),{heading:'TITLE RECLAIMED',message:'You took back the World Championship.'});
-  assert.deepEqual(logic.championshipSettlementPresentation({status:'champion_defended',mode:'rematch',isChampion:false}),{heading:'TITLE FIGHT LOST',message:'The reigning champion kept the belt.'});
-  assert.deepEqual(logic.championshipSettlementPresentation({status:'stale',mode:'challenge'}),{heading:'CHAMPIONSHIP CHANGED',message:'The belt changed before this result could transfer it.'});
-  assert.deepEqual(logic.championshipSettlementPresentation({status:'new_champion',mode:'defense',isChampion:false,championHandle:'NewChamp'}),{heading:'YOU LOST THE WORLD TITLE',message:'@NewChamp took the belt. TITLE REMATCH AVAILABLE TOMORROW.'});
-});
-
-test('retirement suppresses unload saves and clears only career storage',()=>{
-  const values=new Map([
-    ['cage-warrior-save-v3','progressed career'],
-    ['cage-warrior-save-backup-v1','progressed backup'],
-    ['fytr-save-v1','legacy career'],
-    ['unrelated-preference','keep me'],
-  ]);
-  const storage={removeItem:key=>values.delete(key)};
-
-  assert.equal(logic.shouldPersistCareer(false),true);
-  assert.equal(logic.shouldPersistCareer(true),false);
-  assert.equal(logic.shouldPersistCareer(false,true,null),false,'a removed active save must not be resurrected');
-  assert.equal(logic.shouldPersistCareer(false,false,null),true,'a new career may create its first save');
-  assert.equal(logic.shouldPersistCareer(false,true,undefined),true,'an unreadable store should retain normal save error handling');
-  assert.deepEqual(logic.clearCareerStorage(storage,['cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1']),[
-    'cage-warrior-save-v3','cage-warrior-save-backup-v1','fytr-save-v1'
-  ]);
-  assert.equal(values.has('cage-warrior-save-v3'),false);
-  assert.equal(values.has('cage-warrior-save-backup-v1'),false);
-  assert.equal(values.has('fytr-save-v1'),false);
-  assert.equal(values.get('unrelated-preference'),'keep me');
-});
-
-test('network opponent ratings combine level, avatar allocation, and archetype without changing balance bounds',()=>{
-  const avatar={power:8,speed:6,chin:2,cardio:4},style={power:2,speed:-1,chin:1,cardio:0};
-  const levelOne=logic.networkOpponentRatings(1,avatar,style,.7);
-  const levelFive=logic.networkOpponentRatings(5,avatar,style,.7);
-  assert.deepEqual(levelOne,{power:8,speed:4,chin:5,cardio:4});
-  assert.deepEqual(levelFive,{power:15,speed:12,chin:12,cardio:12});
-  assert.ok(levelFive.power>levelFive.speed);
-  assert.deepEqual(logic.networkOpponentRatings(5,avatar,style,.7),levelFive);
-});
-
-test('confirmed fighter interactions award bounded deterministic social rewards',()=>{
-  assert.deepEqual(logic.socialInteractionReward(0),{followers:5,hype:1});
-  assert.deepEqual(logic.socialInteractionReward(7),{followers:12,hype:1});
-  assert.deepEqual(logic.socialInteractionReward(23),{followers:12,hype:3});
-  assert.deepEqual(logic.socialInteractionReward(-50),{followers:5,hype:1});
-});
-
-test('fighter identities preserve CapitalCase and use color descriptor city format',()=>{
-  assert.equal(logic.buildFighterIdentity('white','drizzle','phx'),'WhiteDrizzlePHX');
-  assert.equal(logic.buildFighterIdentity('Golden','Tornado','NYC'),'GoldenTornadoNYC');
-  assert.equal(logic.buildFighterIdentity('blue','viper','cle'),'BlueViperCLE');
-  assert.equal(logic.buildFighterIdentity('Mexican','Wind','SEA'),'MexicanWindSEA');
-  assert.equal(logic.buildFighterIdentity('Russian','Hammer','NYC'),'RussianHammerNYC');
-  assert.equal(logic.normalizeFighterIdentity('DarkCobraLAX'),'DarkCobraLAX');
-  assert.equal(logic.normalizeFighterIdentity('legacyfighter'),'legacyfighter');
-  assert.equal(logic.normalizeFighterIdentity('phxbrawler_01'),'phxbrawler_01');
-  assert.equal(logic.buildFighterIdentity('Blue','Viper','too-long'),'');
-});
-
-test('shared fighter opponent names keep CapitalCase without rewriting stored handles',()=>{
-  const openers=['White','Polish','Turbo'];
-  const descriptors=['Drizzle','Lightning','Thunder'];
-  const cityCodes=['PHX','NOLA','LAX','NYC'];
-  assert.equal(logic.displayFighterIdentity('PolishLightningNOLA',openers,descriptors,cityCodes),'PolishLightningNOLA');
-  assert.equal(logic.displayFighterIdentity('POLISHLIGHTNINGNOLA',openers,descriptors,cityCodes),'PolishLightningNOLA');
-  assert.equal(logic.displayFighterIdentity('TURBOTHUNDERLAX',openers,descriptors,cityCodes),'TurboThunderLAX');
-  assert.equal(logic.displayFighterIdentity('phxbrawler_01',openers,descriptors,cityCodes),'PHXBrawler_01');
-  assert.equal(logic.displayFighterIdentity('NYCTRICKSTER_01',openers,descriptors,cityCodes),'NYCTrickster_01');
-  assert.equal(logic.displayFighterIdentity('ROCKYVOLUME',openers,descriptors,cityCodes),'Rockyvolume');
-});
-
-test('fighter identity randomizer uses the full pools and supports deterministic tests',()=>{
-  assert.equal(logic.randomFighterIdentity(['White','Golden'],['Drizzle','Viper'],'SEA',()=>0),'WhiteDrizzleSEA');
-  const values=[0.75,0.5];
-  assert.equal(logic.randomFighterIdentity(['White','Golden'],['Drizzle','Viper'],'NYC',()=>values.shift()),'GoldenViperNYC');
-  assert.equal(logic.randomFighterIdentity([],['Drizzle'],'PHX',()=>0),'');
-  assert.equal(logic.randomFighterIdentity(['White'],[],'PHX',()=>0),'');
-});
-
-test('training quote enforces daily, cash, and energy costs before rewards',()=>{
-  const action={cost:20,sessions:2,gain:2};
-  assert.equal(logic.trainingQuote({cash:500,energy:50},action,true,75,1).reason,'limit');
-  assert.equal(logic.trainingQuote({cash:100,energy:50},action,true,75,4).reason,'cash');
-  assert.equal(logic.trainingQuote({cash:500,energy:0},action,true,75,4).reason,'energy');
-  assert.equal(logic.trainingQuote({cash:500,energy:10},action,true,75,4).reason,'energy');
-  assert.deepEqual(logic.trainingQuote({cash:500,energy:50},action,true,75,4),{ok:true,reason:'',sessions:2,cashCost:150,energyCost:20});
-  assert.equal(logic.trainingGain(2,false,false),2);
-  assert.equal(logic.trainingGain(2,true,true),3);
-  assert.equal(logic.trainingGain(1,false,true),2);
-});
-
-test('the personal trainer improves gym training without changing sparring rules',()=>{
-  assert.equal(logic.trainingGain(1,false,false),1);
-  assert.equal(logic.trainingGain(1,true,false),2);
-  assert.equal(logic.trainingPerfectChance(false),.17);
-  assert.equal(logic.trainingPerfectChance(true),.27);
-  assert.equal(logic.trainingInjuryChance,undefined);
-  assert.equal(logic.trainingRiskBonus,undefined);
-});
-
-test('computer-generated opponents compound after the opening career levels',()=>{
-  const levelOne=logic.generatedOpponentBaseRating(1),levelThree=logic.generatedOpponentBaseRating(3),levelFour=logic.generatedOpponentBaseRating(4),levelTen=logic.generatedOpponentBaseRating(10);
-  assert.equal(levelOne,4);
-  assert.equal(levelThree,7.8);
-  assert.ok(Math.abs(levelFour-10.088)<.000001);
-  assert.ok(levelTen>(4+9*1.9)*1.3);
-  assert.ok(levelFour-levelThree>levelThree-logic.generatedOpponentBaseRating(2));
-});
-
-test('daily opponent progression grants one half-XP runback after the first win',()=>{
-  assert.deepEqual(logic.opponentXpTier(0),{wins:0,multiplier:1,hypeChange:8,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'});
-  assert.deepEqual(logic.opponentXpTier(1),{wins:1,multiplier:.5,hypeChange:8,tier:'repeat',shortLabel:'50% XP',tapeLabel:'50% XP · SAME-DAY RUNBACK',resultLabel:'RUNBACK · 50% XP'});
-  assert.deepEqual(logic.opponentXpTier(2),{wins:2,multiplier:0,hypeChange:-7,tier:'exhausted',shortLabel:'NO XP · $0 · -7 HYPE',tapeLabel:'NO XP · $0 PURSE · -7 HYPE',resultLabel:'NO XP · $0 · -7 HYPE'});
-  assert.equal(logic.opponentFightPurse(500,0),500);
-  assert.equal(logic.opponentFightPurse(500,1),500);
-  assert.equal(logic.opponentFightPurse(500,2),0);
-  assert.equal(logic.fightDropEligible(0),true);
-  assert.equal(logic.fightDropEligible(1),true);
-  assert.equal(logic.fightDropEligible(2),false);
-  assert.deepEqual(logic.opponentXpTier(0,3,4),{wins:0,multiplier:0,hypeChange:8,tier:'lower_level',shortLabel:'NO XP · LOWER LEVEL',tapeLabel:'NO XP · LOWER-LEVEL OPPONENT',resultLabel:'LOWER LEVEL · NO XP'});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:1}),{xp:31,category:'standard_repeat',modifiers:['SAME-DAY RUNBACK · 50% XP']});
-  assert.deepEqual(logic.fightXp({playerLevel:4,opponentLevel:4,won:true,opponentWinsToday:2}),{xp:0,category:'standard_exhausted',modifiers:['OPPONENT XP EXHAUSTED · NO XP']});
-  assert.equal(logic.fightXp({playerLevel:4,opponentLevel:4,won:false,opponentWinsToday:0}).xp,23);
-  assert.equal(logic.nextOpponentXpStage(0,false),0);
-  assert.equal(logic.nextOpponentXpStage(0,true),1);
-  assert.equal(logic.nextOpponentXpStage(1,false),2);
-  assert.equal(logic.nextOpponentXpStage(1,true),2);
-  assert.equal(logic.nextOpponentXpStage(2,true),2);
-});
-
-test('Energy actions spend up to one cell and only zero Energy blocks them',()=>{
-  const partial={energy:10,maxEnergy:100};
-  assert.equal(logic.spendEnergy(partial,25),10);
-  assert.equal(partial.energy,0);
-  assert.equal(logic.spendEnergy(partial,25),0);
-  const fullCell={energy:50,maxEnergy:100};
-  assert.equal(logic.spendEnergy(fullCell,25),25);
-  assert.equal(fullCell.energy,25);
-});
-
-test('sparring requires exact Energy and enough Health for its worst outcome',()=>{
-  const live={cost:50,damage:[1,25]};
-  const hard={cost:75,damage:[25,50]};
-  assert.deepEqual(logic.sparringQuote({energy:50,health:26},live,1),{ok:true,reason:'',sessions:1,energyCost:50,maximumHealthCost:25});
-  assert.equal(logic.sparringQuote({energy:49,health:100},live,1).reason,'energy');
-  assert.equal(logic.sparringQuote({energy:100,health:25},live,1).reason,'health');
-  assert.equal(logic.sparringQuote({energy:75,health:50},hard,1).reason,'health');
-  assert.equal(logic.sparringQuote({energy:75,health:51},hard,0).reason,'limit');
-});
-
-test('side-job bonus rolls stay at twenty-five percent with bounded rewards',()=>{
-  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.25,0),{type:'',amount:0});
-  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',.2499,0),{type:'cash',amount:2});
-  assert.deepEqual(logic.hustleBonus('corner-gym-cleanup',0,.999999),{type:'cash',amount:50});
-  assert.deepEqual(logic.hustleBonus('unload-freight',0,.5),{type:'power',amount:1});
-  assert.deepEqual(logic.hustleBonus('nightclub-door',0,0),{type:'hype',amount:2});
-  assert.deepEqual(logic.hustleBonus('nightclub-door',0,.999999),{type:'hype',amount:4});
-  assert.deepEqual(logic.hustleBonus('rideshare-driver',0,.5),{type:'energy',amount:25});
-});
-
-test('gym training stays at one battery cell without repeat scaling',()=>{
-  assert.equal(logic.trainingCost({cost:8},0),25);
-  assert.equal(logic.trainingCost({cost:8},2),25);
-  assert.equal(logic.trainingGain(1,false,false,0),1);
-  assert.equal(logic.trainingGain(1,false,false,2),1);
-  assert.equal(Number.isInteger(logic.trainingGain(1,true,true,2)),true);
-  assert.equal(logic.sparringDamage,undefined);
-});
-
-test('recovery treatments are always purchasable below full Health and restore Health only',()=>{
-  const ice={energy:0,health:10},massage={energy:0,health:25},cryotherapy={energy:0,health:50},state={cash:400,energy:75,maxEnergy:100,health:94,maxHealth:100};
-  assert.equal(logic.recoveryQuote({...state,cash:40},ice,75).reason,'cash');
-  assert.equal(logic.recoveryQuote({cash:400,energy:75,maxEnergy:100,health:100,maxHealth:100},massage,125).reason,'full');
-  assert.equal(logic.recoveryQuote(state,massage,125).ok,true);
-  assert.deepEqual(logic.applyRecovery(state,massage),{energy:0,health:6});
-  assert.equal(state.energy,75);
-  assert.equal(state.health,100);
-  assert.deepEqual(logic.applyRecovery({energy:75,maxEnergy:100,health:70,maxHealth:100},cryotherapy),{energy:0,health:30});
-});
-
-test('daily injuries reduce every effective attribute by one point',()=>{
-  assert.equal(logic.injuredStat(5,true),4);
-  assert.equal(logic.injuredStat(20,true),19);
-  assert.ok(Math.abs(logic.injuredStat(8.66,true)-7.66)<.000001);
-  assert.equal(logic.injuredStat(1,true),1);
-  assert.equal(logic.injuredStat(8.66,false),8.66);
-});
-
-test('full Rest restores all missing Energy in one recovery',()=>{
-  const rest={energy:50,health:0},state={cash:0,energy:50,maxEnergy:100,health:100,maxHealth:100};
-  assert.equal(logic.recoveryQuote(state,rest,0).ok,true);
-  assert.deepEqual(logic.applyRecovery(state,rest),{energy:50,health:0});
-  assert.equal(state.energy,100);
-  assert.equal(logic.recoveryQuote(state,rest,0).reason,'full');
-});
-
-test('Surge Core restores one Energy segment for a flat cash fee',()=>{
-  const drink={energy:25,health:0},state={cash:25,energy:50,maxEnergy:100,health:100,maxHealth:100};
-  const quote=logic.recoveryQuote(state,drink,25);
-  assert.equal(quote.ok,true);
-  assert.equal(quote.cashCost,25);
-  assert.equal(quote.energyGain,25);
-  state.cash-=quote.cashCost;
-  assert.deepEqual(logic.applyRecovery(state,drink),{energy:25,health:0});
-  assert.equal(state.cash,0);
-  assert.equal(state.energy,75);
-  assert.equal(logic.recoveryQuote({...state,cash:24},drink,25).reason,'cash');
-  assert.equal(logic.recoveryQuote({...state,cash:25,energy:100},drink,25).reason,'full');
-});
-
-test('persistent health sets a tiered starting fight condition',()=>{
-  assert.equal(logic.startingFightCondition(100,100),100);
-  assert.equal(logic.startingFightCondition(90,100),100);
-  assert.equal(logic.startingFightCondition(89,100),95);
-  assert.equal(logic.startingFightCondition(70,100),95);
-  assert.equal(logic.startingFightCondition(69,100),88);
-  assert.equal(logic.startingFightCondition(50,100),88);
-  assert.equal(logic.startingFightCondition(49,100),78);
-  assert.equal(logic.startingFightCondition(20,100),78);
-  assert.equal(logic.startingFightCondition(90,120),95);
-});
-
-test('landed opponent offense directly damages persistent health',()=>{
-  assert.equal(logic.liveFightHealthDamage(),0);
-  assert.equal(logic.liveFightHealthDamage({landed:true}),1);
-  assert.equal(logic.liveFightHealthDamage({landed:true,knockdown:true}),4);
+test('fight damage and starting condition remain active',()=>{
   assert.equal(logic.liveFightHealthDamage({finish:'KO'}),12);
-  assert.equal(logic.liveFightHealthDamage({finish:'TKO'}),12);
   assert.equal(logic.liveFightHealthDamage({finish:'SUBMISSION'}),8);
+  assert.equal(logic.liveFightHealthDamage({knockdown:true}),4);
+  assert.equal(logic.startingFightCondition(95,100),100);
+  assert.ok(logic.startingFightCondition(45,100)<100);
 });
 
-test('hurt fighters risk one fight injury on landed opponent damage',()=>{
-  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:true}),.02);
-  assert.equal(logic.liveFightInjuryChance({eligible:false,landed:true}),0);
-  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:false}),0);
-  assert.equal(logic.liveFightInjuryChance({eligible:true,landed:true,injured:true}),0);
-  assert.equal(logic.fightInjuryCondition(80),40);
-  assert.equal(logic.fightInjuryCondition(37),18.5);
-  assert.equal(logic.fightInjuryCondition(240),100);
+test('lower-level opponents award zero XP and same-level runbacks award half',()=>{
+  const lower=logic.fightXp({won:true,playerLevel:4,opponentLevel:3});
+  const first=logic.fightXp({won:true,playerLevel:4,opponentLevel:4});
+  const runback=logic.fightXp({won:true,playerLevel:4,opponentLevel:4,opponentWinsToday:1});
+  assert.equal(lower.xp,0);
+  assert.equal(runback.xp,Math.round(first.xp*.5));
 });
 
-test('blackjack values aces correctly, caps bets, and pays standard outcomes',()=>{
-  assert.deepEqual(logic.blackjackHandValue(['AS','KH']),{total:21,soft:true,blackjack:true,bust:false});
-  assert.deepEqual(logic.blackjackHandValue(['AS','6H']),{total:17,soft:true,blackjack:false,bust:false});
-  assert.deepEqual(logic.blackjackHandValue(['AS','6H','KC']),{total:17,soft:false,blackjack:false,bust:false});
-  assert.equal(logic.blackjackHandValue(['KS','QH','2C']).bust,true);
-  assert.equal(logic.blackjackBetLimit(403),100);
-  assert.deepEqual(logic.blackjackOutcome(['AS','KH'],['9S','9H'],20),{result:'blackjack',payout:50,profit:30,player:{total:21,soft:true,blackjack:true,bust:false},dealer:{total:18,soft:false,blackjack:false,bust:false}});
-  assert.equal(logic.blackjackOutcome(['TS','QH'],['9S','9H'],20).payout,40);
-  assert.equal(logic.blackjackOutcome(['TS','8H'],['9S','9H'],20).result,'push');
-  assert.equal(logic.blackjackOutcome(['TS','8H'],['KS','QH'],20).result,'loss');
+test('rankings place champion first then sort by level and win percentage',()=>{
+  const profiles=[{id:'a',handle:'Alpha',level:9,wins:10,losses:0},{id:'b',handle:'Bravo',level:8,wins:2,losses:8},{id:'c',handle:'Champ',level:4,wins:1,losses:2}];
+  const ranked=logic.rankFighters(profiles,{champion_id:'c'},25);
+  assert.deepEqual(ranked.map(row=>row.id),['c','a','b']);
 });
 
-test('Cage Dice caps wagers and settles every supported bet',()=>{
-  assert.equal(logic.cageDiceBetLimit(403),100);
-  assert.deepEqual(logic.cageDiceOutcome(2,3,'under',20),{die1:2,die2:3,total:5,doubles:false,choice:'under',multiplier:2,won:true,payout:40,profit:20});
-  assert.equal(logic.cageDiceOutcome(5,4,'over',20).payout,40);
-  assert.equal(logic.cageDiceOutcome(3,4,'seven',20).payout,100);
-  assert.equal(logic.cageDiceOutcome(6,6,'doubles',20).payout,120);
-  assert.equal(logic.cageDiceOutcome(3,4,'doubles',20).payout,0);
+test('fighter creation allocations stay whole and total twenty',()=>{
+  const stats=logic.rollFighterAllocation(()=>.42);
+  assert.equal(logic.validFighterAllocation(stats),true);
+  assert.equal(Object.values(stats).reduce((sum,value)=>sum+value,0),20);
 });
 
-test('horse racing builds a stable daily field, weights favorites, and pays fractional odds',()=>{
-  const profiles=Array.from({length:8},(_,index)=>({id:`horse-${index}`,name:`Horse ${index}`,clue:'Form clue',style:'steady',color:'#fff'}));
-  const field=logic.horseRaceField(12345,profiles),repeat=logic.horseRaceField(12345,profiles),different=logic.horseRaceField(54321,profiles);
-  assert.deepEqual(field,repeat);
-  assert.notDeepEqual(field,different);
-  assert.equal(field.length,6);
-  assert.equal(new Set(field.map(horse=>horse.id)).size,6);
-  assert.deepEqual([...field.map(horse=>horse.odds)].sort((a,b)=>a-b),[2,3,4,5,7,11]);
-  assert.equal(logic.horseRaceBetLimit(403),100);
-  assert.deepEqual(logic.horseRacePayout(50,2,true),{won:true,odds:2,payout:150,profit:100});
-  assert.deepEqual(logic.horseRacePayout(50,11,false),{won:false,odds:11,payout:0,profit:-50});
-  const favoriteFirst=logic.horseRaceFinish(field.map((horse,index)=>Object.assign({},horse,{odds:index===0?2:[3,4,5,7,11][index-1]})),[0,0,0,0,0,0]);
-  assert.equal(favoriteFirst.length,6);
-  assert.equal(favoriteFirst[0],field[0].id);
-  assert.equal(new Set(favoriteFirst).size,6);
-  const orderedField=field.map((horse,index)=>Object.assign({},horse,{odds:[2,3,4,5,7,11][index]})),wins=Object.fromEntries(orderedField.map(horse=>[horse.id,0]));
-  for(let i=0;i<6000;i++)wins[logic.horseRaceFinish(orderedField,[i/6000,.1,.2,.3,.4,.5])[0]]++;
-  assert.ok(wins[orderedField[0].id]>wins[orderedField[5].id]*3);
+test('Victory Pack progress remains capped and eligibility requires an on-level win',()=>{
+  assert.equal(logic.nextVictoryPackProgress(3,2),4);
+  assert.equal(logic.victoryPackReady(4),true);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:4}),true);
+  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:3}),false);
 });
 
-test('score helpers expose a trailing player for the final-ten-second decision',()=>{
-  const rounds=[{scoreP:9,scoreO:10},{scoreP:10,scoreO:9},{scoreP:9,scoreO:10}];
-  assert.deepEqual(logic.fightScore(rounds),{player:28,opponent:29});
-  assert.equal(logic.playerTrailing(rounds),true);
-  rounds[2]={scoreP:10,scoreO:8};
-  assert.equal(logic.playerTrailing(rounds),false);
+test('gear drops are validated without economy fields',()=>{
+  const drop=logic.normalizeGearDrop({item:{id:'wraps',name:'Wraps',category:'Fight Gear'},rarity:'COMMON',count:1,reason:'VICTORY'});
+  assert.equal(drop.item.id,'wraps');
+  assert.equal(drop.rarity,'COMMON');
+  assert.equal(logic.normalizeGearDrop({item:{},rarity:'COMMON'}),null);
 });
 
-test('Victory Pack progress is deterministic and level-gated',()=>{
-  let count=0;
-  count=logic.nextVictoryPackProgress(count);
-  assert.equal(count,1);
-  count=logic.nextVictoryPackProgress(count,2);
-  assert.equal(count,3);
-  assert.equal(logic.victoryPackReady(count),false);
-  count=logic.nextVictoryPackProgress(count);
-  assert.equal(count,4);
-  assert.equal(logic.victoryPackReady(count),true);
-  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:4,repeatEligible:true}),true);
-  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:5,repeatEligible:true}),true);
-  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:3,repeatEligible:true}),false);
-  assert.equal(logic.victoryPackWinEligible({playerLevel:4,opponentLevel:5,repeatEligible:false}),false);
-});
-
-test('gear drop reveal data is normalized without mutating the awarded item',()=>{
-  const item={id:'small-gym-dog',name:' Small Gym Dog ',category:' Lifestyle ',rarity:'COMMON',icon:'dog'};
-  const drop=logic.normalizeGearDrop({item,rarity:'common',count:'2.9',isNew:true,reason:' DAILY DROP ',extras:'+$100 CASH'});
-  assert.deepEqual(drop,{
-    item:{id:'small-gym-dog',name:'Small Gym Dog',category:'Lifestyle',rarity:'COMMON',icon:'dog'},
-    rarity:'COMMON',count:2,isNew:true,reason:'DAILY DROP',extras:'+$100 CASH'
-  });
-  assert.equal(item.name,' Small Gym Dog ');
-});
-
-test('invalid or stale gear drop data is rejected before the result UI renders it',()=>{
-  const validItem={id:'wraps',name:'Stiff Hand Wraps',category:'Fight Gear',rarity:'COMMON'};
-  assert.equal(logic.normalizeGearDrop(null),null);
-  assert.equal(logic.normalizeGearDrop({item:null,rarity:'COMMON'}),null);
-  assert.equal(logic.normalizeGearDrop({item:{id:'missing',name:'',category:'Lifestyle'},rarity:'COMMON'}),null);
-  assert.equal(logic.normalizeGearDrop({item:validItem,rarity:'MYTHIC'}),null);
-  assert.deepEqual(logic.normalizeGearDrop({item:validItem,count:-4}),{
-    item:validItem,rarity:'COMMON',count:1,isNew:false,reason:'GEAR DROP',extras:''
-  });
-});
-
-test('endorsement progression exposes only the next unsigned deal',()=>{
-  const ids=['bobs-auto','volt','ironhide','apex'];
-  assert.equal(logic.nextEndorsementId(ids,[]),'bobs-auto');
-  assert.equal(logic.nextEndorsementId(ids,['bobs-auto']),'volt');
-  assert.equal(logic.nextEndorsementId(ids,['bobs-auto','volt']),'ironhide');
-  assert.equal(logic.nextEndorsementId(ids,['bobs-auto','volt','ironhide','apex']),'');
-});
-
-test('fight plans reward scouting, punish stacked mistakes, and matter most in close matchups',()=>{
-  const plan={pace:'fast',offense:'aggressive',tactics:'adapt'};
-  const prepared=logic.fightPlanAssessment({
-    player:{power:14,speed:11,chin:10,cardio:14},opponent:{power:10,speed:11,chin:10,cardio:11},
-    plan,fighterStyle:'striker',opponentStyle:'striker',focus:95
-  });
-  const careless=logic.fightPlanAssessment({
-    player:{power:10,speed:10,chin:8,cardio:7},opponent:{power:12,speed:10,chin:12,cardio:11},
-    plan,fighterStyle:'striker',opponentStyle:'striker',focus:60
-  });
-  const physicalMismatch=logic.fightPlanAssessment({
-    player:{power:20,speed:20,chin:20,cardio:20},opponent:{power:8,speed:8,chin:8,cardio:8},
-    plan,fighterStyle:'striker',opponentStyle:'striker',focus:95
-  });
-  assert.equal(prepared.grade,'EDGE');
-  assert.ok(prepared.modifier>.06);
-  assert.equal(careless.grade,'EXPOSED');
-  assert.ok(careless.modifier<-.05);
-  assert.ok(physicalMismatch.modifier<prepared.modifier);
-  assert.equal(logic.fightPlanAssessment({player:{power:11,speed:11,chin:11,cardio:11},opponent:{power:11,speed:11,chin:11,cardio:11},plan,fighterStyle:'striker',opponentStyle:'striker',focus:95,adaptationScale:0}).components.tactics,0);
-});
-
-test('explosive builds fatigue faster when Power or Speed greatly exceeds Cardio',()=>{
-  assert.equal(logic.cardioImbalanceFatigue({power:12,speed:10,cardio:8}),0);
-  assert.equal(logic.cardioImbalanceFatigue({power:14,speed:10,cardio:8}),0);
-  assert.ok(Math.abs(logic.cardioImbalanceFatigue({power:16,speed:10,cardio:8})-.003)<1e-12);
-  assert.ok(Math.abs(logic.cardioImbalanceFatigue({power:10,speed:16,cardio:8})-.003)<1e-12);
-  assert.equal(logic.cardioImbalanceFatigue({power:40,speed:10,cardio:5}),.018);
-});
-
-test('daily counters use local calendar dates, reset once, and clamp tampered limits',()=>{
-  const localDate=new Date(2026,0,2,0,30);
-  const today=logic.localDateKey(localDate);
-  assert.equal(today,'2026-01-02');
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-01-01',fight:7,train:4,sparring:2,hustle:3,blackjack:1,cageDice:1,horseRace:1,publicity:2,recovery:1},today),{date:today,fight:0,train:0,sparring:0,hustle:0,blackjack:0,cageDice:0,horseRace:0,publicity:0,recovery:0});
-  assert.deepEqual(logic.dailyCountersFor({date:today,fight:99,train:99,sparring:9,hustle:-4,blackjack:9,cageDice:7,horseRace:8,publicity:3,recovery:9},today),{date:today,fight:10,train:4,sparring:2,hustle:0,blackjack:1,cageDice:1,horseRace:1,publicity:1,recovery:1});
-  assert.equal(logic.dailyCountersFor({date:today,hustle:99},today).hustle,2);
-});
-
-test('fight gear loadout expands from two slots to four at level eight', () => {
-  assert.equal(logic.gearLoadoutLimit(1),2);
-  assert.equal(logic.gearLoadoutLimit(7),2);
-  assert.equal(logic.gearLoadoutLimit(8),4);
-  assert.equal(logic.gearLoadoutLimit(15),4);
-});
-
-test('daily reset countdown targets the next local midnight',()=>{
-  const now=new Date(2026,7,8,21,34,56,250),next=new Date(2026,7,9,0,0,0,0);
-  assert.equal(logic.millisecondsUntilNextLocalDay(now),next-now);
-  assert.equal(logic.formatCountdown(next-now),'02:25:04');
-  assert.equal(logic.formatCountdown(999),'00:00:01');
-  assert.equal(logic.millisecondsUntilNextLocalDay('not-a-date'),0);
+test('countdown formatting supports Energy and Health timers',()=>{
+  assert.equal(logic.formatCountdown(444000),'00:07:24');
+  assert.equal(logic.formatCountdown(0),'00:00:00');
 });

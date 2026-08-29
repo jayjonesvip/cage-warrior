@@ -1,653 +1,145 @@
 # Cage Grind
 
-[![pages-build-deployment](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jayjonesvip/cage-warrior/actions/workflows/pages/pages-build-deployment)
+Cage Grind is a mobile-first MMA career game built with static HTML, CSS, and vanilla JavaScript. Open `index.html` in a modern browser; there is no build step or application server.
 
-[Play Cage Grind](https://cagegrind.com/)
+## Core loop
 
-Cage Grind is a mobile-first, single-player combat-career game. Open
-`index.html` directly in a modern browser; no build step or server is required.
-The page uses ordinary, ordered scripts with no bundler. Shared presentation
-lives in `css/styles.css`; the landing screen has its own `css/landing.css` and
-`js/landing.js`; fight planning and fight-focus flows live in `js/fight-plan.js`
-and `js/fight-focus.js`; Underground Buzz lives in `js/underground-buzz.js`; and
-`js/game.js` coordinates those features with the career.
+The career is intentionally centered on one repeatable loop:
 
-### Landing page
+1. Choose an opponent and fight.
+2. Win to earn one permanent Attribute Point.
+3. Assign the point to Power, Speed, Chin, or Cardio—or save it.
+4. Energy and Health recover automatically.
+5. Fight again, build a following, attract sponsors, collect gear, and climb toward the championship.
 
-- Every browser visit opens on a minimal, responsive Cage Grind card before
-  revealing the game interface. The transparent app icon sits behind the card
-  as a centered ten-percent-opacity watermark.
-- A completed local career receives a personalized **Welcome Back** message,
-  current level, record, career rank, and a **Continue Career** action. A partially
-  completed fighter receives **Continue Your Build** instead of being mistaken
-  for a new or finished career.
-- New players see **Build. Fight. Become.** and **Start Your Career** without a
-  simulated fighter card that could be mistaken for live gameplay. Choosing an
-  entry action never resets or replaces the recovered local save.
-- Championship loading remains non-blocking and personalizes a returning
-  champion's status without adding another panel to the front door.
-- A deliberately small **Origins of Cage Grind** link preserves the recovered
-  CageWars.net history, screenshots, historical mechanics, and current-system
-  distinction without competing with the career entry action.
-- `landing_view` and `landing_enter` remain the primary funnel events.
+Training, sparring, manual resting, recovery-room treatments, side jobs, gambling, and the money economy are not part of the current game.
 
-### Responsive desktop interface
+## Navigation
 
-- Phone and installed-mobile layouts remain unchanged below 1100px.
-- At desktop widths, navigation becomes a persistent left rail, the fighter
-  HUD becomes a single horizontal command bar, and the playable area expands
-  to a 1440px maximum workspace.
-- Home uses a split career dashboard, Training and Hustle use two-column
-  workspaces, opponents and gear render four across, and Cage Feed receives a
-  wider reading column.
-- Fight Night keeps the same planned simulation, with a wider live timeline on
-  desktop after the locker-room plan is locked.
-- Buttons use one shared three-color language at every screen size: blue for
-  primary actions, slate for secondary choices, and amber for rare rewards,
-  title opportunities, and other limited moments.
+The simplified four-item navigation is Home, Fight, Gear, and Feed. The four primary pages are:
 
-## Current game
+- **Home** — identity, record, world rank, sponsor progress, available Attribute Points, Daily Drop, and career guide.
+- **Fight** — recommended opponents, ranked real fighters, rematches, and championship activity.
+- **Gear** — Victory Packs, collectibles, and the equipped Fight Gear loadout.
+- **Feed** — CageReporter coverage, mentions, rivals, sponsors, and player interactions.
 
-Build a fighter from unknown rookie to champion through tactical fights,
-training, side jobs, publicity, sponsors, equipment drops, and a persistent
-generated league.
+The compact Energy, Health, Power, Speed, Chin, and Cardio dashboard remains sticky while the larger identity row scrolls away.
 
-### Fighting and progression
+## Fighter creation and progression
 
-- New careers complete three permanent Home-screen steps in order. First,
-  choose a "Fighting Out Of" hometown: Phoenix, Los Angeles, Chicago, New York,
-  Miami, Houston, Cleveland, Seattle, New Orleans, Hawaii, Boston, Atlanta,
-  San Francisco, Denver, Tampa Bay, Philadelphia, San Antonio, Las Vegas,
-  Portland, or Baltimore. New Orleans belongs to the Deep South title region;
-  Hawaii belongs to the Pacific Islands. Next, **Build Your Fighter** on one
-  focused card. Left and right controls cycle through all 44 portraits, while
-  **Random** jumps to another appearance without changing the attributes.
-  **Shuffle Attributes** rolls an independent Power, Speed, Chin, and Cardio
-  allocation totaling exactly 20, with each value between 2 and 8. Live meters
-  show the roll, and one of two permanent MMA archetypes is calculated above
-  them: offensive totals become **Striker**, while Chin-and-Cardio-led builds become
-  **Grappler**. Ties resolve as Striker. Locking the fighter saves the portrait,
-  allocation, and calculated archetype together, so there is no separate
-  archetype-selection step. The last step suggests a fighter identity
-  from shared color and weather/dangerous-animal pools, followed by the hometown
-  abbreviation. **Shuffle** rerolls it, while **Manual Entry** opens the name card
-  as a text field for a custom single-word handle. **Ready** checks the global
-  roster, permanently reserves the unique identity, and starts the career.
-- Fighter attributes are independent from the chosen portrait. Every roll uses
-  whole numbers from 2 through 8 and totals exactly 20. The game validates the
-  allocation before locking the fighter in.
-- Each selector disappears as soon as its choice is locked. Career systems,
-  the HUD, and navigation remain hidden until hometown, fighter build, and
-  permanent fighter name are complete. The Career Identity card keeps the hometown and archetype
-  beside Followers, career earnings, and the live World Championship status; the selected
-  avatar remains visible in the Home hero without a duplicate identity row.
-  The fighter name is also the Cage Feed username and cannot be edited after
-  **Ready**. New names use CapitalCase without a numeric suffix, such as
-  `WhiteDrizzlePHX`, `GoldenTornadoNYC`, or `BlueViperCLE`. Manual handles are
-  3–32 characters, start with a letter, and use only letters, numbers, or an
-  underscore. Every hometown uses
-  the same 82 opening words (48 color/attitude terms and 34 nationality/origin
-  terms), plus 29 weather/force, 37 animal, and 37 combat terms. Exact repeated
-  words are excluded, producing 8,443 combinations per city and 168,860 across
-  all 20 hometowns. City endings are PHX, LAX, CHI,
-  NYC, MIA, HOU, CLE, SEA, NOLA, HNL, BOS, ATL, SFO, DEN, TPA, PHL, SAT,
-  LAS, PDX, and BWI. Each hometown also owns a persistent accent color that
-  follows its fighter across Home, the Cage Feed, public profiles, ranked cards,
-  the World Championship, and fight presentation. Tale of the Tape, the live
-  fight, and results display the player's color alongside the opponent's color.
-- Home includes a deliberately red **Retire Fighter** action. Its confirmation
-  warns that the local career, record, Cash, gear, and progress will be lost.
-  the verified CEO publishes the retirement, the name remains permanently reserved,
-  and the game returns to the first fighter-creation step. Historical title
-  results remain in the public record, while the newly claimed fighter starts
-  with fresh title-shot eligibility against the current champion. If the public
-  retirement cannot be recorded, the local career is kept safe. A fighter who
-  retires while holding the World Championship is permanently announced as a
-  retired champion; the belt immediately passes to the highest-ranked active
-  fighter using level, win percentage, and total fights.
-- Home presents Hit the Gym, Take a Fight, Hustle, and Gear as illustrated
-  choice cards. The cards explain each career path while distinct bottom
-  buttons perform the actual navigation, so every action remains visually
-  obvious. Enabled primary actions use consistent blue fills and bold white
-  labels; secondary controls use slate, special opportunities use amber, and
-  disabled or locked controls remain visibly subdued.
-- `Odd Jobs` are early-career work only, with two jobs allowed per local day.
-  At Level 5 the section
-  is replaced by a full-time fighter milestone note, while publicity,
-  endorsements, and Underground Buzz remain available. Each shift runs through
-  a short icon-driven work meter before revealing its pay. Every job has a 25%
-  bonus chance: gym cleanup can uncover $2–$50 in spare change, extra-heavy
-  freight adds 1 Power, and recognition at the nightclub door adds 2–4%
-  Hype. Rideshare Driver pays $3 per randomly assigned mile across a 12–32 mile
-  route, with a 25% chance to restore one 25% Energy segment from resting between fares.
-- Odd Jobs, sparring, Recovery Room treatments, and Career Spotlight appearances
-  share one modal-meter layout: title, body, a stationary centered icon over the
-  filling meter, and a two-column Reward / Cost panel. Meter length is stored in
-  each action definition as `meterSeconds`; Career Spotlight appearances range
-  from two to six seconds and reveal their results only when the meter completes.
-- Underground Buzz previews its locked games as future opportunities. Backroom
-  Blackjack unlocks at Level 2, and Cage Dice unlocks at Level 4 with one daily
-  roll on under seven, over seven, exactly seven, or doubles. Underground Racing
-  unlocks at Level 6 with one daily win bet on a generated six-horse field. All
-  three games cap a wager at 25% of available Cash. Cage Dice uses
-  `assets/cage-dice.jpg`, with a built-in dice fallback if the artwork cannot
-  load.
-- Fighter selection places each transparent portrait over a blue arena-light
-  gradient, with a brighter keyboard-focus and hover treatment around the card.
-- The Home hero shows a championship-aware career rank. Levels 1–2 are Rookie;
-  Level 3+ is Prospect until the fighter reaches the reigning champion's level,
-  when the rank becomes Title Contender. World Champion and Former World
-  Champion override those progression ranks for the current career.
-- An active endorsement appears in the Home hero directly beneath Cage Status,
-  showing the sponsor brand and the number of contracted fights remaining.
-- Endorsements form a sequential sponsor ladder beginning with Bob's Auto Shop
-  at Level 2, followed by Gary's Bar & Grill at Level 3 and 500 Followers, then
-  larger brands at 2,500, 10,000, 30,000, 80,000, and 200,000 Followers. Only
-  the next brand may offer a contract, so crossing
-  several milestones at once never produces competing offers. Older saves
-  repair incomplete sponsor history before rendering or accepting deals.
-- A rotating promoter ticker leads the unlocked Home screen and teaches the
-  active rules—fight costs, medical clearance, purses, rematches, tactics,
-  drops, fight planning, and titles—in the voice of a suspiciously well-informed
-  fight agent.
-- The persistent top HUD keeps all four fighter attributes in one compact row
-  directly beneath energy and health across every unlocked game screen.
-- Energy is a four-cell battery displayed at 0%, 25%, 50%, 75%, or 100%.
-  Health retains its continuous meter. Critical resource styling turns red
-  below 25% so a dangerous condition is visible at a glance.
-- XP sits beneath level and rank in the top-left identity block, while Hype
-  sits beneath Cash and Followers on the right. The redundant Home resource
-  card is removed.
-- **XP is earned through fights. Training improves attributes, hustles earn
-  cash, and publicity builds Followers and Hype.** Completed losses award
-  visible fight experience, while forfeits award none. The level requirement
-  remains `80 + (level × 40)` XP.
-- Followers are the fighter's lasting social audience, while Hype represents
-  short-term attention. Successful fighter-to-fighter Cage Feed posts add a
-  small, deterministic burst of both while keeping the shared community feed
-  at the center of the interaction.
-- Every generated opponent uses the same Striker-or-Grappler system. Their card,
-  tale of the tape, attributes, scouting report, and in-fight behavior all
-  reflect that archetype. Generated career-opponent attributes retain their
-  original linear curve through Level 3, then receive a 1.04 compounding
-  multiplier per level beginning at Level 4. Real Cage Network snapshots do
-  not use this fictional-opponent difficulty curve.
-- Every booked fight begins with a locker-room **Fight Plan**. Players set a
-  **Slow** or **Fast** pace, choose **Conservative** or **Aggressive** offense,
-  and decide whether to **Stick to Style** or **Adapt**. The last locked-in
-  combination is saved and preselected for the next fight.
-- Slow pace creates fewer exchanges and reduces accumulated cardio fatigue.
-  Fast pace creates more exchanges and gains initiative when the fighter has
-  both strong cardio and a cardio edge, but magnifies fatigue when that edge is
-  missing. Power or Speed that reaches roughly double Cardio also accelerates
-  fatigue; ordinary specialist builds are unaffected, while extreme explosive
-  builds need Cardio investment to sustain their output. Conservative offense favors jabs, accuracy, and defense at the cost
-  of damage and knockdowns; Aggressive offense favors power shots and finish
-  attempts while sacrificing accuracy and creating counter opportunities.
-- Stick to Style uses the permanent signature archetype and its full
-  familiarity throughout the bout. Adapt starts in the signature style, makes
-  a partial matchup adjustment in Round 2, and uses the full response plan in
-  Round 3. High Focus improves the execution of those switches while low Focus
-  can turn adaptation into hesitation. The fight then runs as one uninterrupted
-  full simulation, with no coach fee or routine mid-fight decision prompts.
-- Fight-plan quality is evaluated against the actual matchup rather than a
-  universal preferred combination. Relative Power, Speed, Chin, Cardio,
-  archetypes, and Focus determine whether the plan creates an **Edge**, stays
-  **Even**, or leaves the fighter **Exposed**. Its influence is strongest when
-  the fighters are evenly rated and deliberately smaller in physical
-  mismatches. The live feed identifies the most important tactical effect and
-  the result screen records the final plan grade.
-- Every booked fight generates a fight-only **Focus** rating from 75–90%. Half
-  of walkouts receive an unread text from Mom, the fighter's wife, brother
-  Tommy, Agent Carl, or Grandma. Reading it reveals one of 50 messages with a meaningful boost or distraction; ignoring
-  it leaves the message hidden and applies a smaller known Focus cost. The
-  other half offer quiet preparation: music gains 4–10 Focus with a 20% chance
-  to reach 100%, while meditation reliably raises Focus to at least 92%.
-  Focus is capped at 50–100% and affects initiative, strike execution, and the
-  quality of adaptive game-plan changes for that fight only. The Focus screen
-  reuses the full-bleed fight-plan locker room and shows the percentage in the
-  final-moments label instead of a separate meter. Its result card presents the
-  final tier and Focus percentage as the primary hierarchy, with only the net
-  change in a compact accent badge.
-- Mom and Wife each have 16 possible texts, Tommy has 10, and Carl and Grandma
-  have 4 each; every contact's pool is evenly split between positive and
-  negative outcomes. Messages come from a shuffled, saved 50-card deck, so
-  every text appears once before any repeats, including after a reload.
-- Grapplers can finish a fight by tap after a successful takedown. Speed,
-  cardio, opponent condition, and signature-plan proficiency affect the
-  submission chance.
-- Persistent Health determines starting fight Condition. Fighters at 90% or
-  better Health enter at 100% Condition; 70–89% enters at 95%, 50–69% at 88%,
-  and 20–49% at 78%. Below 20 Health still fails medical clearance, making a
-  quick turnaround while hurt possible but meaningfully dangerous.
-- Entering below full Health enables a hidden injury roll on every damaging
-  opponent hit. At most one injury can occur per fight; it immediately halves
-  current Condition, appears in the fight feed and toast, reduces every
-  effective attribute by one, and persists until the next local midnight.
-- Each confirmed opponent strike or takedown directly removes 1 persistent
-  Health while its existing fight damage continues to reduce Condition. A
-  knockdown removes 4 Health, then a losing KO/TKO removes 12 additional
-  Health or a losing submission removes 8. Misses, movement, and defensive
-  narration remove no Health. The live deductions are saved immediately and
-  the result screen reports the total fight damage.
-- Major incoming damage (4 or more persistent Health) triggers a brief,
-  stylized blood-sport particle burst over the live fight. Routine shots do not.
-- A fighter may book a fight with any Energy above 0%; 0% Energy blocks the
-  fight. Booking spends up to one 25% battery cell, so a fighter below 25%
-  enters at 0% afterward. Career level, scheduled length, early finishes, and
-  haymaker decisions do not add another Energy charge. Existing Health and
-  medical-clearance rules still apply.
-- Fighters can complete up to 10 fights per local calendar day. The Fight page
-  shows the remaining bouts, then reveals the live local-midnight countdown only
-  after all 10 fights are used; nonzero Energy and medical clearance remain the
-  primary pacing limits.
-- Watch fights normally or use 2× speed. There is no result skip and no routine
-  interruption once the cage door closes. Each round-number interlude remains
-  visible for two seconds; before Rounds 2 and 3 it carries the cumulative
-  unofficial score and whether the fighter leads, trails, or is even.
-- Fight results lead with a large **YOU WIN** or red **YOU LOST** outcome, then
-  show the finish method, round, and clock beneath it before the full scorecard.
-- Build win streaks and earn upset and rivalry bonuses. Streaks of two or more
-  become notable Cage Feed headlines after every additional win.
-- Cage Grind has one shared World Championship held only by an active ranked
-  profile. A fighter may challenge once their level reaches or exceeds the
-  champion's level.
-- The Fight page starts with a dedicated World Championship section. Reach the
-  champion's level to earn one title shot per UTC day. A dethroned champion gets
-  one level-override **Title Rematch** against the fighter who took the belt;
-  after that attempt, win or lose, the normal contender rules apply. Champions
-  receive one deterministic active ranked challenger and may defend once per
-  UTC day. Regular ranked fights are separate and never put the belt at risk.
-  Retiring and claiming a new fighter preserves old results and title history
-  while starting a new career-history window.
-- Generated progression continues beyond level 15.
-- Level-ups trigger a dedicated promotion celebration showing the new level
-  and rank, max-health gains, partial recovery, career bonus, and newly
-  available competition. Maximum Energy remains 100%; every level restores
-  one 25% Energy segment and up to 25 Health. Celebration effects share one bounded canvas loop,
-  respect reduced-motion preferences, and stop when their result dialog closes
-  so repeated rewards cannot accumulate background animation work.
+A new career permanently locks the fighter avatar, twenty-point starting attribute allocation, archetype, hometown, and unique Cage Feed handle.
 
-### Cage Feed
+Level and XP still come from fights. Attributes always display as whole numbers.
 
-- Completing a fighter identity activates Cage Feed, publishes the fighter's
-  introduction, grants the first Followers, and creates a one-time verified
-  CageReporter mention announcing that the fighter signed a Cage Grind contract.
-  Existing saved careers that already have Followers are treated as connected
-  accounts and keep their audience.
-- Cage Feed uses Supabase for a shared global timeline while the career itself
-  remains in `localStorage`. A connection is required only when **Ready**
-  reserves a new globally unique identity and when a retirement is published;
-  an established career and its local gameplay remain available offline.
-- Fighter name and Cage Feed username are one case-preserved value. The database
-  claims it atomically, silently tries another generated combination on a
-  collision, and never releases claimed or retired names for reuse. Legacy
-  lowercase identities remain valid and permanently reserved.
-- Cage Feed has its own bottom-navigation icon. Its numbered red badge counts
-  unread mentions only; opening the **Mentions** view marks those posts read.
-- The top-bar audience line shows both Followers and Following. Following is the
-  live count of ranked fighter profiles in the shared Cage Feed roster.
-- The timeline scrolls above a persistent two-action dock for **Call Out** and
-  **Show Respect**. Each action opens a
-  searchable ranked-fighter picker, generates a category-specific draft, and
-  requires a preview confirmation before publishing. A new draft can be drawn
-  without spending the daily allowance. Every Feed profile is clickable and
-  read-only; posting exists only in the action dock. The desktop Feed fills the
-  available workspace instead of retaining a narrow reading-column cap.
-- `@handles` use highlighted mention styling. Posts addressed to the current
-  fighter receive an amber edge and can be isolated with the Feed's **Mentions**
-  filter. Targeted fighter posts use the stored profile ID, while official posts
-  are matched against the current fighter's exact `@handle`.
-- `CageReporter` publishes one contract-signing announcement when a new fighter
-  is created, then exactly one contextual result for each eligible career fight.
-  The strongest fight angle wins: an injured victory, streak, ordinary win, or
-  loss. Appearances, autograph signings, and sponsor deals do not generate
-  Reporter coverage.
-- The verified `@CageGrindCEO` account uses the CEO's office portrait and a
-  distinct black-and-gold treatment. Server-authored CEO posts recognize a new
-  career and the first exceptional performance bonus without allowing arbitrary
-  client-authored CEO copy. Championship transfers and defenses are announced
-  only by the database-owned global belt workflow.
-- Tapping the CEO portrait opens his verified public profile with his executive
-  bio. The official account does not accept fighter-message interactions.
-- CageReporter uses a dedicated newsroom portrait and verified read-only
-  profile. Career reports address the featured fighter by `@handle`, so they
-  appear in that fighter's Mentions filter.
-- Each endorsement brand has a verified, clickable, read-only sponsor profile.
-  Accepting a new contract creates one sponsor-owned signing announcement
-  targeted to the fighter's permanent profile ID. Sponsor announcements do not
-  consume the fighter's daily posting allowance.
-- Every sanctioned title shot receives an official CEO announcement. Outside
-  the championship picture, only qualifying upsets and knockout finishes have
-  a deterministic 10% chance at one modest CEO cash and Hype bonus per local day.
-- The action dock draws personalized drafts from a 28-message pool covering
-  callouts and respect. The CEO alone
-  welcomes new fighters. A confirmed post awards 5–12 Followers and 1–3 Hype.
-  Supabase enforces five direct fighter interactions per UTC day;
-  `CageReporter` career coverage does not use that allowance. These social posts
-  do not fabricate an accepted online fight.
+Every legitimate victory awards exactly `+1 ATTRIBUTE POINT`. Losses and forfeitures never award one. Unspent points are persisted immediately and can be assigned from the victory result or Home. Assignment is permanent, saved immediately, and guarded against repeated clicks.
 
-### Career opponents
+The first post-fight result includes a compact guide explaining Attribute Points, passive recovery, and how to take the next fight. It is permanently hidden after that first result is closed; established careers do not see it.
 
-- Opponents are generated locally with persistent, country-aware identities such
-  as `MarioLopezMX` or `RandyJonesUSA`, plus attributes, archetypes,
-  professional records, and head-to-head history. First and last names come
-  from the same country group, so an unrelated suffix is never attached.
-- The **Cage Network** adds every exact-level real fighter profile beside four
-  locally generated contenders in **Recommended**. The **Ranked** filter shows
-  the complete real-fighter ladder from highest level to lowest. These are
-  clearly labeled AI-controlled snapshots that use the fighter's public
-  identity, portrait, archetype, and record. Their combat ratings are derived
-  deterministically from level, avatar allocation, and archetype. Roster cards
-  preserve CapitalCase identity display even for legacy all-caps profiles,
-  without rewriting the fighter's stored Cage Feed handle.
-- Cage Network snapshots persist in the local career and remain playable
-  offline. Fighting one never changes the ranked fighter's public record, never
-  creates a misleading shared CageReporter result, and can never award a title.
-- A Cage Network card uses the fighter's stored city or identity suffix to show
-  where they fight out of, their region, and the available purse. A fighter with
-  no prior player matchup is labeled **First Meeting** instead of showing an
-  empty head-to-head message.
-- Opponent style is always visible on roster cards, the Tale of the Tape,
-  locker-room Fight Plan, and live fight header so players can make an informed
-  tactical choice before the opening bell.
-- The current level always replenishes to four fresh contenders, so the fight
-  path cannot run dry before a level-up. Fresh current-level fights pay a full
-  purse; past-level fights and rival fights pay half purse.
-- Any available opponent who has beaten the player carries a bright horizontal
-  **Rival Fight** banner across the lower part of their fighter image and remains
-  immediately available.
-- Regular opponents never retire. Every defeated fighter persists in the
-  **Past Rivals** collection. A free taunt guarantees that rival
-  accepts one more fight; the bout uses the player's current level-based round
-  cost and pays half purse. It awards no XP when below the player's level;
-  otherwise it follows the same daily XP curve. Winning closes the offer
-  until another taunt, while losing keeps **Run It Back** immediately available.
-- Current-level and higher-level opponents award full base fight XP before the
-  first win that day. Lower-level opponents always award 0 XP. Completed ranked fights add 20%;
-  World Championship bouts add 30% instead of stacking the ranked bonus. A
-  first World Championship victory adds 25 XP, while title defenses do not.
-  The level-scaled `26 + (opponent level × 9)` victory formula is unchanged
-  above Level 3; Levels 1–3 receive a small 15/10/5 XP early-career boost so
-  fight-only progression reaches the intended early pacing.
-- The Career Opponents roster shows available current and past opponents and
-  rivals. Championship bouts never appear inside this roster. Fighters are presented as fixed-ratio
-  collectible-style cards, two across on mobile, with proportional artwork
-  selected deterministically from 24 standalone transparent fighter
-  silhouettes. Bright accent spotlights and subtle rim lighting keep the black
-  silhouettes readable against every roster status and Tale of the Tape card.
-  The front stays focused on identity and booking; tapping the card body flips
-  it to a fixed-height details side with attributes, rating, availability,
-  purse context, rivalry status, and head-to-head history. See Matchup remains
-  a separate action and does not trigger the flip.
-- An available opponent's **See Matchup** button opens a reversible Tale of the
-  Tape preview without displaying the purse on the roster action. The preview
-  spends no Energy and explains that any Energy above 0% permits booking.
-  It then offers **Go Back** or **Set Fight Plan**; up to one cell is charged
-  only after the fight is booked.
-- When the ten-fight daily allowance is exhausted, otherwise available fighter
-  cards take on the locked presentation and replace **See Matchup** with
-  **Daily Limit Reached — New Fights at Local Midnight** until the reset.
-- Each same-level or higher-level opponent has a daily XP curve: fights remain
-  at full XP until the first win, that win unlocks one 50% XP same-day runback,
-  and every later fight that day pays 0 XP. The runback is consumed whether it
-  ends in a win or loss. Later fights also pay no purse and cost 7 Hype even
-  when won; those zero-XP wins cannot award a collectible or advance the
-  Victory Pack meter. Opponent cards, the Tale of the Tape, and results
-  show the tier.
-- The shared champion is rendered from the authenticated Supabase profile and
-  is never generated or stored in the local career save. The dedicated card
-  shows champion identity, record, level, defenses, player status, and one clear
-  action or requirement. A champion sees one server-selected ranked challenger.
-  A fighter who loses the belt while away receives a one-time title-loss notice
-  naming the new champion and the next rematch date. The Tale
-  of the Tape uses a dedicated **World Championship Bout** banner
-  for championship matchups and compares Power, Speed, Chin, and Cardio with
-  proportional meters; the stronger side of each attribute is highlighted in
-  green and ties use a neutral gold treatment.
-- Daily Contracts and the seeded Daily Challenge are currently removed. The
-  guaranteed Daily Drop remains available and may be expanded later.
+## Passive recovery
 
-### Collectible drops
+Recovery is timestamp-based, so it continues accurately after reloads, device sleep, or time in the background.
 
-- Fight-win, Daily, and install collectibles arrive in sealed Cage Grind packs;
-  equipment is never purchased.
-- The home-screen Daily Drop awards Cash, one 25% Energy segment, and one deterministic,
-  level-eligible collectible every day. It does not reset Victory Pack progress.
-- Collectible card artwork is emphasized within the fixed two-column card
-  layout, while the Daily Drop uses the same high-contrast label treatment as
-  other primary actions.
-- Victory Packs use a visible deterministic four-segment meter instead of a
-  random drop chance. Eligible wins against same-level or higher-level opponents
-  add one segment; an upset, rivalry win, or KO/TKO adds two. Lower-level and
-  exhausted repeat opponents cannot advance the meter.
-- Completing the fourth segment guarantees a Victory Pack. Winning a title
-  guarantees an immediate Championship Drop of at least Rare quality.
-- Minimum level controls when an item enters the permanent pool. Earlier items
-  remain eligible at higher levels.
-- The Level 1 Common pool includes MMA Shorts for +1 Speed and an Energy Drink
-  that adds 0.02 Health every 15 seconds. Collectibles never passively restore Energy.
-- Rarity is rolled before the item. If the first item is already owned, every
-  Victory, Daily, or install pack performs one hidden item reroll within that
-  same rarity. A duplicate can still result and increases quantity, but never
-  stacks the item's perk.
-- Drop reveals validate their reward data before rendering. If a stale item or
-  a device-specific celebration effect fails, the awarded collectible remains
-  saved and the result dialog recovers instead of blocking the career.
-- Owned items appear as fixed 5:7 collectible cards, two across on mobile,
-  with full-card Common, Rare, Epic, and Legendary treatments. Tapping a card,
-  or using Enter or Space from the keyboard, flips it to show its description.
-- Collectibles are ready for optional disclosed product placements through the
-  `sponsored`, `brand`, `sponsorDescription`, `sponsorDisclosure`, `qrAsset`,
-  `promoCode`, and `campaignEnds` fields. QR campaign content is rendered only
-  when `qrAsset` is present, and cards never create clickable external links.
-  ALLMAX ISOFLEX is the first disclosed pilot placement.
-- Fight Gear starts with a two-slot active loadout and expands to four slots at
-  Level 8. Attempting to exceed the current limit opens a focused Loadout Full
-  dialog explaining the limit and unlock. Bling, Lifestyle, Property, and Rides
-  provide passive career bonuses.
-- The collectible pool also includes early-career and status drops such as a
-  used car, small-batch bourbon, a small gym dog, Cuban cigars, fresh tennis
-  shoes, a full-length fur coat, motorcycles, a scooter, camp food and
-  supplements, including the disclosed ALLMAX ISOFLEX pilot placement, a
-  flagship phone, a diamond grill, and a concert grand piano.
-  Small Gym Dog is a separate Common card from the existing Rare Gym Dog.
-  Collectibles support same-name PNG artwork in `assets/icons/` through their
-  stable item IDs.
+### Energy
 
-### Economy and training
+- Maximum: 100
+- Base recovery: `+1 Energy` every 5 seconds
+- Offline recovery cap: 8 hours
+- HUD status: `CHARGING · FULL IN MM:SS`
+- A cyan `+1` pop appears when displayed Energy increases.
+- If multiple points accumulate while backgrounded, the HUD reports the total once.
 
-- **Cash** is the spendable balance shown in the header.
-- New careers begin with $0 Cash. Early training upgrades must be earned through
-  fight purses, side shifts, and the first small sponsorship instead of being
-  affordable immediately.
-- **Career Earnings** is a permanent prestige total. Professional fight pay,
-  career bonuses, sponsors, and appearances increase both values.
-- Side jobs, underground winnings, and daily cash increase Cash without
-  inflating Career Earnings.
-- Underground Buzz offers Backroom Blackjack as a once-per-local-day game.
-  The player chooses a whole-dollar wager up
-  to 25% of available Cash, then plays a persisted hand with Hit or Stand.
-  Dealer stands on all 17s, natural blackjack pays 3:2, and pushes return the
-  wager. There are no splits, doubles, or insurance.
-- Underground Racing is independently available once per local day at Level 6.
-  Six horses receive a daily set of traditional fractional odds from 2/1 through
-  11/1, along with a short running-form clue. The player makes a win-only wager
-  up to 25% of available Cash and watches an eight-second six-lane race. The
-  interface shows the exact total return before the bet is placed; a winning
-  2/1 wager returns the original stake plus twice that amount in profit.
-- Basic training requires and costs exactly 25% Energy and allows three daily sessions. All
-  sparring levels share one separate daily session. Technical Sparring costs
-  exactly 25% Energy, adds +1 to one random skill, and causes no Health damage.
-  Live Sparring requires and costs 50% Energy, adds +2 to one random skill, and
-  costs a random 1–25 Health. Hard Sparring requires and costs 75% Energy, adds
-  +1 to all four skills, and costs a random 25–50 Health. Live and Hard Sparring
-  are disabled unless the fighter can cover their maximum possible Health loss.
-  Their activity meters run for two, four, and six
-  seconds respectively, then reveal and highlight the exact attributes awarded.
-- Training gains are whole points and there is no timed cooldown or cooldown
-  confirmation. Gym drills and sparring never trigger injuries, repeat bonuses,
-  or hidden risk rolls. Injury risk exists only when entering a fight below full
-  Health. Knee, shoulder, elbow,
-  rib, ankle, back, hand, and neck injuries reduce all four effective attributes
-  by one point. Injuries clear at the
-  player's next local midnight and never carry into a new day. While injured,
-  all gym and sparring actions are locked; recovery, hustles, and fights remain
-  available, and fights use the reduced attributes.
-- The personal trainer is an optional gym upgrade that improves gym gains and raises the
-  perfect-session odds from 17% to 27%. His fee is
-  `$250 + ($75 × fighter level)` per gym session. Coaching never changes a
-  sparring cost, reward, or risk.
-- The Training page shows a dedicated **Rest & Recharge** card above every other
-  section whenever Energy is below 100%. Free Rest fills Energy to 100% and takes
-  3 seconds for every missing 25% battery segment (3–12 seconds). Chugging a Surge
-  Core energy drink costs a flat $25, takes 2 seconds, and restores exactly one
-  25% Energy segment. Energy does not regenerate passively or while offline.
-  Paid treatments are available whenever Health is below full and restore Health
-  only: Ice Bath restores 10, Sports Massage restores 25, and Cryotherapy restores
-  50. Every restored Health point costs `$3 × fighter level`, giving all three
-  treatments identical value. Treatments are disabled at 100% Health and do not
-  consume a training session.
-- Most Energy-consuming actions—fights, gym training, Odd Jobs, and Career
-  Spotlight appearances—use up to 25% Energy and are disabled at 0%. Sparring
-  is the exception, with exact 25%, 50%, and 75% costs and matching minimum
-  Energy requirements. The Daily
-  Drop and level-up recovery also restore exactly one 25% segment, keeping the
-  entire Energy economy on the same battery intervals.
-- Live countdowns on the Training and Hustle pages appear when their currently
-  available daily activities are exhausted, showing the time remaining until
-  the player's next local midnight.
+The four-cell battery remains a visual aid, but Energy is continuous from 0–100 and is never rounded to 25-point segments.
 
-### Persistence
+Selected equipped Fight Gear can improve the Energy tick from 5 seconds to 4 seconds. Only the best equipped recovery perk applies, and the interval never drops below 4 seconds.
 
-Progress is stored locally in the browser with `localStorage`. Save migration
-preserves existing fighters, hometown identity, avatar and base allocation,
-generated rosters, rivalries, collections, loadouts, Cash, and
-Career Earnings. An in-progress blackjack hand is persisted so a refresh cannot
-consume the wager without allowing the player to finish. Horse-racing wagers,
-finish orders, and payouts are saved before their animation begins, preventing
-refresh rerolls while allowing the completed race to be reviewed. Legacy
-Pressure Fighter, Counter-Striker, Brawler, Trickster, Technician, and
-Endurance identities map to Striker. Control Grappler, Submission Hunter,
-Wrestle-Boxer, and older wrestling identities map to Grappler. Old opponent
-tendencies migrate without losing records or rivalries, and previously retired
-regular fighters return to the permanent Past Rivals system. Legacy local title
-progress and generated champions are removed because the shared database owns
-the only World Championship. The game also keeps
-a last-known-good backup and refunds energy from an interrupted fight when the
-save is restored. If a blank rookie save is ever written over a progressed
-career, startup prefers the progressed last-known-good backup automatically.
-Invalid JSON and empty save values cannot replace that backup. Save migration
-also clamps resources to their valid ranges, discards malformed roster entries,
-and repairs interrupted-fight booking data before play resumes. Daily rewards
-and activity limits reset on the player's local calendar date.
-Version 18 save migration merges legacy fighter names and Cage Feed handles into
-one locked identity without discarding career progress. Version 19 preserves the
-CapitalCase format for new identities while retaining existing lowercase names.
-Only Cage Grind's
-primary, backup, and legacy career keys are removed on retirement; the browser's
-Supabase session and unrelated site storage are left intact.
+### Health
 
-### Replaceable icons
+- Recovers `+1 Health` every 60 seconds
+- Never exceeds maximum Health
+- HUD status: `RECOVERING · FULL IN HH:MM:SS`
+- Uses the same timestamp and offline-cap safeguards as Energy
 
-Interface, fight, training, hustle, publicity, sponsor, title, and collectible
-icons support individual PNG overrides. Add a correctly named file under
-`assets/icons/`; the PNG replaces the built-in symbol automatically, while a
-missing file safely leaves the original fallback visible. The complete
-filename inventory and usage map lives in
-[`assets/icons/README.md`](assets/icons/README.md).
+Fight damage, minimum medical clearance, and fighting-hurt injury risk remain active.
 
-## Development
+## Fight rewards
 
-Run the repository checks with:
+Fight results focus on career progress instead of currency:
 
-```sh
+- One Attribute Point for a victory
+- XP
+- Followers
+- Hype changes
+- Victory Pack progress or a gear reveal
+- Rivalry and championship outcomes
+
+Same-day opponent XP rules remain: full XP for the first same-level win, half XP for one runback, then zero XP. Lower-level opponents award no XP.
+
+## Gear and Victory Packs
+
+Eligible wins against opponents at the fighter's level or higher advance the four-step Victory Pack meter. Upsets, rivalries, and finishes can accelerate progress. A first career win guarantees a Victory Pack.
+
+Collectibles are permanent. Fight Gear can be equipped for combat attributes and, on selected items, faster Energy charging. Duplicate quantities are recorded but perks do not stack by quantity.
+
+The Daily Drop grants a guaranteed collectible. It does not grant currency or manually refill resources.
+
+## Follower-based sponsors
+
+Sponsors are a sequential status track. Reaching the next follower milestone automatically advances the fighter, records the previous sponsor in career history, and shows a sponsor announcement. Sponsorships do not expire and do not pay bonuses.
+
+| Order | Sponsor | Followers required |
+|---:|---|---:|
+| 1 | Bob's Auto Shop | 0 |
+| 2 | Gary's Bar & Grill | 500 |
+| 3 | Surge Core | 2,500 |
+| 4 | Ironhide Athletics | 10,000 |
+| 5 | Apex Wireless | 30,000 |
+| 6 | Northline Auto | 80,000 |
+| 7 | Titan Global | 200,000 |
+
+The current sponsor is shown on the fighter profile with progress toward the next milestone. Titan Global displays `TOP-TIER SPONSOR`.
+
+Existing careers are never moved backward during sponsor migration: their follower-qualified sponsor and furthest recorded sponsor are both considered.
+
+## Sharing wins
+
+Victories include a **Share Win** action. Share text uses the actual opponent, finish, round, updated record, win streak, championship result, and `https://cagegrind.com` when available.
+
+The game uses the Web Share API where supported, then falls back to the Clipboard API. If both are unavailable, it opens a selectable text field. Sharing is non-fatal and never interferes with saving or claiming the fight result.
+
+## Championships, rankings, and real fighters
+
+The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. Rankings place the active champion first, then order fighters by level and win percentage. Recommended opponents contain four generated on-level fighters plus eligible on-level real ranked fighters. The Ranked filter shows real fighters from highest level to lowest.
+
+Retiring as champion passes the belt to the highest-ranked eligible active fighter through the existing database flow.
+
+## Save migration
+
+Current saves use state version 25. Migration preserves identity, avatar, hometown, archetype, level, XP, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history.
+
+Migration adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the appropriate follower-based sponsor without moving backward, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
+
+## Editable fight rules
+
+`fight-rules.json` contains descriptive, validated fight and resource constants. `js/fight-rules.js` validates the file and falls back safely when a value is missing or unsafe. `js/game-logic.js` contains deterministic progression and migration helpers used by the browser and tests.
+
+## Project structure
+
+- `index.html` — application shell, screens, and dialogs
+- `css/styles.css` — primary responsive game presentation
+- `css/github-steel.css` — clean steel-blue theme refinements
+- `js/definitions.js` — fighters, gear, sponsors, and other data catalogs
+- `js/game-logic.js` — deterministic state, recovery, progression, and fight rules
+- `js/game.js` — browser interaction and rendering
+- `js/cage-social.js` — shared Feed and championship integration
+- `js/analytics.js` — non-fatal analytics wrapper
+- `tests/*.test.js` — Node built-in test-runner validation
+
+## Development and validation
+
+Run the complete test suite:
+
+```bash
 npm test
 ```
 
-The game uses static HTML, CSS, and ordinary scripts without a build step.
-`js/game-logic.js` contains shared rule helpers used by the browser and behavioral
-tests. `js/definitions.js` owns the data-only catalogs for fighter avatars,
-collectibles, training, sparring, odd jobs, recovery, publicity, endorsements,
-fight plans, and fight moments. `js/game.js` remains the coordinator;
-`js/landing.js`, `js/fight-plan.js`, `js/fight-focus.js`, and
-`js/underground-buzz.js` own their feature flows and receive state/UI callbacks
-from the coordinator. `js/fight-focus-contacts.js` owns the locker-room contact and
-message data, while `js/strings.js` groups the remaining opponent, commentary,
-Cage Feed, username, and ticker copy. Script order in `index.html` and the
-service-worker precache list must keep data and feature modules ahead of
-`js/game.js`.
-The generated transparent header wordmark lives at
-`assets/cage-grind-logo.png`. The six bottom-navigation icons live under
-`assets/icons/nav-*.png` and automatically use the same asset-override system.
-The 44 runtime fighter portraits use transparent `assets/avatars/fighter-avatar-01.png`
-through `assets/avatars/fighter-avatar-44.png` assets. Generated opponent art is grouped
-under `assets/silhouettes/`. Replaceable icons and
-standalone opponent silhouettes in the
-[GitHub assets folder](https://github.com/jayjonesvip/cage-warrior/tree/main/assets)
-are source copies of the visual artwork. Regression tests live under `tests/` and
-cover script parsing plus behavioral save recovery and migration, resource
-clamping, fight booking and payouts, rival fights, championship states and settlement, opponent availability, training,
-recovery options, blackjack rules and wager limits,
-Victory Pack progress, endorsements, daily resets, roster rules, readable text sizing,
-equipment drops, reward reveals, and the Cash/Career Earnings economy.
-
-## Deployment, search, and installation
-
-`cagegrind.com` is the canonical public URL. The repository includes the Pages
-`CNAME`, canonical and social-sharing metadata, structured game and site data,
-`robots.txt`, `sitemap.xml`, and a 1200×630 social card. DNS still has to point
-the apex domain to GitHub Pages at the registrar; `onlinecagefighting.com`
-should redirect to the canonical URL rather than serve a second copy.
-
-`manifest.webmanifest` and the branded 192px/512px icons make the game
-installable on supporting browsers. Transparent icons are used for the normal
-install artwork, while the separate maskable icon intentionally has an opaque
-safe-zone background for launchers that crop icons into platform shapes.
-After career setup, Home presents an install offer until installation succeeds.
-Chromium browsers use the native install prompt; iPhone and iPad players are
-directed to Share → Add to Home Screen. A successful `appinstalled` event or a
-verified standalone launch grants exactly one deterministic collectible drop,
-then permanently hides the offer for that saved career.
-
-`service-worker.js` caches the core shell and previously visited same-origin
-assets for offline fallback. `js/pwa.js` checks uncached `app-version.json` on
-startup, when the app returns to the foreground, and when connectivity returns.
-If a newer semantic version is deployed, the game opens a styled update dialog;
-updating reloads code without modifying the career save. For each release, keep
-the versions in `package.json`, the `app-version` meta tag, `app-version.json`,
-and `service-worker.js` synchronized. Tests enforce that contract.
-
-### Supabase Cage Feed setup
-
-Low-level Supabase authentication, session recovery, REST, and RPC calls live in
-`js/supabase-client.js`; Cage Feed-specific queries live in `js/cage-social.js`.
-Both remain dependency-free browser scripts. Apply the SQL files in
-`supabase/migrations/` in filename order using the Supabase SQL Editor (or the
-Supabase CLI). The avatar migration adds each career portrait to its public
-profile; existing fighters populate it automatically on their next Feed visit.
-The profile-count migration supplies the exact shared-roster Following count.
-The opponent-candidate migration supplies authenticated, exact-level profiles
-updated within the last 30 days for local AI snapshots; the game falls back to
-its generated roster if the RPC or network is unavailable. In the Supabase
-identity migration, `cage_name_registry` permanently reserves unique names,
-removes duplicate public name fields, excludes retired profiles from active
-counts and opponents, and adds the retirement announcement RPC. In the Supabase
-Dashboard, enable **Authentication → Providers → Anonymous Sign-Ins**. The
-migration enables Row Level Security, permits authenticated reads, and restricts
-profile and post creation to validated RPC functions. Never place a secret or
-`service_role` key in this repository—the checked-in `sb_publishable_` key is
-the intentionally public browser key.
-
-## Analytics
-
-Google Analytics 4 measurement ID `G-LMT6RLVT5L` is loaded from the page head.
-`js/analytics.js` validates event and parameter names, strips unsupported values,
-limits string lengths, and treats analytics failures as non-fatal so tracking
-can never interrupt gameplay. The initial event set covers career setup and
-starts, screen navigation, training and recovery, hustles and publicity,
-endorsements, Cage Feed activity, daily rewards, blackjack, underground
-sparring, matchup and fight-plan decisions, fight results, titles, level-ups, gear
-drops, and equipment changes. Events include gameplay categories and numeric
-outcomes but never fighter names, opponent names, social post copy, or saved
-career data.
+When changing cached files, update `app-version.json`, package metadata, the service-worker cache version, and `?v=` asset query strings together.

@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.5.240',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.5.240',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.6.0',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.6.0',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -228,24 +228,24 @@ interactions: {
   },
 
   ticker: [
-    'Listen, kid: gym drills take a full battery cell. Sparring charges extra when the gloves get heavy.',
+    'Every win earns one permanent attribute point. Spend it now or save it for the right build.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
-    'Rest is free: three seconds per missing battery cell fills you to full. You can fight with any Energy above zero, but empty means no clearance.',
-    'Commission wants 20 health before a bout. Heal up before they notice the bruises.',
-    'Fresh contenders pay full purse. Old names pay half, so make the nostalgia quick.',
-    'You beat a man once, he gets selective. Taunt a past rival if you want another envelope.',
+    'Energy charges one point every five seconds. Empty means no clearance; anything above zero gets you booked.',
+    'Health recovers one point every minute. Commission still wants 20 before a bout.',
+    'Fresh contenders pay full XP. Old names remember your tricks, so rematch rewards fade.',
+    'You beat a fighter once, they get selective. Taunt a past rival if you want another fight.',
     'Set the plan before the walkout: pace, offense, and whether you trust your style or adapt.',
     'Adapting takes focus, kid. Round one reads him, round two adjusts, round three owns the answer.',
     'No shop, no shortcuts. Beat fighters at your level or higher and fill the Victory Pack meter.',
     'Four Victory Pack segments earn the sealed pack. A big performance can fill two.',
     'Duplicate on the first draw? The locker rerolls once in the same rarity. After that, the result stands.',
-    'One Daily Drop, every day. Free cash, one Energy cell, collectible included. Do not ask who paid.',
-    'The personal trainer wants $250 plus $75 per level. Talent is temporary; invoices are forever.',
-    'Before Level 5, side gigs keep the lights on. After that, you are a full-time fighter—act like one.',
-    'Followers open doors and hype makes noise. Publicity gets both, assuming you can still smile.',
+    'One Daily Drop, every day. Guaranteed collectible. Do not ask who packed it.',
+    'Followers open sponsor doors. Hit the next milestone and the next brand joins your corner.',
+    'The right equipped gear can cut Energy charging from five seconds to four. Best perk only.',
+    'Followers build your status. Hype makes sure the division notices.',
     'CageGrindCEO: Records get attention. Finishes get phone calls.',
     'A title only unlocks the champion. Nobody mails you a belt—you take it from the man holding it.',
     'CageGrindCEO: Win when the lights are brightest and I will know your name.',
-    'If the corner offers a towel or a haymaker, the safe money is gone. Pick the ending you can live with.'
+    'If the corner offers a towel or a haymaker, pick the ending you can live with.'
   ]
 };

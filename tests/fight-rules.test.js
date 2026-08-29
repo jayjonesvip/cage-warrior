@@ -1,40 +1,37 @@
-const fs = require('node:fs');
-const test = require('node:test');
-const assert = require('node:assert/strict');
+'use strict';
 
-const configuration = JSON.parse(fs.readFileSync('fight-rules.json', 'utf8'));
-const rules = require('../js/fight-rules.js');
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const rules=require('../js/fight-rules.js');
 
-test('editable fight rules reproduce the built-in safe defaults', () => {
-  assert.equal(configuration.schemaVersion, 2);
-  assert.deepEqual(rules.normalize(configuration), rules.defaults);
+const root=path.resolve(__dirname,'..');
+
+test('fight-rules.json is valid and uses the current schema',()=>{
+  const document=JSON.parse(fs.readFileSync(path.join(root,'fight-rules.json'),'utf8'));
+  assert.equal(document.schemaVersion,3);
+  assert.equal(document.energyEconomy.energyRecoveryIntervalMilliseconds,5000);
+  assert.equal(document.energyEconomy.healthRecoveryIntervalMilliseconds,60000);
+  assert.equal(document.energyEconomy.maximumEnergy,100);
+  assert.equal(document.energyEconomy.fightEnergyCost,25);
 });
 
-test('fight rule validation accepts safe edits and rejects unsafe values', () => {
-  const edited = structuredClone(configuration);
-  edited.fatigue.powerOrSpeedToCardioRatioThreshold = 2;
-  edited.energyEconomy.restSecondsPerMissingEnergySegment = 4;
-  edited.recoveryEconomy.dollarsPerHealthPointPerFighterLevel = 4;
-  edited.energyEconomy.trainingEnergyCost = 40;
-  edited.fightStructure.scheduledRounds = 5;
-  edited.focus.startingMinimum = 99;
-  edited.focus.startingMaximum = 70;
-
-  const normalized = rules.normalize(edited);
-  assert.equal(normalized.fatigue.powerOrSpeedToCardioRatioThreshold, 2);
-  assert.equal(normalized.energyEconomy.restSecondsPerMissingEnergySegment, 4);
-  assert.equal(normalized.recoveryEconomy.dollarsPerHealthPointPerFighterLevel, 4);
-  assert.equal(normalized.energyEconomy.trainingEnergyCost, 25);
-  assert.equal(normalized.fightStructure.scheduledRounds, 3);
-  assert.equal(normalized.focus.startingMinimum, rules.defaults.focus.startingMinimum);
-  assert.equal(normalized.focus.startingMaximum, rules.defaults.focus.startingMaximum);
+test('rule loader keeps safe edits and rejects out-of-range values',()=>{
+  const normalized=rules.normalize({
+    energyEconomy:{energyRecoveryIntervalMilliseconds:4000,maximumEnergy:999},
+    experienceRewards:{sameDayRunbackExperienceMultiplier:.9},
+    fightStructure:{dailyFightLimit:12}
+  });
+  assert.equal(normalized.energyEconomy.energyRecoveryIntervalMilliseconds,4000);
+  assert.equal(normalized.energyEconomy.maximumEnergy,100);
+  assert.equal(normalized.experienceRewards.sameDayRunbackExperienceMultiplier,.5);
+  assert.equal(normalized.fightStructure.dailyFightLimit,12);
 });
 
-test('the static app loads and caches the editable fight configuration', () => {
-  const page = fs.readFileSync('index.html', 'utf8');
-  const serviceWorker = fs.readFileSync('service-worker.js', 'utf8');
-  assert.ok(page.indexOf('js/fight-rules.js') < page.indexOf('js/game-logic.js'));
-  assert.match(serviceWorker, /'\.\/fight-rules\.json'/);
-  assert.match(serviceWorker, /'\.\/js\/fight-rules\.js\?v=2\.5\.240'/);
-  assert.match(serviceWorker, /url\.pathname\.endsWith\('\/fight-rules\.json'\)[\s\S]*networkFirst\(request\)/);
+test('removed activity and economy sections are absent from rules',()=>{
+  const source=fs.readFileSync(path.join(root,'fight-rules.json'),'utf8');
+  for(const key of ['training','sparring','hustle','recoveryPrices','fightPurse','cashReward']){
+    assert.equal(source.includes(`"${key}"`),false,key);
+  }
 });

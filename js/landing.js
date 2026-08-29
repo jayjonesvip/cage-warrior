@@ -11,7 +11,7 @@
       $('#landingEyebrow').textContent=champion?'THE CHAMP IS BACK':returning?'YOUR CAREER CONTINUES':building?'FIGHTER BUILD IN PROGRESS':'THE FIGHT STARTS NOW';
       $('#landingTitleLead').textContent=returning?'WELCOME BACK,':building?'FINISH YOUR':'BUILD. FIGHT.';
       const titleAccent=$('#landingTitleAccent');titleAccent.textContent=returning?state.name:building?'FIGHTER BUILD.':'BECOME.';titleAccent.style.fontSize=returning?`${Math.max(.32,Math.min(.88,10.5/String(state.name||'').length))}em`:'';
-      $('#landingDescription').textContent=returning?'The gym is waiting, your next opponent is ready, and there’s still a championship to win.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Start with nothing. Train your fighter, earn your shot, and grind your way from unknown rookie to cage champion.';
+      $('#landingDescription').textContent=returning?'Your next opponent is ready, and there’s still a championship to win.':building?'Your fighter is saved on this device. Finish the permanent choices, lock in a unique name, and start the climb.':'Start with nothing. Fight, improve, and grind your way from unknown rookie to cage champion.';
       $('#landingEnterBtn').textContent=returning?'CONTINUE CAREER →':building?'CONTINUE YOUR BUILD →':'START YOUR CAREER →';
       $('#landingDetailOne').textContent=returning?`LEVEL ${state.level}`:building?'PROGRESS SAVED':'FREE TO PLAY';
       $('#landingDetailTwo').textContent=returning?`${state.wins}-${state.losses} PRO`:building?'FINISH YOUR FIGHTER':'NO DOWNLOAD';

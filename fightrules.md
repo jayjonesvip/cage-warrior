@@ -1,229 +1,46 @@
 # Cage Grind Fight Rules
 
-This guide describes the player-facing rules for booking, planning, and resolving fights in Cage Grind.
+The live numeric configuration is stored in `fight-rules.json`. Property names are descriptive so the file can be reviewed or edited without tracing the full browser UI.
 
-## Editable balance configuration
+## Booking a fight
 
-The live numeric balance values are stored in `fight-rules.json`. Its property names are deliberately descriptive, and every section includes context and safe editing ranges so the file can be handed to an artificial intelligence chat without requiring the rest of the codebase.
+- A fighter needs more than 0 Energy.
+- A fight spends up to 25 Energy; if less than 25 remains, it spends the available amount.
+- Medical clearance requires at least 20 Health.
+- Entering below full Health can cause one fight injury after confirmed opponent damage.
+- The daily fight limit is 10 and resets at local midnight.
 
-Only change numeric values. Do not rename properties or remove the descriptive properties whose names begin with an underscore. Probabilities are decimals from zero through one, while multipliers use one as the unchanged baseline. The browser validates supported values and falls back to built-in defaults for missing, malformed, out-of-range, or internally inconsistent settings. The game also falls back safely when it is opened directly from `index.html` and the browser prevents local JavaScript from loading a separate JSON file.
+## Fight plans
 
-The scheduled round count is currently fixed at three because the adaptation and final-round decision systems have explicit three-round behavior. Other supported values can be adjusted within their documented safe ranges and checked with `npm test`.
+Before the walkout, the player chooses slow or fast pace, conservative or aggressive offense, and whether to stick to style or adapt. The plan is evaluated against both fighters' attributes and archetypes. Focus affects how reliably the fighter executes adaptation.
 
-A useful request to send with the file is:
+## Persistent damage and passive recovery
 
-> Adjust the attached Cage Grind fight rules to accomplish the following balance goal: [describe the desired player experience]. Preserve every property and all descriptive context, change only supported numeric values, remain inside each documented safe range, keep minimum values at or below their matching maximum values, and return the complete valid JSON file with a concise summary of the gameplay effects.
+Opponent offense can remove persistent Health during a live fight. Energy and Health then recover automatically from saved timestamps:
 
-## Fight eligibility
+- Energy: +1 every 5 seconds
+- Health: +1 every 60 seconds
+- Offline recovery: capped at 8 hours
 
-A fighter may book a fight when all of the following are true:
+Selected equipped Fight Gear may reduce the Energy interval to 4 seconds. Only the strongest equipped recovery perk applies.
 
-- At least one of the daily 10 fights remains.
-- Health is at least 20.
-- The Energy battery is fully charged at 100%.
-- No other fight is already pending.
+## Fight rewards
 
-The daily fight limit resets at local midnight. World Championship opportunities use their own UTC-day limit.
+A legitimate win grants one permanent Attribute Point, fight XP, Followers, a Hype change, eligible Victory Pack progress, and rivalry or championship progress when applicable.
 
-## Energy battery
+Losses and forfeitures do not grant Attribute Points. A forfeit grants no XP or Victory Pack progress.
 
-Energy has a fixed maximum of 100% and is always stored in four 25% segments.
+## Repeat XP
 
-| Activity | Energy change |
-| --- | ---: |
-| Fight | Up to −25%; requires Energy above 0% |
-| Gym training or sparring | Up to −25%; requires Energy above 0% |
-| Odd Job | Up to −25%; requires Energy above 0% |
-| Career Spotlight appearance | Up to −25%; requires Energy above 0% |
-| Free 10-second Rest | +25% |
-| Daily Drop | +25% |
-| Level promotion | +25% |
+- Lower-level opponent: 0 XP
+- First same-level win that day: full XP
+- First same-day runback after that win: 50% XP
+- Later same-day fights against that opponent: 0 XP
 
-A fight may begin with any Energy above 0% and spends up to one battery segment
-when it is booked; a fighter with less than 25% spends the remaining Energy.
-The existing minimum-Health medical-clearance rule still applies. Career level,
-an early finish, and haymaker choices do not add another cost. Every other
-Energy-consuming activity uses up to one full segment. Any Energy above 0%
-permits the action and 0% disables it. Energy does not recover
-passively or while the game is closed. Rest is free and repeatable until the
-battery reaches 100%. Every paid treatment also restores one 25% Energy segment
-alongside its Health boost.
+## Victory Packs
 
-## Fighter attributes
+Wins against the player's level or higher can advance the four-step Victory Pack meter. A first career win guarantees a pack. Duplicate handling and rarity selection remain deterministic so reloading cannot reroll a saved outcome.
 
-- **Power** increases damage and knockout pressure. It also contributes to takedowns.
-- **Speed** improves initiative, accuracy, defensive matchups, and submission opportunities.
-- **Chin** reduces incoming damage and knockdown danger.
-- **Cardio** supports sustained accuracy, initiative, control, and fast-paced fighting.
+## Championships
 
-Ordinary gym training is limited to three sessions per local day. Sparring has a separate two-session limit because it carries additional Health and injury risk. Both counters reset at local midnight.
-
-### Cardio imbalance
-
-Ordinary specialist builds are allowed without an extra penalty. Additional fatigue begins when the fighter's higher Power or Speed rating exceeds Cardio by more than 75%.
-
-- At 1.75× Cardio or below, there is no imbalance penalty.
-- At roughly 2× Cardio, the fighter begins tiring noticeably faster.
-- More extreme differences increase the penalty up to a safety cap.
-- A Fast pace or Aggressive offense magnifies the effect.
-- The same rule applies to player fighters and opponents.
-
-This means a fighter can specialize heavily in Power or Speed, but needs enough Cardio to sustain that advantage across a full fight.
-
-### Computer-generated opponent growth
-
-Fictional career opponents use ordinary linear attribute growth through the opening levels. Starting at Level 4, their base attributes also receive a 1.04 compounding multiplier for each level. This raises the pressure gradually at first and becomes meaningful in the later career. It does not copy the player's current build, and it does not alter real Cage Network fighters.
-
-## Fight plan
-
-Every booked fight starts in the locker room. The player locks one choice on each of three axes. The most recently selected combination is remembered for the next fight.
-
-### Pace
-
-- **Slow:** Fewer exchanges and less accumulated fatigue.
-- **Fast:** More exchanges and potential initiative when Cardio supports the pace, but greater fatigue when it does not.
-
-### Offense
-
-- **Conservative:** More jabs, greater accuracy, safer defense, and fewer counter openings; lower damage and knockout pressure.
-- **Aggressive:** More power shots, damage, and finish attempts; lower accuracy and more counter opportunities.
-
-### Tactics
-
-- **Stick to Style:** Uses the fighter's permanent Striker or Grappler identity with full familiarity.
-- **Adapt:** Starts in the signature style, partially adjusts in Round 2, and makes the full matchup response in Round 3. Focus controls how well those changes are executed.
-
-The plan is graded **Edge**, **Even**, or **Exposed** against the actual matchup. Power, Speed, Chin, Cardio, both archetypes, and Focus all contribute. Plan effects matter most in close matchups and are intentionally smaller when one fighter is physically dominant.
-
-## Focus
-
-Each booked fight starts with a temporary Focus value from 75–90% before the final locker-room choice.
-
-- A contact message can improve or reduce Focus depending on the response.
-- Ignoring a message applies a smaller known Focus cost.
-- Music adds 4–10 Focus and has a chance to reach 100%.
-- Meditation raises Focus to at least 92%.
-- Final Focus is clamped from 50–100%.
-
-Focus affects initiative, execution, and the quality of an adaptive fight plan. It lasts for that fight only.
-
-## Archetypes and techniques
-
-### Striker
-
-Strikers favor jabs, crosses, hooks, and kicks. Their signature plan improves stand-up execution and knockout pressure.
-
-### Grappler
-
-Grapplers attempt more takedowns and gain extra control after successful entries. They can finish by submission. Submission chances improve with Speed, Cardio, signature-plan proficiency, and damage already dealt to the opponent.
-
-## Fatigue and exchanges
-
-Fatigue accumulates through each round and reduces execution accuracy.
-
-- Later rounds carry more baseline fatigue.
-- Cardio below 10 increases exchange-by-exchange fatigue.
-- A major Power/Cardio or Speed/Cardio imbalance adds further fatigue.
-- Fast pace increases the number of exchanges and multiplies player fatigue.
-- Aggressive offense adds another fatigue multiplier.
-- Slow and Conservative choices reduce the accumulated cost.
-
-## Condition, Health, and injuries
-
-Persistent Health determines starting fight Condition.
-
-| Health before the fight | Starting Condition |
-| --- | ---: |
-| 90–100% | 100% |
-| 70–89% | 95% |
-| 50–69% | 88% |
-| 20–49% | 78% |
-| Below 20% | Not medically cleared |
-
-Condition is the in-fight damage state. Health persists after the fight.
-
-- A confirmed opponent strike or takedown removes 1 persistent Health.
-- A knockdown removes 4 Health.
-- A losing KO or TKO removes 12 additional Health.
-- A losing submission removes 8 additional Health.
-- Misses and defensive narration remove no Health.
-
-Entering below full Health enables an injury roll on damaging opponent actions. Only one fight injury can occur per bout. An injury immediately halves current Condition, reduces every effective attribute by 1, and lasts until local midnight.
-
-## Winning and scoring
-
-A fight can end by:
-
-- KO
-- TKO
-- Submission
-- Unanimous decision
-- Split decision
-- Forfeit
-
-Rounds use 10-point scoring. Damage, landed offense, takedowns, control, and knockdowns determine the round winner. A dominant round or knockdown advantage can produce a 10–8 score; otherwise the usual winning score is 10–9.
-
-If all three rounds finish, the accumulated score decides the winner. The fight presentation shows unofficial totals between rounds and the official scorecard after the result.
-
-## Forfeits
-
-Leaving a committed fight requires confirmation. A forfeit:
-
-- Records a professional loss.
-- Uses one of the daily fights.
-- Awards no Cash, Followers, XP, or gear.
-
-## Rewards
-
-### Wins
-
-A win can award:
-
-- The opponent purse.
-- Fight XP.
-- Followers.
-- Hype.
-- Streak, upset, or rivalry bonuses.
-- A possible sealed Cage Grind collectible drop.
-
-Hype increases win payouts and Followers. Upsets are wins against an opponent whose combined ratings are at least 4 points higher.
-
-### Losses
-
-A completed non-forfeit loss awards:
-
-- 8% of the base purse.
-- 37.5% of the normal fight XP before other modifiers.
-- A smaller number of Followers.
-
-A loss resets the win streak and reduces Hype.
-
-### XP modifiers
-
-- Ranked fight: +20% XP.
-- World Championship fight: +30% XP instead of the ranked bonus.
-- Winning the World Championship: +25 additional XP.
-- Upset victory: +25% XP.
-- Opponent below the player's current level: 0 XP.
-- Same-level or higher-level opponent through the first win that day: full XP.
-- One same-day runback after the first win over that opponent: 50% XP.
-- Every later fight against that opponent on the same day: 0 XP.
-- Later same-day fights also have no purse and carry a Hype penalty when won.
-
-## World Championship
-
-Cage Grind has one shared World Champion.
-
-- A challenger becomes eligible when their level reaches the champion's level.
-- A contender receives one title opportunity per UTC day.
-- The champion may defend once per UTC day against the selected active challenger.
-- A dethroned champion receives one level-override rematch opportunity against the fighter who took the belt.
-- After the rematch attempt, ordinary contender eligibility rules apply again.
-- Regular ranked fights never place the championship at risk.
-
-## Fight presentation
-
-- Fights run as a complete planned simulation without a result skip.
-- Playback can run at normal speed or 2× speed.
-- Round introductions show the current unofficial score before Rounds 2 and 3.
-- The result includes the finish, clock, judges' cards when applicable, round statistics, totals, rewards, and the final fight-plan grade.
+Championship challenges and defenses are resolved by the shared server-authoritative flow. The active world champion leads the rankings. When a champion retires, the highest-ranked eligible active fighter inherits the title.
