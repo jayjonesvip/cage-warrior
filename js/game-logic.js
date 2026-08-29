@@ -177,10 +177,31 @@
     return Math.max(0,missing*interval-remainder);
   }
 
-  function awardVictoryAttributePoint(state,{won=false,forfeited=false}={}){
+  function victoryAttributePointReward(playerLevel=1,opponentLevel=1){
+    const player=Math.max(1,whole(playerLevel,1)),opponent=Math.max(1,whole(opponentLevel,1));
+    if(opponent<player)return fightRule('attributePointRewards.victoryAgainstLowerLevelOpponent',0);
+    if(opponent>player)return fightRule('attributePointRewards.victoryAgainstHigherLevelOpponent',2);
+    return fightRule('attributePointRewards.victoryAgainstSameLevelOpponent',1);
+  }
+
+  function awardVictoryAttributePoint(state,{won=false,forfeited=false,playerLevel=state?.level,opponentLevel=playerLevel}={}){
     if(!won||forfeited)return 0;
-    state.attributePoints=nonNegativeWhole(state.attributePoints)+1;
-    return 1;
+    const points=victoryAttributePointReward(playerLevel,opponentLevel);
+    state.attributePoints=nonNegativeWhole(state.attributePoints)+points;
+    return points;
+  }
+
+  function matchupAdvice({playerLevel=1,opponentLevel=1,playerRating=0,opponentRating=0,titleBout=false,playerIsChampion=false,rookieShowcase=false}={}){
+    const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),ratingEdge=finite(playerRating)-finite(opponentRating),points=victoryAttributePointReward(playerLevel,opponentLevel);
+    if(rookieShowcase)return {tone:'favorable',headline:'LET US SEE WHAT YOU HAVE',message:'A clean opening test. Stay composed and make the first contract count.'};
+    if(titleBout&&playerIsChampion)return {tone:'title',headline:'PROTECT THE BELT',message:'Every ranked challenger can take what you earned. Do not overlook this defense.'};
+    if(titleBout)return {tone:levelDifference>0||ratingEdge<=-4?'danger':'title',headline:'YOUR TITLE SHOT',message:levelDifference>0||ratingEdge<=-4?'You are the underdog on paper, but one win changes everything.':'This is the moment you climbed for. Fight smart and take the belt.'};
+    if(levelDifference<0)return {tone:'avoid',headline:'LOW-RETURN FIGHT',message:'Not worth the energy for progression. A win pays no XP or Attribute Points.'};
+    if(levelDifference>=2||ratingEdge<=-8)return {tone:'danger',headline:'HIGH-RISK FIGHT',message:`You are out of your league on paper. A win still earns ${points} Attribute Points.`};
+    if(levelDifference>0)return {tone:'step-up',headline:'STEP-UP FIGHT',message:`A real test of your skills. The risk comes with ${points} Attribute Points.`};
+    if(ratingEdge>=4)return {tone:'favorable',headline:'GOOD TEST OF SKILLS',message:'You have the edge, but this opponent is at your level. Go earn the point.'};
+    if(ratingEdge<=-4)return {tone:'danger',headline:'TOUGH MATCHUP',message:'A hard fight at your level. Bring a real plan and earn the point.'};
+    return {tone:'even',headline:'RIGHT-SIZED FIGHT',message:'A good test of your skills. This is the matchup your career needs.'};
   }
 
   function assignAttributePoint(state,attribute){
@@ -292,6 +313,7 @@
       return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
     }
     if(opponent.globalChampionship)return opponent.titleCooldown?'blocked':opponent.challengeEligible?'title':'locked';
+    if(opponent.network)return level>opponent.tier?'passed':'current';
     if(level<opponent.tier)return 'locked';
     if(level>opponent.tier)return 'passed';
     return 'current';
@@ -448,5 +470,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,awardVictoryAttributePoint,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,xpRequirement,opponentXpTier,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,liveFightInjuryChance,fightInjuryCondition,xpRequirement,opponentXpTier,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
 });

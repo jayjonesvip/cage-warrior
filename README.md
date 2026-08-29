@@ -7,8 +7,8 @@ Cage Grind is a mobile-first MMA career game built with static HTML, CSS, and va
 The career is intentionally centered on one repeatable loop:
 
 1. Choose an opponent and fight.
-2. Win to earn one permanent Attribute Point.
-3. Assign the point to Power, Speed, Chin, or Cardio—or save it.
+2. Win to earn permanent Attribute Points: zero below your level, one at your level, and two above it.
+3. Assign points to Power, Speed, Chin, or Cardio—or save them.
 4. Energy and Health recover automatically.
 5. Fight again, build a following, attract sponsors, collect gear, and climb toward the championship.
 
@@ -19,7 +19,7 @@ Training, sparring, manual resting, recovery-room treatments, side jobs, gamblin
 The simplified four-item navigation is Home, Fight, Gear, and Feed. The four primary pages are:
 
 - **Home** — identity, record, world rank, sponsor progress, available Attribute Points, Daily Drop, and career guide.
-- **Fight** — recommended opponents, ranked real fighters, rematches, and championship activity.
+- **Fight** — a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
 - **Gear** — Victory Packs, collectibles, and the equipped Fight Gear loadout.
 - **Feed** — CageReporter coverage, mentions, rivals, sponsors, and player interactions.
 
@@ -108,7 +108,11 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 
 ## Championships, rankings, and real fighters
 
-The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. Rankings place the active champion first, then order fighters by level and win percentage. Recommended opponents contain four generated on-level fighters plus eligible on-level real ranked fighters. The Ranked filter shows real fighters from highest level to lowest.
+The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. The Fight page uses the same ranking order as the Home rankings modal: the active champion is first, followed by fighters ordered by level and win percentage. Each full-width row shows rank, portrait, name, record, level, win percentage, exact win XP, and the Attribute Points available for that matchup. Tap any available row to open the existing Tale of the Tape.
+
+Ranked opponents are not level-locked. Wins below the player's level award zero XP and zero Attribute Points, on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects them.
+
+The champion appears at rank number one and every fighter gets one title attempt per local day. A reigning champion sees the same ladder and may select any proven ranked fighter for a title defense; the selected title row locks after that daily attempt.
 
 On-level opponent attributes follow the expected one-Attribute-Point-per-win career curve. Generated and ranked matchup ratings grow steadily through the early levels, then compound only slightly from Level 7 onward. Existing generated opponents are recalculated when a career loads so older saves do not retain the retired Training-era difficulty curve.
 

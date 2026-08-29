@@ -131,7 +131,8 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
 });
 
 test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
-  assert.match(game,/win\?'ATTRIBUTE POINT':'HYPE'/);
+  assert.match(game,/attributePoint===1\?'ATTRIBUTE POINT':'ATTRIBUTE POINTS'/);
+  assert.match(game,/attribute_points_earned:attributePoint/);
   assert.match(game,/rewardFansLabel.*FOLLOWERS/);
   assert.match(game,/rewardXpLabel/);
   assert.doesNotMatch(game,/rewardCash|rewardEarnings/);
@@ -187,7 +188,7 @@ test('Energy recovery gear is capped at the strongest equipped perk',()=>{
 
 test('Home explains the fight-first loop',()=>{
   assert.match(html,/FIGHT\. IMPROVE\. CLIMB\./);
-  assert.match(html,/Every legitimate win earns one attribute point/);
+  assert.match(html,/Wins earn up to two Attribute Points based on opponent level/);
   assert.doesNotMatch(html,/BUILD YOUR CAREER[\s\S]*HUSTLE/i);
 });
 
@@ -206,10 +207,34 @@ test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
 });
 
 test('fight, championship, opponents, rankings, gear, packs, and Feed remain present',()=>{
-  for(const token of ['id="opponentList"','id="worldTitleCard"','id="openRankingsBtn"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
+  for(const token of ['id="opponentList"','id="openRankingsBtn"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
+  assert.doesNotMatch(html,/id="worldTitleCard"/);
   assert.match(game,/rankFighters/);
   assert.match(game,/settleChampionshipResult/);
   assert.match(game,/victoryPack/);
+});
+
+test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
+  for(const token of ['fight-ladder-columns','RANK · FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
+  for(const token of ['fight-ranking-list','fight-ranking-row','fightWinRewardPreview','victoryAttributePointReward','data-fight-key'])assert.match(game,new RegExp(token));
+  assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
+  assert.doesNotMatch(html,/data-opponent-filter/);
+  assert.match(game,/onChampionshipChange:renderOpponents/);
+  assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
+});
+
+test('Tale of the Tape includes dynamic agent matchup advice',()=>{
+  for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
+  assert.match(game,/LOGIC\.matchupAdvice/);
+  assert.match(styles,/\.tape-agent-read/);
+});
+
+test('open ranked title migration allows one selected daily defense',()=>{
+  const migration=read('supabase/migrations/20260829120000_open_ranked_title_fights.sql');
+  assert.match(migration,/begin_cage_championship_challenge\(p_opponent_id uuid default null\)/);
+  assert.match(migration,/where id=p_opponent_id[\s\S]*coalesce\(wins,0\)\+coalesce\(losses,0\)>0/);
+  assert.match(migration,/prior\.initiated_by=v_user_id and prior\.challenge_day=v_today/);
+  assert.doesNotMatch(migration,/v_player\.level\s*<\s*v_champion\.level/);
 });
 
 test('saved generated opponents are rebalanced to the fight-first curve',()=>{
@@ -226,7 +251,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['Win to earn one permanent Attribute Point','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 25'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below your level, one at your level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 25'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
 });
 

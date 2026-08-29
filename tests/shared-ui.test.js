@@ -16,17 +16,17 @@ test('shared championship card presents contenders consistently everywhere', () 
 
   assert.equal(model.eyebrow, 'CAGE GRIND · ONE BELT');
   assert.equal(model.title, 'WORLD CHAMPIONSHIP');
-  assert.equal(model.kicker, 'TITLE CONTENDER');
+  assert.equal(model.kicker, 'CURRENT WORLD CHAMPION');
   assert.equal(model.headline, '@JayJonesVIP');
-  assert.equal(model.meta, 'TITLE SHOT AVAILABLE · CHAMPION LEVEL 5');
+  assert.equal(model.meta, 'ONE TITLE ATTEMPT AVAILABLE');
 });
 
-test('current career level repairs stale championship eligibility', () => {
-  const championship=resolveChampionshipIdentity({champion_id:'champ',champion_handle:'LevelFive',champion_level:5,challenge_eligible:false,level_eligible:false,eligibility_status:'level_locked'},{level:6,name:'LevelSix'});
+test('championship eligibility no longer depends on the challenger level', () => {
+  const championship=resolveChampionshipIdentity({champion_id:'champ',champion_handle:'LevelTwelve',champion_level:12,challenge_eligible:false,level_eligible:false,eligibility_status:'level_locked'},{level:1,name:'Rookie'});
   assert.equal(championship.level_eligible,true);
   assert.equal(championship.challenge_eligible,true);
   assert.equal(championship.eligibility_status,'eligible');
-  assert.equal(championshipCardModel({championship,state:{level:6,name:'LevelSix'},loaded:true}).meta,'TITLE SHOT AVAILABLE · CHAMPION LEVEL 5');
+  assert.equal(championshipCardModel({championship,state:{level:1,name:'Rookie'},loaded:true}).meta,'ONE TITLE ATTEMPT AVAILABLE');
 });
 
 test('shared championship card covers champion, vacant, and offline states', () => {

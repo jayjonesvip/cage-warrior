@@ -100,13 +100,26 @@ test('spending Energy starts the charging timestamp when leaving full',()=>{
   assert.equal(fighter.energyRecoveryAt,5000);
 });
 
-test('a legitimate win awards exactly one Attribute Point',()=>{
-  const fighter=state();
-  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true}),1);
-  assert.equal(fighter.attributePoints,1);
+test('victory Attribute Points scale with opponent level',()=>{
+  const fighter=state({level:5});
+  assert.equal(logic.victoryAttributePointReward(5,4),0);
+  assert.equal(logic.victoryAttributePointReward(5,5),1);
+  assert.equal(logic.victoryAttributePointReward(5,6),2);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,playerLevel:5,opponentLevel:4}),0);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,playerLevel:5,opponentLevel:5}),1);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,playerLevel:5,opponentLevel:6}),2);
+  assert.equal(fighter.attributePoints,3);
   assert.equal(logic.awardVictoryAttributePoint(fighter,{won:false}),0);
   assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,forfeited:true}),0);
-  assert.equal(fighter.attributePoints,1);
+  assert.equal(fighter.attributePoints,3);
+});
+
+test('matchup advice distinguishes low-return, right-sized, step-up, and dangerous fights',()=>{
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:4}).headline,'LOW-RETURN FIGHT');
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:5,playerRating:30,opponentRating:30}).headline,'RIGHT-SIZED FIGHT');
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:6,playerRating:30,opponentRating:32}).headline,'STEP-UP FIGHT');
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:7,playerRating:30,opponentRating:40}).headline,'HIGH-RISK FIGHT');
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:8,titleBout:true}).headline,'YOUR TITLE SHOT');
 });
 
 test('Attribute Points assign permanently to one whole-number stat',()=>{

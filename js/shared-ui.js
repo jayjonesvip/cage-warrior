@@ -26,26 +26,24 @@
     const championship=value&&typeof value==='object'?value:null;
     if(!championship)return championship;
     if(championship.is_champion===true||isCurrentChampion(championship,state))return Object.assign({},championship,{is_champion:true,challenge_eligible:false,rematch_blocked:false,level_eligible:true,daily_bout_used:false,eligibility_status:'champion',former_champion:false,former_champion_rematch:false});
-    const fighterLevel=Math.max(1,Math.floor(Number(state.level))||1),championLevel=Math.max(1,Math.floor(Number(championship.champion_level))||1),levelEligible=!!championship.champion_id&&fighterLevel>=championLevel;
-    if(!levelEligible)return championship;
+    if(!championship.champion_id)return championship;
     const blocked=championship.daily_bout_used===true||championship.rematch_blocked===true;
     return Object.assign({},championship,{level_eligible:true,challenge_eligible:!blocked,eligibility_status:blocked?championship.eligibility_status:'eligible'});
   }
 
   function championshipCardModel({championship,state={},loaded=false,unavailable=false}={}){
     const champ=resolveChampionshipIdentity(championship,state);
-    const level=Math.max(1,Math.floor(Number(state.level))||1);
     const defenses=Math.max(0,Math.floor(Number(champ?.defenses))||0);
     const status=String(champ?.eligibility_status||'');
     const model={eyebrow:'CAGE GRIND · ONE BELT',title:'WORLD CHAMPIONSHIP',kicker:'TITLE STATUS',headline:'CHECKING THE WORLD CHAMPION',meta:'Loading the current champion and title requirements.'};
     if(champ?.is_champion){
       model.kicker='REIGNING WORLD CHAMPION';model.headline='YOU ARE THE WORLD CHAMPION';model.meta=`${defenses} SUCCESSFUL DEFENSE${defenses===1?'':'S'}`;
     }else if(champ?.champion_handle){
-      const championHandle=`@${champ.champion_handle}`,requiredLevel=Math.max(1,Math.floor(Number(champ.champion_level))||1);
+      const championHandle=`@${champ.champion_handle}`;
       if(champ.former_champion){
-        model.kicker='FORMER WORLD CHAMPION';model.headline=champ.last_title_loss_opponent_handle?`LOST THE BELT TO @${champ.last_title_loss_opponent_handle}`:championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):champ.former_champion_rematch?`TITLE REMATCH AVAILABLE AGAINST ${championHandle}`:level>=requiredLevel?'STANDARD TITLE-SHOT RULES APPLY':`REACH LEVEL ${requiredLevel} TO CHALLENGE`;
+        model.kicker='FORMER WORLD CHAMPION';model.headline=champ.last_title_loss_opponent_handle?`LOST THE BELT TO @${champ.last_title_loss_opponent_handle}`:championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):champ.former_champion_rematch?`TITLE REMATCH AVAILABLE AGAINST ${championHandle}`:'ONE TITLE ATTEMPT AVAILABLE';
       }else{
-        model.kicker=level>=requiredLevel?'TITLE CONTENDER':'CURRENT WORLD CHAMPION';model.headline=championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):level>=requiredLevel?`TITLE SHOT AVAILABLE · CHAMPION LEVEL ${requiredLevel}`:`REACH LEVEL ${requiredLevel} TO CHALLENGE`;
+        model.kicker='CURRENT WORLD CHAMPION';model.headline=championHandle;model.meta=status==='daily_bout_used'?resetCopy(champ):'ONE TITLE ATTEMPT AVAILABLE';
       }
     }else if(loaded&&!unavailable){
       model.kicker='BELT VACANT';model.headline='THE WORLD TITLE IS OPEN';model.meta='ONE BELT · RANKED FIGHTERS ONLY';
