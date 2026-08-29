@@ -191,6 +191,16 @@ test('rankings place champion first then sort by level and win percentage',()=>{
   assert.deepEqual(ranked.map(row=>row.id),['c','a','b']);
 });
 
+test('on-level opponent ratings track one Attribute Point per expected victory',()=>{
+  const expected={1:[3.9,4.1],5:[8.3,8.5],9:[13,13.4],12:[16.9,17.3]};
+  for(const [level,[minimum,maximum]] of Object.entries(expected)){
+    const rating=logic.generatedOpponentBaseRating(Number(level));
+    assert.ok(rating>=minimum&&rating<=maximum,`Level ${level}: ${rating}`);
+  }
+  const ranked=logic.networkOpponentRatings(12,{power:5,speed:5,chin:5,cardio:5},{power:0,speed:0,chin:0,cardio:0},0);
+  assert.deepEqual(ranked,{power:17,speed:17,chin:17,cardio:17});
+});
+
 test('fighter creation allocations stay whole and total twenty',()=>{
   const stats=logic.rollFighterAllocation(()=>.42);
   assert.equal(logic.validFighterAllocation(stats),true);

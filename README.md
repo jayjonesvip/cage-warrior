@@ -110,6 +110,8 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 
 The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. Rankings place the active champion first, then order fighters by level and win percentage. Recommended opponents contain four generated on-level fighters plus eligible on-level real ranked fighters. The Ranked filter shows real fighters from highest level to lowest.
 
+On-level opponent attributes follow the expected one-Attribute-Point-per-win career curve. Generated and ranked matchup ratings grow steadily through the early levels, then compound only slightly from Level 7 onward. Existing generated opponents are recalculated when a career loads so older saves do not retain the retired Training-era difficulty curve.
+
 Retiring as champion passes the belt to the highest-ranked eligible active fighter through the existing database flow.
 
 ## Save migration

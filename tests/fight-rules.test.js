@@ -15,6 +15,9 @@ test('fight-rules.json is valid and uses the current schema',()=>{
   assert.equal(document.energyEconomy.healthRecoveryIntervalMilliseconds,60000);
   assert.equal(document.energyEconomy.maximumEnergy,100);
   assert.equal(document.energyEconomy.fightEnergyCost,25);
+  assert.equal(document.computerGeneratedOpponentDifficulty.linearAttributeRatingGainPerLevel,1.1);
+  assert.equal(document.computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel,7);
+  assert.equal(document.computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel,1.01);
 });
 
 test('rule loader keeps safe edits and rejects out-of-range values',()=>{

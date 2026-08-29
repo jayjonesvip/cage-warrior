@@ -21,6 +21,11 @@ test('all first-party JavaScript parses without a build step',()=>{
   }
 });
 
+test('removed canvas hero renderer has no stale runtime references',()=>{
+  assert.doesNotMatch(game,/\bdrawHero\b/);
+  assert.doesNotMatch(game,/\bdrawFighter\b/);
+});
+
 test('HTML ids are unique',()=>{
   const ids=[...html.matchAll(/\sid="([^"]+)"/g)].map(match=>match[1]);
   assert.equal(new Set(ids).size,ids.length);
@@ -36,6 +41,12 @@ test('literal game selectors point at existing or intentionally dynamic ids',()=
 test('primary navigation contains only Home, Fight, Gear, and Feed',()=>{
   const nav=[...html.matchAll(/<button class="navbtn[^>]*data-nav="([^"]+)"/g)].map(match=>match[1]);
   assert.deepEqual(nav,['home','fight','gear','feed']);
+});
+
+test('primary navigation renders the custom PNG icon set directly',()=>{
+  for(const name of ['home','fight','gear','feed'])assert.match(html,new RegExp(`assets/icons/nav-${name}\\.png\\?v=`),name);
+  assert.doesNotMatch(html,/data-icon-name="nav-(?:home|fight|gear|feed)"/);
+  assert.match(styles,/\.navbtn \.ni img/);
 });
 
 test('only four primary screens remain',()=>{
@@ -149,6 +160,17 @@ test('follower-based sponsor ladder uses the agreed thresholds',()=>{
   assert.doesNotMatch(definitions,/perFight|signingBonus|fightsRequired|cashRequired/);
 });
 
+test('Career Identity shows the next sponsor goal instead of duplicating the current sponsor',()=>{
+  assert.match(html,/id="careerSponsorLabel">Next Sponsor/);
+  assert.match(html,/id="careerSponsorProgressTrack"[^>]*role="progressbar"/);
+  assert.match(html,/id="careerSponsorProgressMeta"/);
+  assert.match(game,/NEXT SPONSOR/);
+  assert.match(game,/FOLLOWERS NEEDED/);
+  assert.match(game,/TOP-TIER SPONSOR/);
+  assert.match(game,/CURRENT SPONSOR/);
+  assert.match(styles,/\.career-sponsor-progress-track/);
+});
+
 test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(html,/id="sponsorAnnouncementModal"/);
   assert.match(html,/id="careerSponsorProgress"/);
@@ -188,6 +210,12 @@ test('fight, championship, opponents, rankings, gear, packs, and Feed remain pre
   assert.match(game,/rankFighters/);
   assert.match(game,/settleChampionshipResult/);
   assert.match(game,/victoryPack/);
+});
+
+test('saved generated opponents are rebalanced to the fight-first curve',()=>{
+  assert.match(game,/function rebalanceGeneratedOpponent/);
+  assert.match(game,/rebalanceGeneratedOpponent\(o\)/);
+  assert.match(game,/generatedOpponentRatings\(tier,serial,seed,arch\)/);
 });
 
 test('service worker no longer caches removed activity code or art',()=>{
