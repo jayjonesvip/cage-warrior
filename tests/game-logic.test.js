@@ -186,6 +186,14 @@ test('fight damage and starting condition remain active',()=>{
   assert.equal(logic.liveFightHealthDamage({finish:'KO'}),12);
   assert.equal(logic.liveFightHealthDamage({finish:'SUBMISSION'}),8);
   assert.equal(logic.liveFightHealthDamage({knockdown:true}),4);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:4,won:true,finish:'DECISION'}),5);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:0,won:true,finish:'KO'}),5);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:3,finish:'UNANIMOUS DECISION'}),10);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:12,finish:'UNANIMOUS DECISION'}),15);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:9,finish:'SUBMISSION'}),15);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:16,finish:'KO'}),20);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:24,finish:'TKO'}),30);
+  assert.equal(logic.finalFightHealthLoss({rawDamage:0,forfeited:true,finish:'FORFEIT'}),0);
   assert.equal(logic.startingFightCondition(95,100),100);
   assert.ok(logic.startingFightCondition(45,100)<100);
 });

@@ -59,7 +59,7 @@ Selected equipped Fight Gear can improve the Energy tick from 5 seconds to 4 sec
 - HUD status: `RECOVERING · FULL IN HH:MM:SS`
 - Uses the same timestamp and offline-cap safeguards as Energy
 
-Fight damage, minimum medical clearance, and fighting-hurt injury risk remain active.
+Fight damage, minimum medical clearance, and fighting-hurt injury risk remain active. Persistent Health damage is increased by 25% and rounded up after each fight. Wins cost at least 5 Health. Losses enforce minimum damage of 10 Health by decision, 15 by submission, and 20 by knockout or technical knockout; damage already taken during the fight counts toward those totals.
 
 ## Fight rewards
 

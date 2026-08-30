@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.6';
+  const ICON_ASSET_VERSION = '2.7.7';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -450,10 +450,19 @@
     energyStatus.hidden=state.energy>=state.maxEnergy;energyStatus.textContent=`CHARGING · FULL IN ${LOGIC.formatCountdown(LOGIC.recoveryTimeRemaining(state.energy,state.maxEnergy,state.energyRecoveryAt,energyRecoveryInterval()))}`;
     healthStatus.hidden=state.health>=state.maxHealth;healthStatus.textContent=`RECOVERING · FULL IN ${LOGIC.formatCountdown(LOGIC.recoveryTimeRemaining(state.health,state.maxHealth,state.healthRecoveryAt,HEALTH_RECOVERY_INTERVAL))}`;
   }
+  function renderResourceHud(){
+    const energyNow=Math.floor(state.energy),healthNow=Math.floor(state.health);
+    if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
+    if(lastShownHealth!==null&&healthNow<lastShownHealth)flashResource('health',lastShownHealth-healthNow);
+    lastShownEnergy=energyNow;lastShownHealth=healthNow;
+    $('#hudEnergyText').textContent=`${energyNow}%`;$('#energyBattery').setAttribute('aria-label',`Energy ${energyNow} percent`);$$('#energyBattery i').forEach((segment,index)=>segment.style.setProperty('--charge',`${clamp((state.energy-index*25)/25*100,0,100)}%`));$('#energyHud').classList.toggle('critical',state.energy<=25);
+    $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';$('#healthHud').classList.toggle('critical',LOGIC.resourceIsCritical(state.health,state.maxHealth));
+    renderRecoveryClocks();
+  }
   function updatePassiveRecovery(){
     const recovered=LOGIC.passiveRecovery(state,Date.now(),OFFLINE_RECOVERY_CAP,{energy:energyRecoveryInterval(),health:HEALTH_RECOVERY_INTERVAL});
     if(recovered.energy>0)flashRecoveryResources({energy:recovered.energy,health:0});
-    if(recovered.energy||recovered.health){saveState();if(state.nameLocked)updateUI()}else renderRecoveryClocks();
+    if(recovered.energy||recovered.health){saveState();if(state.nameLocked){renderResourceHud();$('#fightInjuryWarning').hidden=state.health>=state.maxHealth;if(fight&&!combatLocked&&$('#fightOverlay').classList.contains('active')&&!$('#tapeStage').classList.contains('hidden'))fillTape(fight)}}else renderRecoveryClocks();
   }
 
   function flashRecoveryResources(restored){
@@ -476,13 +485,7 @@
     const careerRank=rankName(),rankText=$('#rankText');$('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;rankText.textContent=careerRank;rankText.classList.toggle('world-champion',careerRank==='WORLD CHAMPION');
     $('#progressText').textContent=state.attributePoints?`${state.attributePoints} POINT${state.attributePoints===1?'':'S'}`:(currentRanking()?.position?`RANK #${currentRanking().position}`:'UNRANKED');$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageStatus').textContent=cageStatus();$('#heroLevel').textContent=`LVL ${state.level}`;
     const victoryPackProgress=clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),victoryPackMeter=$('#victoryPackMeter');$('#victoryPackProgressText').textContent=`${victoryPackProgress}/4`;$('#victoryPackFill').style.width=`${victoryPackProgress*25}%`;$('#victoryPackTrack').setAttribute('aria-valuenow',String(victoryPackProgress));$('#victoryPackHint').textContent=victoryPackProgress>=3?'NEXT ELIGIBLE WIN GUARANTEES':'WIN AT YOUR LEVEL OR HIGHER';victoryPackMeter.classList.toggle('ready',victoryPackProgress>=3);
-    const energyNow=Math.floor(state.energy),healthNow=Math.floor(state.health);
-    if(lastShownEnergy!==null&&energyNow<lastShownEnergy)flashResource('energy',lastShownEnergy-energyNow);
-    if(lastShownHealth!==null&&healthNow<lastShownHealth)flashResource('health',lastShownHealth-healthNow);
-    lastShownEnergy=energyNow;lastShownHealth=healthNow;
-    $('#hudEnergyText').textContent=`${energyNow}%`;$('#energyBattery').setAttribute('aria-label',`Energy ${energyNow} percent`);$$('#energyBattery i').forEach((segment,index)=>segment.style.setProperty('--charge',`${clamp((state.energy-index*25)/25*100,0,100)}%`));const lowEnergy=state.energy<=25;$('#energyHud').classList.toggle('critical',lowEnergy);
-    $('#hudHealthText').textContent=`${healthNow}/${state.maxHealth}`;$('#hudHealthBar').style.width=(state.health/state.maxHealth*100)+'%';$('#healthHud').classList.toggle('critical',LOGIC.resourceIsCritical(state.health,state.maxHealth));
-    renderRecoveryClocks();
+    renderResourceHud();
     $('#xpText').textContent=`${Math.floor(state.xp)}/${xpNeed()}`;
     $('#hypeText').textContent=Math.floor(state.hype)+'%';
     const fightInjury=currentFightInjury(),attributesRow=$('.hud-attributes-row');attributesRow.classList.toggle('injured',!!fightInjury);attributesRow.setAttribute('aria-label',fightInjury?`Fighter attributes reduced by ${fightInjury.name}`:'Fighter attributes');
@@ -1116,9 +1119,15 @@
     return championshipSettlementPromise;
   }
 
+  function finalizePersistentFightDamage(f){
+    const rawDamage=Math.max(0,Math.round(Number(f?.healthLost)||0)),target=LOGIC.finalFightHealthLoss({rawDamage,won:f?.winner==='player',forfeited:!!f?.forfeited,finish:f?.method}),additional=Math.max(0,target-rawDamage),before=state.health;
+    if(additional>0)state.health=clamp(state.health-additional,1,state.maxHealth);
+    const applied=Math.max(0,Math.round(before-state.health));f.healthLost=rawDamage+applied;return f.healthLost;
+  }
+
   function finishFightSimulation(){
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
-    const o=fight.o,win=fight.winner==='player',circuitOpponent=!o.network&&!o.rookieShowcase&&!o.globalChampionship,firstCareerWin=win&&state.wins===0,winsToday=opponentWinsToday(o),xpTier=LOGIC.opponentXpTier(winsToday,o.min,state.level),dropEligible=LOGIC.fightDropEligible(winsToday),isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=fight.healthLost||0,titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival,opponentWinsToday:winsToday}),hypeBefore=state.hype;let fans=0,xp=xpResult.xp,ceoHype=0,gearDrop=null,attributePoint=0;const lootNotes=[];o.meetings=(o.meetings||0)+1;
+    const o=fight.o,win=fight.winner==='player',circuitOpponent=!o.network&&!o.rookieShowcase&&!o.globalChampionship,firstCareerWin=win&&state.wins===0,winsToday=opponentWinsToday(o),xpTier=LOGIC.opponentXpTier(winsToday,o.min,state.level),dropEligible=LOGIC.fightDropEligible(winsToday),isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.speed+fight.opp.chin+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=finalizePersistentFightDamage(fight),titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival,opponentWinsToday:winsToday}),hypeBefore=state.hype;let fans=0,xp=xpResult.xp,ceoHype=0,gearDrop=null,attributePoint=0;const lootNotes=[];o.meetings=(o.meetings||0)+1;
     const victoryPackEligible=win&&LOGIC.victoryPackWinEligible({playerLevel:state.level,opponentLevel:o.min,repeatEligible:dropEligible}),victoryPackProgressSteps=victoryPackEligible&&(upset||rivalry||fight.method.includes('KO'))?2:victoryPackEligible?1:0;
     if(win){
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);attributePoint=LOGIC.awardVictoryAttributePoint(state,{won:true,forfeited:false,playerLevel:state.level,opponentLevel:o.min});fans=Math.round(o.fans*(1+state.hype/100)*(1+ownedBonus('prestige')/100)*(upset?1.25:1)*(rivalry?1.15:1)*rand(.9,1.2));fans=changeFollowers(fans);state.hype=clamp(state.hype+xpTier.hypeChange,0,100);sfx.win();confettiBurst();
@@ -1160,7 +1169,7 @@
   function showPostFightFollowup(){if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.6" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.7" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

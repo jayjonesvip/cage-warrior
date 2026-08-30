@@ -11,6 +11,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html');
 const game=read('js/game.js');
 const logic=read('js/game-logic.js');
+const rules=read('fight-rules.json');
 const definitions=read('js/definitions.js');
 const styles=read('css/styles.css');
 const steel=read('css/github-steel.css');
@@ -104,6 +105,23 @@ test('persistent HUD exposes continuous charging and Health recovery status',()=
   assert.match(game,/pageshow/);
 });
 
+test('fight results increase persistent Health damage and enforce loss floors',()=>{
+  assert.match(rules,/"totalDamageMultiplier": 1\.25/);
+  assert.match(rules,/"victoryMinimum": 5/);
+  assert.match(rules,/"decisionLossMinimum": 10/);
+  assert.match(rules,/"submissionLossMinimum": 15/);
+  assert.match(rules,/"knockoutOrTechnicalKnockoutLossMinimum": 20/);
+  assert.match(game,/finalizePersistentFightDamage\(fight\)/);
+});
+
+test('passive recovery updates the HUD without rebuilding clickable opponent rows',()=>{
+  const recoveryBody=game.match(/function updatePassiveRecovery\(\)\{([\s\S]*?)\n  \}/)?.[1]||'';
+  assert.match(recoveryBody,/renderResourceHud\(\)/);
+  assert.doesNotMatch(recoveryBody,/updateUI\(\)/);
+  assert.match(game,/state\.health>=state\.maxHealth/);
+  assert.match(game,/state\.health>=MINIMUM_FIGHT_HEALTH/);
+});
+
 test('Energy recovery popup reports accumulated Energy once',()=>{
   assert.match(game,/if\(recovered\.energy>0\)flashRecoveryResources\(\{energy:recovered\.energy,health:0\}\)/);
   assert.match(html,/id="hudEnergyDelta"/);
@@ -179,6 +197,8 @@ test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(html,/id="careerSponsorProgress"/);
   assert.match(game,/sponsorAnnouncementPending/);
   assert.match(game,/TOP-TIER SPONSOR/);
+  assert.match(styles,/\.sponsor-announcement-dialog \.modal-actions\.single-action\{grid-template-columns:minmax\(0,1fr\)\}/);
+  assert.match(styles,/\.sponsor-announcement-dialog \.modal-run\{width:100%\}/);
 });
 
 test('Energy recovery gear is capped at the strongest equipped perk',()=>{
