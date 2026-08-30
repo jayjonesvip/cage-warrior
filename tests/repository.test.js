@@ -206,6 +206,36 @@ test('Career Identity shows the next sponsor goal instead of duplicating the cur
   assert.match(styles,/\.career-sponsor-progress-track/);
 });
 
+test('Home presents XP and Victory Pack progress before sponsorship',()=>{
+  const xpIndex=html.indexOf('id="careerXpLevel"');
+  const packIndex=html.indexOf('id="victoryPackMeter"');
+  const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
+  const heroIndex=html.indexOf('<div class="hero">');
+  assert.ok(xpIndex>=0&&packIndex>xpIndex&&sponsorIndex>packIndex);
+  assert.ok(packIndex<heroIndex,'Victory Pack progress belongs above the fighter portrait');
+  assert.match(html,/id="careerXpTrack"[^>]*role="progressbar"/);
+  assert.match(html,/id="victoryPackTrack"[^>]*role="progressbar"/);
+  assert.match(game,/\$\('#careerXpFill'\)\.style\.width/);
+  assert.match(game,/\$\('#victoryPackFill'\)\.style\.width/);
+  assert.match(styles,/\.career-token\.career-progression-goal\{grid-column:1\/-1!important/);
+  assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
+});
+
+test('Feed summarizes followers and all known followed accounts',()=>{
+  assert.match(html,/class="feed-network-summary"[^>]*aria-label="Cage Feed audience"/);
+  assert.match(html,/id="feedFollowersCount"/);
+  assert.match(html,/id="feedFollowingCount"/);
+  assert.match(game,/function feedFollowingTotal\(\)/);
+  assert.match(game,/STRINGS\.social\.profiles/);
+  assert.match(game,/STRINGS\.social\.usernames/);
+  assert.match(game,/endorsementDefs\.map\(sponsor=>sponsorFeedProfile/);
+  assert.match(game,/rankingProfiles\(\)/);
+  assert.match(game,/profile\.id!==ownId/);
+  assert.match(game,/\$\('#feedFollowersCount'\)\.textContent=fmt\(state\.fans\)/);
+  assert.match(game,/\$\('#feedFollowingCount'\)\.textContent=fmt\(feedFollowingTotal\(\)\)/);
+  assert.match(styles,/\.feed-network-summary\{display:grid;grid-template-columns:1fr 1fr/);
+});
+
 test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(html,/id="sponsorAnnouncementModal"/);
   assert.match(html,/id="careerSponsorProgress"/);
@@ -289,6 +319,12 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
   assert.match(game,/LOGIC\.rankedFightTitleMode/);
   assert.match(game,/fightMode==='ranked'\)return Object\.assign\(\{\},opponent,\{worldRank,titleDefenseComplete:playerIsChampion\}\)/);
+});
+
+test('Fight ladder switches to detailed columns from its card width, not viewport width',()=>{
+  assert.match(styles,/\.fight-ladder\{container-type:inline-size;container-name:fight-ladder\}/);
+  assert.match(styles,/@container fight-ladder \(min-width:660px\)/);
+  assert.doesNotMatch(styles,/@media \(min-width:700px\)\{\s*\.fight-ladder-columns/);
 });
 
 test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()=>{

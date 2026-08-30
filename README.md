@@ -18,10 +18,10 @@ Training, sparring, manual resting, recovery-room treatments, side jobs, gamblin
 
 The simplified four-item navigation is Home, Fight, Gear, and Feed. The four primary pages are:
 
-- **Home** — identity, record, world rank, sponsor progress, and career guide.
+- **Home** — identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and career guide.
 - **Fight** — available Attribute Points, a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
 - **Gear** — Daily and installation Drops, Victory Packs, collectibles, and the equipped Fight Gear loadout.
-- **Feed** — CageReporter coverage, mentions, rivals, sponsors, and player interactions.
+- **Feed** — follower/following totals, CageReporter coverage, mentions, rivals, sponsors, and player interactions. Following includes known social accounts and ranked fighters.
 
 The compact Energy, Health, Power, Speed, Chin, and Cardio dashboard remains sticky while the larger identity row scrolls away.
 
@@ -78,6 +78,8 @@ Same-day opponent XP rules remain: full XP for the first same-level win, half XP
 
 Eligible wins against opponents at the fighter's level or higher advance the four-step Victory Pack meter. Upsets, rivalries, and finishes can accelerate progress. A first career win guarantees a Victory Pack.
 
+XP and Victory Pack progress are shown as full-width Home progression rows above sponsorship, keeping the fighter portrait focused on identity, record, and the current sponsor.
+
 Collectibles are permanent. Each Gear category shows unique collection progress as owned collectibles out of the total available in that category; duplicate copies do not inflate this count. Fight Gear can be equipped for combat attributes and, on selected items, faster Energy charging. Duplicate quantities are recorded but perks do not stack by quantity.
 
 The Gear page keeps the Daily Drop, its next-drop countdown, and the installation Drop together above the collection. When a Daily Drop is ready, the Gear navigation item receives a gold action indicator. The Daily Drop grants a guaranteed collectible; it does not grant currency or manually refill resources.
@@ -110,7 +112,7 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 
 The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. The Fight page uses the same ranking order as the Home rankings modal: the active champion is first, followed by fighters ordered by level and win percentage. Each full-width row shows rank, portrait, name, record, level, win percentage, exact win XP, and the Attribute Points available for that matchup. Tap any available row to open the existing Tale of the Tape.
 
-Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, show their country flag and country code, provide reliable full-XP progression matchups, and never count as championship defenses. Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement. A Circuit fighter who wins becomes the single available `CAGE CIRCUIT REMATCH`; losing to a different Circuit fighter replaces the older rematch, so one slot always remains fresh. Circuit opponents can distribute their ratings differently, but their four-attribute total is capped at one point above the player's total. After two consecutive Circuit losses, fresh opponents are instead capped one point below the player until a Circuit win resets the loss streak. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
+Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, show their country flag, provide reliable full-XP progression matchups, and never count as championship defenses. Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement. A Circuit fighter who wins becomes the single available `CAGE CIRCUIT REMATCH`; losing to a different Circuit fighter replaces the older rematch, so one slot always remains fresh. Circuit opponents can distribute their ratings differently, but their four-attribute total is capped at one point above the player's total. After two consecutive Circuit losses, fresh opponents are instead capped one point below the player until a Circuit win resets the loss streak. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
 
 Ranked opponents are not level-locked. Wins below the player's level award zero XP and zero Attribute Points, on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects them.
 
