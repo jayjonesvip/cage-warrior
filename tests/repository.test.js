@@ -167,7 +167,7 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
 test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
   assert.match(game,/attributePoint===1\?'ATTRIBUTE POINT':'ATTRIBUTE POINTS'/);
   assert.match(game,/attribute_points_earned:attributePoint/);
-  assert.match(game,/ATTRIBUTE POINT\$\{attributePoint===1\?'':'S'\} · AVAILABLE ON FIGHT PAGE/);
+  assert.doesNotMatch(game,/AVAILABLE ON FIGHT PAGE/);
   assert.doesNotMatch(game,/ASSIGN NOW OR SAVE/);
   assert.match(game,/rewardFansLabel.*FOLLOWERS/);
   assert.match(game,/lowerLevelFollowerPenalty/);
@@ -175,6 +175,26 @@ test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
   assert.match(game,/FOLLOWERS LOST/);
   assert.match(game,/rewardXpLabel/);
   assert.doesNotMatch(game,/rewardCash|rewardEarnings/);
+});
+
+test('fight result uses focused outcome and rewards stages',()=>{
+  assert.match(html,/id="resultOutcomeStage"[\s\S]*id="resultContinueBtn"[\s\S]*id="resultRewardsStage"/);
+  assert.match(html,/id="resultRewardsStage"[^>]*hidden/);
+  assert.match(html,/class="result-secondary-actions"[\s\S]*id="shareWinBtn"[\s\S]*id="detailsToggle"/);
+  assert.match(game,/function showResultStage\(stage='outcome'\)/);
+  assert.match(game,/showResultStage\('outcome'\)/);
+  assert.match(game,/resultContinueBtn.*showResultStage\('rewards'\)/);
+  assert.match(styles,/\.result-stage\[hidden\]\{display:none\}/);
+});
+
+test('zero and negative result metrics use the red non-positive treatment',()=>{
+  assert.match(game,/function styleResultMetric\(selector,value\)/);
+  assert.match(game,/nonPositive=Number\(value\)<=0/);
+  assert.match(game,/styleResultMetric\('#rewardPrimary'/);
+  assert.match(game,/styleResultMetric\('#rewardFans'/);
+  assert.match(game,/styleResultMetric\('#rewardXp'/);
+  assert.match(styles,/\.rewardbox\.non-positive b\{color:#ff6d77\}/);
+  assert.match(styles,/\.result-bonus-row\.non-positive\{color:#ff737b\}/);
 });
 
 test('post-fight scorecard renders both fighter portraits with silhouette fallback',()=>{
@@ -370,6 +390,15 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
   assert.match(game,/LOGIC\.rankedFightTitleMode/);
   assert.match(game,/fightMode==='ranked'\)return Object\.assign\(\{\},opponent,\{worldRank,titleDefenseComplete:playerIsChampion\}\)/);
+});
+
+test('Fight ladder keeps the current fighter visible but not selectable',()=>{
+  assert.match(game,/function renderPlayerRankingRow\(profile,position\)/);
+  assert.match(game,/class="fight-ranking-row player\$\{champion\?' champion':''\}" role="listitem"/);
+  assert.match(game,/YOUR FIGHTER<\/span>/);
+  assert.match(game,/NOT SELECTABLE/);
+  assert.match(game,/rankedEntries\.push\(\{rank:ranking\.position,html:renderPlayerRankingRow/);
+  assert.match(styles,/\.fight-ranking-row\.player\{/);
 });
 
 test('Fight ladder switches to detailed columns from its card width, not viewport width',()=>{
