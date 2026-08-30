@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.7.7" />
+<meta name="app-version" content="2.7.15" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -42,10 +42,10 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="css/styles.css?v=2.7.7">
-<link rel="stylesheet" href="css/shared.css?v=2.7.7">
-<link rel="stylesheet" href="css/landing.css?v=2.7.7">
-<link rel="stylesheet" href="css/github-steel.css?v=2.7.7">
+<link rel="stylesheet" href="css/styles.css?v=2.7.15">
+<link rel="stylesheet" href="css/shared.css?v=2.7.15">
+<link rel="stylesheet" href="css/landing.css?v=2.7.15">
+<link rel="stylesheet" href="css/github-steel.css?v=2.7.15">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <body class="landing-active">
 <section class="landing-page" id="landingPage" aria-labelledby="landingTitle">
   <main class="landing-card">
-    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.7" alt="" aria-hidden="true">
+    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.15" alt="" aria-hidden="true">
     <img class="landing-logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <p class="landing-eyebrow" id="landingEyebrow">THE FIGHT STARTS NOW</p>
     <h1 id="landingTitle"><span id="landingTitleLead">BUILD. FIGHT.</span><br><span class="accent" id="landingTitleAccent">BECOME.</span></h1>
@@ -130,14 +130,6 @@
     <section class="screen active" data-screen="home">
       <div class="card career-after-setup"><div class="ticker"><i class="pulse-dot"></i><span id="tickerText">Win fights. Assign attribute points. Climb the rankings.</span></div></div>
 
-      <span id="homeDropTopAnchor" hidden></span>
-      <section class="card daily-drop-card career-after-setup" id="homeDropOffer" hidden aria-live="polite" aria-labelledby="homeDropTitle">
-        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.7" alt="" aria-hidden="true">
-        <div class="daily-drop-copy"><small id="homeDropEyebrow">ONE FREE PACK EVERY DAY</small><h2 id="homeDropTitle">DAILY DROP</h2><p id="homeDropDescription">Guaranteed collectible</p></div>
-        <button class="daily" id="dailyBtn" type="button"><span id="dailyBtnLabel">CLAIM DAILY DROP</span><strong class="daily-drop-countdown" id="dailyDropCountdown" data-daily-reset-clock aria-label="Time until the next Daily Drop" hidden>--:--:--</strong></button>
-        <button class="daily" id="installGameBtn" type="button" hidden>INSTALL GAME · FREE DROP</button>
-      </section>
-
       <div class="card build-card fighter-builder-intro identity-setup" id="fighterBuilderIntro"><div class="card-title">Build Your Fighter <small>New Career</small></div><div class="fighter-builder-progress"><div class="builder-progress-copy"><span id="builderProgressStep">0 OF 3 COMPLETE</span><b id="builderProgressPercent">0%</b></div><div class="builder-progress-track" id="builderProgressTrack" role="progressbar" aria-label="Fighter build progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="builderProgressFill"></i></div></div><p class="fighter-builder-copy"><b>NO ACTIVE FIGHTER FOUND.</b> This may be your first visit, a retired career, or cleared browser data. Lock in your hometown, fighter build, and permanent name to begin a new climb.</p></div>
 
       <div class="card build-card career-after-setup" id="careerIdentityCard"><div class="card-title">Career Identity <small id="careerIdentityStatus">LOCKED IN</small></div><div class="career-strip"><div class="career-token"><small>Fighting Out Of</small><b id="homeCityText">Not selected</b></div><div class="career-token"><small>Fighter Archetype</small><b id="homeStyleText">Not selected</b></div><div class="career-token"><small>Followers</small><b id="careerFollowersText">0</b></div><button class="career-token career-rankings-button" id="openRankingsBtn" type="button"><small>World Standings</small><b>TOP 25 RANKINGS</b><span id="homeRankText">VIEW RANKINGS</span></button><div class="career-token career-sponsor-goal"><small id="careerSponsorLabel">Next Sponsor</small><b id="careerSponsorText">UNSIGNED</b><div class="career-sponsor-progress-track" id="careerSponsorProgressTrack" role="progressbar" aria-label="Progress toward next sponsor" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><i id="careerSponsorProgressFill"></i></div><div class="career-sponsor-progress-copy"><span id="careerSponsorProgress">0 FOLLOWERS NEEDED</span><em id="careerSponsorProgressMeta">0 / 0 FOLLOWERS</em></div></div></div></div>
@@ -177,8 +169,6 @@
         <div class="hero-copy"><div class="record"><b id="recordText">0-0</b><small>PRO RECORD</small></div></div>
       </div>
 
-      <section class="attribute-assignment card career-after-setup" data-attribute-assignment hidden aria-live="polite"><header><h2>IMPROVE YOUR FIGHTER</h2><b data-attribute-points>0 ATTRIBUTE POINTS AVAILABLE</b></header><p>Assign a permanent point now, or save it for later.</p><div class="attribute-assignment-grid"><button type="button" data-assign-attribute="power"><span>POWER</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="speed"><span>SPEED</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="chin"><span>CHIN</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="cardio"><span>CARDIO</span><b>5</b><em>+1</em></button></div></section>
-
       <section class="career-guide" aria-labelledby="careerGuideTitle">
         <header class="career-guide-heading"><h2 id="careerGuideTitle">FIGHT. IMPROVE. CLIMB.</h2><p>Win fights to earn attribute points. Build your following, attract bigger sponsors, collect gear, and chase the championship.</p></header>
         <div class="choice-grid">
@@ -198,11 +188,18 @@
 
     <section class="screen" data-screen="fight">
       <div class="daily-reset-clock" id="fightResetClock" hidden><span>DAILY FIGHT LIMIT REACHED</span><strong data-daily-reset-clock aria-label="Time until daily fight limit resets">--:--:--</strong><small>NEW FIGHTS AT YOUR LOCAL MIDNIGHT</small></div>
+      <section class="attribute-assignment card fight-attribute-assignment" data-attribute-assignment hidden aria-live="polite"><header><div><small>UNSPENT ATTRIBUTE POINTS</small><h2>IMPROVE YOUR FIGHTER</h2></div><b data-attribute-points>0 POINTS AVAILABLE</b></header><p>Choose one permanent upgrade. The large value includes active gear; the smaller line separates your fighter's base attribute from gear bonuses.</p><div class="attribute-assignment-grid"><div class="attribute-assignment-stat"><div><span>POWER</span><b data-attribute-effective>5</b><small data-attribute-breakdown>5 BASE</small></div><button type="button" data-assign-attribute="power" aria-label="Add one permanent Power point">+1</button></div><div class="attribute-assignment-stat"><div><span>SPEED</span><b data-attribute-effective>5</b><small data-attribute-breakdown>5 BASE</small></div><button type="button" data-assign-attribute="speed" aria-label="Add one permanent Speed point">+1</button></div><div class="attribute-assignment-stat"><div><span>CHIN</span><b data-attribute-effective>5</b><small data-attribute-breakdown>5 BASE</small></div><button type="button" data-assign-attribute="chin" aria-label="Add one permanent Chin point">+1</button></div><div class="attribute-assignment-stat"><div><span>CARDIO</span><b data-attribute-effective>5</b><small data-attribute-breakdown>5 BASE</small></div><button type="button" data-assign-attribute="cardio" aria-label="Add one permanent Cardio point">+1</button></div></div></section>
       <div class="card opponent-roster fight-ladder"><div class="card-title">World Fight Rankings <small id="rosterSummary">Ranked fighters</small><span class="limit-pill" id="fightLimitText">10 FIGHTS LEFT</span></div><div class="fight-ladder-columns" aria-hidden="true"><span>RANK · FIGHTER</span><span>RECORD</span><span>LEVEL</span><span>WIN %</span><span>WIN REWARDS</span></div><div class="fight-injury-warning" id="fightInjuryWarning" hidden><span aria-hidden="true">&#9888;</span><div><b>FIGHTING HURT</b><small>Fighting when you are not at full strength incurs a small chance of injury.</small></div></div><div id="opponentList"></div></div>
       <div class="section-note">Tap any fighter to open the Tale of the Tape. Two generated on-level Cage Circuit fighters stay at the top as unranked, full-XP matchups with rank N/A. Wins below your level award no XP or Attribute Points, on-level wins award one Attribute Point, and wins above your level award two. The World Champion is ranked #1 and may be challenged once per day. Every ranked fight selected by the reigning champion is a title defense.</div>
     </section>
 
     <section class="screen" data-screen="gear">
+      <section class="card daily-drop-card career-after-setup" id="gearDropOffer" hidden aria-live="polite" aria-labelledby="gearDropTitle">
+        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.15" alt="" aria-hidden="true">
+        <div class="daily-drop-copy"><small id="gearDropEyebrow">ONE FREE PACK EVERY DAY</small><h2 id="gearDropTitle">DAILY DROP</h2><p id="gearDropDescription">Guaranteed collectible</p></div>
+        <button class="daily" id="dailyBtn" type="button"><span id="dailyBtnLabel">CLAIM DAILY DROP</span><strong class="daily-drop-countdown" id="dailyDropCountdown" data-daily-reset-clock aria-label="Time until the next Daily Drop" hidden>--:--:--</strong></button>
+        <button class="daily" id="installGameBtn" type="button" hidden>INSTALL GAME · FREE DROP</button>
+      </section>
       <div id="gearShop"></div>
       <div class="section-note">Collectibles come from fight wins and the guaranteed Daily Drop. Minimum level adds an item to your permanent pool, so early gear can still appear later. Duplicate quantities never stack perks.</div>
     </section>
@@ -210,10 +207,10 @@
   </div>
 
   <nav class="bottomnav" hidden>
-    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.7" alt="" aria-hidden="true"></span>Home</button>
-    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.7" alt="" aria-hidden="true"></span>Fight</button>
-    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.7" alt="" aria-hidden="true"></span>Gear</button>
-    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.7" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
+    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.15" alt="" aria-hidden="true"></span>Home</button>
+    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.15" alt="" aria-hidden="true"></span>Fight</button>
+    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.15" alt="" aria-hidden="true"></span>Gear</button>
+    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.15" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
   </nav>
 
   <div class="modal-overlay" id="retireCareerModal" aria-hidden="true">
@@ -280,7 +277,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.7" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.15" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -331,7 +328,7 @@
 
   <section id="fightOverlay">
     <div class="sim-shell">
-      <div class="sim-header"><b>CAGE GRIND <span>FIGHT NIGHT</span></b><div class="sim-controls hidden" id="fightControls"><button class="sim-control" id="speedBtn" type="button">FAST ×2</button></div></div>
+      <div class="sim-header"><div class="fight-night-brand"><img src="assets/cage-grind-logo.png" alt="Cage Grind"><b><span id="fightNightDay">SUNDAY</span> NIGHT FIGHT</b></div><div class="sim-controls hidden" id="fightControls"><button class="sim-control" id="speedBtn" type="button">FAST ×2</button></div></div>
 
       <div class="sim-stage" id="tapeStage">
         <div class="tape-card">
@@ -366,7 +363,7 @@
 
       <div class="sim-stage hidden" id="planStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.7" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.15" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>BUILD THE FIGHT PLAN</small></div>
           <div class="fight-plan-card">
             <span class="fight-plan-kicker">FINAL INSTRUCTIONS</span>
@@ -385,7 +382,7 @@
 
       <div class="sim-stage hidden" id="focusStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.7" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.15" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>FINAL MOMENTS BEFORE THE WALKOUT · FOCUS <b id="focusValue">82%</b></small></div>
           <div class="fight-plan-card focus-encounter" id="focusEncounter"></div>
         </div>
@@ -412,7 +409,7 @@
   <div class="modal-overlay drop-claim-modal" id="dropClaimModal" aria-hidden="true">
     <section class="drop-claim-dialog" role="dialog" aria-modal="true" aria-labelledby="dropClaimTitle" aria-describedby="dropClaimMessage">
       <header class="drop-claim-copy"><small id="dropClaimEyebrow">SEALED CAGE GRIND PACK</small><h2 id="dropClaimTitle">DROP READY</h2><p id="dropClaimMessage">Reveal your collectible.</p></header>
-      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.7" alt="Sealed Cage Grind collectible pack"></div>
+      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.15" alt="Sealed Cage Grind collectible pack"></div>
       <div class="drop-claim-rewards" id="dropClaimRewards" hidden></div>
       <button class="drop-claim-action" id="dropRevealBtn" type="button">REVEAL DROP</button>
       <button class="drop-claim-action close" id="dropCloseBtn" type="button" hidden>CLOSE</button>
@@ -425,14 +422,13 @@
     <p id="resultLine">You gave the crowd something to remember.</p>
     <div class="result-damage" id="resultDamage" hidden></div>
     <div class="championship-result-status" id="championshipResultStatus" hidden role="status" aria-live="polite"></div>
-    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.7" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+    <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.15" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
     <div class="rewards"><div class="rewardbox"><b id="rewardPrimary">+1</b><small id="rewardPrimaryLabel">Attribute Point</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
     <div class="result-bonuses" id="resultBonuses" hidden></div>
     <aside class="post-fight-tutorial" id="postFightTutorial" hidden aria-labelledby="postFightTutorialTitle">
       <header><small>FIRST FIGHT GUIDE</small><b id="postFightTutorialTitle">WHAT HAPPENS NEXT</b></header>
-      <ol><li id="postFightTutorialReward">Assign your Attribute Point now, or save it for Home.</li><li>Energy and Health recharge automatically.</li><li>Close the result, then return to Fight when cleared.</li></ol>
+      <ol><li id="postFightTutorialReward">Your Attribute Point is saved at the top of the Fight screen.</li><li>Energy and Health recharge automatically.</li><li>Close the result, then return to Fight when cleared.</li></ol>
     </aside>
-    <section class="attribute-assignment result-attribute-assignment" data-attribute-assignment hidden aria-live="polite"><header><h3>ASSIGN YOUR POINT</h3><b data-attribute-points>1 ATTRIBUTE POINT AVAILABLE</b></header><p>Make the win count now, or save the point for later.</p><div class="attribute-assignment-grid"><button type="button" data-assign-attribute="power"><span>POWER</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="speed"><span>SPEED</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="chin"><span>CHIN</span><b>5</b><em>+1</em></button><button type="button" data-assign-attribute="cardio"><span>CARDIO</span><b>5</b><em>+1</em></button></div></section>
     <div class="loot" id="lootBox" style="display:none"></div>
     <div class="result-actions"><button class="continue-btn" id="continueBtn">CLAIM REWARDS</button><button class="details-toggle" id="shareWinBtn" type="button" hidden>SHARE WIN</button><button class="details-toggle" id="detailsToggle" type="button">VIEW SCORECARD</button></div>
     <div class="result-details" id="resultDetails">
@@ -465,19 +461,19 @@
   </section>
 </div>
 
-<script src="js/fight-rules.js?v=2.7.7"></script>
-<script src="js/game-logic.js?v=2.7.7"></script>
-<script src="js/shared-ui.js?v=2.7.7"></script>
-<script src="js/fight-focus-contacts.js?v=2.7.7"></script>
-<script src="js/strings.js?v=2.7.7"></script>
-<script src="js/analytics.js?v=2.7.7"></script>
-<script src="js/supabase-client.js?v=2.7.7"></script>
-<script src="js/cage-social.js?v=2.7.7"></script>
-<script src="js/landing.js?v=2.7.7"></script>
-<script src="js/fight-focus.js?v=2.7.7"></script>
-<script src="js/fight-plan.js?v=2.7.7"></script>
-<script src="js/definitions.js?v=2.7.7"></script>
-<script src="js/game.js?v=2.7.7"></script>
-<script src="js/pwa.js?v=2.7.7"></script>
+<script src="js/fight-rules.js?v=2.7.15"></script>
+<script src="js/game-logic.js?v=2.7.15"></script>
+<script src="js/shared-ui.js?v=2.7.15"></script>
+<script src="js/fight-focus-contacts.js?v=2.7.15"></script>
+<script src="js/strings.js?v=2.7.15"></script>
+<script src="js/analytics.js?v=2.7.15"></script>
+<script src="js/supabase-client.js?v=2.7.15"></script>
+<script src="js/cage-social.js?v=2.7.15"></script>
+<script src="js/landing.js?v=2.7.15"></script>
+<script src="js/fight-focus.js?v=2.7.15"></script>
+<script src="js/fight-plan.js?v=2.7.15"></script>
+<script src="js/definitions.js?v=2.7.15"></script>
+<script src="js/game.js?v=2.7.15"></script>
+<script src="js/pwa.js?v=2.7.15"></script>
 </body>
 </html>

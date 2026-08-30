@@ -114,6 +114,12 @@ test('fight results increase persistent Health damage and enforce loss floors',(
   assert.match(game,/finalizePersistentFightDamage\(fight\)/);
 });
 
+test('below-full Health opens fights without invoking removed Training code',()=>{
+  assert.match(game,/injuryEligible:state\.health<state\.maxHealth&&!currentFightInjury\(\)/);
+  assert.doesNotMatch(game,/currentTrainingInjury/);
+  assert.match(game,/state\.health>=MINIMUM_FIGHT_HEALTH/);
+});
+
 test('passive recovery updates the HUD without rebuilding clickable opponent rows',()=>{
   const recoveryBody=game.match(/function updatePassiveRecovery\(\)\{([\s\S]*?)\n  \}/)?.[1]||'';
   assert.match(recoveryBody,/renderResourceHud\(\)/);
@@ -133,9 +139,17 @@ test('battery cells display proportional continuous charge',()=>{
   assert.equal((html.match(/<i><\/i>/g)||[]).length>=4,true);
 });
 
-test('Attribute Point assignment appears on Home and victory results',()=>{
-  assert.equal((html.match(/data-attribute-assignment/g)||[]).length,2);
-  for(const stat of ['power','speed','chin','cardio'])assert.equal((html.match(new RegExp(`data-assign-attribute="${stat}"`,'g'))||[]).length,2,stat);
+test('Attribute Point assignment has one source of truth above Fight rankings',()=>{
+  assert.equal((html.match(/data-attribute-assignment/g)||[]).length,1);
+  for(const stat of ['power','speed','chin','cardio'])assert.equal((html.match(new RegExp(`data-assign-attribute="${stat}"`,'g'))||[]).length,1,stat);
+  assert.match(html,/data-screen="fight"[\s\S]*?fight-attribute-assignment[\s\S]*?opponent-roster fight-ladder/);
+  assert.match(html,/data-attribute-effective/);
+  assert.match(html,/data-attribute-breakdown/);
+  assert.match(styles,/\.attribute-assignment-stat button\{appearance:none/);
+  assert.match(game,/effective=effectiveStat\(key\)/);
+  assert.match(game,/bonus\?`\$\{base\} BASE · \+\$\{bonus\} GEAR`/);
+  assert.doesNotMatch(html,/result-attribute-assignment|ASSIGN YOUR POINT/);
+  assert.doesNotMatch(game,/save it for Home/);
   assert.match(game,/assignAttributePoint/);
   assert.match(game,/awardVictoryAttributePoint/);
   assert.match(game,/saveState\(\)/);
@@ -228,12 +242,42 @@ test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
   assert.match(styles,/@media \(max-width:340px\)/);
 });
 
+test('drop offers live at the top of Gear and flag its navigation when ready',()=>{
+  const home=html.slice(html.indexOf('data-screen="home"'),html.indexOf('data-screen="fight"'));
+  const gear=html.slice(html.indexOf('data-screen="gear"'),html.lastIndexOf('</main>'));
+  assert.doesNotMatch(home,/id="(?:gearDropOffer|dailyBtn|installGameBtn)"/);
+  assert.match(gear,/id="gearDropOffer"[\s\S]*id="dailyBtn"[\s\S]*id="installGameBtn"[\s\S]*id="gearShop"/);
+  assert.match(game,/gearNav\.classList\.toggle\('drop-ready',dailyAvailable\)/);
+  assert.match(game,/Gear, Daily Drop ready/);
+  assert.match(styles,/\.navbtn\.drop-ready/);
+});
+
+test('single-action modal footers fill their card width',()=>{
+  assert.match(styles,/\.modal-actions\.single-action\{grid-template-columns:minmax\(0,1fr\)\}/);
+  assert.match(styles,/\.modal-actions\.single-action>button\{width:100%\}/);
+});
+
 test('fight, championship, opponents, rankings, gear, packs, and Feed remain present',()=>{
   for(const token of ['id="opponentList"','id="openRankingsBtn"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
   assert.doesNotMatch(html,/id="worldTitleCard"/);
   assert.match(game,/rankFighters/);
   assert.match(game,/settleChampionshipResult/);
   assert.match(game,/victoryPack/);
+});
+
+test('Gear category status reports unique collection completion',()=>{
+  assert.match(game,/const categoryTotal=gearItems\.filter\(g=>g\.category===cat\)\.length/);
+  assert.match(game,/collectionStatus=`\$\{items\.length\} \/ \$\{categoryTotal\} COLLECTIBLES`/);
+  assert.match(game,/loadoutStatus=cat==='Fight Gear'\?`\$\{state\.equippedGear\.length\}\/\$\{loadoutLimit\} EQUIPPED/);
+  assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span>\$\{loadoutStatus\?`<small>\$\{loadoutStatus\}<\/small>`:''\}`/);
+  assert.doesNotMatch(game,/`\$\{items\.length\} COLLECTIBLE\$\{items\.length===1\?'':'S'\}`/);
+  assert.match(styles,/\.shop-status>span\{white-space:nowrap\}/);
+});
+
+test('Energy Drink collectible uses the Surge Core can artwork',()=>{
+  assert.match(definitions,/id:'energy-drink'[^\n]+assetExt:'png'/);
+  assert.ok(fs.existsSync(path.join(root,'assets/icons/energy-drink.png')));
+  assert.ok(!fs.existsSync(path.join(root,'assets/icons/energy-drink.jpg')));
 });
 
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
@@ -262,17 +306,59 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/state\.circuitLossStreak=0/);
   assert.match(game,/state\.circuitLossStreak\+\+/);
   assert.match(game,/LOGIC\.capOpponentRatings\(ratings,state\.stats,maximumAdvantage\)/);
+  assert.match(game,/const opponentCountryMeta=\{USA:\['US','United States'\][\s\S]*SAM:\['WS','Samoa'\]\}/);
+  assert.match(game,/function opponentCountryBadge\(code\)/);
+  assert.match(game,/assets\/flags\/\$\{country\.iso\}\.svg\?v=\$\{ICON_ASSET_VERSION\}/);
+  assert.match(game,/countryBadge=country\?opponentCountryBadge\(opponent\.country\):''/);
+  assert.match(game,/tapeCountry\.innerHTML=opponentCountryBadge\(f\.o\.country\)/);
   assert.match(game,/LOWER LEVEL/);
   assert.match(game,/XP USED TODAY/);
   assert.match(styles,/\.fight-ranking-row\.circuit/);
+  assert.match(styles,/\.fight-country-badge/);
+  assert.match(styles,/\.fight-country-badge img\{[^}]*width:20px/);
+  assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
+  for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
+  assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
   assert.match(html,/Two generated on-level Cage Circuit fighters stay at the top/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
+});
+
+test('real ranked fighters remain available to new Level 1 careers',()=>{
+  assert.doesNotMatch(game,/!profile\.isChampion&&profile\.fights<1/);
+  assert.match(game,/loadOpponentCandidates\(state\.level,20\)/);
+  assert.match(game,/if\(ranked\.length\)state\.roster=/);
+  assert.match(game,/Promise\.allSettled\(\[SHARED_FEED\.loadFeed/);
+  assert.match(game,/if\(!profilesLoaded&&!candidatesLoaded\)throw/);
+  assert.match(game,/if\(championshipResult\.status==='fulfilled'\)/);
+});
+
+test('Fighting Hurt callout leaves spacing before the opponent groups',()=>{
+  assert.match(styles,/\.fight-injury-warning\{[^}]*margin:9px;/);
+});
+
+test('desktop Fight layout uses a single-column navigation rail and centered details dialog',()=>{
+  assert.match(styles,/@media \(min-width:1100px\)\{\.bottomnav\{grid-template-columns:1fr/);
+  assert.match(styles,/\.tape-breakdown\{align-items:center;padding:24px\}/);
+  assert.match(styles,/\.tape-breakdown-sheet\{width:min\(720px,calc\(100% - 48px\)\)/);
 });
 
 test('Tale of the Tape includes dynamic agent matchup advice',()=>{
   for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
   assert.match(game,/LOGIC\.matchupAdvice/);
   assert.match(styles,/\.tape-agent-read/);
+});
+
+test('fight-night masthead uses the local weekday and stays centered',()=>{
+  assert.match(html,/class="fight-night-brand"><img src="assets\/cage-grind-logo\.png" alt="Cage Grind"><b><span id="fightNightDay">SUNDAY<\/span> NIGHT FIGHT/);
+  assert.match(game,/function localFightNightDay\(date=new Date\(\)\)/);
+  assert.match(game,/\$\('#fightNightDay'\)\.textContent=localFightNightDay\(\)/);
+  assert.match(styles,/\.sim-header\{position:relative;display:grid;grid-template-columns:minmax\(0,1fr\);justify-items:center/);
+  assert.match(styles,/\.fight-night-brand\{display:grid;justify-items:center/);
+  assert.match(styles,/\.sim-header b\{[^}]*text-align:center;white-space:nowrap/);
+});
+
+test('Tale of the Tape leaves breathing room above the fighter cards',()=>{
+  assert.match(styles,/\.tape-versus-cards\{[^}]*padding:9px 10px 0/);
 });
 
 test('Tale of the Tape keeps the primary matchup clean and moves supporting information into Fight Details',()=>{
