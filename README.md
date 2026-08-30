@@ -110,6 +110,8 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 
 The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. The Fight page uses the same ranking order as the Home rankings modal: the active champion is first, followed by fighters ordered by level and win percentage. Each full-width row shows rank, portrait, name, record, level, win percentage, exact win XP, and the Attribute Points available for that matchup. Tap any available row to open the existing Tale of the Tape.
 
+Four generated on-level Cage Circuit fighters appear beneath the real rankings. They are clearly labeled unranked with rank `N/A`, provide reliable on-level progression matchups, and never count as championship defenses.
+
 Ranked opponents are not level-locked. Wins below the player's level award zero XP and zero Attribute Points, on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects them.
 
 The champion appears at rank number one and every fighter gets one title attempt per local day. A reigning champion sees the same ladder and may select any proven ranked fighter for a title defense; the selected title row locks after that daily attempt.

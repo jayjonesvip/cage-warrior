@@ -223,6 +223,16 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
 });
 
+test('Fight adds four on-level unranked Cage Circuit opponents beneath rankings',()=>{
+  assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,4\)\.map\(opponent=>Object\.assign\(\{\},opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
+  assert.match(game,/opponents=\[\.\.\.ranked,\.\.\.showcase,\.\.\.circuit\]/);
+  assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
+  assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
+  assert.match(game,/UNRANKED · RANK N\/A/);
+  assert.match(styles,/\.fight-ranking-row\.circuit/);
+  assert.match(html,/Generated on-level Cage Circuit fighters appear as unranked with rank N\/A/);
+});
+
 test('Tale of the Tape includes dynamic agent matchup advice',()=>{
   for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
   assert.match(game,/LOGIC\.matchupAdvice/);
