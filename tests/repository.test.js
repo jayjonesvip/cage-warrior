@@ -223,20 +223,31 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
 });
 
-test('Fight adds four on-level unranked Cage Circuit opponents beneath rankings',()=>{
-  assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,4\)\.map\(opponent=>Object\.assign\(\{\},opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
-  assert.match(game,/opponents=\[\.\.\.ranked,\.\.\.showcase,\.\.\.circuit\]/);
+test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()=>{
+  assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,2\)\.map\(opponent=>Object\.assign\(\{\},opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
+  assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.circuit,\.\.\.ranked\]/);
+  assert.match(game,/\$\{showcaseRows\}\$\{circuitRows\}\$\{rankedRows\}/);
   assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
-  assert.match(game,/UNRANKED · RANK N\/A/);
+  assert.match(game,/FRESH MATCHUPS · FULL XP/);
+  assert.match(game,/LOWER LEVEL/);
+  assert.match(game,/XP USED TODAY/);
   assert.match(styles,/\.fight-ranking-row\.circuit/);
-  assert.match(html,/Generated on-level Cage Circuit fighters appear as unranked with rank N\/A/);
+  assert.match(html,/Two generated on-level Cage Circuit fighters stay at the top/);
 });
 
 test('Tale of the Tape includes dynamic agent matchup advice',()=>{
   for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
   assert.match(game,/LOGIC\.matchupAdvice/);
   assert.match(styles,/\.tape-agent-read/);
+});
+
+test('Tale of the Tape keeps the primary matchup clean and moves supporting information into Fight Details',()=>{
+  assert.match(html,/id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
+  assert.match(html,/id="tapeBreakdownTitle">FIGHT DETAILS<\/h2>/);
+  assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('id="tapeBreakdown"'));
+  assert.ok(html.indexOf('id="tapeAgentRead"')>html.indexOf('id="tapeBreakdown"'));
+  assert.match(styles,/\.tape-actions\{grid-template-columns:\.85fr 1fr 1\.45fr/);
 });
 
 test('open ranked title migration allows one selected daily defense',()=>{
