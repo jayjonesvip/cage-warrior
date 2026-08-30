@@ -110,11 +110,11 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 
 The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. The Fight page uses the same ranking order as the Home rankings modal: the active champion is first, followed by fighters ordered by level and win percentage. Each full-width row shows rank, portrait, name, record, level, win percentage, exact win XP, and the Attribute Points available for that matchup. Tap any available row to open the existing Tale of the Tape.
 
-Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, provide reliable full-XP progression matchups, and never count as championship defenses. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
+Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, provide reliable full-XP progression matchups, and never count as championship defenses. Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement. A Circuit fighter who wins becomes the single available `CAGE CIRCUIT REMATCH`; losing to a different Circuit fighter replaces the older rematch, so one slot always remains fresh. Circuit opponents can distribute their ratings differently, but their four-attribute total is capped at one point above the player's total. After two consecutive Circuit losses, fresh opponents are instead capped one point below the player until a Circuit win resets the loss streak. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
 
 Ranked opponents are not level-locked. Wins below the player's level award zero XP and zero Attribute Points, on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects them.
 
-The champion appears at rank number one and every fighter gets one title attempt per local day. A reigning champion sees the same ladder and may select any proven ranked fighter for a title defense; the selected title row locks after that daily attempt.
+The champion appears at rank number one and every fighter gets one title attempt per local day. A reigning champion sees the same ladder and may select any proven ranked fighter for the day's title defense. After that defense is complete, the remaining ranked fighters stay available as normal non-title fights instead of inheriting the defense lock.
 
 On-level opponent attributes follow the expected one-Attribute-Point-per-win career curve. Generated and ranked matchup ratings grow steadily through the early levels, then compound only slightly from Level 7 onward. Existing generated opponents are recalculated when a career loads so older saves do not retain the retired Training-era difficulty curve.
 
@@ -122,7 +122,7 @@ Retiring as champion passes the belt to the highest-ranked eligible active fight
 
 ## Save migration
 
-Current saves use state version 25. Migration preserves identity, avatar, hometown, archetype, level, XP, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history.
+Current saves use state version 26. Migration preserves identity, avatar, hometown, archetype, level, XP, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history. Existing careers begin with no Circuit loss streak.
 
 Migration adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the appropriate follower-based sponsor without moving backward, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
 

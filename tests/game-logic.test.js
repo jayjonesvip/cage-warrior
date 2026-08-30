@@ -204,6 +204,13 @@ test('rankings place champion first then sort by level and win percentage',()=>{
   assert.deepEqual(ranked.map(row=>row.id),['c','a','b']);
 });
 
+test('the champion can take normal ranked fights after completing the daily defense',()=>{
+  assert.equal(logic.rankedFightTitleMode({playerIsChampion:true,defenseUsedToday:false}),'defense');
+  assert.equal(logic.rankedFightTitleMode({playerIsChampion:true,defenseUsedToday:true}),'ranked');
+  assert.equal(logic.rankedFightTitleMode({opponentIsChampion:true}),'challenge');
+  assert.equal(logic.rankedFightTitleMode({opponentIsChampion:false}),'ranked');
+});
+
 test('on-level opponent ratings track one Attribute Point per expected victory',()=>{
   const expected={1:[3.9,4.1],5:[8.3,8.5],9:[13,13.4],12:[16.9,17.3]};
   for(const [level,[minimum,maximum]] of Object.entries(expected)){
@@ -212,6 +219,16 @@ test('on-level opponent ratings track one Attribute Point per expected victory',
   }
   const ranked=logic.networkOpponentRatings(12,{power:5,speed:5,chin:5,cardio:5},{power:0,speed:0,chin:0,cardio:0},0);
   assert.deepEqual(ranked,{power:17,speed:17,chin:17,cardio:17});
+});
+
+test('Cage Circuit ratings preserve distribution within the player-total cap',()=>{
+  const player={power:10,speed:10,chin:10,cardio:10},ratings={power:24,speed:16,chin:12,cardio:8};
+  const standard=logic.capOpponentRatings(ratings,player,1),rebound=logic.capOpponentRatings(ratings,player,-1);
+  assert.equal(Object.values(standard).reduce((sum,value)=>sum+value,0),41);
+  assert.equal(Object.values(rebound).reduce((sum,value)=>sum+value,0),39);
+  assert.ok(standard.power>standard.speed&&standard.speed>standard.cardio);
+  assert.ok(Object.values(standard).every(Number.isInteger));
+  assert.deepEqual(logic.capOpponentRatings({power:4,speed:5,chin:4,cardio:5},player,1),{power:4,speed:5,chin:4,cardio:5});
 });
 
 test('fighter creation allocations stay whole and total twenty',()=>{

@@ -14,6 +14,7 @@ const logic=read('js/game-logic.js');
 const definitions=read('js/definitions.js');
 const styles=read('css/styles.css');
 const steel=read('css/github-steel.css');
+const readme=read('README.md');
 
 test('all first-party JavaScript parses without a build step',()=>{
   for(const file of fs.readdirSync(path.join(root,'js')).filter(name=>name.endsWith('.js'))){
@@ -67,10 +68,11 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 25',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*25/);
+test('new careers use explicit save version 26',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*26/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
+  assert.match(game,/circuitLossStreak:0/);
   assert.match(game,/energyRecoveryAt:Date\.now\(\)/);
   assert.match(game,/healthRecoveryAt:Date\.now\(\)/);
 });
@@ -221,19 +223,30 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(html,/data-opponent-filter/);
   assert.match(game,/onChampionshipChange:renderOpponents/);
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
+  assert.match(game,/LOGIC\.rankedFightTitleMode/);
+  assert.match(game,/fightMode==='ranked'\)return Object\.assign\(\{\},opponent,\{worldRank,titleDefenseComplete:playerIsChampion\}\)/);
 });
 
 test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()=>{
-  assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,2\)\.map\(opponent=>Object\.assign\(\{\},opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
+  assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,2\)\.map\(opponent=>Object\.assign\(opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
+  assert.match(game,/o\.lossesToPlayer=\(o\.lossesToPlayer\|\|0\)\+1/);
+  assert.match(game,/ensureRoster\(\);state\.dailyOpponentWins/);
   assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.circuit,\.\.\.ranked\]/);
   assert.match(game,/\$\{showcaseRows\}\$\{circuitRows\}\$\{rankedRows\}/);
   assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
   assert.match(game,/FRESH MATCHUPS · FULL XP/);
+  assert.match(game,/CAGE CIRCUIT REMATCH/);
+  assert.match(game,/circuitRematches\.length>1/);
+  assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
+  assert.match(game,/state\.circuitLossStreak=0/);
+  assert.match(game,/state\.circuitLossStreak\+\+/);
+  assert.match(game,/LOGIC\.capOpponentRatings\(ratings,state\.stats,maximumAdvantage\)/);
   assert.match(game,/LOWER LEVEL/);
   assert.match(game,/XP USED TODAY/);
   assert.match(styles,/\.fight-ranking-row\.circuit/);
   assert.match(html,/Two generated on-level Cage Circuit fighters stay at the top/);
+  assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 
 test('Tale of the Tape includes dynamic agent matchup advice',()=>{
@@ -261,7 +274,7 @@ test('open ranked title migration allows one selected daily defense',()=>{
 test('saved generated opponents are rebalanced to the fight-first curve',()=>{
   assert.match(game,/function rebalanceGeneratedOpponent/);
   assert.match(game,/rebalanceGeneratedOpponent\(o\)/);
-  assert.match(game,/generatedOpponentRatings\(tier,serial,seed,arch\)/);
+  assert.match(game,/generatedOpponentRatings\(tier,serial,seed,arch,maximumAdvantage\)/);
 });
 
 test('service worker no longer caches removed activity code or art',()=>{
@@ -272,7 +285,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below your level, one at your level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 25'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below your level, one at your level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 26'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
 });
 
