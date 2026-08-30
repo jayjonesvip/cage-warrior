@@ -99,8 +99,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.17',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.17',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.21',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.21',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -120,6 +120,8 @@ opponentNames: {
       performanceBonus:{profile:'ceo',text:'I noticed that performance, @{name}. A bonus is already on the way.'}
     },
     sponsorSigning:'Welcome @{name} to the {brand} team. We are proud to back the next stage of the climb.',
+    sponsorReturning:'Welcome back, @{name}. Your following is above the {brand} milestone again, and the partnership is back on.',
+    sponsorDropped:'{brand} has dropped @{name} after the fighter fell below its follower requirement. Rebuild the audience and the door can reopen.',
   cycles: {
   fightWin: [
     {profile:'media', text:'RESULT: {name} defeats {opponent} by {finish}.{titleSuffix}'},
@@ -228,19 +230,19 @@ interactions: {
   },
 
   ticker: [
-    'Every win earns one permanent attribute point. Spend it now or save it for the right build.',
+    'On-level wins earn one Attribute Point. Beat a higher-level fighter and earn two. Assign them on the Fight page.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
     'Energy charges one point every five seconds. Empty means no clearance; anything above zero gets you booked.',
     'Health recovers one point every minute. Commission still wants 20 before a bout.',
-    'Fresh contenders pay full XP. Old names remember your tricks, so rematch rewards fade.',
-    'You beat a fighter once, they get selective. Taunt a past rival if you want another fight.',
+    'Fresh on-level contenders pay full XP. One same-day runback pays half; later wins pay none.',
+    'Beating a lower-level fighter costs five percent of your followers. Fans expect you to fight up, not down.',
     'Set the plan before the walkout: pace, offense, and whether you trust your style or adapt.',
     'Adapting takes focus, kid. Round one reads him, round two adjusts, round three owns the answer.',
     'No shop, no shortcuts. Beat fighters at your level or higher and fill the Victory Pack meter.',
     'Four Victory Pack segments earn the sealed pack. A big performance can fill two.',
     'Duplicate on the first draw? The locker rerolls once in the same rarity. After that, the result stands.',
     'One Daily Drop, every day. Guaranteed collectible. Do not ask who packed it.',
-    'Followers open sponsor doors. Hit the next milestone and the next brand joins your corner.',
+    'Followers open sponsor doors—and falling below a milestone can cost you the deal. Build back and they can return.',
     'The right equipped gear can cut Energy charging from five seconds to four. Best perk only.',
     'Followers build your status. Hype makes sure the division notices.',
     'CageGrindCEO: Records get attention. Finishes get phone calls.',

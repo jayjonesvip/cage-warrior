@@ -43,11 +43,11 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px so
 .main, .screen, .fight-screen, .gear-screen, .feed-screen { background-color:var(--bg) }
 .card-title, .shop-head, .opponents-head, .fight-section-head { border-color:var(--line); background:var(--panel2) }
 .choice, .opponent, .gear, .action, .social-post { background-image:none }
-.choice.red, .choice.legacy, .opponent.ranked, .opponent.recommended { border-color:#388bfd }
+.opponent.ranked, .opponent.recommended { border-color:#388bfd }
 .bottom-nav .navbtn { border-color:transparent; background:transparent; color:#8b949e; box-shadow:none }
 .bottom-nav .navbtn.active { border-color:#388bfd; background:#0d419d; color:#fff }
-.install-offer button:not(:disabled), .choice-action, .fight-btn:not(:disabled), .tape-action.fight:not(:disabled), .continue-btn, .modal-run:not(:disabled), .fighter-message-send:not(:disabled), .attribute-assign-btn:not(:disabled) { border-color:var(--button-primary-border)!important; background:var(--button-primary)!important; color:#fff!important; box-shadow:var(--button-primary-shadow)!important; text-shadow:none!important }
-.details-toggle, .modal-cancel, .sim-control:not(.active), .gear-footer button, .share-win-btn { border-color:var(--button-secondary-border)!important; background:var(--button-secondary)!important; color:#f0f6fc!important; box-shadow:var(--button-secondary-shadow)!important; text-shadow:none!important }
+.install-offer button:not(:disabled), .fight-btn:not(:disabled), .tape-action.fight:not(:disabled), .continue-btn, .modal-run:not(:disabled), .fighter-message-send:not(:disabled), .attribute-assign-btn:not(:disabled) { border-color:var(--button-primary-border)!important; background:var(--button-primary)!important; color:#fff!important; box-shadow:var(--button-primary-shadow)!important; text-shadow:none!important }
+.details-toggle, .modal-cancel, .gear-footer button, .share-win-btn { border-color:var(--button-secondary-border)!important; background:var(--button-secondary)!important; color:#f0f6fc!important; box-shadow:var(--button-secondary-shadow)!important; text-shadow:none!important }
 button:disabled { border-color:#30363d!important; background:#161b22!important; color:#6e7681!important; box-shadow:none!important }
 .retire-career-btn, .retire-confirm { border-color:#f85149!important; background:#b62324!important; color:#fff!important; box-shadow:0 1px 0 #010409!important; text-shadow:none!important }
 

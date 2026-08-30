@@ -114,8 +114,16 @@ test('victory Attribute Points scale with opponent level',()=>{
   assert.equal(fighter.attributePoints,3);
 });
 
+test('a lower-level victory costs five percent of current followers',()=>{
+  assert.equal(logic.lowerLevelFollowerPenalty(1000,{won:true,playerLevel:5,opponentLevel:4}),50);
+  assert.equal(logic.lowerLevelFollowerPenalty(101,{won:true,playerLevel:5,opponentLevel:4}),6);
+  assert.equal(logic.lowerLevelFollowerPenalty(1000,{won:true,playerLevel:5,opponentLevel:5}),0);
+  assert.equal(logic.lowerLevelFollowerPenalty(1000,{won:false,playerLevel:5,opponentLevel:4}),0);
+  assert.equal(logic.lowerLevelFollowerPenalty(1000,{won:true,forfeited:true,playerLevel:5,opponentLevel:4}),0);
+});
+
 test('matchup advice distinguishes low-return, right-sized, step-up, and dangerous fights',()=>{
-  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:4}).headline,'LOW-RETURN FIGHT');
+  assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:4}).headline,'FAN BACKLASH');
   assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:5,playerRating:30,opponentRating:30}).headline,'RIGHT-SIZED FIGHT');
   assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:6,playerRating:30,opponentRating:32}).headline,'STEP-UP FIGHT');
   assert.equal(logic.matchupAdvice({playerLevel:5,opponentLevel:7,playerRating:30,opponentRating:40}).headline,'HIGH-RISK FIGHT');
@@ -141,10 +149,12 @@ test('sponsors advance sequentially from followers',()=>{
   assert.equal(progress.next,null);
 });
 
-test('sponsor migration never moves a career backward',()=>{
+test('sponsors drop to the follower-qualified tier without erasing history',()=>{
   const sponsors=[{id:'bob',followersRequired:0},{id:'gary',followersRequired:500},{id:'surge',followersRequired:2500}];
   const progress=logic.sponsorProgress(sponsors,20,['bob','gary']);
-  assert.equal(progress.active.id,'gary');
+  assert.equal(progress.active.id,'bob');
+  assert.deepEqual(progress.history,['bob','gary']);
+  assert.equal(progress.next.id,'gary');
 });
 
 test('share text includes dynamic finish, record, streak and championship',()=>{

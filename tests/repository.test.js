@@ -167,9 +167,22 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
 test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
   assert.match(game,/attributePoint===1\?'ATTRIBUTE POINT':'ATTRIBUTE POINTS'/);
   assert.match(game,/attribute_points_earned:attributePoint/);
+  assert.match(game,/ATTRIBUTE POINT\$\{attributePoint===1\?'':'S'\} · AVAILABLE ON FIGHT PAGE/);
+  assert.doesNotMatch(game,/ASSIGN NOW OR SAVE/);
   assert.match(game,/rewardFansLabel.*FOLLOWERS/);
+  assert.match(game,/lowerLevelFollowerPenalty/);
+  assert.match(game,/FAN BACKLASH/);
+  assert.match(game,/FOLLOWERS LOST/);
   assert.match(game,/rewardXpLabel/);
   assert.doesNotMatch(game,/rewardCash|rewardEarnings/);
+});
+
+test('post-fight scorecard renders both fighter portraits with silhouette fallback',()=>{
+  assert.match(game,/class="rt-portrait player"><img/);
+  assert.match(game,/class="rt-portrait opponent"><img/);
+  assert.match(game,/opponentPortrait=silhouetteForOpponent\(f\.o\)/);
+  assert.match(styles,/\.result-tape \.rt-portrait\{/);
+  assert.match(styles,/\.result-tape \.rt-portrait img\{/);
 });
 
 test('Share Win is victory-only and retains Web Share and fallback paths',()=>{
@@ -221,8 +234,24 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
 });
 
+test('Home visually leads with the fighter profile before career details',()=>{
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;flex-direction:column\}/);
+  assert.match(styles,/#careerGameContent>\.hero\{order:1\}/);
+  assert.match(styles,/#careerIdentityCard\{order:2\}/);
+  assert.match(html,/class="card career-after-setup home-ticker"/);
+  assert.match(styles,/>\.home-ticker\{order:3\}/);
+  assert.doesNotMatch(html,/FIGHT\. IMPROVE\. CLIMB\.|career-guide|choice-action/);
+  assert.doesNotMatch(styles,/career-guide|choice-action|choice-grid/);
+  assert.doesNotMatch(game,/\[data-go\]/);
+  assert.match(styles,/#careerGameContent\{display:contents!important\}/);
+});
+
 test('Feed summarizes followers and all known followed accounts',()=>{
   assert.match(html,/class="feed-network-summary"[^>]*aria-label="Cage Feed audience"/);
+  assert.match(html,/class="feed-header-filters"[^>]*aria-label="Filter Cage Feed posts"/);
+  assert.match(html,/data-feed-filter="all"[^>]*aria-pressed="true">SHOW ALL<\/button>/);
+  assert.match(html,/data-feed-filter="mentions"[^>]*aria-pressed="false">MENTIONS/);
+  assert.doesNotMatch(html,/id="feedCycleStatus"|class="feed-filter-bar"/);
   assert.match(html,/id="feedFollowersCount"/);
   assert.match(html,/id="feedFollowingCount"/);
   assert.match(game,/function feedFollowingTotal\(\)/);
@@ -234,6 +263,22 @@ test('Feed summarizes followers and all known followed accounts',()=>{
   assert.match(game,/\$\('#feedFollowersCount'\)\.textContent=fmt\(state\.fans\)/);
   assert.match(game,/\$\('#feedFollowingCount'\)\.textContent=fmt\(feedFollowingTotal\(\)\)/);
   assert.match(styles,/\.feed-network-summary\{display:grid;grid-template-columns:1fr 1fr/);
+  assert.match(styles,/\.feed-network-summary>div:last-child\{text-align:right\}/);
+  assert.doesNotMatch(styles,/\.feed-network-summary[^}]*border|\.feed-network-summary>div\+div/);
+  assert.match(styles,/\.feed-header-filters button\.active\{color:#70d9ff/);
+  assert.doesNotMatch(html,/feed-page-note|Mentions isolates posts addressed to you/);
+  assert.doesNotMatch(styles,/\.feed-page-note/);
+  assert.doesNotMatch(styles,/\.feed-filter-bar/);
+});
+
+test('fight feed runs at the default speed without a speed control',()=>{
+  assert.doesNotMatch(html,/id="speedBtn"|id="fightControls"|sim-control/);
+  assert.doesNotMatch(game,/fightSpeed|toggleFightSpeed|speedBtn|fightControls/);
+  assert.doesNotMatch(styles,/sim-control/);
+  assert.doesNotMatch(steel,/sim-control/);
+  assert.doesNotMatch(read('js/fight-focus.js'),/fightControls/);
+  assert.doesNotMatch(read('js/fight-plan.js'),/fightControls/);
+  assert.match(game,/function scheduleFight\(fn,delay\)\{const id=setTimeout\(fn,Math\.max\(40,delay\)\)/);
 });
 
 test('sponsor announcement and next-milestone progress are wired',()=>{
@@ -252,12 +297,6 @@ test('Energy recovery gear is capped at the strongest equipped perk',()=>{
   assert.doesNotMatch(definitions,/healthRegen/);
 });
 
-test('Home explains the fight-first loop',()=>{
-  assert.match(html,/FIGHT\. IMPROVE\. CLIMB\./);
-  assert.match(html,/Wins earn up to two Attribute Points based on opponent level/);
-  assert.doesNotMatch(html,/BUILD YOUR CAREER[\s\S]*HUSTLE/i);
-});
-
 test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
   assert.match(styles,/\.resource-hud\{[\s\S]*?position:sticky/);
   assert.match(styles,/top:0/);
@@ -269,7 +308,19 @@ test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
 test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
   assert.match(styles,/\.bottomnav\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.attribute-assignment-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/@media \(max-width:699px\)\{\.attribute-assignment-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.fight-attribute-assignment\{border-color:#3a8fbd;box-shadow:/);
   assert.match(styles,/@media \(max-width:340px\)/);
+});
+
+test('sponsors can drop and return as follower totals cross milestones',()=>{
+  assert.match(game,/publishSponsorDrop\(beforeSponsor\)/);
+  assert.match(game,/sponsor_dropped/);
+  assert.match(game,/sponsor_returned/);
+  assert.match(game,/post\.kind==='sponsor-drop'\|\|post\.kind==='sponsor-return'/);
+  assert.match(game,/publishSponsorSigning\(progress\.active,\{returning\}\)/);
+  assert.match(read('js/strings.js'),/sponsorDropped:/);
+  assert.match(read('js/strings.js'),/sponsorReturning:/);
 });
 
 test('drop offers live at the top of Gear and flag its navigation when ready',()=>{
@@ -347,7 +398,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/assets\/flags\/\$\{country\.iso\}\.svg\?v=\$\{ICON_ASSET_VERSION\}/);
   assert.match(game,/countryBadge=country\?opponentCountryBadge\(opponent\.country\):''/);
   assert.match(game,/tapeCountry\.innerHTML=opponentCountryBadge\(f\.o\.country\)/);
-  assert.match(game,/LOWER LEVEL/);
+  assert.match(game,/-\$\{fightRule\('experienceRewards\.lowerLevelOpponentFollowerLossPercent',5\)\}% FOLLOWERS/);
   assert.match(game,/XP USED TODAY/);
   assert.match(styles,/\.fight-ranking-row\.circuit/);
   assert.match(styles,/\.fight-country-badge/);
@@ -429,6 +480,8 @@ test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
   for(const token of ['zero below your level, one at your level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 26'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
+  assert.match(readme,/five percent of current followers/);
+  assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);
 });
 
 test('PWA metadata describes the current fight-first game',()=>{

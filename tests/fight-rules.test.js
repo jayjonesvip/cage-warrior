@@ -18,18 +18,20 @@ test('fight-rules.json is valid and uses the current schema',()=>{
   assert.equal(document.computerGeneratedOpponentDifficulty.linearAttributeRatingGainPerLevel,1.1);
   assert.equal(document.computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel,7);
   assert.equal(document.computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel,1.01);
+  assert.equal(document.experienceRewards.lowerLevelOpponentFollowerLossPercent,5);
   assert.deepEqual(document.attributePointRewards,{victoryAgainstLowerLevelOpponent:0,victoryAgainstSameLevelOpponent:1,victoryAgainstHigherLevelOpponent:2});
 });
 
 test('rule loader keeps safe edits and rejects out-of-range values',()=>{
   const normalized=rules.normalize({
     energyEconomy:{energyRecoveryIntervalMilliseconds:4000,maximumEnergy:999},
-    experienceRewards:{sameDayRunbackExperienceMultiplier:.9},
+    experienceRewards:{sameDayRunbackExperienceMultiplier:.9,lowerLevelOpponentFollowerLossPercent:7},
     fightStructure:{dailyFightLimit:12}
   });
   assert.equal(normalized.energyEconomy.energyRecoveryIntervalMilliseconds,4000);
   assert.equal(normalized.energyEconomy.maximumEnergy,100);
   assert.equal(normalized.experienceRewards.sameDayRunbackExperienceMultiplier,.5);
+  assert.equal(normalized.experienceRewards.lowerLevelOpponentFollowerLossPercent,7);
   assert.equal(normalized.fightStructure.dailyFightLimit,12);
 });
 

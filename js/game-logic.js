@@ -191,12 +191,17 @@
     return points;
   }
 
+  function lowerLevelFollowerPenalty(followers,{won=false,forfeited=false,playerLevel=1,opponentLevel=1}={}){
+    if(!won||forfeited||whole(opponentLevel,1)>=whole(playerLevel,1))return 0;
+    return Math.ceil(nonNegativeWhole(followers)*fightRule('experienceRewards.lowerLevelOpponentFollowerLossPercent',5)/100);
+  }
+
   function matchupAdvice({playerLevel=1,opponentLevel=1,playerRating=0,opponentRating=0,titleBout=false,playerIsChampion=false,rookieShowcase=false}={}){
     const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),ratingEdge=finite(playerRating)-finite(opponentRating),points=victoryAttributePointReward(playerLevel,opponentLevel);
     if(rookieShowcase)return {tone:'favorable',headline:'LET US SEE WHAT YOU HAVE',message:'A clean opening test. Stay composed and make the first contract count.'};
     if(titleBout&&playerIsChampion)return {tone:'title',headline:'PROTECT THE BELT',message:'Every ranked challenger can take what you earned. Do not overlook this defense.'};
     if(titleBout)return {tone:levelDifference>0||ratingEdge<=-4?'danger':'title',headline:'YOUR TITLE SHOT',message:levelDifference>0||ratingEdge<=-4?'You are the underdog on paper, but one win changes everything.':'This is the moment you climbed for. Fight smart and take the belt.'};
-    if(levelDifference<0)return {tone:'avoid',headline:'LOW-RETURN FIGHT',message:'Not worth the energy for progression. A win pays no XP or Attribute Points.'};
+    if(levelDifference<0)return {tone:'avoid',headline:'FAN BACKLASH',message:`A win pays no XP or Attribute Points, and costs ${fightRule('experienceRewards.lowerLevelOpponentFollowerLossPercent',5)}% of your followers.`};
     if(levelDifference>=2||ratingEdge<=-8)return {tone:'danger',headline:'HIGH-RISK FIGHT',message:`You are out of your league on paper. A win still earns ${points} Attribute Points.`};
     if(levelDifference>0)return {tone:'step-up',headline:'STEP-UP FIGHT',message:`A real test of your skills. The risk comes with ${points} Attribute Points.`};
     if(ratingEdge>=4)return {tone:'favorable',headline:'GOOD TEST OF SKILLS',message:'You have the edge, but this opponent is at your level. Go earn the point.'};
@@ -213,8 +218,9 @@
   }
 
   function sponsorProgress(definitions,followers,history=[]){
-    const sponsors=Array.isArray(definitions)?definitions:[],count=nonNegativeWhole(followers),known=new Set(Array.isArray(history)?history:[]),eligible=sponsors.reduce((last,item,index)=>count>=nonNegativeWhole(item.followersRequired)?index:last,-1),historic=sponsors.reduce((last,item,index)=>known.has(item.id)?index:last,-1),activeIndex=Math.max(eligible,historic,0),active=sponsors[activeIndex]||null;
-    return {active,activeIndex,history:sponsors.slice(0,activeIndex+1).map(item=>item.id),next:sponsors[activeIndex+1]||null,newlyUnlocked:active&&!known.has(active.id)?active:null};
+    const sponsors=Array.isArray(definitions)?definitions:[],count=nonNegativeWhole(followers),known=new Set(Array.isArray(history)?history:[]),activeIndex=sponsors.reduce((last,item,index)=>count>=nonNegativeWhole(item.followersRequired)?index:last,-1),active=sponsors[activeIndex]||null,newlyUnlocked=active&&!known.has(active.id)?active:null;
+    for(const item of sponsors.slice(0,activeIndex+1))known.add(item.id);
+    return {active,activeIndex,history:sponsors.filter(item=>known.has(item.id)).map(item=>item.id),next:sponsors[activeIndex+1]||null,newlyUnlocked};
   }
 
   function fightWinShareText({opponent='Opponent',method='',round=0,record='',winStreak=0,titleWon=false,url='https://cagegrind.com'}={}){
@@ -494,5 +500,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,finalFightHealthLoss,liveFightInjuryChance,fightInjuryCondition,xpRequirement,opponentXpTier,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,finalFightHealthLoss,liveFightInjuryChance,fightInjuryCondition,xpRequirement,opponentXpTier,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
 });

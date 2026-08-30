@@ -18,7 +18,7 @@ Training, sparring, manual resting, recovery-room treatments, side jobs, gamblin
 
 The simplified four-item navigation is Home, Fight, Gear, and Feed. The four primary pages are:
 
-- **Home** — identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and career guide.
+- **Home** — the fighter profile and portrait first, followed by identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and the rotating career ticker.
 - **Fight** — available Attribute Points, a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
 - **Gear** — Daily and installation Drops, Victory Packs, collectibles, and the equipped Fight Gear loadout.
 - **Feed** — follower/following totals, CageReporter coverage, mentions, rivals, sponsors, and player interactions. Following includes known social accounts and ranked fighters.
@@ -31,9 +31,9 @@ A new career permanently locks the fighter avatar, twenty-point starting attribu
 
 Level and XP still come from fights. Attributes always display as whole numbers.
 
-Every legitimate victory awards exactly `+1 ATTRIBUTE POINT`. Losses and forfeitures never award one. Unspent points are persisted immediately and assigned from the top of the Fight page. Assignment is permanent, saved immediately, and guarded against repeated clicks.
+Eligible victories award whole Attribute Points based on opponent level: zero below the fighter's level, one at the same level, and two above it. Losses and forfeitures never award points. Unspent points are persisted immediately and assigned from the glowing **Improve Your Fighter** panel at the top of the Fight page. On mobile, its four attributes use a readable two-by-two layout; desktop retains one row. Assignment is permanent, saved immediately, and guarded against repeated clicks.
 
-The first post-fight result includes a compact guide explaining Attribute Points, passive recovery, and how to take the next fight. It is permanently hidden after that first result is closed; established careers do not see it.
+The first post-fight result includes a compact guide explaining Attribute Points, passive recovery, and how to take the next fight. It is permanently hidden after that first result is closed; established careers do not see it. The expandable scorecard retains both fighter names, portraits or silhouette fallbacks, ratings, round scoring, fight plan, and totals.
 
 ## Passive recovery
 
@@ -65,14 +65,14 @@ Fight damage, minimum medical clearance, and fighting-hurt injury risk remain ac
 
 Fight results focus on career progress instead of currency:
 
-- One Attribute Point for a victory
+- Zero, one, or two Attribute Points based on opponent level
 - XP
 - Followers
 - Hype changes
 - Victory Pack progress or a gear reveal
 - Rivalry and championship outcomes
 
-Same-day opponent XP rules remain: full XP for the first same-level win, half XP for one runback, then zero XP. Lower-level opponents award no XP.
+Same-day opponent XP rules remain: full XP for the first same-level win, half XP for one runback, then zero XP. Lower-level opponents award no XP or Attribute Points. Winning against one also costs five percent of current followers, rounded up, and the matchup preview and result screen both disclose that fan backlash.
 
 ## Gear and Victory Packs
 
@@ -86,7 +86,7 @@ The Gear page keeps the Daily Drop, its next-drop countdown, and the installatio
 
 ## Follower-based sponsors
 
-Sponsors are a sequential status track. Reaching the next follower milestone automatically advances the fighter, records the previous sponsor in career history, and shows a sponsor announcement. Sponsorships do not expire and do not pay bonuses.
+Sponsors are a sequential status track. Reaching the next follower milestone automatically advances the fighter, records the sponsor in career history, and shows a sponsor announcement. Sponsorships do not pay bonuses.
 
 | Order | Sponsor | Followers required |
 |---:|---|---:|
@@ -100,7 +100,7 @@ Sponsors are a sequential status track. Reaching the next follower milestone aut
 
 The current sponsor is shown on the fighter profile with progress toward the next milestone. Titan Global displays `TOP-TIER SPONSOR`.
 
-Existing careers are never moved backward during sponsor migration: their follower-qualified sponsor and furthest recorded sponsor are both considered.
+Sponsor status follows the current audience. If a fighter falls below the active milestone, the deal ends and the fighter drops to the highest sponsor tier their current follower total still qualifies for. The dropped sponsor announces the split in the Cage Feed. Previously earned sponsors remain in career history, and crossing their milestone again restores the partnership with a return Feed post and sponsor announcement.
 
 ## Sharing wins
 
@@ -114,7 +114,7 @@ The shared Supabase-backed championship remains server-authoritative and non-fat
 
 Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, show their country flag, provide reliable full-XP progression matchups, and never count as championship defenses. Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement. A Circuit fighter who wins becomes the single available `CAGE CIRCUIT REMATCH`; losing to a different Circuit fighter replaces the older rematch, so one slot always remains fresh. Circuit opponents can distribute their ratings differently, but their four-attribute total is capped at one point above the player's total. After two consecutive Circuit losses, fresh opponents are instead capped one point below the player until a Circuit win resets the loss streak. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
 
-Ranked opponents are not level-locked. Wins below the player's level award zero XP and zero Attribute Points, on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects them.
+Ranked opponents are not level-locked. Wins below the player's level award zero XP, zero Attribute Points, and trigger the five-percent follower penalty; on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects every consequence.
 
 The champion appears at rank number one and every fighter gets one title attempt per local day. A reigning champion sees the same ladder and may select any proven ranked fighter for the day's title defense. After that defense is complete, the remaining ranked fighters stay available as normal non-title fights instead of inheriting the defense lock.
 
@@ -126,7 +126,7 @@ Retiring as champion passes the belt to the highest-ranked eligible active fight
 
 Current saves use state version 26. Migration preserves identity, avatar, hometown, archetype, level, XP, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history. Existing careers begin with no Circuit loss streak.
 
-Migration adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the appropriate follower-based sponsor without moving backward, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
+Migration adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the sponsor supported by the current follower total while retaining sponsor history, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
 
 ## Editable fight rules
 
