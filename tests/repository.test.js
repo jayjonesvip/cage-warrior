@@ -168,7 +168,7 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
 test('beating Vaso unlocks and opens the persistent Diego first contract',()=>{
   assert.match(game,/key:'first-contract-diego-ramos-br',name:'DiegoRamosBR'/);
   assert.match(game,/assets\/opponents\/diego-ramos-br\.png/);
-  assert.match(game,/firstContractUnlocked=LOGIC\.firstContractUnlockEligible/);
+  assert.match(game,/firstContractUnlocked=LOGIC\.firstContractUnlockEligible\(\{won:win,rookieShowcase:o\.rookieShowcase===true\}\)/);
   assert.match(game,/state\.firstContractPending=true;ensureFirstContractOpponent\(\)/);
   assert.match(game,/if\(offerFirstContractOpponent\(\)\)return true/);
   assert.match(game,/if\(o\.firstContract\)state\.firstContractPending=false/);
