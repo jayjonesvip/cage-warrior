@@ -176,3 +176,15 @@ These supplied assets use transparent PNG artwork so they sit cleanly on gear ca
 | `coastal-speedboat.png` | Coastal Speedboat |
 | `luxury-yacht.png` | Luxury Yacht |
 | `private-jet.png` | Private Jet |
+
+## Corner-store drop artwork
+
+| Filename | Item | Rarity |
+| --- | --- | --- |
+| `hot-coffee.png` | Hot Coffee | Common |
+| `iced-coffee.png` | Iced Coffee | Common |
+| `tinned-sardines.png` | Tinned Sardines | Common |
+| `white-loafers.png` | White Loafers | Rare |
+| `kettle-bell.png` | Kettlebell | Common |
+| `smart-watch.png` | Smart Watch | Rare |
+| `dill-pickle.png` | Dill Pickle | Common |

@@ -52,6 +52,8 @@ The four-cell battery remains a visual aid, but Energy is continuous from 0–10
 
 Selected equipped Fight Gear can improve the Energy tick from 5 seconds to 4 seconds. Only the best equipped recovery perk applies, and the interval never drops below 4 seconds.
 
+Owning the Dill Pickle Lifestyle collectible improves the Health tick from 60 seconds to 55 seconds. Duplicate copies do not stack this recovery perk.
+
 ### Health
 
 - Recovers `+1 Health` every 60 seconds
@@ -113,6 +115,8 @@ The game uses the Web Share API where supported, then falls back to the Clipboar
 The shared Supabase-backed championship remains server-authoritative and non-fatal when offline. The Fight page uses the same ranking order as the Home rankings modal: the active champion is first, followed by fighters ordered by level and win percentage. Each full-width row shows rank, portrait, name, record, level, win percentage, exact win XP, and the Attribute Points available for that matchup. Tap any available row to open the existing Tale of the Tape.
 
 Two generated on-level Cage Circuit fighters always appear above the real rankings. They are clearly labeled unranked with rank `N/A`, show their country flag, provide reliable full-XP progression matchups, and never count as championship defenses. Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement. A Circuit fighter who wins becomes the single available `CAGE CIRCUIT REMATCH`; losing to a different Circuit fighter replaces the older rematch, so one slot always remains fresh. Circuit opponents can distribute their ratings differently, but their four-attribute total is capped at one point above the player's total. After two consecutive Circuit losses, fresh opponents are instead capped one point below the player until a Circuit win resets the loss streak. Ranked opponents below the player's level correctly award `0 XP`; the ladder labels those rows `LOWER LEVEL`, and it labels opponents whose same-day XP has already been exhausted as `XP USED TODAY`.
+
+Winning the opening VasoJoseMX showcase unlocks the fighter's first contract against DiegoRamosBR. After the guaranteed first-win Victory Pack is revealed and closed, the game opens Diego's Tale of the Tape automatically. The contract remains pinned above the Cage Circuit until the player starts it, so backing out or returning later never loses the matchup.
 
 Ranked opponents are not level-locked. Wins below the player's level award zero XP, zero Attribute Points, and trigger the five-percent follower penalty; on-level wins award one Attribute Point, and wins above the player's level award two. Existing same-day XP reduction rules still apply and the displayed preview reflects every consequence.
 

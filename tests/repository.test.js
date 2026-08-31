@@ -16,6 +16,7 @@ const definitions=read('js/definitions.js');
 const styles=read('css/styles.css');
 const steel=read('css/github-steel.css');
 const readme=read('README.md');
+const serviceWorker=read('service-worker.js');
 
 test('all first-party JavaScript parses without a build step',()=>{
   for(const file of fs.readdirSync(path.join(root,'js')).filter(name=>name.endsWith('.js'))){
@@ -162,6 +163,17 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
   assert.match(game,/tutorial\.hidden=state\.postFightTutorialSeen/);
   assert.match(game,/state\.postFightTutorialSeen=true;saveState\(\)/);
   assert.match(logic,/state\.postFightTutorialSeen=raw\.postFightTutorialSeen===true\|\|state\.wins\+state\.losses>0/);
+});
+
+test('beating Vaso unlocks and opens the persistent Diego first contract',()=>{
+  assert.match(game,/key:'first-contract-diego-ramos-br',name:'DiegoRamosBR'/);
+  assert.match(game,/assets\/opponents\/diego-ramos-br\.png/);
+  assert.match(game,/firstContractUnlocked=LOGIC\.firstContractUnlockEligible/);
+  assert.match(game,/state\.firstContractPending=true;ensureFirstContractOpponent\(\)/);
+  assert.match(game,/if\(offerFirstContractOpponent\(\)\)return true/);
+  assert.match(game,/if\(o\.firstContract\)state\.firstContractPending=false/);
+  assert.match(serviceWorker,/assets\/opponents\/diego-ramos-br\.png/);
+  assert.equal(fs.existsSync(path.join(root,'assets/opponents/diego-ramos-br.png')),true);
 });
 
 test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
@@ -317,6 +329,14 @@ test('Energy recovery gear is capped at the strongest equipped perk',()=>{
   assert.doesNotMatch(definitions,/healthRegen/);
 });
 
+test('Dill Pickle electrolytes improve Health recovery without granting followers',()=>{
+  const pickle=definitions.match(/\{id:'dill-pickle'[^\n]+\}/)?.[0]||'';
+  assert.match(pickle,/healthRecoverySpeed:5000/);
+  assert.doesNotMatch(pickle,/prestige:/);
+  assert.match(game,/Math\.max\(30000,HEALTH_RECOVERY_INTERVAL-ownedCollectionBestBonus\('healthRecoverySpeed'\)\)/);
+  assert.match(game,/health:healthRecoveryInterval\(\)/);
+});
+
 test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
   assert.match(styles,/\.resource-hud\{[\s\S]*?position:sticky/);
   assert.match(styles,/top:0/);
@@ -381,6 +401,27 @@ test('Energy Drink collectible uses the Surge Core can artwork',()=>{
   assert.ok(!fs.existsSync(path.join(root,'assets/icons/energy-drink.jpg')));
 });
 
+test('corner-store Lifestyle drops include three commons and one rare with artwork',()=>{
+  for(const id of ['hot-coffee','iced-coffee','tinned-sardines']){
+    assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'Lifestyle'[^\\n]+rarity:'COMMON'`));
+    assert.ok(fs.existsSync(path.join(root,`assets/icons/${id}.png`)),id);
+  }
+  assert.match(definitions,/id:'white-loafers'[^\n]+category:'Lifestyle'[^\n]+rarity:'RARE'/);
+  assert.ok(fs.existsSync(path.join(root,'assets/icons/white-loafers.png')));
+});
+
+test('kettlebell, Smart Watch, and Dill Pickle drops use supplied artwork and balanced rarities',()=>{
+  const drops=[
+    ['kettle-bell','Fight Gear','COMMON'],
+    ['smart-watch','Bling','RARE'],
+    ['dill-pickle','Lifestyle','COMMON']
+  ];
+  for(const [id,category,rarity] of drops){
+    assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'${category}'[^\\n]+rarity:'${rarity}'`));
+    assert.ok(fs.existsSync(path.join(root,`assets/icons/${id}.png`)),id);
+  }
+});
+
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
   for(const token of ['fight-ladder-columns','RANK · FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
   for(const token of ['fight-ranking-list','fight-ranking-row','fightWinRewardPreview','victoryAttributePointReward','data-fight-key'])assert.match(game,new RegExp(token));
@@ -411,8 +452,8 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/\.sort\(fighterLevelOrder\)\.slice\(0,2\)\.map\(opponent=>Object\.assign\(opponent,\{worldRank:null,circuitFallback:true\}\)\)/);
   assert.match(game,/o\.lossesToPlayer=\(o\.lossesToPlayer\|\|0\)\+1/);
   assert.match(game,/ensureRoster\(\);state\.dailyOpponentWins/);
-  assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.circuit,\.\.\.ranked\]/);
-  assert.match(game,/\$\{showcaseRows\}\$\{circuitRows\}\$\{rankedRows\}/);
+  assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.contract,\.\.\.circuit,\.\.\.ranked\]/);
+  assert.match(game,/\$\{showcaseRows\}\$\{contractRows\}\$\{circuitRows\}\$\{rankedRows\}/);
   assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
   assert.match(game,/FRESH MATCHUPS · FULL XP/);

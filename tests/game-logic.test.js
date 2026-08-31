@@ -33,6 +33,14 @@ test('first-fight tutorial migration hides guidance for established careers',()=
   assert.equal(logic.normalizeCoreState(state({wins:0,losses:0}),defaults,{wins:0,losses:0,postFightTutorialSeen:true}).postFightTutorialSeen,true);
 });
 
+test('first contract unlocks from a Vaso win and migrates a one-win rookie save',()=>{
+  assert.equal(logic.firstContractUnlockEligible({won:true,rookieShowcase:true}),true);
+  assert.equal(logic.firstContractUnlockEligible({won:false,rookieShowcase:true}),false);
+  assert.equal(logic.firstContractPending({nameLocked:true,level:1,wins:1,losses:0}),true);
+  assert.equal(logic.firstContractPending({savedPending:false,nameLocked:true,level:1,wins:1,losses:0}),false);
+  assert.equal(logic.firstContractPending({nameLocked:true,level:2,wins:1,losses:0}),false);
+});
+
 test('legacy saves seed passive recovery from their existing save timestamp',()=>{
   const lastSave=Date.now()-5000,raw=state({energy:50,health:50,lastSave});
   const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);
