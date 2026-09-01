@@ -29,7 +29,7 @@ The compact Energy, Health, Power, Speed, Chin, and Cardio dashboard remains sti
 
 A new career permanently locks the fighter avatar, twenty-point starting attribute allocation, archetype, hometown, and unique Cage Feed handle.
 
-Level and XP still come from fights. Attributes always display as whole numbers.
+Level and XP still come from fights. The balanced XP curve keeps Levels 1–5 approachable, then adds a quadratic late-career requirement so higher levels take progressively more victories. Level 15 requires 1,280 XP instead of 680. Attributes always display as whole numbers.
 
 Eligible victories award whole Attribute Points based on opponent level: zero below the fighter's level, one at the same level, and two above it. Losses and forfeitures never award points. Unspent points are persisted immediately and assigned from the glowing **Improve Your Fighter** panel at the top of the Fight page. On mobile, its four attributes use a readable two-by-two layout; desktop retains one row. Assignment is permanent, saved immediately, and guarded against repeated clicks.
 
@@ -128,9 +128,9 @@ Retiring as champion passes the belt to the highest-ranked eligible active fight
 
 ## Save migration
 
-Current saves use state version 26. Migration preserves identity, avatar, hometown, archetype, level, XP, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history. Existing careers begin with no Circuit loss streak.
+Current saves use state version 27. Migration preserves identity, avatar, hometown, archetype, level, XP progress percentage, record, attributes, followers, Hype, gear, equipped gear, opponents, rivalry, championship, and Feed history. Existing careers begin with no Circuit loss streak.
 
-Migration adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the sponsor supported by the current follower total while retaining sponsor history, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
+Migration proportionally rescales existing XP into the balanced curve, adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the sponsor supported by the current follower total while retaining sponsor history, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
 
 ## Editable fight rules
 

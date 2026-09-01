@@ -224,6 +224,13 @@ test('lower-level opponents award zero XP and same-level runbacks award half',()
   assert.equal(runback.xp,Math.round(first.xp*.5));
 });
 
+test('balanced XP curve slows late-career leveling while preserving early progression',()=>{
+  const requirements=[120,160,200,240,280,326,384,454,536,630,736,854,984,1126,1280];
+  requirements.forEach((requirement,index)=>assert.equal(logic.xpRequirement(index+1),requirement,`Level ${index+1}`));
+  assert.equal(logic.rescaleXpProgress(56,logic.legacyXpRequirement(15),logic.xpRequirement(15)),105);
+  assert.equal(logic.rescaleXpProgress(140,logic.legacyXpRequirement(5),logic.xpRequirement(5)),140);
+});
+
 test('rankings place champion first then sort by level and win percentage',()=>{
   const profiles=[{id:'a',handle:'Alpha',level:9,wins:10,losses:0},{id:'b',handle:'Bravo',level:8,wins:2,losses:8},{id:'c',handle:'Champ',level:4,wins:1,losses:2}];
   const ranked=logic.rankFighters(profiles,{champion_id:'c'},25);

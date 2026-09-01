@@ -70,13 +70,14 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 26',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*26/);
+test('new careers use explicit save version 27',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*27/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
   assert.match(game,/circuitLossStreak:0/);
   assert.match(game,/energyRecoveryAt:Date\.now\(\)/);
   assert.match(game,/healthRecoveryAt:Date\.now\(\)/);
+  assert.match(game,/source\.version\)\)\|\|0\)<27\)s\.xp=LOGIC\.rescaleXpProgress/);
 });
 
 test('migration does not erase followers when a legacy social flag is false',()=>{
@@ -590,7 +591,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below your level, one at your level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 26'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 27','balanced XP curve'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);
