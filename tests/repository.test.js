@@ -70,8 +70,8 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 27',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*27/);
+test('new careers use explicit save version 28',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*28/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
   assert.match(game,/circuitLossStreak:0/);
@@ -371,7 +371,7 @@ test('Dill Pickle electrolytes improve Health recovery without granting follower
   const pickle=definitions.match(/\{id:'dill-pickle'[^\n]+\}/)?.[0]||'';
   assert.match(pickle,/healthRecoverySpeed:5000/);
   assert.doesNotMatch(pickle,/prestige:/);
-  assert.match(game,/Math\.max\(30000,HEALTH_RECOVERY_INTERVAL-ownedCollectionBestBonus\('healthRecoverySpeed'\)\)/);
+  assert.match(game,/Math\.max\(30000,HEALTH_RECOVERY_INTERVAL-activePerkBestBonus\('healthRecoverySpeed'\)\)/);
   assert.match(game,/health:healthRecoveryInterval\(\)/);
 });
 
@@ -439,6 +439,21 @@ test('Gear category status reports unique collection completion',()=>{
   assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span>\$\{loadoutStatus\?`<small>\$\{loadoutStatus\}<\/small>`:''\}`/);
   assert.doesNotMatch(game,/`\$\{items\.length\} COLLECTIBLE\$\{items\.length===1\?'':'S'\}`/);
   assert.match(styles,/\.shop-status>span\{white-space:nowrap\}/);
+});
+
+test('career perks use a separate active loadout with visible reasons to optimize it',()=>{
+  assert.match(game,/equippedGear:\[\],equippedPerks:\[\]/);
+  assert.match(game,/LOGIC\.perkLoadoutLimit\(s\.level\)/);
+  assert.match(logic,/function perkLoadoutLimit\(level\)/);
+  assert.match(game,/id="perk-loadout-title">PERK LOADOUT/);
+  assert.match(game,/New drops can improve this build/);
+  assert.match(game,/state\.equippedPerks\.length\}\/\$\{perkLimit\} ACTIVE/);
+  assert.match(game,/function activePerkBonus\(prop\)/);
+  assert.match(game,/activePerkBonus\('prestige'\)/);
+  assert.match(game,/activePerkBestBonus\('healthRecoverySpeed'\)/);
+  assert.match(game,/const perk=g\.category!==\'Fight Gear\'/);
+  assert.match(styles,/\.perk-loadout-panel\{/);
+  assert.match(styles,/\.perk-loadout-slots span\.filled\{/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
@@ -647,7 +662,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 27','balanced XP curve'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 28','balanced XP curve'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);

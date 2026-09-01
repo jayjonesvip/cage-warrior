@@ -270,6 +270,13 @@ test('fighter creation allocations stay whole and total twenty',()=>{
   assert.equal(Object.values(stats).reduce((sum,value)=>sum+value,0),20);
 });
 
+test('perk loadout expands from two to four active slots at Level 8',()=>{
+  assert.equal(logic.perkLoadoutLimit(1),2);
+  assert.equal(logic.perkLoadoutLimit(7),2);
+  assert.equal(logic.perkLoadoutLimit(8),4);
+  assert.equal(logic.perkLoadoutLimit(15),4);
+});
+
 test('Victory Pack progress remains capped and eligibility requires an on-level win',()=>{
   assert.equal(logic.nextVictoryPackProgress(3,2),4);
   assert.equal(logic.victoryPackReady(4),true);
