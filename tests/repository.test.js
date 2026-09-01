@@ -348,7 +348,7 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait\{[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait img\{[^}]*-webkit-mask-image:linear-gradient\(90deg,transparent 0,#000 11%,#000 89%,transparent 100%\),linear-gradient\(180deg,transparent 0,#000 9%,#000 74%,transparent 100%\)[^}]*mask-composite:intersect/);
   assert.match(game,/classList\.toggle\('unknown-silhouette',!f\.o\.network&&!f\.o\.portraitAsset\)/);
-  assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.14\)/);
+  assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
 });
 
 test('sponsor announcement and next-milestone progress are wired',()=>{
@@ -588,6 +588,7 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.doesNotMatch(html,/id="tapeOppCity"/);
   assert.doesNotMatch(styles,/\.matchup-promo-card \.tape-card-top\{/);
   assert.match(styles,/\.matchup-poster-kicker>\*\{[^}]*border:0[^}]*background:transparent/);
+  assert.match(styles,/\.matchup-promo-card \.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
   assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
 });
