@@ -605,7 +605,8 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.match(styles,/\.matchup-poster-kicker>\*\{[^}]*border:0[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
-  assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
+  assert.match(styles,/\.matchup-poster-title em\{[^}]*color:#e10600[^}]*font-family:"Bebas Neue"[^}]*text-shadow:/);
+  assert.doesNotMatch(styles,/\.matchup-poster-title em\{[^}]*border-bottom/);
 });
 
 test('favorite designation lives in Tale of the Tape instead of the promo poster',()=>{
