@@ -552,7 +552,11 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/\$\{showcaseRows\}\$\{contractRows\}\$\{circuitRows\}\$\{rankedRows\}/);
   assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
-  assert.match(game,/FRESH MATCHUPS · FULL XP/);
+  assert.match(game,/FRESH MATCHUPS · FULL XP · PRO RECORD/);
+  assert.match(game,/f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
+  assert.match(game,/if\(win\)\{[\s\S]*?state\.wins\+\+;state\.winStreak\+\+/);
+  assert.match(game,/\}else\{[\s\S]*?state\.losses\+\+;state\.winStreak=0/);
+  assert.match(html,/Their wins and losses count on your professional record and streak/);
   assert.match(game,/CAGE CIRCUIT REMATCH/);
   assert.match(game,/circuitRematches\.length>1/);
   assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
@@ -668,8 +672,8 @@ test('fighter locations live in Tale of the Tape instead of the promo portraits'
 });
 
 test('promo poster uses a bundled condensed font and three-part card billing',()=>{
-  assert.match(html,/id="tapeBoutClass">UNRANKED BOUT<\/span>[\s\S]*id="tapeBoutRounds">3 ROUNDS<\/b>[\s\S]*id="tapeCardPlacement">MAIN CARD<\/strong>/);
-  assert.match(game,/tapeBoutClass'\)\.textContent=titleBout\?'WORLD TITLE':f\.o\.network\?'RANKED BOUT':'UNRANKED BOUT'/);
+  assert.match(html,/id="tapeBoutClass">UNRANKED PRO BOUT<\/span>[\s\S]*id="tapeBoutRounds">3 ROUNDS<\/b>[\s\S]*id="tapeCardPlacement">MAIN CARD<\/strong>/);
+  assert.match(game,/tapeBoutClass'\)\.textContent=titleBout\?'WORLD TITLE':f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
   assert.match(styles,/@font-face\{font-family:"Bebas Neue";src:url\("\.\.\/assets\/fonts\/BebasNeue-Regular\.ttf\?v=/);
   assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-Regular.ttf')));
   assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-OFL.txt')));
