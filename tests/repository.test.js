@@ -684,12 +684,21 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
 });
 
 test('favorite designation lives in Tale of the Tape instead of the promo poster',()=>{
-  assert.match(html,/id="tapeStatsPlayerFavorite" hidden>FAVORITE/);
-  assert.match(html,/id="tapeStatsOppFavorite" hidden>FAVORITE/);
+  assert.match(html,/id="tapeStatsPlayerFavorite" hidden><i aria-hidden="true">★<\/i>Favorite/);
+  assert.match(html,/id="tapeStatsOppFavorite" hidden><i aria-hidden="true">★<\/i>Favorite/);
   assert.match(game,/\$\('#tapeStatsPlayerFavorite'\)\.hidden=!playerFavorite/);
   assert.match(game,/\$\('#tapeStatsOppFavorite'\)\.hidden=!oppFavorite/);
-  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\{/);
+  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\{[^}]*display:inline-flex[^}]*border:0[^}]*background:transparent[^}]*color:#e7b84d/);
+  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite i\{[^}]*color:#f2bd43/);
   assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\[hidden\]\{display:none\}/);
+});
+
+test('Tale of the Tape makes tied attributes explicit and keeps opponent values legible',()=>{
+  assert.match(game,/row\.classList\.toggle\('even',even\)/);
+  assert.match(game,/row\.querySelector\('b'\)\.textContent=`\$\{label\}\$\{even\?' · TIE':''\}`/);
+  assert.match(styles,/\.tape-attribute-meter\.even i\{background:#3a4658;box-shadow:none\}/);
+  assert.match(styles,/\.tape-attribute-value\.even,[^{]+\{color:#9aa6b5;text-shadow:none\}/);
+  assert.match(styles,/\.tape-attribute-row>\.tape-attribute-value:last-child\{color:#f9c4c1\}/);
 });
 
 test('fighter locations live in Tale of the Tape instead of the promo portraits',()=>{
