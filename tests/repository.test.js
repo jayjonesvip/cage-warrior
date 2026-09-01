@@ -463,8 +463,10 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(game,/Array\.from\(\{length:4\}/);
   assert.match(game,/group\(state\.equippedGear,LOGIC\.gearLoadoutLimit\(state\.level\),'Fight Gear'\)/);
   assert.match(game,/group\(state\.equippedPerks,LOGIC\.perkLoadoutLimit\(state\.level\),'Career perk'\)/);
+  assert.match(game,/<button class="gear-loadout-thumb locked"[^>]*disabled><i class="slot-lock"/);
   assert.match(styles,/\.gear-loadout-dock\{position:absolute;[^}]*bottom:calc\(76px \+ var\(--safe-bottom\)\)/);
   assert.match(styles,/\.gear-loadout-group\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.slot-lock:before\{/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
