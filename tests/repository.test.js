@@ -210,6 +210,24 @@ test('zero and negative result metrics use the red non-positive treatment',()=>{
   assert.match(styles,/\.result-bonus-row\.non-positive\{color:#ff737b\}/);
 });
 
+test('reward metrics count in sequence with positive and non-positive feedback',()=>{
+  assert.match(game,/function prepareRewardMetric\(selector,value,plus=false\)/);
+  assert.match(game,/function animateRewardMetrics\(\)/);
+  assert.match(game,/index\*230/);
+  assert.match(game,/sfx\[positive\?'rewardGood':'rewardBad'\]/);
+  assert.match(game,/rewardGood\(step=0\)/);
+  assert.match(game,/rewardBad\(negative=false\)/);
+  assert.match(game,/rewardParticles\(box,positive,index\)/);
+  assert.match(game,/function setRewardClaimReady\(ready\)/);
+  assert.match(game,/if\(rewards\)\{setRewardClaimReady\(false\);requestAnimationFrame\(animateRewardMetrics\)\}/);
+  assert.match(game,/setRewardClaimReady\(false\)/);
+  assert.match(game,/remaining===0\)setRewardClaimReady\(true\)/);
+  assert.match(styles,/@keyframes rewardParticleRise/);
+  assert.match(styles,/@keyframes rewardParticleFall/);
+  assert.match(styles,/#continueBtn\.rewards-counting\{[^}]*cursor:wait/);
+  assert.match(styles,/@media \(prefers-reduced-motion:reduce\)\{\.rewardbox\.reward-animating/);
+});
+
 test('post-fight scorecard renders both fighter portraits with silhouette fallback',()=>{
   assert.match(game,/class="rt-portrait rt-player"><img/);
   assert.match(game,/class="rt-portrait rt-opponent"><img/);
