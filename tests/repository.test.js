@@ -117,7 +117,10 @@ test('fight results increase persistent Health damage and enforce loss floors',(
 });
 
 test('below-full Health opens fights without invoking removed Training code',()=>{
-  assert.match(game,/injuryEligible:state\.health<state\.maxHealth&&!currentFightInjury\(\)/);
+  assert.match(game,/delete s\.fightInjury/);
+  assert.doesNotMatch(game,/FIGHTING HURT|injuryEligible|currentFightInjury|liveFightInjury|fight_injury_suffered/);
+  assert.doesNotMatch(html,/FIGHTING HURT|fight-injury-warning|attribute-injury-icon/);
+  assert.doesNotMatch(styles,/fight-injury|attribute-injury|injury-locked/);
   assert.doesNotMatch(game,/currentTrainingInjury/);
   assert.match(game,/state\.health>=MINIMUM_FIGHT_HEALTH/);
 });
@@ -587,10 +590,6 @@ test('real ranked fighters remain available to new Level 1 careers',()=>{
   assert.match(game,/Promise\.allSettled\(\[SHARED_FEED\.loadFeed/);
   assert.match(game,/if\(!profilesLoaded&&!candidatesLoaded\)throw/);
   assert.match(game,/if\(championshipResult\.status==='fulfilled'\)/);
-});
-
-test('Fighting Hurt callout leaves spacing before the opponent groups',()=>{
-  assert.match(styles,/\.fight-injury-warning\{[^}]*margin:9px;/);
 });
 
 test('desktop Fight layout uses a single-column navigation rail and centered details dialog',()=>{

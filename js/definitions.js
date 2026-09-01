@@ -130,13 +130,6 @@ const endorsementDefs = [
   {id:'titan-global',icon:'🌐',brand:'Titan Global',product:'Worldwide lifestyle campaign',followersRequired:200000}
 ];
 
-const fightInjuryDefs = [
-  {id:'knee',name:'Sprained Knee',icon:'🦵'}, {id:'shoulder',name:'Strained Shoulder',icon:'💪'},
-  {id:'elbow',name:'Hyperextended Elbow',icon:'🦾'}, {id:'ribs',name:'Bruised Ribs',icon:'🩻'},
-  {id:'ankle',name:'Twisted Ankle',icon:'🦶'}, {id:'back',name:'Lower-Back Strain',icon:'⚠️'},
-  {id:'hand',name:'Cut Hand',icon:'🩹'}, {id:'neck',name:'Neck Strain',icon:'🤕'}
-];
-
 const fightMomentDefs = {
   opponentHurt:{title:'YOU HAVE THEM HURT',prompt:'Your opponent is retreating with their guard broken.',choices:[
     {id:'swarm',label:'SWARM FOR THE FINISH',risk:'HIGH RISK',stat:'power',base:.54,styles:['striker'],success:{damage:14},fail:{selfDamage:8}},

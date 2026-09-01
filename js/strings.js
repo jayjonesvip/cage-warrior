@@ -132,13 +132,6 @@ opponentNames: {
     {profile:'rival', author:'{opponent}', text:'Enjoy the win, {name}. If they book it again, I know what changes.'},
     {profile:'fan', text:'That was the kind of performance that turns a prospect into must-watch television. {name} showed up.'}
   ],
-  fightInjuredWin: [
-    {profile:'media', text:'FIGHTING HURT: {name} battled through a {injury} and still beat {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'{name} carried a {injury} into the cage and walked out with a win over {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'INJURED BUT VICTORIOUS: A {injury} did not stop {name} from finishing {opponent}.{titleSuffix}'},
-    {profile:'media', text:'{name} fought through a {injury} and still found a way past {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'Despite a {injury}, {name} gets the job done against {opponent} by {finish}.{titleSuffix}'}
-  ],
   fightWinHater: {profile:'hater', text:'Everybody relax. One win does not make {name} unbeatable. Book the rematch.'},
   fightStreakHeadline: [
     {profile:'media', text:'WIN STREAK: {name} has now won {winStreak} straight. The division has to pay attention.'},

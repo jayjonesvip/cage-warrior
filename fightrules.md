@@ -7,7 +7,6 @@ The live numeric configuration is stored in `fight-rules.json`. Property names a
 - A fighter needs more than 0 Energy.
 - A fight spends up to 25 Energy; if less than 25 remains, it spends the available amount.
 - Medical clearance requires at least 20 Health.
-- Entering below full Health can cause one fight injury after confirmed opponent damage.
 - The daily fight limit is 10 and resets at local midnight.
 
 ## Fight plans

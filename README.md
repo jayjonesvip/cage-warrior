@@ -61,7 +61,7 @@ Equipping the Dill Pickle collectible improves the Health tick from 60 seconds t
 - HUD status: `RECOVERING · FULL IN HH:MM:SS`
 - Uses the same timestamp and offline-cap safeguards as Energy
 
-Fight damage, minimum medical clearance, and fighting-hurt injury risk remain active. Persistent Health damage is increased by 25% and rounded up after each fight. Wins cost at least 5 Health. Losses enforce minimum damage of 10 Health by decision, 15 by submission, and 20 by knockout or technical knockout; damage already taken during the fight counts toward those totals.
+Fight damage and minimum medical clearance remain active. Persistent Health damage is increased by 25% and rounded up after each fight. Wins cost at least 5 Health. Losses enforce minimum damage of 10 Health by decision, 15 by submission, and 20 by knockout or technical knockout; damage already taken during the fight counts toward those totals.
 
 ## Fight rewards
 
