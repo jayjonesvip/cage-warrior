@@ -308,9 +308,20 @@ test('fight feed runs at the default speed without a speed control',()=>{
   assert.doesNotMatch(game,/fightSpeed|toggleFightSpeed|speedBtn|fightControls/);
   assert.doesNotMatch(styles,/sim-control/);
   assert.doesNotMatch(steel,/sim-control/);
-  assert.doesNotMatch(read('js/fight-focus.js'),/fightControls/);
   assert.doesNotMatch(read('js/fight-plan.js'),/fightControls/);
   assert.match(game,/function scheduleFight\(fn,delay\)\{const id=setTimeout\(fn,Math\.max\(40,delay\)\)/);
+});
+
+test('fight plan starts the bout directly and matchup portraits share one branded surface',()=>{
+  const fightPlan=read('js/fight-plan.js');
+  assert.doesNotMatch(html,/focusStage|liveFocusText|fight-focus/);
+  assert.doesNotMatch(game,/fightFocusFeature|resolveFocusChoice|continueAfterFocus/);
+  assert.match(fightPlan,/beginFight\(\)/);
+  assert.match(game,/showFightStage\(stage\)\{\['tapeStage','planStage','liveStage'\]/);
+  assert.match(game,/versusCards\.style\.setProperty\('--player-accent',playerAccent\)/);
+  assert.match(game,/versusCards\.style\.setProperty\('--opponent-accent',opponentAccent\)/);
+  assert.match(styles,/\.matchup-promo-card \.tape-versus-cards\{[^}]*cage-grind-octagon-transparent\.png[^}]*linear-gradient\(90deg[^}]*--player-accent[^}]*--opponent-accent/);
+  assert.match(styles,/\.matchup-promo-card \.tape-card-portrait\{[^}]*background:transparent/);
 });
 
 test('sponsor announcement and next-milestone progress are wired',()=>{
