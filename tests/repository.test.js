@@ -147,7 +147,16 @@ test('Attribute Point assignment has one source of truth above Fight rankings',(
   assert.match(html,/data-screen="fight"[\s\S]*?fight-attribute-assignment[\s\S]*?opponent-roster fight-ladder/);
   assert.match(html,/data-attribute-effective/);
   assert.match(html,/data-attribute-breakdown/);
+  assert.match(html,/data-attribute-toggle[^>]*aria-expanded="false"/);
+  assert.match(html,/data-attribute-body hidden/);
+  assert.match(html,/class="attribute-point-badge" data-attribute-points/);
+  assert.match(html,/data-attribute-subtitle/);
   assert.match(styles,/\.attribute-assignment-stat button\{appearance:none/);
+  assert.match(styles,/\.attribute-point-badge\{[^}]*background:#22c55e;[^}]*color:#052e13/);
+  assert.match(styles,/\.attribute-assignment-stat button\{[^}]*border-radius:50%;background:#22c55e;color:#052e13/);
+  assert.match(game,/attributeAssignmentExpanded = false/);
+  assert.match(game,/toggleAttributeAssignment/);
+  assert.match(game,/subtitle\.textContent=attributeAssignmentExpanded\?'Choose one permanent upgrade'/);
   assert.match(game,/effective=effectiveStat\(key\)/);
   assert.match(game,/bonus\?`\$\{base\} BASE · \+\$\{bonus\} GEAR`/);
   assert.doesNotMatch(html,/result-attribute-assignment|ASSIGN YOUR POINT/);
@@ -387,7 +396,12 @@ test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
   assert.match(styles,/\.bottomnav\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.attribute-assignment-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/@media \(max-width:699px\)\{\.attribute-assignment-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(styles,/\.fight-attribute-assignment\{border-color:#3a8fbd;box-shadow:/);
+  assert.match(styles,/\.fight-attribute-assignment\{padding:0;border-color:#22c55e;background:#111c2e/);
+  assert.equal((html.match(/data-attribute-point-dot/g)||[]).length,2);
+  assert.match(html,/data-nav="gear"[\s\S]*?data-attribute-point-dot/);
+  assert.match(styles,/\.navbtn\.attribute-ready\[data-nav="fight"\]/);
+  assert.match(game,/fightNav\.classList\.toggle\('attribute-ready',available\)/);
+  assert.match(game,/\$\$\('\[data-attribute-point-dot\]'\)\.forEach\(dot=>\{dot\.hidden=!available\}\)/);
   assert.match(styles,/@media \(max-width:340px\)/);
 });
 

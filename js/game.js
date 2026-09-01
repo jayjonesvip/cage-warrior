@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.52';
+  const ICON_ASSET_VERSION = '2.7.53';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -55,6 +55,7 @@
   let landingFeature = null;
   let audioCtx = null;
   let currentScreen = 'home';
+  let attributeAssignmentExpanded = false;
   let fight = null;
   let fightTimers = [];
   let pendingResultDrop = null;
@@ -535,9 +536,27 @@
     if(avatar)$('#heroFighterArt').src=avatar.asset;
   }
   function renderAttributeAssignment(){
-    const areas=$$('[data-attribute-assignment]');
-    areas.forEach(area=>{area.hidden=state.attributePoints<1;const count=area.querySelector('[data-attribute-points]');if(count)count.textContent=`${state.attributePoints} POINT${state.attributePoints===1?'':'S'} AVAILABLE`;area.querySelectorAll('[data-assign-attribute]').forEach(button=>{const key=button.dataset.assignAttribute,stat=button.closest('.attribute-assignment-stat'),base=Math.round(Number(state.stats[key])||0),effective=effectiveStat(key),bonus=Math.max(0,effective-base);button.disabled=state.attributePoints<1;const value=stat?.querySelector('[data-attribute-effective]'),breakdown=stat?.querySelector('[data-attribute-breakdown]');if(value)value.textContent=effective;if(breakdown)breakdown.textContent=bonus?`${base} BASE · +${bonus} GEAR`:`${base} BASE`})});
+    const available=state.attributePoints>0;
+    if(!available)attributeAssignmentExpanded=false;
+    $$('[data-attribute-point-dot]').forEach(dot=>{dot.hidden=!available});
+    const fightNav=$('.navbtn[data-nav="fight"]');
+    fightNav.classList.toggle('attribute-ready',available);
+    fightNav.setAttribute('aria-label',available?`Fight, ${state.attributePoints} attribute point${state.attributePoints===1?'':'s'} available`:'Fight');
+    const gearNav=$('.navbtn[data-nav="gear"]');
+    gearNav.classList.toggle('attribute-ready',available);
+    const gearLabel=gearNav.classList.contains('drop-ready')?'Gear, Daily Drop ready':'Gear';
+    gearNav.setAttribute('aria-label',available?`${gearLabel}, attribute point available`:gearLabel);
+    $$('[data-attribute-assignment]').forEach(area=>{
+      area.hidden=!available;area.classList.toggle('expanded',attributeAssignmentExpanded);
+      const toggle=area.querySelector('[data-attribute-toggle]'),body=area.querySelector('[data-attribute-body]'),count=area.querySelector('[data-attribute-points]'),subtitle=area.querySelector('[data-attribute-subtitle]');
+      if(toggle)toggle.setAttribute('aria-expanded',String(attributeAssignmentExpanded));
+      if(body)body.hidden=!attributeAssignmentExpanded;
+      if(count)count.textContent=state.attributePoints;
+      if(subtitle)subtitle.textContent=attributeAssignmentExpanded?'Choose one permanent upgrade':`${state.attributePoints} attribute point${state.attributePoints===1?'':'s'} available`;
+      area.querySelectorAll('[data-assign-attribute]').forEach(button=>{const key=button.dataset.assignAttribute,stat=button.closest('.attribute-assignment-stat'),base=Math.round(Number(state.stats[key])||0),effective=effectiveStat(key),bonus=Math.max(0,effective-base);button.disabled=!available;const value=stat?.querySelector('[data-attribute-effective]'),breakdown=stat?.querySelector('[data-attribute-breakdown]');if(value)value.textContent=effective;if(breakdown)breakdown.textContent=bonus?`${base} BASE · +${bonus} GEAR`:`${base} BASE`})
+    });
   }
+  function toggleAttributeAssignment(){if(state.attributePoints<1)return;attributeAssignmentExpanded=!attributeAssignmentExpanded;renderAttributeAssignment();sfx.tap()}
 
   function renderPostFightTutorial(win){
     const tutorial=$('#postFightTutorial');tutorial.hidden=state.postFightTutorialSeen;$('#postFightTutorialReward').textContent=win?'Your Attribute Point is saved at the top of the Fight screen.':'Attribute Points are awarded only when you win.';
@@ -1227,7 +1246,7 @@
   function showPostFightFollowup(){if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.52" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.53" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1277,6 +1296,7 @@
     const collectibleFlip=e.target.closest('[data-collectible-flip]');if(collectibleFlip&&!e.target.closest('button')){toggleCollectibleCard(collectibleFlip);return}
     const nav=e.target.closest('[data-nav]');if(nav){navTo(nav.dataset.nav);return}
     const attribute=e.target.closest('[data-assign-attribute]');if(attribute){assignAttribute(attribute.dataset.assignAttribute);return}
+    const attributeToggle=e.target.closest('[data-attribute-toggle]');if(attributeToggle){toggleAttributeAssignment();return}
     const feedFilterButton=e.target.closest('[data-feed-filter]');if(feedFilterButton){feedFilter=feedFilterButton.dataset.feedFilter==='mentions'?'mentions':'all';renderSocial();$('#socialTimeline').scrollTop=0;sfx.tap();return}
     const feedIntent=e.target.closest('[data-feed-intent]');if(feedIntent){openFighterPostComposer(feedIntent.dataset.feedIntent);return}
     const feedChallenge=e.target.closest('[data-feed-challenge]');if(feedChallenge){openFeedChallenge(feedChallenge.dataset.feedChallenge,feedChallenge.dataset.feedChallengePost);return}
