@@ -211,11 +211,13 @@ test('zero and negative result metrics use the red non-positive treatment',()=>{
 });
 
 test('post-fight scorecard renders both fighter portraits with silhouette fallback',()=>{
-  assert.match(game,/class="rt-portrait player"><img/);
-  assert.match(game,/class="rt-portrait opponent"><img/);
+  assert.match(game,/class="rt-portrait rt-player"><img/);
+  assert.match(game,/class="rt-portrait rt-opponent"><img/);
   assert.match(game,/opponentPortrait=silhouetteForOpponent\(f\.o\)/);
   assert.match(styles,/\.result-tape \.rt-portrait\{/);
   assert.match(styles,/\.result-tape \.rt-portrait img\{/);
+  assert.doesNotMatch(game,/class="rt-name (?:player|opponent)"/);
+  assert.match(styles,/\.result-secondary-actions \.details-toggle\{[^}]*border-radius:999px!important/);
 });
 
 test('Share Win is victory-only and retains Web Share and fallback paths',()=>{
@@ -326,6 +328,7 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.match(styles,/\.matchup-poster-backdrop:before\{[^}]*cage-grind-octagon-transparent\.png[^}]*opacity:\.28[^}]*brightness\(\.48\)/);
   assert.match(styles,/\.matchup-promo-card \.tape-versus-cards\{[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait\{[^}]*background:transparent/);
+  assert.match(styles,/\.matchup-promo-card \.tape-card-portrait img\{[^}]*-webkit-mask-image:linear-gradient\(90deg,transparent 0,#000 11%,#000 89%,transparent 100%\),linear-gradient\(180deg,transparent 0,#000 9%,#000 74%,transparent 100%\)[^}]*mask-composite:intersect/);
   assert.match(game,/classList\.toggle\('unknown-silhouette',!f\.o\.network&&!f\.o\.portraitAsset\)/);
   assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.14\)/);
 });
