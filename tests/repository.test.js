@@ -393,6 +393,14 @@ test('drop offers live at the top of Gear and flag its navigation when ready',()
   assert.match(styles,/\.navbtn\.drop-ready/);
 });
 
+test('Daily Drop offer uses a dramatic gold pack treatment without changing claimed state',()=>{
+  assert.match(styles,/\.daily-drop-card\{[^}]*min-height:198px[^}]*border:2px solid #c7962e[^}]*radial-gradient\(circle at 21% 48%,#ffc8324d/);
+  assert.match(styles,/\.daily-drop-pack\{[^}]*height:165px[^}]*animation:dailyDropHover/);
+  assert.match(styles,/\.daily\{[^}]*linear-gradient\(#ffe47a[^}]*font-family:"Oswald"/);
+  assert.match(styles,/@keyframes dailyDropShine/);
+  assert.match(styles,/\.daily-drop-card\.claimed\{[^}]*min-height:0/);
+});
+
 test('single-action modal footers fill their card width',()=>{
   assert.match(styles,/\.modal-actions\.single-action\{grid-template-columns:minmax\(0,1fr\)\}/);
   assert.match(styles,/\.modal-actions\.single-action>button\{width:100%\}/);
