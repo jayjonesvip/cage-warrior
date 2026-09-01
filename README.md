@@ -20,7 +20,7 @@ The simplified four-item navigation is Home, Fight, Gear, and Feed. The four pri
 
 - **Home** — the fighter profile and portrait first, followed by identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and the rotating career ticker.
 - **Fight** — available Attribute Points, a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
-- **Gear** — Daily and installation Drops, Victory Packs, collectibles, an equipped Fight Gear loadout, and a separate active Perk Loadout.
+- **Gear** — Daily and installation Drops, Victory Packs, and collectible cards that equip Fight Gear or career perks directly.
 - **Feed** — follower/following totals, CageReporter coverage, mentions, rivals, sponsors, and player interactions. Following includes known social accounts and ranked fighters.
 
 The compact Energy, Health, Power, Speed, Chin, and Cardio dashboard remains sticky while the larger identity row scrolls away.
@@ -52,7 +52,7 @@ The four-cell battery remains a visual aid, but Energy is continuous from 0–10
 
 Selected equipped Fight Gear can improve the Energy tick from 5 seconds to 4 seconds. Only the best equipped recovery perk applies, and the interval never drops below 4 seconds.
 
-Equipping the Dill Pickle in the Perk Loadout improves the Health tick from 60 seconds to 55 seconds. Duplicate copies do not stack this recovery perk.
+Equipping the Dill Pickle collectible improves the Health tick from 60 seconds to 55 seconds. Duplicate copies do not stack this recovery perk.
 
 ### Health
 
@@ -82,7 +82,7 @@ Eligible wins against opponents at the fighter's level or higher advance the fou
 
 XP and Victory Pack progress are shown as full-width Home progression rows above sponsorship, keeping the fighter portrait focused on identity, record, and the current sponsor.
 
-Collectibles are permanent. Each Gear category shows unique collection progress as owned collectibles out of the total available in that category; duplicate copies do not inflate this count. Fight Gear can be equipped for combat attributes and, on selected items, faster Energy charging. Bling, Lifestyle, and Property & Rides collectibles share a separate Perk Loadout that controls follower and recovery bonuses. Both loadouts begin with two slots and expand to four at Level 8. Duplicate quantities are recorded but perks do not stack by quantity.
+Collectibles are permanent. Each Gear category shows unique collection progress as owned collectibles out of the total available in that category; duplicate copies do not inflate this count. Every owned card equips inline. Fight Gear controls combat attributes and, on selected items, faster Energy charging. Bling, Lifestyle, and Property & Rides share career-perk slots for follower and recovery bonuses. Both slot groups begin with two slots and expand to four at Level 8. Duplicate quantities are recorded but perks do not stack by quantity.
 
 The Gear page keeps the Daily Drop, its next-drop countdown, and the installation Drop together above the collection. When a Daily Drop is ready, the Gear navigation item receives a gold action indicator. The Daily Drop grants a guaranteed collectible; it does not grant currency or manually refill resources.
 

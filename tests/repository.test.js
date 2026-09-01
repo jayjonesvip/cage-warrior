@@ -435,25 +435,25 @@ test('fight, championship, opponents, rankings, gear, packs, and Feed remain pre
 test('Gear category status reports unique collection completion',()=>{
   assert.match(game,/const categoryTotal=gearItems\.filter\(g=>g\.category===cat\)\.length/);
   assert.match(game,/collectionStatus=`\$\{items\.length\} \/ \$\{categoryTotal\} COLLECTIBLES`/);
-  assert.match(game,/loadoutStatus=cat==='Fight Gear'\?`\$\{state\.equippedGear\.length\}\/\$\{loadoutLimit\} EQUIPPED/);
-  assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span>\$\{loadoutStatus\?`<small>\$\{loadoutStatus\}<\/small>`:''\}`/);
+  assert.match(game,/fightGear=cat==='Fight Gear',loadoutStatus=fightGear\?`\$\{state\.equippedGear\.length\}\/\$\{loadoutLimit\} EQUIPPED/);
+  assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span><small>\$\{loadoutStatus\}<\/small>`/);
   assert.doesNotMatch(game,/`\$\{items\.length\} COLLECTIBLE\$\{items\.length===1\?'':'S'\}`/);
   assert.match(styles,/\.shop-status>span\{white-space:nowrap\}/);
 });
 
-test('career perks use a separate active loadout with visible reasons to optimize it',()=>{
+test('career perks equip inline with the same treatment as Fight Gear',()=>{
   assert.match(game,/equippedGear:\[\],equippedPerks:\[\]/);
   assert.match(game,/LOGIC\.perkLoadoutLimit\(s\.level\)/);
   assert.match(logic,/function perkLoadoutLimit\(level\)/);
-  assert.match(game,/id="perk-loadout-title">PERK LOADOUT/);
-  assert.match(game,/New drops can improve this build/);
-  assert.match(game,/state\.equippedPerks\.length\}\/\$\{perkLimit\} ACTIVE/);
+  assert.doesNotMatch(game,/id="perk-loadout-title">PERK LOADOUT/);
+  assert.match(game,/state\.equippedPerks\.length\}\/\$\{perkLimit\} PERKS EQUIPPED/);
+  assert.match(game,/Equip a collectible below to activate its career perk/);
   assert.match(game,/function activePerkBonus\(prop\)/);
   assert.match(game,/activePerkBonus\('prestige'\)/);
   assert.match(game,/activePerkBestBonus\('healthRecoverySpeed'\)/);
   assert.match(game,/const perk=g\.category!==\'Fight Gear\'/);
-  assert.match(styles,/\.perk-loadout-panel\{/);
-  assert.match(styles,/\.perk-loadout-slots span\.filled\{/);
+  assert.doesNotMatch(styles,/\.perk-loadout-panel\{/);
+  assert.match(styles,/\.perk-category-note\{/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
