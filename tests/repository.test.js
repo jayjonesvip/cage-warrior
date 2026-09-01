@@ -514,16 +514,22 @@ test('fight-night masthead uses the local weekday and stays centered',()=>{
   assert.match(styles,/\.sim-header b\{[^}]*text-align:center;white-space:nowrap/);
 });
 
-test('Tale of the Tape leaves breathing room above the fighter cards',()=>{
-  assert.match(styles,/\.tape-versus-cards\{[^}]*padding:9px 10px 0/);
+test('matchup opens as a Las Vegas promo poster with event billing',()=>{
+  assert.match(html,/class="matchup-poster"/);
+  assert.match(html,/id="tapePosterPlayerName"[\s\S]*id="tapePosterOppName"/);
+  assert.match(html,/id="tapeFightDate"[\s\S]*LAS VEGAS, NV[\s\S]*CAGE GRIND ARENA/);
+  assert.match(game,/fightPosterDate\(\)/);
+  assert.match(styles,/\.matchup-poster-title\{[^}]*font-family:Impact/);
 });
 
-test('Tale of the Tape keeps the primary matchup clean and moves supporting information into Fight Details',()=>{
-  assert.match(html,/id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
+test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
+  assert.match(html,/class="matchup-tools"[\s\S]*id="tapeStatsToggle"[^>]*>TALE OF THE TAPE<\/button>[\s\S]*id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
+  assert.match(html,/id="tapeStatsPanel"[\s\S]*id="tapeAttributes"/);
   assert.match(html,/id="tapeBreakdownTitle">FIGHT DETAILS<\/h2>/);
-  assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('id="tapeBreakdown"'));
-  assert.ok(html.indexOf('id="tapeAgentRead"')>html.indexOf('id="tapeBreakdown"'));
-  assert.match(styles,/\.tape-actions\{grid-template-columns:\.85fr 1fr 1\.45fr/);
+  assert.ok(html.indexOf('id="tapeStatsToggle"')<html.indexOf('class="matchup-poster"'));
+  assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('class="matchup-poster"'));
+  assert.match(game,/tapeStatsToggle'\)\.addEventListener\('click',openTapeStats\)/);
+  assert.match(styles,/\.matchup-promo-card \.tape-actions\{grid-template-columns:\.8fr 1\.45fr/);
 });
 
 test('open ranked title migration allows one selected daily defense',()=>{
