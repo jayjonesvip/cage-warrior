@@ -580,9 +580,22 @@ test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
 
 test('promo poster fits without scrolling and keeps fighter billing collision-free',()=>{
   assert.match(styles,/#tapeStage:has\(\.matchup-promo-card\)\{overflow:clip/);
-  assert.match(styles,/\.matchup-promo-card \.tape-favorite\{top:34px/);
+  assert.doesNotMatch(html,/id="tapePlayerFavorite"/);
+  assert.doesNotMatch(html,/id="tapeOppFavorite"/);
+  assert.match(styles,/\.matchup-promo-card \.tape-card-top\{[^}]*flex-direction:column[^}]*color:#fff[^}]*text-align:left/);
+  assert.match(styles,/\.matchup-promo-card \.opponent-card \.tape-card-top\{[^}]*text-align:right/);
+  assert.match(styles,/\.matchup-promo-card \.opponent-card \.tape-card-portrait \.fighter-city-badge\{[^}]*right:10px/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
   assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
+});
+
+test('favorite designation lives in Tale of the Tape instead of the promo poster',()=>{
+  assert.match(html,/id="tapeStatsPlayerFavorite" hidden>FAVORITE/);
+  assert.match(html,/id="tapeStatsOppFavorite" hidden>FAVORITE/);
+  assert.match(game,/\$\('#tapeStatsPlayerFavorite'\)\.hidden=!playerFavorite/);
+  assert.match(game,/\$\('#tapeStatsOppFavorite'\)\.hidden=!oppFavorite/);
+  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\{/);
+  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\[hidden\]\{display:none\}/);
 });
 
 test('promo poster uses a bundled condensed font and three-part card billing',()=>{
