@@ -456,6 +456,17 @@ test('career perks equip inline with the same treatment as Fight Gear',()=>{
   assert.match(styles,/\.perk-category-note\{/);
 });
 
+test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
+  assert.match(html,/id="gearLoadoutDock"[^>]*hidden/);
+  assert.match(html,/id="gearLoadoutSlots"/);
+  assert.match(game,/function renderGearLoadoutDock\(\)/);
+  assert.match(game,/Array\.from\(\{length:4\}/);
+  assert.match(game,/group\(state\.equippedGear,LOGIC\.gearLoadoutLimit\(state\.level\),'Fight Gear'\)/);
+  assert.match(game,/group\(state\.equippedPerks,LOGIC\.perkLoadoutLimit\(state\.level\),'Career perk'\)/);
+  assert.match(styles,/\.gear-loadout-dock\{position:absolute;[^}]*bottom:calc\(76px \+ var\(--safe-bottom\)\)/);
+  assert.match(styles,/\.gear-loadout-group\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+});
+
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
   assert.match(definitions,/id:'energy-drink'[^\n]+assetExt:'png'/);
   assert.ok(fs.existsSync(path.join(root,'assets/icons/energy-drink.png')));
