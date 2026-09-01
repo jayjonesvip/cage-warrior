@@ -431,6 +431,12 @@ test('Daily Drop offer uses a dramatic gold pack treatment without changing clai
   assert.match(styles,/\.daily\{[^}]*linear-gradient\(#ffe47a[^}]*font-family:"Oswald"/);
   assert.match(styles,/@keyframes dailyDropShine/);
   assert.match(styles,/\.daily-drop-card\.claimed\{[^}]*min-height:0/);
+  assert.match(html,/id="installOfferHideBtn"[^>]*hidden>HIDE<\/button>/);
+  assert.match(game,/INSTALL_OFFER_DISMISS_KEY = 'cage-grind-install-offer-hidden'/);
+  assert.match(game,/sessionStorage\.getItem\(INSTALL_OFFER_DISMISS_KEY\)==='1'/);
+  assert.match(game,/gearDropOffer\.hidden=!ready\|\|\(installAvailable&&installOfferDismissed\)/);
+  assert.match(game,/sessionStorage\.setItem\(INSTALL_OFFER_DISMISS_KEY,'1'\)/);
+  assert.doesNotMatch(game,/installOfferDismissed[^\n]*saveState/);
 });
 
 test('single-action modal footers fill their card width',()=>{
