@@ -469,6 +469,7 @@ test('Daily Drop offer uses a dramatic gold pack treatment without changing clai
   assert.match(game,/sessionStorage\.getItem\(INSTALL_OFFER_DISMISS_KEY\)==='1'/);
   assert.match(game,/gearDropOffer\.hidden=!ready\|\|\(installAvailable&&installOfferDismissed\)/);
   assert.match(game,/sessionStorage\.setItem\(INSTALL_OFFER_DISMISS_KEY,'1'\)/);
+  assert.match(styles,/\.daily-drop-card\[hidden\]\{display:none\}/);
   assert.doesNotMatch(game,/installOfferDismissed[^\n]*saveState/);
 });
 
