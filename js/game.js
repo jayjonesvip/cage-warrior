@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.53';
+  const ICON_ASSET_VERSION = '2.7.54';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -542,10 +542,6 @@
     const fightNav=$('.navbtn[data-nav="fight"]');
     fightNav.classList.toggle('attribute-ready',available);
     fightNav.setAttribute('aria-label',available?`Fight, ${state.attributePoints} attribute point${state.attributePoints===1?'':'s'} available`:'Fight');
-    const gearNav=$('.navbtn[data-nav="gear"]');
-    gearNav.classList.toggle('attribute-ready',available);
-    const gearLabel=gearNav.classList.contains('drop-ready')?'Gear, Daily Drop ready':'Gear';
-    gearNav.setAttribute('aria-label',available?`${gearLabel}, attribute point available`:gearLabel);
     $$('[data-attribute-assignment]').forEach(area=>{
       area.hidden=!available;area.classList.toggle('expanded',attributeAssignmentExpanded);
       const toggle=area.querySelector('[data-attribute-toggle]'),body=area.querySelector('[data-attribute-body]'),count=area.querySelector('[data-attribute-points]'),subtitle=area.querySelector('[data-attribute-subtitle]');
@@ -1246,7 +1242,7 @@
   function showPostFightFollowup(){if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.53" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.54" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

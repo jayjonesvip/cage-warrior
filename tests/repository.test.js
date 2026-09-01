@@ -397,8 +397,8 @@ test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
   assert.match(styles,/\.attribute-assignment-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/@media \(max-width:699px\)\{\.attribute-assignment-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.fight-attribute-assignment\{padding:0;border-color:#22c55e;background:#111c2e/);
-  assert.equal((html.match(/data-attribute-point-dot/g)||[]).length,2);
-  assert.match(html,/data-nav="gear"[\s\S]*?data-attribute-point-dot/);
+  assert.equal((html.match(/data-attribute-point-dot/g)||[]).length,1);
+  assert.doesNotMatch(html,/data-nav="gear"[^>]*>[\s\S]*?data-attribute-point-dot[\s\S]*?<\/button>/);
   assert.match(styles,/\.navbtn\.attribute-ready\[data-nav="fight"\]/);
   assert.match(game,/fightNav\.classList\.toggle\('attribute-ready',available\)/);
   assert.match(game,/\$\$\('\[data-attribute-point-dot\]'\)\.forEach\(dot=>\{dot\.hidden=!available\}\)/);
