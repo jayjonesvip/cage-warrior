@@ -1,6 +1,6 @@
 {
   "name": "cage-grind",
-  "version": "2.7.30",
+  "version": "2.7.32",
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.js"

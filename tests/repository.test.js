@@ -519,7 +519,7 @@ test('matchup opens as a Las Vegas promo poster with event billing',()=>{
   assert.match(html,/id="tapePosterPlayerName"[\s\S]*id="tapePosterOppName"/);
   assert.match(html,/id="tapeFightDate"[\s\S]*LAS VEGAS, NV[\s\S]*CAGE GRIND ARENA/);
   assert.match(game,/fightPosterDate\(\)/);
-  assert.match(styles,/\.matchup-poster-title span\{[^}]*font-family:Impact[^}]*white-space:nowrap/);
+  assert.match(styles,/\.matchup-poster-title span\{[^}]*font-family:"Bebas Neue",Impact[^}]*white-space:nowrap/);
 });
 
 test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
@@ -537,6 +537,21 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.match(styles,/\.matchup-promo-card \.tape-favorite\{top:34px/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
   assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
+});
+
+test('promo poster uses a bundled condensed font and three-part card billing',()=>{
+  assert.match(html,/id="tapeBoutClass">UNRANKED BOUT<\/span>[\s\S]*id="tapeBoutRounds">3 ROUNDS<\/b>[\s\S]*id="tapeCardPlacement">MAIN CARD<\/strong>/);
+  assert.match(game,/tapeBoutClass'\)\.textContent=titleBout\?'WORLD TITLE':f\.o\.network\?'RANKED BOUT':'UNRANKED BOUT'/);
+  assert.match(styles,/@font-face\{font-family:"Bebas Neue";src:url\("\.\.\/assets\/fonts\/BebasNeue-Regular\.ttf\?v=/);
+  assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-Regular.ttf')));
+  assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-OFL.txt')));
+  assert.ok(fs.existsSync(path.join(root,'assets/fonts/Oswald-Variable.ttf')));
+  assert.ok(fs.existsSync(path.join(root,'assets/fonts/BarlowCondensed-SemiBold.ttf')));
+  assert.match(serviceWorker,/assets\/fonts\/BebasNeue-Regular\.ttf/);
+  assert.match(serviceWorker,/assets\/fonts\/Oswald-Variable\.ttf/);
+  assert.match(serviceWorker,/assets\/fonts\/BarlowCondensed-SemiBold\.ttf/);
+  assert.match(styles,/\.matchup-poster-billing b\{font-family:"Oswald"/);
+  assert.match(styles,/\.matchup-poster-billing small\{[^}]*font-family:"Barlow Condensed"/);
 });
 
 test('open ranked title migration allows one selected daily defense',()=>{
