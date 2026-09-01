@@ -356,7 +356,7 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.match(styles,/\.matchup-promo-card \.tape-versus-cards\{[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait\{[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait img\{[^}]*-webkit-mask-image:linear-gradient\(90deg,transparent 0,#000 11%,#000 89%,transparent 100%\),linear-gradient\(180deg,transparent 0,#000 9%,#000 74%,transparent 100%\)[^}]*mask-composite:intersect/);
-  assert.match(game,/classList\.toggle\('unknown-silhouette',!f\.o\.network&&!f\.o\.portraitAsset\)/);
+  assert.match(game,/classList\.toggle\('unknown-silhouette',unknownOpponent\)/);
   assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
 });
 
@@ -633,6 +633,10 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.doesNotMatch(styles,/\.matchup-promo-card \.tape-card-top\{/);
   assert.match(styles,/\.matchup-poster-kicker>\*\{[^}]*border:0[^}]*background:transparent/);
   assert.match(styles,/\.matchup-promo-card \.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
+  assert.match(game,/unknownOpponent=!f\.o\.network&&!f\.o\.portraitAsset/);
+  assert.match(game,/classList\.toggle\('solo-player-poster',unknownOpponent\)/);
+  assert.match(styles,/\.matchup-promo-card\.solo-player-poster \.player-card\{grid-column:1\/-1;width:54%;justify-self:center\}/);
+  assert.match(styles,/\.matchup-promo-card\.solo-player-poster \.opponent-card\{display:none\}/);
   assert.match(game,/classList\.toggle\('story-portrait',rookieShowcase\|\|firstContract\)/);
   assert.match(styles,/\.matchup-promo-card \.tape-opp-sprite\.story-portrait\{object-fit:cover;object-position:center top\}/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
