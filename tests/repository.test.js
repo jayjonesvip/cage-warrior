@@ -363,6 +363,20 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.24\)/);
 });
 
+test('fight plan selections and matchup reasoning remain easy to scan',()=>{
+  const fightPlan=read('js/fight-plan.js');
+  assert.equal((html.match(/class="fight-plan-setting-icon"/g)||[]).length,3);
+  assert.match(html,/fight-plan-setting-icon[^>]*>◴<\/span>PACE/);
+  assert.match(html,/fight-plan-setting-icon[^>]*>&#9994;&#65038;<\/span>OFFENSE/);
+  assert.match(html,/fight-plan-setting-icon[^>]*>✥<\/span>TACTICS/);
+  assert.match(styles,/\.fight-plan-toggle button\{position:relative;[^}]*background:#1a2438;color:#c3cbd8/);
+  assert.match(styles,/\.fight-plan-toggle button\[aria-pressed="true"\]:after\{content:"✓";[^}]*border-radius:50%;background:#fff;color:#1674b8/);
+  assert.match(fightPlan,/OPPONENT STYLE · \$\{escapeHtml\(opponentStyle\)\}/);
+  assert.equal((fightPlan.match(/class="fight-plan-reason"/g)||[]).length,2);
+  assert.match(fightPlan,/outputReason/);
+  assert.match(fightPlan,/tacticReason/);
+});
+
 test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(html,/id="sponsorAnnouncementModal"/);
   assert.match(html,/id="careerSponsorProgress"/);
