@@ -458,6 +458,7 @@ test('career perks equip inline with the same treatment as Fight Gear',()=>{
 
 test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(html,/id="gearLoadoutDock"[^>]*hidden/);
+  assert.match(html,/class="gear-loadout-label"[^>]*>ACTIVE LOADOUT</);
   assert.match(html,/id="gearLoadoutSlots"/);
   assert.match(game,/function renderGearLoadoutDock\(\)/);
   assert.match(game,/Array\.from\(\{length:4\}/);
@@ -466,6 +467,7 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(game,/<button class="gear-loadout-thumb locked"[^>]*disabled><i class="slot-lock"/);
   assert.match(styles,/\.gear-loadout-dock\{position:absolute;[^}]*bottom:calc\(76px \+ var\(--safe-bottom\)\)/);
   assert.match(styles,/\.gear-loadout-group\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.gear-loadout-label\{position:absolute;top:3px;left:50%;transform:translateX\(-50%\)/);
   assert.match(styles,/\.slot-lock:before\{/);
 });
 
