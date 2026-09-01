@@ -345,6 +345,22 @@ test('fight feed runs at the default speed without a speed control',()=>{
   assert.match(game,/function scheduleFight\(fn,delay\)\{const id=setTimeout\(fn,Math\.max\(40,delay\)\)/);
 });
 
+test('live fight log separates structure, consequences, routine flavor, and repeated lines',()=>{
+  assert.match(game,/text:`ROUND \$\{item\.round\} BEGINS`,className:'round-divider'/);
+  assert.match(game,/text:`ROUND \$\{item\.round\} ENDS`,className:'round-divider'/);
+  assert.doesNotMatch(game,/className:'round-end'/);
+  assert.match(styles,/\.action-line\.round-divider\{[^}]*border:0;[^}]*background:transparent;[^}]*text-align:center/);
+  assert.match(game,/consequential=!divider&&!summary&&\/\(\^\|\\s\)\(opp\|big\|ko\|plan-edge\|plan-even\|plan-exposed\)/);
+  assert.match(styles,/\.action-line\.consequential\{[^}]*border-width:1px;[^}]*font-size:12px;font-weight:750/);
+  assert.match(game,/class="event-icon" aria-hidden="true">&#9888;&#65038;/);
+  assert.match(styles,/\.action-line:not\(\.consequential\):not\(\.round-divider\):not\(\.unofficial-score\)\{color:#aeb8c3/);
+  assert.match(game,/previous\.dataset\.fightText===String\(item\.text\|\|''\)[\s\S]*previous\.dataset\.fightSide===String\(item\.side\|\|''\)/);
+  assert.match(game,/tally\.textContent=`×\$\{count\}`/);
+  assert.match(styles,/\.action-repeat\{[^}]*border-radius:999px/);
+  assert.match(styles,/\.condition\{height:10px/);
+  assert.match(styles,/\.action-line\.unofficial-score\{[^}]*border:1px solid #876b2c;[^}]*border-left:3px solid #e6bc56/);
+});
+
 test('fight plan starts the bout directly and matchup portraits share one branded surface',()=>{
   const fightPlan=read('js/fight-plan.js');
   assert.doesNotMatch(html,/focusStage|liveFocusText|fight-focus/);

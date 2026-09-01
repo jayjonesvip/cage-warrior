@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.60';
+  const ICON_ASSET_VERSION = '2.7.61';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -936,7 +936,7 @@
       scoreRoundState(rs);
       addFightStats(sim.totals.player,rs.player);addFightStats(sim.totals.opp,rs.opp);sim.rounds.push(rs);
       if(sim.mode==='sim-plus'&&!stopped&&round===3&&!sim.crisisUsed){sim.finalDecisionPending=true;sim.timeline.push({type:'lastChance',round:3,clock:'0:10'})}
-      if(!stopped)sim.timeline.push({type:'roundEnd',round,clock:'0:00',text:`Round ${round} ends. The corner teams rush in.`,className:'round-end',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
+      if(!stopped)sim.timeline.push({type:'roundEnd',round,clock:'0:00',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition});
     if(round===3&&!sim.winner&&!sim.finalDecisionPending)settleFightDecision(sim)
   }
   function settleFightDecision(sim){const score=LOGIC.fightScore(sim.rounds),margin=Math.abs(score.player-score.opponent);sim.winner=score.player>=score.opponent?'player':'opp';sim.method=margin<=1&&Math.random()<.45?'SPLIT DECISION':'UNANIMOUS DECISION';sim.finishRound=3;sim.finishClock='0:00';sim.finalDecisionPending=false}
@@ -1111,7 +1111,8 @@
   function appendFightLine(item){
     applyLiveFightHealthDamage(item);
     showBloodSportBurst(item);
-    const feed=$('#actionFeed'),line=document.createElement('div');line.className=`action-line ${item.className||''}`;line.innerHTML=`<span class="stamp">${item.clock||''}</span>${item.text}`;feed.appendChild(line);feed.scrollTop=feed.scrollHeight;
+    const feed=$('#actionFeed'),eventClass=String(item.className||'').trim(),divider=eventClass==='round-divider',summary=eventClass==='unofficial-score',consequential=!divider&&!summary&&/(^|\s)(opp|big|ko|plan-edge|plan-even|plan-exposed)(\s|$)/.test(eventClass),duplicateEligible=!divider&&!summary&&!consequential&&item.type==='action',previous=feed.lastElementChild,sameAsPrevious=duplicateEligible&&previous?.classList.contains('action-line')&&previous.dataset.fightText===String(item.text||'')&&previous.dataset.fightSide===String(item.side||'')&&previous.dataset.fightClass===eventClass;
+    if(sameAsPrevious){const count=Math.max(1,Number(previous.dataset.repeatCount)||1)+1;previous.dataset.repeatCount=String(count);let tally=previous.querySelector('.action-repeat');if(!tally){tally=document.createElement('span');tally.className='action-repeat';previous.appendChild(tally)}tally.textContent=`×${count}`}else{const line=document.createElement('div');line.className=`action-line ${eventClass}${consequential?' consequential':''}`;line.dataset.fightText=String(item.text||'');line.dataset.fightSide=String(item.side||'');line.dataset.fightClass=eventClass;line.dataset.repeatCount='1';line.innerHTML=`<span class="stamp">${item.clock||''}</span>${consequential?'<span class="event-icon" aria-hidden="true">&#9888;&#65038;</span>':''}${item.text}`;feed.appendChild(line)}feed.scrollTop=feed.scrollHeight;
     if(item.playerCondition!=null){const p=Math.round(item.playerCondition),o=Math.round(item.oppCondition);$('#livePlayerCondition').style.width=p+'%';$('#liveOppCondition').style.width=o+'%';$('#livePlayerConditionText').textContent=p+'% CONDITION';$('#liveOppConditionText').textContent=o+'% CONDITION'}
     if(item.big||item.type==='ko'){sfx.crit();shake(true)}else if(item.type==='action'&&item.landed){sfx.hit()}else{tone(170,.025,'square',.012,25)}
   }
@@ -1128,7 +1129,7 @@
     if(!fight)return;
     fightTimelineIndex=index;if(index>=fight.timeline.length){if(fight.winner||fight.rounds.length>=3)scheduleFight(()=>finishFightSimulation(),420);else showCornerChoice();return}
     const item=fight.timeline[index];$('#liveRound').textContent=`ROUND ${item.round||1}`;$('#liveClock').textContent=item.clock||'5:00';if(item.type==='roundStart'&&!fight.roundIntros.includes(item.round)){fight.roundIntros.push(item.round);showRoundInterstitial(item.round,()=>playFightTimeline(index));return}if(item.type==='fightMoment'){showFightMoment(item);return}if(item.type==='lastChance'){showLastChanceDecision();return}
-    if(item.type==='roundStart')appendFightLine({clock:item.clock,text:`ROUND ${item.round} begins. Both fighters meet in the center.`,className:'round-end'});else{appendFightLine(item);if(item.type==='roundEnd')unofficialScoreLine(item.round)}
+    if(item.type==='roundStart')appendFightLine({type:'roundStart',clock:item.clock,text:`ROUND ${item.round} BEGINS`,className:'round-divider'});else if(item.type==='roundEnd'){appendFightLine({type:'roundEnd',clock:item.clock,text:`ROUND ${item.round} ENDS`,className:'round-divider',playerCondition:item.playerCondition,oppCondition:item.oppCondition});unofficialScoreLine(item.round)}else appendFightLine(item);
     const delay=item.type==='roundStart'?430:item.type==='roundEnd'?560:item.type==='ko'?760:300;
     scheduleFight(()=>playFightTimeline(index+1),delay);
   }
@@ -1234,7 +1235,7 @@
   function showPostFightFollowup(){if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.60" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.61" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
