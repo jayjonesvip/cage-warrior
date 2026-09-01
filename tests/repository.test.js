@@ -320,8 +320,11 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.match(game,/showFightStage\(stage\)\{\['tapeStage','planStage','liveStage'\]/);
   assert.match(game,/versusCards\.style\.setProperty\('--player-accent',playerAccent\)/);
   assert.match(game,/versusCards\.style\.setProperty\('--opponent-accent',opponentAccent\)/);
-  assert.match(styles,/\.matchup-promo-card \.tape-versus-cards\{[^}]*cage-grind-octagon-transparent\.png[^}]*linear-gradient\(90deg[^}]*--player-accent[^}]*--opponent-accent/);
+  assert.match(styles,/\.matchup-promo-card \.tape-versus-cards\{[^}]*linear-gradient\(90deg[^}]*--player-accent[^}]*--opponent-accent/);
+  assert.match(styles,/\.matchup-promo-card \.tape-versus-cards:before\{[^}]*cage-grind-octagon-transparent\.png[^}]*opacity:\.38[^}]*brightness\(\.52\)/);
   assert.match(styles,/\.matchup-promo-card \.tape-card-portrait\{[^}]*background:transparent/);
+  assert.match(game,/classList\.toggle\('unknown-silhouette',!f\.o\.network&&!f\.o\.portraitAsset\)/);
+  assert.match(styles,/\.tape-opp-sprite\.unknown-silhouette\{transform:scale\(1\.14\)/);
 });
 
 test('sponsor announcement and next-milestone progress are wired',()=>{
