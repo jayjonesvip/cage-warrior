@@ -519,7 +519,7 @@ test('matchup opens as a Las Vegas promo poster with event billing',()=>{
   assert.match(html,/id="tapePosterPlayerName"[\s\S]*id="tapePosterOppName"/);
   assert.match(html,/id="tapeFightDate"[\s\S]*LAS VEGAS, NV[\s\S]*CAGE GRIND ARENA/);
   assert.match(game,/fightPosterDate\(\)/);
-  assert.match(styles,/\.matchup-poster-title\{[^}]*font-family:Impact/);
+  assert.match(styles,/\.matchup-poster-title span\{[^}]*font-family:Impact[^}]*white-space:nowrap/);
 });
 
 test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
@@ -530,6 +530,13 @@ test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
   assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('class="matchup-poster"'));
   assert.match(game,/tapeStatsToggle'\)\.addEventListener\('click',openTapeStats\)/);
   assert.match(styles,/\.matchup-promo-card \.tape-actions\{grid-template-columns:\.8fr 1\.45fr/);
+});
+
+test('promo poster fits without scrolling and keeps fighter billing collision-free',()=>{
+  assert.match(styles,/#tapeStage:has\(\.matchup-promo-card\)\{overflow:clip/);
+  assert.match(styles,/\.matchup-promo-card \.tape-favorite\{top:34px/);
+  assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
+  assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
 });
 
 test('open ranked title migration allows one selected daily defense',()=>{
