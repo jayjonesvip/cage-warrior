@@ -582,9 +582,12 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.match(styles,/#tapeStage:has\(\.matchup-promo-card\)\{overflow:clip/);
   assert.doesNotMatch(html,/id="tapePlayerFavorite"/);
   assert.doesNotMatch(html,/id="tapeOppFavorite"/);
-  assert.match(styles,/\.matchup-promo-card \.tape-card-top\{[^}]*flex-direction:column[^}]*color:#fff[^}]*text-align:left/);
-  assert.match(styles,/\.matchup-promo-card \.opponent-card \.tape-card-top\{[^}]*text-align:right/);
-  assert.match(styles,/\.matchup-promo-card \.opponent-card \.tape-card-portrait \.fighter-city-badge\{[^}]*right:10px/);
+  assert.doesNotMatch(html,/id="tapePlayerRecord"/);
+  assert.doesNotMatch(html,/id="tapeOppRecord"/);
+  assert.doesNotMatch(html,/id="tapePlayerCity"/);
+  assert.doesNotMatch(html,/id="tapeOppCity"/);
+  assert.doesNotMatch(styles,/\.matchup-promo-card \.tape-card-top\{/);
+  assert.match(styles,/\.matchup-poster-kicker>\*\{[^}]*border:0[^}]*background:transparent/);
   assert.match(styles,/\.matchup-poster-title\{[^}]*flex-direction:column/);
   assert.match(styles,/\.matchup-poster-title em\{[^}]*border-bottom:3px solid #ef4138[^}]*font-family:system-ui/);
 });
@@ -596,6 +599,14 @@ test('favorite designation lives in Tale of the Tape instead of the promo poster
   assert.match(game,/\$\('#tapeStatsOppFavorite'\)\.hidden=!oppFavorite/);
   assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\{/);
   assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\[hidden\]\{display:none\}/);
+});
+
+test('fighter locations live in Tale of the Tape instead of the promo portraits',()=>{
+  assert.match(html,/id="tapeStatsPlayerCity">CG<\/span>/);
+  assert.match(html,/id="tapeStatsOppCity">CG<\/span>/);
+  assert.match(game,/\$\('#tapeStatsPlayerCity'\)\.textContent=fighterCityCode\(state\.fighterCity\)/);
+  assert.match(game,/const tapeCountry=\$\('#tapeStatsOppCity'\)/);
+  assert.match(styles,/\.tape-stats-fighters \.tape-stats-city\{[^}]*position:static[^}]*display:inline-grid/);
 });
 
 test('promo poster uses a bundled condensed font and three-part card billing',()=>{
