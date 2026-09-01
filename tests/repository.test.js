@@ -701,6 +701,20 @@ test('Tale of the Tape makes tied attributes explicit and keeps opponent values 
   assert.match(styles,/\.tape-attribute-row>\.tape-attribute-value:last-child\{color:#f9c4c1\}/);
 });
 
+test('career breakthrough modal uses flat materials and emphasizes the actionable unlock',()=>{
+  assert.match(html,/class="level-up-reward unlock"><b id="levelUpUnlockValue">NEW<\/b><small id="levelUpUnlockLabel">COMPETITION<\/small>/);
+  assert.doesNotMatch(html,/id="levelUpNote"/);
+  assert.match(game,/\$\('#levelUpUnlockValue'\)\.textContent=loadoutUnlocked\?'4 \+ 4':'NEW'/);
+  assert.match(game,/\$\('#levelUpUnlockLabel'\)\.textContent=loadoutUnlocked\?'LOADOUT SLOTS':'COMPETITION'/);
+  assert.match(styles,/\.level-up-card\{[^}]*border:1px solid #d4af37[^}]*background:#0e1c30/);
+  assert.match(styles,/\.level-up-card:before\{[^}]*width:200px[^}]*background:radial-gradient\(circle,#3ca8ff35 0,transparent 68%\)/);
+  assert.match(styles,/\.level-up-number\{[^}]*border:3px solid #2f9cf4[^}]*background:#071a2d[^}]*box-shadow:none/);
+  assert.match(styles,/\.level-up-reward\.unlock\{[^}]*border-color:#22c55e[^}]*background:#22c55e14/);
+  assert.match(styles,/\.level-up-rewards\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.level-up-continue\{[^}]*background:#2376e5[^}]*box-shadow:none/);
+  assert.doesNotMatch(styles,/\.level-up-card:before\{[^}]*repeating-conic-gradient/);
+});
+
 test('fighter locations live in Tale of the Tape instead of the promo portraits',()=>{
   assert.match(html,/id="tapeStatsPlayerCity">CG<\/span>/);
   assert.match(html,/id="tapeStatsOppCity">CG<\/span>/);
