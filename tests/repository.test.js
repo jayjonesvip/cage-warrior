@@ -604,7 +604,7 @@ test('fight, championship, opponents, rankings, gear, packs, and Feed remain pre
 });
 
 test('Gear category status reports unique collection completion',()=>{
-  assert.match(game,/const categoryTotal=gearItems\.filter\(g=>g\.category===cat\)\.length/);
+  assert.match(game,/const categoryTotal=categoryItems\.length/);
   assert.match(game,/collectionStatus=`\$\{items\.length\} \/ \$\{categoryTotal\} COLLECTIBLES`/);
   assert.match(game,/loadoutStatus=`\$\{activeItems\.length\}\/\$\{loadoutLimit\} EQUIPPED`/);
   assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span><small>\$\{loadoutStatus\}<\/small>`/);
@@ -664,42 +664,49 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(styles,/\.gear-loadout-thumb\.rarity-slot-rare\{border-color:#75e9ff/);
 });
 
-test('Gear visually separates rarity, equipped state, filters, and meaningless duplicates',()=>{
+test('Gear uses full-card loadouts, rarity collections, filters, and no meaningless duplicate badges',()=>{
   assert.match(html,/class="gear-filter-tabs"[^>]*id="gearFilterTabs"/);
   for(const filter of ['combat','bling','property','lifestyle'])assert.match(html,new RegExp(`role="tab" data-gear-filter="${filter}"`));
   assert.doesNotMatch(html,/data-gear-filter="all"/);
   assert.match(game,/return \['combat','bling','property','lifestyle'\]\.includes\(saved\)\?saved:'combat'/);
   assert.match(game,/const categoryByFilter=\{combat:'Fight Gear',bling:'Bling',property:'Property & Rides',lifestyle:'Lifestyle'\},visibleOrder=\[categoryByFilter\[gearFilter\]\|\|'Fight Gear'\]/);
-  assert.match(game,/class="gear collectible-card equipped equipped-compact/);
+  assert.match(game,/loadoutCard&&equipped\?'equipped-full'/);
   assert.match(game,/data-equip="\$\{item\.id\}" aria-label="Unequip/);
   assert.doesNotMatch(game,/class="gear-count"/);
-  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\)\{border:1px solid #2a3a52;background:#0d1622/);
-  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\) \.gear-flair\{display:none\}/);
-  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\{--equipped-rarity:#748396;border:1px solid #2d3a48;border-left:4px solid var\(--equipped-rarity\)/);
-  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\.rarity-card-legendary\{--equipped-rarity:#ffe589\}/);
+  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common\{border:1px solid #2a3a52;background:#0d1622/);
+  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:after,\.gear\.collectible-card\.rarity-card-common \.gear-flair\{display:none\}/);
+  assert.match(styles,/\.gear\.collectible-card\.equipped-full\{/);
+  assert.match(styles,/\.gear-equipped-full-check\{/);
   assert.match(styles,/\.gear-filter-tabs\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
   assert.match(game,/function moveGearFilter\(key\)/);
-  assert.match(game,/class="gear-equipped-block"/);
-  assert.match(game,/YOUR LOADOUT <span>\$\{activeItems\.length\}\/\$\{loadoutLimit\}<\/span>/);
+  assert.match(game,/class="gear-loadout-shop-block"/);
+  assert.match(game,/Array\.from\(\{length:loadoutLimit\}/);
+  assert.match(game,/collectibleCardHtml\(activeItems\[index\],\{loadoutCard:true\}\)/);
+  assert.match(game,/loadoutEmptyCardHtml\(cat,index,hasAvailable\)/);
 });
 
-test('Gear reveals compact anonymous placeholders without leaking undiscovered item details',()=>{
-  assert.match(game,/const gearUndiscoveredExpanded=new Set\(\)/);
+test('Gear merges available and anonymous undiscovered cards into rarity groups',()=>{
   assert.match(game,/undiscoveredItems=categoryItems\.filter\(g=>gearCount\(g\.id\)<1\)/);
   assert.match(game,/function undiscoveredCardHtml\(category,rarity,index\)/);
   assert.match(game,/class="gear collectible-card gear-undiscovered-card rarity-undiscovered-\$\{rarity\.toLowerCase\(\)\}"/);
   assert.match(game,/UNDISCOVERED<\/b><small>FIND IN A DROP/);
-  assert.match(game,/data-gear-undiscovered="\$\{slug\}" aria-expanded="\$\{expanded\}"/);
-  assert.match(game,/function toggleUndiscoveredGear\(slug\)/);
+  assert.match(game,/function collectionBlockHtml\(category,availableItems,undiscoveredItems\)/);
+  assert.match(game,/AVAILABLE \+ UNDISCOVERED/);
+  assert.match(game,/\$\{available\.map\(item=>collectibleCardHtml\(item\)\)\.join\(''\)\}\$\{hidden\.map/);
   assert.match(game,/const lockIcon=levelLocked\?'<span class="gear-level-lock"/);
   assert.match(game,/levelLocked\?`<button class="equip-btn" type="button" disabled>LOCKED/);
   assert.match(game,/rarities=\['COMMON','RARE','EPIC','LEGENDARY'\]/);
-  assert.match(game,/class="undiscovered-rarity-group rarity-undiscovered-\$\{rarity\.toLowerCase\(\)\}"/);
-  assert.match(styles,/\.gear-undiscovered-contents\[hidden\]\{display:none\}/);
-  assert.match(styles,/\.undiscovered-rarity-group\.rarity-undiscovered-legendary\{--undiscovered-rarity:#ffe589\}/);
+  assert.match(game,/class="gear-rarity-group rarity-undiscovered-\$\{rarity\.toLowerCase\(\)\}"/);
+  assert.match(styles,/\.gear-rarity-group\.rarity-undiscovered-legendary\{--undiscovered-rarity:#ffe589\}/);
   assert.match(styles,/\.gear\.collectible-card\.gear-undiscovered-card\{display:grid;[^}]*border:1px dashed var\(--undiscovered-rarity,#748396\)/);
   assert.match(styles,/\.gear-level-lock\{position:absolute/);
+});
+
+test('desktop navigation and loadout dock reserve their full viewport space',()=>{
+  assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
+  assert.match(styles,/\.gear-loadout-dock\{left:132px;bottom:0;height:86px;padding:16px 18px 8px\}/);
+  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:116px\}/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
