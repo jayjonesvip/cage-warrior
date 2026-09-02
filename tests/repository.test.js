@@ -250,6 +250,21 @@ test('post-fight scorecard renders both fighter portraits with silhouette fallba
   assert.match(styles,/\.result-secondary-actions \.details-toggle\{[^}]*border-radius:999px!important/);
 });
 
+test('post-fight details keep identity sticky and prioritize visible Fight Totals',()=>{
+  const details=html.slice(html.indexOf('id="resultDetails"'),html.indexOf('id="sponsorAnnouncementModal"'));
+  const scorecardIndex=details.indexOf('id="resultScorecardSection"'),totalsIndex=details.indexOf('id="fightTotals"'),tapeIndex=details.indexOf('id="resultTapeSection"');
+  assert.ok(scorecardIndex>=0&&totalsIndex>scorecardIndex&&tapeIndex>totalsIndex);
+  assert.match(details,/class="result-fighter-sticky"[\s\S]*id="resultStickyPlayer"[\s\S]*id="resultStickyOpponent"/);
+  assert.match(details,/id="resultScorecardToggle"[^>]*aria-expanded="false"[^>]*aria-controls="resultScorecardBody"[\s\S]*id="resultScorecardBody" hidden/);
+  assert.match(details,/id="resultTapeToggle"[^>]*aria-expanded="false"[^>]*aria-controls="resultTapeBody"[\s\S]*id="resultTapeSummary"[\s\S]*id="resultTapeBody" hidden/);
+  assert.match(game,/setResultSectionExpanded\('resultScorecardSection',false\);setResultSectionExpanded\('resultTapeSection',false\)/);
+  assert.match(game,/tapeSummary\.textContent=`\$\{planLabel\} — \$\{planAssessment\.grade\}`/);
+  assert.match(game,/class="totals-fighter totals-tag-user">\$\{escapeHtml\(playerTag\)\}[\s\S]*class="totals-fighter totals-tag-opponent">\$\{escapeHtml\(opponentTag\)\}/);
+  assert.match(styles,/\.result-fighter-sticky\{[^}]*position:sticky[^}]*top:0/);
+  assert.match(styles,/\.result-section-body\[hidden\]\{display:none\}/);
+  assert.match(styles,/\.totals-grid \.totals-fighter\.totals-tag-user\{color:#ffe084\}[\s\S]*\.totals-grid \.totals-fighter\.totals-tag-opponent\{color:#ff8178\}/);
+});
+
 test('Share Win is victory-only and retains Web Share and fallback paths',()=>{
   assert.match(html,/id="shareWinBtn"[^>]*hidden>SHARE WIN/);
   assert.match(game,/shareWinBtn'\)\.hidden=!win/);
