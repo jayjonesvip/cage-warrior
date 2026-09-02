@@ -221,6 +221,17 @@ interactions: {
     }
   },
 
+  postFightTexts: {
+    chance: .32,
+    contacts: [
+      {id:'wife',name:'Maya',relationship:'WIFE',avatar:'assets/contact-wife.jpg',win:[['That was a good one. You looked calm in there.','Call me when you are clear of medicals.']],loss:[['I watched the whole thing. I am proud of you, win or lose.','Get checked out and come home safe.']],titleWin:[['You did it. You actually brought the belt home.','I am so proud of you.']]},
+      {id:'mom',name:'Mom',relationship:'MOM',avatar:'assets/contact-mom.jpg',win:[['I knew you had that fight.','Please tell me you are not too bruised.']],loss:[['One hard night does not change who you are.','Rest first. Then you can figure out the next one.']],titleWin:[['My baby is the world champion!','I have already told everyone. Twice.']]},
+      {id:'grandma',name:'Grandma',relationship:'GRANDMA',avatar:'assets/contact-grandma.jpg',win:[['I saw you on my phone! Very exciting.','You still need to eat something after all that.']],loss:[['That other fighter was very rude.','Come see me when you feel better.']],titleWin:[['They gave you a very large belt.','Bring it by so I can get a picture.']]},
+      {id:'tommy',name:'Tommy',relationship:'BROTHER',avatar:'assets/contact-brother-tommy.png',win:[['That finish was nasty. The whole room went crazy.','Do not start acting famous on me now.']],loss:[['Bad night. That is all it was.','You know I am with you for the comeback.']],titleWin:[['WORLD CHAMP. I cannot believe it.','Nobody gets to call me the successful brother anymore.']]},
+      {id:'carl',name:'Agent Carl',relationship:'AGENT',avatar:'assets/contact-agent-carl.png',win:[['Strong performance. People are calling.','Do not commit to anything until we talk.']],loss:[['Keep your phone close. We control the story from here.','One result does not erase your value.']],titleWin:[['Congratulations, champ. Your phone is about to become unusable.','Call me before you promise anybody anything.']]}
+    ]
+  },
+
   ticker: [
     'On-level wins earn one Attribute Point. Beat a higher-level fighter and earn two. Assign them on the Fight page.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',

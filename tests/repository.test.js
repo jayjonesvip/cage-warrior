@@ -13,6 +13,7 @@ const game=read('js/game.js');
 const logic=read('js/game-logic.js');
 const rules=read('fight-rules.json');
 const definitions=read('js/definitions.js');
+const strings=read('js/strings.js');
 const styles=read('css/styles.css');
 const steel=read('css/github-steel.css');
 const readme=read('README.md');
@@ -187,6 +188,17 @@ test('post-fight tutorial appears only until the first result is closed',()=>{
   assert.match(game,/tutorial\.hidden=state\.postFightTutorialSeen/);
   assert.match(game,/state\.postFightTutorialSeen=true;saveState\(\)/);
   assert.match(logic,/state\.postFightTutorialSeen=raw\.postFightTutorialSeen===true\|\|state\.wins\+state\.losses>0/);
+});
+
+test('occasional post-fight texts use the established contact portraits',()=>{
+  assert.match(html,/id="postFightMessageModal"[\s\S]*id="postFightMessageAvatar"[\s\S]*id="postFightMessageList"[\s\S]*id="postFightMessageComposer"/);
+  for(const asset of ['contact-wife.jpg','contact-mom.jpg','contact-grandma.jpg','contact-brother-tommy.png','contact-agent-carl.png'])assert.match(strings,new RegExp(`assets/${asset.replace('.','\\.')}`));
+  assert.match(strings,/postFightTexts:[\s\S]*chance: \.32[\s\S]*relationship:'WIFE'[\s\S]*relationship:'AGENT'/);
+  assert.match(game,/const notable=titleWon\|\|titleFight\|\|\(won&&winStreak>0&&winStreak%5===0\)/);
+  assert.match(game,/pendingPostFightText=selectPostFightText\(\{won:win,forfeited:!!fight\.forfeited,titleWon,titleFight:!!o\.globalChampionship/);
+  assert.match(game,/function showPostFightFollowup\(\)\{if\(showPendingPostFightText\(\)\)return true/);
+  assert.match(game,/bubble\.textContent=message/);
+  assert.match(styles,/\.post-fight-message-thread\{[^}]*width:min\(100%,420px\)[^}]*border-radius:18px/);
 });
 
 test('beating Vaso unlocks and opens the persistent Diego first contract',()=>{
