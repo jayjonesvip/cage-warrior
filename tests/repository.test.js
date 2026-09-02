@@ -258,6 +258,12 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
   assert.doesNotMatch(game,/sendPostFightTextReply|post_fight_text_replied/);
   assert.match(styles,/\.post-fight-message-thread\{[^}]*width:min\(100%,420px\)[^}]*border-radius:18px/);
+  assert.match(game,/class="post-fight-message-row in post-fight-message-typing-row"/);
+  assert.match(game,/messages\.slice\(1\)\.map\(messageRow\)\.join\(''\)/);
+  assert.match(game,/\},1500\)/);
+  assert.match(game,/if\(postFightMessageTimer\)\{clearTimeout\(postFightMessageTimer\);postFightMessageTimer=null\}/);
+  assert.match(styles,/\.post-fight-message-typing i\{[^}]*animation:postFightTyping 1s ease-in-out infinite/);
+  assert.match(styles,/@keyframes postFightTyping/);
   const copyContext={};vm.runInNewContext(strings,copyContext);const contacts=copyContext.CAGE_STRINGS.postFightTexts.contacts;
   assert.equal(contacts.length,5);
   contacts.forEach(contact=>{assert.equal(contact.win.length,10,`${contact.name} needs ten win texts`);assert.equal(contact.loss.length,10,`${contact.name} needs ten loss texts`);assert.ok(contact.titleWin.length>=3,`${contact.name} needs varied title texts`)});
@@ -427,6 +433,9 @@ test('Feed summarizes followers and all known followed accounts',()=>{
   assert.match(game,/profile\.id!==ownId/);
   assert.match(game,/\$\('#feedFollowersCount'\)\.textContent=fmt\(state\.fans\)/);
   assert.match(game,/\$\('#feedFollowingCount'\)\.textContent=fmt\(feedFollowingTotal\(\)\)/);
+  assert.match(game,/function mergedSocialPosts\(localPosts,remotePosts\)/);
+  assert.match(game,/posts=sharedReady\?mergedSocialPosts\(localPosts,sharedSocialPosts\):localPosts/);
+  assert.match(game,/addSocialPosts\(reporterPosts\);saveState\(\);renderSocial\(\);queueSharedPosts/);
   assert.match(styles,/\.feed-network-summary\{display:grid;grid-template-columns:1fr 1fr/);
   assert.match(styles,/\.feed-network-summary>div:last-child\{text-align:right\}/);
   assert.doesNotMatch(styles,/\.feed-network-summary[^}]*border|\.feed-network-summary>div\+div/);
@@ -559,7 +568,7 @@ test('sponsors can drop and return as follower totals cross milestones',()=>{
   assert.match(game,/publishSponsorDrop\(beforeSponsor\)/);
   assert.match(game,/sponsor_dropped/);
   assert.match(game,/sponsor_returned/);
-  assert.match(game,/post\.kind==='sponsor-drop'\|\|post\.kind==='sponsor-return'/);
+  assert.match(game,/posts=sharedReady\?mergedSocialPosts\(localPosts,sharedSocialPosts\):localPosts/);
   assert.match(game,/publishSponsorSigning\(progress\.active,\{returning\}\)/);
   assert.match(read('js/strings.js'),/sponsorDropped:/);
   assert.match(read('js/strings.js'),/sponsorReturning:/);
