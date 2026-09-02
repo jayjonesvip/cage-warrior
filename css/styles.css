@@ -145,15 +145,15 @@ body #lockFighterNameBtn:hover:not(:disabled){border-color:#9ed8ff!important;bac
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.14'/%3E%3C/svg%3E");mix-blend-mode:overlay
   }
   .topbar{
-    position:relative;z-index:20;width:100%;height:72px;padding:8px 12px;
+    position:relative;z-index:20;width:100%;height:55px;padding:6px 9px;
     display:flex;align-items:center;gap:10px;background:linear-gradient(#101a2a,#050911);border-bottom:1px solid #203756;box-shadow:0 7px 18px #000a
   }
-  .logo{flex:0 0 91px;width:91px;height:50px;display:block;object-fit:contain;filter:drop-shadow(0 3px 3px #000b) drop-shadow(0 0 7px #1678ff55)}
+  .logo{flex:0 0 74px;width:74px;height:40px;display:block;object-fit:contain;filter:drop-shadow(0 3px 3px #000b) drop-shadow(0 0 7px #1678ff55)}
   .identity{min-width:0;flex:1;line-height:1}.identity,.career-progress-summary{align-self:stretch;display:flex;flex-direction:column;justify-content:center}
   .identity-name-row{display:flex;align-items:center;gap:2px;min-width:0}.identity .name{min-width:0;font-family:system-ui,sans-serif;font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top-name-edit{flex:0 0 14px;width:14px;height:14px;margin-left:3px;padding:0;border:0;border-radius:0;background:transparent;color:#8de1ff;box-shadow:none;display:grid;place-items:center;align-self:center}.top-name-edit .game-icon{width:10px;height:10px;vertical-align:0;transform:scaleX(-1) translateY(-.5px)}.top-name-edit:focus-visible{outline:1px solid #75d8ff;outline-offset:1px}.top-name-edit.locked{background:transparent;color:#596775;filter:grayscale(1);opacity:.55}
   .identity .sub{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.identity .sub #rankText.world-champion{color:#ffd66e;font-weight:950;text-shadow:0 0 8px #d99b284d}
   .career-progress-summary{text-align:right;line-height:1}
-  .career-progress-summary> b{display:block;color:var(--green);font-family:system-ui,sans-serif;font-size:13px;font-weight:900}
+  .career-progress-summary> b{display:block;color:var(--green);font-family:system-ui,sans-serif;font-size:13px;font-weight:900}.career-progress-summary> b.rank-status{color:#7ddcff}
   .top-progress{display:flex;align-items:center;gap:5px;margin-top:4px;font-family:system-ui,sans-serif;font-size:8.5px;font-weight:900;line-height:1;color:#7890aa;letter-spacing:.55px;text-transform:uppercase;white-space:nowrap}
   .top-progress b{color:#7ddcff;font-size:9px}.career-progress-summary .top-progress{justify-content:flex-end}.career-progress-summary .top-progress b{color:#92a9ff}
   .resource-hud{

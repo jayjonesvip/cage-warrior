@@ -107,6 +107,15 @@ test('persistent HUD exposes continuous charging and Health recovery status',()=
   assert.match(game,/pageshow/);
 });
 
+test('top bar stays compact and leaves XP progression on the Home card',()=>{
+  const topbar=html.slice(html.indexOf('<header class="topbar">'),html.indexOf('</header>',html.indexOf('<header class="topbar">')));
+  assert.doesNotMatch(topbar,/id="xpText"|>XP</);
+  assert.match(styles,/\.topbar\{[\s\S]*?height:55px;padding:6px 9px/);
+  assert.match(styles,/\.logo\{flex:0 0 74px;width:74px;height:40px/);
+  assert.match(styles,/\.career-progress-summary> b\.rank-status\{color:#7ddcff\}/);
+  assert.match(game,/progressText\.classList\.toggle\('rank-status',!state\.attributePoints&&!!headerRanking\?\.position\)/);
+});
+
 test('fight results increase persistent Health damage and enforce loss floors',()=>{
   assert.match(rules,/"totalDamageMultiplier": 1\.25/);
   assert.match(rules,/"victoryMinimum": 5/);
