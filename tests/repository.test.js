@@ -572,14 +572,18 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
 
 test('Gear visually separates rarity, equipped state, filters, and meaningless duplicates',()=>{
   assert.match(html,/class="gear-filter-tabs"[^>]*id="gearFilterTabs"/);
-  for(const filter of ['combat','bling','all'])assert.match(html,new RegExp(`data-gear-filter="${filter}"`));
-  assert.match(game,/gearFilter==='combat'\?\['Fight Gear'\]:gearFilter==='bling'\?\['Bling'\]:order/);
+  for(const filter of ['combat','bling','property','lifestyle','all'])assert.match(html,new RegExp(`data-gear-filter="${filter}"`));
+  assert.match(game,/gearFilter==='combat'\?\['Fight Gear'\]:gearFilter==='bling'\?\['Bling'\]:gearFilter==='property'\?\['Property & Rides'\]:gearFilter==='lifestyle'\?\['Lifestyle'\]:order/);
   assert.match(game,/class="gear collectible-card equipped equipped-compact/);
   assert.match(game,/data-equip="\$\{item\.id\}" aria-label="Unequip/);
   assert.doesNotMatch(game,/class="gear-count"/);
   assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\)\{border:1px solid #2a3a52;background:#0d1622/);
   assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\) \.gear-flair\{display:none\}/);
-  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\{[^}]*border:1px solid #22c55e/);
+  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\{--equipped-rarity:#748396;border:1px solid #2d3a48;border-left:4px solid var\(--equipped-rarity\)/);
+  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\.rarity-card-legendary\{--equipped-rarity:#ffe589\}/);
+  assert.match(styles,/\.gear-filter-tabs\{display:flex;[^}]*overflow-x:auto/);
+  assert.match(game,/class="gear-equipped-block"/);
+  assert.match(game,/YOUR LOADOUT <span>\$\{activeItems\.length\}<\/span>/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
