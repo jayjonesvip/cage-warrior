@@ -112,6 +112,8 @@ test('top bar stays compact and leaves XP progression on the Home card',()=>{
   assert.doesNotMatch(topbar,/id="xpText"|>XP</);
   assert.match(styles,/\.topbar\{[\s\S]*?height:55px;padding:6px 9px/);
   assert.match(styles,/\.logo\{flex:0 0 74px;width:74px;height:40px/);
+  assert.doesNotMatch(styles,/\.logo\{width:112px;height:50px/);
+  assert.doesNotMatch(styles,/\.logo\{flex-basis:104px;width:104px;height:60px/);
   assert.match(styles,/\.career-progress-summary> b\.rank-status\{color:#7ddcff\}/);
   assert.match(game,/progressText\.classList\.toggle\('rank-status',!state\.attributePoints&&!!headerRanking\?\.position\)/);
 });
