@@ -564,8 +564,22 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(game,/<button class="gear-loadout-thumb locked"[^>]*disabled><i class="slot-lock"/);
   assert.match(styles,/\.gear-loadout-dock\{position:absolute;[^}]*bottom:calc\(76px \+ var\(--safe-bottom\)\)/);
   assert.match(styles,/\.gear-loadout-group\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(styles,/\.gear-loadout-label\{position:absolute;top:3px;left:50%;transform:translateX\(-50%\)/);
+  assert.match(styles,/\.gear-loadout-label\{position:absolute;top:4px;left:50%;transform:translateX\(-50%\)/);
   assert.match(styles,/\.slot-lock:before\{/);
+  assert.match(game,/rarity-slot-\$\{rarity\}/);
+  assert.match(styles,/\.gear-loadout-thumb\.rarity-slot-rare\{border-color:#75e9ff/);
+});
+
+test('Gear visually separates rarity, equipped state, filters, and meaningless duplicates',()=>{
+  assert.match(html,/class="gear-filter-tabs"[^>]*id="gearFilterTabs"/);
+  for(const filter of ['combat','bling','all'])assert.match(html,new RegExp(`data-gear-filter="${filter}"`));
+  assert.match(game,/gearFilter==='combat'\?\['Fight Gear'\]:gearFilter==='bling'\?\['Bling'\]:order/);
+  assert.match(game,/class="gear collectible-card equipped equipped-compact/);
+  assert.match(game,/data-equip="\$\{item\.id\}" aria-label="Unequip/);
+  assert.doesNotMatch(game,/class="gear-count"/);
+  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\)\{border:1px solid #2a3a52;background:#0d1622/);
+  assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\) \.gear-flair\{display:none\}/);
+  assert.match(styles,/\.gear\.collectible-card\.equipped-compact\{[^}]*border:1px solid #22c55e/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
