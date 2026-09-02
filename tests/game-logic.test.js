@@ -192,6 +192,15 @@ test('an in-progress follower hour retains its saved Aura rate',()=>{
   assert.equal(logic.passiveFollowerGrowth(fighter,1000+2*hour).followers,6);
 });
 
+test('passive follower growth accepts an equipped effective Aura value for future hours',()=>{
+  const hour=3_600_000,fighter=state({fans:0,aura:10,followersUpdatedAt:1000,followersAccrualAura:10});
+  const first=logic.passiveFollowerGrowth(fighter,1000+hour,48*hour,30);
+  assert.equal(first.followers,2);
+  assert.equal(fighter.followersAccrualAura,30);
+  const second=logic.passiveFollowerGrowth(fighter,1000+2*hour,48*hour,30);
+  assert.equal(second.followers,4);
+});
+
 test('fight followers apply the twenty-five percent reduction without changing forfeits',()=>{
   const base={opponentBaseFollowers:746,aura:50,followerPerks:0,upset:false,rivalry:false,won:true};
   assert.equal(logic.fightFollowerReward({...base,randomMultiplier:.9}),755);
@@ -365,10 +374,36 @@ test('balanced XP curve slows late-career leveling while preserving early progre
   assert.equal(logic.rescaleXpProgress(140,logic.legacyXpRequirement(5),logic.xpRequirement(5)),140);
 });
 
-test('rankings place champion first then sort by level and win percentage',()=>{
+test('hybrid rankings keep the champion first and score the remaining field',()=>{
   const profiles=[{id:'a',handle:'Alpha',level:9,wins:10,losses:0},{id:'b',handle:'Bravo',level:8,wins:2,losses:8},{id:'c',handle:'Champ',level:4,wins:1,losses:2}];
   const ranked=logic.rankFighters(profiles,{champion_id:'c'},25);
   assert.deepEqual(ranked.map(row=>row.id),['c','a','b']);
+  assert.ok(ranked.every(row=>Number.isFinite(row.rankScore)));
+});
+
+test('hybrid ranking rewards opponent quality, recent form, and permanent attributes',()=>{
+  const base={level:8,wins:12,losses:8};
+  const quality=logic.rankFighters([
+    {...base,id:'low-quality',handle:'LowQuality',attributeTotal:40,rankingHistory:[{won:true,quality:35}]},
+    {...base,id:'high-quality',handle:'HighQuality',attributeTotal:40,rankingHistory:[{won:true,quality:90}]}
+  ],null,25);
+  assert.equal(quality[0].id,'high-quality');
+  const form=logic.rankFighters([
+    {...base,id:'cold',handle:'Cold',attributeTotal:40,rankingHistory:Array.from({length:10},()=>({won:false,quality:50}))},
+    {...base,id:'hot',handle:'Hot',attributeTotal:40,rankingHistory:Array.from({length:10},()=>({won:true,quality:50}))}
+  ],null,25);
+  assert.equal(form[0].id,'hot');
+  const skill=logic.rankFighters([
+    {...base,id:'developed',handle:'Developed',attributeTotal:80},
+    {...base,id:'raw',handle:'Raw',attributeTotal:24}
+  ],null,25);
+  assert.equal(skill[0].id,'developed');
+});
+
+test('ranking fight history grades opponent difficulty deterministically',()=>{
+  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}),{won:true,quality:50});
+  assert.deepEqual(logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true}),{won:false,quality:75});
+  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:12,championship:true}),{won:true,quality:85});
 });
 
 test('the champion can take normal ranked fights after completing the daily defense',()=>{
@@ -404,11 +439,10 @@ test('fighter creation allocations stay whole and total twenty',()=>{
   assert.equal(Object.values(stats).reduce((sum,value)=>sum+value,0),20);
 });
 
-test('perk loadout expands from two to four active slots at Level 8',()=>{
-  assert.equal(logic.perkLoadoutLimit(1),2);
-  assert.equal(logic.perkLoadoutLimit(7),2);
-  assert.equal(logic.perkLoadoutLimit(8),4);
-  assert.equal(logic.perkLoadoutLimit(15),4);
+test('every gear category has exactly two active loadout slots',()=>{
+  assert.equal(logic.loadoutCategoryLimit(),2);
+  assert.equal(logic.loadoutCategoryLimit(1),2);
+  assert.equal(logic.loadoutCategoryLimit(15),2);
 });
 
 test('Victory Pack progress remains capped and eligibility requires an on-level win',()=>{

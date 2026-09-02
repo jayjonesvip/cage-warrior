@@ -177,8 +177,8 @@
 
   function followersPerHour(aura=0){return Math.max(0,Math.round(fightRule('followerRewards.passiveBasePerHour',1)))+Math.floor(clamp(finite(aura),0,100)/Math.max(1,fightRule('followerRewards.auraPerFollowerStep',10)))}
 
-  function passiveFollowerGrowth(state,now=Date.now(),offlineCap=FOLLOWER_OFFLINE_CAP){
-    const current=Math.max(0,finite(now,Date.now())),currentAura=clamp(whole(state?.aura),0,100),saved=Number(state?.followersUpdatedAt),savedAura=clamp(whole(state?.followersAccrualAura,currentAura),0,100),cap=Math.max(FOLLOWER_HOUR,finite(offlineCap,FOLLOWER_OFFLINE_CAP));
+  function passiveFollowerGrowth(state,now=Date.now(),offlineCap=FOLLOWER_OFFLINE_CAP,aura=state?.aura){
+    const current=Math.max(0,finite(now,Date.now())),currentAura=clamp(whole(aura),0,100),saved=Number(state?.followersUpdatedAt),savedAura=clamp(whole(state?.followersAccrualAura,currentAura),0,100),cap=Math.max(FOLLOWER_HOUR,finite(offlineCap,FOLLOWER_OFFLINE_CAP));
     if(!Number.isFinite(saved)||saved<=0||saved>current){state.followersUpdatedAt=current;state.followersAccrualAura=currentAura;return {followers:0,hours:0,rate:followersPerHour(currentAura),aura:currentAura,changed:true}}
     const elapsed=current-saved,cappedElapsed=Math.min(elapsed,cap),hours=Math.floor(cappedElapsed/FOLLOWER_HOUR),rate=followersPerHour(savedAura);
     if(hours<1)return {followers:0,hours:0,rate,aura:savedAura,changed:false};
@@ -393,8 +393,7 @@
     return {xp:Math.max(0,Math.round(earned*repeatTier.multiplier)),category,modifiers};
   }
 
-  function gearLoadoutLimit(level){return finite(level)>=8?4:2}
-  function perkLoadoutLimit(level){return finite(level)>=8?4:2}
+  function loadoutCategoryLimit(){return 2}
 
   function fightScore(rounds){return (Array.isArray(rounds)?rounds:[]).reduce((score,round)=>({player:score.player+finite(round.scoreP),opponent:score.opponent+finite(round.scoreO)}),{player:0,opponent:0})}
   function playerTrailing(rounds){const score=fightScore(rounds);return score.player<score.opponent}
@@ -542,16 +541,26 @@
     return {heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'};
   }
 
+  function rankingFightEntry({won=false,playerLevel=1,opponentLevel=1,ranked=false,championship=false}={}){
+    const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),quality=clamp(50+levelDifference*10+(ranked?5:0)+(championship?15:0),0,100);
+    return {won:won===true,quality};
+  }
+
+  function rankingComponents(profile){
+    const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses,winPercentage=fights?wins/fights:0,history=(Array.isArray(profile?.rankingHistory)?profile.rankingHistory:[]).filter(entry=>entry&&typeof entry==='object').slice(-10),recentScore=history.length?history.filter(entry=>entry.won===true).length/history.length*100:winPercentage*100,qualityWins=history.filter(entry=>entry.won===true),qualityScore=qualityWins.length?qualityWins.reduce((sum,entry)=>sum+clamp(finite(entry.quality,50),0,100),0)/qualityWins.length:50,attributeTotal=Math.max(20,finite(profile?.attributeTotal,20+Math.max(0,whole(profile?.level,1)-1))),resumeScore=winPercentage*75+Math.min(fights,50)/50*25,skillScore=clamp(attributeTotal/150*100,0,100),score=resumeScore*.5+qualityScore*.25+recentScore*.15+skillScore*.1;
+    return {score,resumeScore,qualityScore,recentScore,skillScore,attributeTotal,winPercentage,fights};
+  }
+
   function rankFighters(profiles,championship=null,limit=25){
     const championId=String(championship?.champion_id||''),championHandle=String(championship?.champion_handle||'').replace(/^@/,'').toLowerCase(),seen=new Set(),fighters=[];
     for(const profile of Array.isArray(profiles)?profiles:[]){
       const id=String(profile?.id||''),handle=String(profile?.handle||'').replace(/^@/,'');
       if((!id&&!handle)||seen.has(id||handle.toLowerCase()))continue;
       seen.add(id||handle.toLowerCase());
-      const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses;
-      fighters.push({...profile,id,handle,wins,losses,fights,level:Math.max(1,whole(profile?.level,1)),winPercentage:fights?wins/fights:0,isChampion:Boolean(championId&&id===championId||championHandle&&handle.toLowerCase()===championHandle)});
+      const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),components=rankingComponents({...profile,wins,losses});
+      fighters.push({...profile,id,handle,wins,losses,...components,level:Math.max(1,whole(profile?.level,1)),rankScore:components.score,isChampion:Boolean(championId&&id===championId||championHandle&&handle.toLowerCase()===championHandle)});
     }
-    fighters.sort((a,b)=>Number(b.isChampion)-Number(a.isChampion)||b.level-a.level||b.winPercentage-a.winPercentage||b.fights-a.fights||a.handle.localeCompare(b.handle)||a.id.localeCompare(b.id));
+    fighters.sort((a,b)=>Number(b.isChampion)-Number(a.isChampion)||b.rankScore-a.rankScore||b.winPercentage-a.winPercentage||b.fights-a.fights||a.handle.localeCompare(b.handle)||a.id.localeCompare(b.id));
     return fighters.slice(0,Math.max(1,Math.min(1000,whole(limit,25))));
   }
 
@@ -576,5 +585,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,perkLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankingFightEntry,rankingComponents,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,loadoutCategoryLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
 });

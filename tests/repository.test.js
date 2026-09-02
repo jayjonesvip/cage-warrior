@@ -71,8 +71,8 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 30',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*30/);
+test('new careers use explicit save version 31',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*31/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
   assert.match(game,/circuitLossStreak:0/);
@@ -80,7 +80,24 @@ test('new careers use explicit save version 30',()=>{
   assert.match(game,/healthRecoveryAt:Date\.now\(\)/);
   assert.match(game,/followersUpdatedAt:Date\.now\(\)/);
   assert.match(game,/followersAccrualAura:0/);
+  assert.match(game,/rankingHistory:\[\]/);
   assert.match(game,/source\.version\)\)\|\|0\)<27\)s\.xp=LOGIC\.rescaleXpProgress/);
+});
+
+test('fighter-name shuffle is a compact action beside the proposed name',()=>{
+  assert.match(html,/class="fighter-name-draft-row"[\s\S]*class="fighter-name-preview"[\s\S]*id="fighterNameSuggestion"[\s\S]*id="newFighterNameBtn"/);
+  assert.match(html,/id="newFighterNameBtn"[^>]*aria-label="Shuffle fighter name"/);
+  assert.doesNotMatch(html,/>SHUFFLE NAME</);
+  assert.match(styles,/\.fighter-name-draft-row\{[^}]*grid-template-columns:minmax\(0,1fr\) 40px[^}]*align-items:stretch/);
+  assert.match(styles,/\.fighter-name-shuffle\{[^}]*min-height:74px/);
+});
+
+test('World Rank uses fight quality, recent form, and permanent attributes without gear',()=>{
+  assert.match(game,/attributeTotal:Object\.values\(state\.stats\)/);
+  assert.match(game,/rankingHistory:state\.rankingHistory/);
+  assert.match(game,/LOGIC\.rankingFightEntry\(\{won:win/);
+  assert.doesNotMatch(game,/attributeTotal:[^;\n]*(effectiveStat|equippedGear)/);
+  assert.match(read('README.md'),/50% résumé, 25% quality of defeated opposition, 15% recent form, and 10% permanent base attributes/);
 });
 
 test('migration does not erase followers when a legacy social flag is false',()=>{
@@ -149,8 +166,8 @@ test('passive recovery updates the HUD without rebuilding clickable opponent row
 
 test('Aura passively grows followers and refreshes sponsor eligibility',()=>{
   assert.match(logic,/function followersPerHour\(aura=0\)/);
-  assert.match(logic,/function passiveFollowerGrowth\(state,now=Date\.now\(\),offlineCap=FOLLOWER_OFFLINE_CAP\)/);
-  assert.match(game,/LOGIC\.passiveFollowerGrowth\(state,now,FOLLOWER_OFFLINE_CAP\)/);
+  assert.match(logic,/function passiveFollowerGrowth\(state,now=Date\.now\(\),offlineCap=FOLLOWER_OFFLINE_CAP,aura=state\?\.aura\)/);
+  assert.match(game,/LOGIC\.passiveFollowerGrowth\(state,now,FOLLOWER_OFFLINE_CAP,effectiveAura\(\)\)/);
   assert.match(game,/syncSponsorProgress\(\)/);
   assert.match(game,/WHILE YOU WERE AWAY · \+\$\{fmt\(followerGrowth\.followers\)\} FOLLOWERS/);
   assert.match(game,/document\.addEventListener\('visibilitychange',[\s\S]*updatePassiveRecovery\(true\)/);
@@ -159,7 +176,7 @@ test('Aura passively grows followers and refreshes sponsor eligibility',()=>{
 
 test('fight follower rewards use Aura and the reduced payout helper',()=>{
   assert.match(logic,/function fightFollowerReward\(\{opponentBaseFollowers=0,aura=0/);
-  assert.match(game,/LOGIC\.fightFollowerReward\(\{opponentBaseFollowers:o\.fans,aura:state\.aura/);
+  assert.match(game,/LOGIC\.fightFollowerReward\(\{opponentBaseFollowers:o\.fans,aura:effectiveAura\(\)/);
   assert.match(game,/if\(!fight\.forfeited\)fans=changeFollowers\(LOGIC\.fightFollowerReward\(\{opponentBaseFollowers:o\.fans,won:false\}\)\)/);
 });
 
@@ -483,19 +500,17 @@ test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(styles,/\.sponsor-announcement-dialog \.modal-run\{width:100%\}/);
 });
 
-test('Energy recovery gear is capped at the strongest equipped perk',()=>{
-  assert.match(definitions,/energyRecoverySpeed:1000/);
-  assert.match(game,/Math\.max\(4000,ENERGY_RECOVERY_INTERVAL-ownedBestBonus\('energyRecoverySpeed'\)\)/);
-  assert.match(game,/Math\.max\(best,Number\(item\?\.\[prop\]\)\|\|0\)/);
+test('Property loadout stacks bounded Energy recovery bonuses',()=>{
+  assert.match(definitions,/Property & Rides'\)\{item\.energyRecoverySpeed=effect\.energyRecoverySpeed/);
+  assert.match(game,/Math\.max\(4000,ENERGY_RECOVERY_INTERVAL-activePerkBonus\('energyRecoverySpeed'\)\)/);
   assert.doesNotMatch(definitions,/healthRegen/);
 });
 
-test('Dill Pickle electrolytes improve Health recovery without granting followers',()=>{
-  const pickle=definitions.match(/\{id:'dill-pickle'[^\n]+\}/)?.[0]||'';
-  assert.match(pickle,/healthRecoverySpeed:5000/);
-  assert.doesNotMatch(pickle,/prestige:/);
-  assert.match(game,/Math\.max\(30000,HEALTH_RECOVERY_INTERVAL-activePerkBestBonus\('healthRecoverySpeed'\)\)/);
+test('Lifestyle loadout stacks bounded Health recovery bonuses without follower perks',()=>{
+  assert.match(definitions,/item\.category==='Lifestyle'\)\{item\.healthRecoverySpeed=effect\.healthRecoverySpeed/);
+  assert.match(game,/Math\.max\(30000,HEALTH_RECOVERY_INTERVAL-activePerkBonus\('healthRecoverySpeed'\)\)/);
   assert.match(game,/health:healthRecoveryInterval\(\)/);
+  assert.doesNotMatch(game,/activePerkBonus\('prestige'\)/);
 });
 
 test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
@@ -570,7 +585,7 @@ test('fight, championship, opponents, rankings, gear, packs, and Feed remain pre
 test('Gear category status reports unique collection completion',()=>{
   assert.match(game,/const categoryTotal=gearItems\.filter\(g=>g\.category===cat\)\.length/);
   assert.match(game,/collectionStatus=`\$\{items\.length\} \/ \$\{categoryTotal\} COLLECTIBLES`/);
-  assert.match(game,/fightGear=cat==='Fight Gear',loadoutStatus=fightGear\?`\$\{state\.equippedGear\.length\}\/\$\{loadoutLimit\} EQUIPPED/);
+  assert.match(game,/loadoutStatus=`\$\{activeItems\.length\}\/\$\{loadoutLimit\} EQUIPPED`/);
   assert.match(game,/status=`<span>\$\{collectionStatus\}<\/span><small>\$\{loadoutStatus\}<\/small>`/);
   assert.doesNotMatch(game,/`\$\{items\.length\} COLLECTIBLE\$\{items\.length===1\?'':'S'\}`/);
   assert.match(styles,/\.shop-status>span\{white-space:nowrap\}/);
@@ -578,17 +593,35 @@ test('Gear category status reports unique collection completion',()=>{
 
 test('career perks equip inline with the same treatment as Fight Gear',()=>{
   assert.match(game,/equippedGear:\[\],equippedPerks:\[\]/);
-  assert.match(game,/LOGIC\.perkLoadoutLimit\(s\.level\)/);
-  assert.match(logic,/function perkLoadoutLimit\(level\)/);
+  assert.match(game,/trimCategoryLoadout\(savedPerks,ownedPerks,LOADOUT_CATEGORIES\.slice\(1\)\)/);
+  assert.match(logic,/function loadoutCategoryLimit\(\)\{return 2\}/);
   assert.doesNotMatch(game,/id="perk-loadout-title">PERK LOADOUT/);
-  assert.match(game,/state\.equippedPerks\.length\}\/\$\{perkLimit\} PERKS EQUIPPED/);
-  assert.match(game,/Equip a collectible below to activate its career perk/);
+  assert.match(game,/function equippedForCategory\(category/);
   assert.match(game,/function activePerkBonus\(prop\)/);
-  assert.match(game,/activePerkBonus\('prestige'\)/);
-  assert.match(game,/activePerkBestBonus\('healthRecoverySpeed'\)/);
+  assert.match(game,/function effectiveAura\(\)/);
+  assert.match(game,/activePerkBonus\('healthRecoverySpeed'\)/);
   assert.match(game,/const perk=g\.category!==\'Fight Gear\'/);
   assert.doesNotMatch(styles,/\.perk-loadout-panel\{/);
   assert.match(styles,/\.perk-category-note\{/);
+});
+
+test('each loadout category owns one distinct career effect',()=>{
+  assert.match(game,/subtitles=\{'Fight Gear':'Attribute bonuses','Bling':'Aura bonuses','Lifestyle':'Health recovery','Property & Rides':'Energy recovery'\}/);
+  assert.match(definitions,/COMMON:\{auraBonus:1,healthRecoverySpeed:2500,energyRecoverySpeed:100\}/);
+  assert.match(definitions,/item\.category==='Fight Gear'\)item\.desc=item\.desc\.split/);
+  assert.match(definitions,/item\.category==='Bling'\)\{item\.auraBonus=effect\.auraBonus/);
+  assert.match(definitions,/item\.category==='Lifestyle'\)\{item\.healthRecoverySpeed=effect\.healthRecoverySpeed/);
+  assert.match(definitions,/item\.category==='Property & Rides'\)\{item\.energyRecoverySpeed=effect\.energyRecoverySpeed/);
+  assert.match(game,/state\.aura\+activePerkBonus\('auraBonus'\)/);
+  assert.match(game,/\+\$\{auraGear\} BLING/);
+});
+
+test('top-tier Property rarity and Main Event Ring Gear use the revised balance',()=>{
+  assert.match(definitions,/EPIC:\{auraBonus:3,healthRecoverySpeed:7500,energyRecoverySpeed:300\}/);
+  for(const id of ['sports-car','house','supercar'])assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+rarity:'EPIC'`));
+  for(const id of ['luxury-yacht','private-jet','mansion'])assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+rarity:'LEGENDARY'`));
+  assert.match(definitions,/id:'main-event-kit'[^\n]+bonuses:\{power:3,speed:3,chin:3,cardio:3\}/);
+  assert.match(game,/if\(g\?\.bonuses\?\.\[key\]\)v\+=g\.bonuses\[key\]/);
 });
 
 test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
@@ -596,22 +629,26 @@ test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(html,/class="gear-loadout-label"[^>]*>ACTIVE LOADOUT</);
   assert.match(html,/id="gearLoadoutSlots"/);
   assert.match(game,/function renderGearLoadoutDock\(\)/);
-  assert.match(game,/Array\.from\(\{length:4\}/);
-  assert.match(game,/group\(state\.equippedGear,LOGIC\.gearLoadoutLimit\(state\.level\),'Fight Gear'\)/);
-  assert.match(game,/group\(state\.equippedPerks,LOGIC\.perkLoadoutLimit\(state\.level\),'Career perk'\)/);
-  assert.match(game,/<button class="gear-loadout-thumb locked"[^>]*disabled><i class="slot-lock"/);
+  assert.match(game,/LOADOUT_CATEGORIES=\['Fight Gear','Bling','Property & Rides','Lifestyle'\]/);
+  assert.match(game,/Array\.from\(\{length:LOGIC\.loadoutCategoryLimit\(\)\}/);
+  assert.match(game,/slotRoot\.innerHTML=LOADOUT_CATEGORIES\.map\(group\)\.join\(''\)/);
+  assert.match(game,/class="gear-loadout-thumb add-slot"[^>]*data-loadout-category/);
+  assert.doesNotMatch(game,/gear-loadout-thumb locked/);
   assert.match(styles,/\.gear-loadout-dock\{position:absolute;[^}]*bottom:calc\(76px \+ var\(--safe-bottom\)\)/);
-  assert.match(styles,/\.gear-loadout-group\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.gear-loadout-groups\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.gear-loadout-label\{position:absolute;top:4px;left:50%;transform:translateX\(-50%\)/);
-  assert.match(styles,/\.slot-lock:before\{/);
+  assert.match(styles,/\.loadout-group-bling\{--loadout-group:#f4c85a\}/);
+  assert.match(styles,/\.loadout-group-property-rides\{--loadout-group:#64d898\}/);
   assert.match(game,/rarity-slot-\$\{rarity\}/);
   assert.match(styles,/\.gear-loadout-thumb\.rarity-slot-rare\{border-color:#75e9ff/);
 });
 
 test('Gear visually separates rarity, equipped state, filters, and meaningless duplicates',()=>{
   assert.match(html,/class="gear-filter-tabs"[^>]*id="gearFilterTabs"/);
-  for(const filter of ['combat','bling','property','lifestyle','all'])assert.match(html,new RegExp(`data-gear-filter="${filter}"`));
-  assert.match(game,/gearFilter==='combat'\?\['Fight Gear'\]:gearFilter==='bling'\?\['Bling'\]:gearFilter==='property'\?\['Property & Rides'\]:gearFilter==='lifestyle'\?\['Lifestyle'\]:order/);
+  for(const filter of ['combat','bling','property','lifestyle'])assert.match(html,new RegExp(`role="tab" data-gear-filter="${filter}"`));
+  assert.doesNotMatch(html,/data-gear-filter="all"/);
+  assert.match(game,/return \['combat','bling','property','lifestyle'\]\.includes\(saved\)\?saved:'combat'/);
+  assert.match(game,/const categoryByFilter=\{combat:'Fight Gear',bling:'Bling',property:'Property & Rides',lifestyle:'Lifestyle'\},visibleOrder=\[categoryByFilter\[gearFilter\]\|\|'Fight Gear'\]/);
   assert.match(game,/class="gear collectible-card equipped equipped-compact/);
   assert.match(game,/data-equip="\$\{item\.id\}" aria-label="Unequip/);
   assert.doesNotMatch(game,/class="gear-count"/);
@@ -619,9 +656,29 @@ test('Gear visually separates rarity, equipped state, filters, and meaningless d
   assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:not\(\.equipped-compact\) \.gear-flair\{display:none\}/);
   assert.match(styles,/\.gear\.collectible-card\.equipped-compact\{--equipped-rarity:#748396;border:1px solid #2d3a48;border-left:4px solid var\(--equipped-rarity\)/);
   assert.match(styles,/\.gear\.collectible-card\.equipped-compact\.rarity-card-legendary\{--equipped-rarity:#ffe589\}/);
-  assert.match(styles,/\.gear-filter-tabs\{display:flex;[^}]*overflow-x:auto/);
+  assert.match(styles,/\.gear-filter-tabs\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
+  assert.match(game,/function moveGearFilter\(key\)/);
   assert.match(game,/class="gear-equipped-block"/);
-  assert.match(game,/YOUR LOADOUT <span>\$\{activeItems\.length\}<\/span>/);
+  assert.match(game,/YOUR LOADOUT <span>\$\{activeItems\.length\}\/\$\{loadoutLimit\}<\/span>/);
+});
+
+test('Gear reveals compact anonymous placeholders without leaking undiscovered item details',()=>{
+  assert.match(game,/const gearUndiscoveredExpanded=new Set\(\)/);
+  assert.match(game,/undiscoveredItems=categoryItems\.filter\(g=>gearCount\(g\.id\)<1\)/);
+  assert.match(game,/function undiscoveredCardHtml\(category,rarity,index\)/);
+  assert.match(game,/class="gear collectible-card gear-undiscovered-card rarity-undiscovered-\$\{rarity\.toLowerCase\(\)\}"/);
+  assert.match(game,/UNDISCOVERED<\/b><small>FIND IN A DROP/);
+  assert.match(game,/data-gear-undiscovered="\$\{slug\}" aria-expanded="\$\{expanded\}"/);
+  assert.match(game,/function toggleUndiscoveredGear\(slug\)/);
+  assert.match(game,/const lockIcon=levelLocked\?'<span class="gear-level-lock"/);
+  assert.match(game,/levelLocked\?`<button class="equip-btn" type="button" disabled>LOCKED/);
+  assert.match(game,/rarities=\['COMMON','RARE','EPIC','LEGENDARY'\]/);
+  assert.match(game,/class="undiscovered-rarity-group rarity-undiscovered-\$\{rarity\.toLowerCase\(\)\}"/);
+  assert.match(styles,/\.gear-undiscovered-contents\[hidden\]\{display:none\}/);
+  assert.match(styles,/\.undiscovered-rarity-group\.rarity-undiscovered-legendary\{--undiscovered-rarity:#ffe589\}/);
+  assert.match(styles,/\.gear\.collectible-card\.gear-undiscovered-card\{display:grid;[^}]*border:1px dashed var\(--undiscovered-rarity,#748396\)/);
+  assert.match(styles,/\.gear-level-lock\{position:absolute/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{

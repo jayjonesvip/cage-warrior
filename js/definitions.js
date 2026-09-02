@@ -67,7 +67,7 @@ const gearItems = [
   {id:'storm-gloves',category:'Fight Gear',name:'Storm-Cage Gloves',icon:'🥊',rarity:'EPIC',minLevel:7,desc:'+6 Power. Main-card leather with a mean snap.',stat:'power',bonus:6},
   {id:'cobalt-kit',category:'Fight Gear',name:'Cobalt Walkout Set',icon:'🥋',rarity:'EPIC',minLevel:8,desc:'+5 Cardio. Energy recharges every 4 seconds while equipped.',stat:'cardio',bonus:5,energyRecoverySpeed:1000},
   {id:'champ-gloves',category:'Fight Gear',name:'Championship Gloves',icon:'🥊',rarity:'LEGENDARY',minLevel:11,desc:'+9 Power. Gold-trimmed and level-gated for a reason.',stat:'power',bonus:9},
-  {id:'main-event-kit',category:'Fight Gear',name:'Main Event Ring Gear',icon:'🩳',rarity:'LEGENDARY',minLevel:13,desc:'+8 Speed. Cameras, sponsors, and no cheap fabric.',stat:'speed',bonus:8},
+  {id:'main-event-kit',category:'Fight Gear',name:'Main Event Ring Gear',icon:'🩳',rarity:'LEGENDARY',minLevel:13,desc:'+3 Power, Speed, Chin, and Cardio.',bonuses:{power:3,speed:3,chin:3,cardio:3}},
 
   // Bling — increases followers earned from fight wins
   {id:'bourbon',category:'Bling',name:'Small-Batch Bourbon',icon:'🥃',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins. Save it for after the fight.',prestige:1},
@@ -93,7 +93,7 @@ const gearItems = [
   {id:'iced-coffee',category:'Lifestyle',name:'Iced Coffee',icon:'🥤',rarity:'COMMON',minLevel:1,desc:'Cold caffeine for a long fight camp. +1% followers from fight wins.',prestige:1},
   {id:'tinned-sardines',category:'Lifestyle',name:'Tinned Sardines',icon:'🐟',rarity:'COMMON',minLevel:1,desc:'Old-school corner fuel. +1% followers from fight wins.',prestige:1},
   {id:'dill-pickle',category:'Lifestyle',name:'Dill Pickle',icon:'🥒',rarity:'COMMON',minLevel:1,desc:'Electrolytes reduce Health recovery to one point every 55 seconds.',healthRecoverySpeed:5000},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'+2% followers from fight wins.',prestige:2,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.79'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'+2% followers from fight wins.',prestige:2,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.85'},
   {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps your corner loose. +3% followers from fight wins.',prestige:3},
   {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins.',prestige:4},
   {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins.',prestige:4},
@@ -112,13 +112,31 @@ const gearItems = [
   {id:'redline-superbike',category:'Property & Rides',name:'Redline Superbike',icon:'🏍️',rarity:'EPIC',minLevel:7,desc:'+6% followers from fight wins. The parking lot hears you coming.',prestige:6},
   {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',rarity:'RARE',minLevel:4,desc:'+3% followers from fight wins. Fast water, faster clips.',prestige:3},
   {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',rarity:'EPIC',minLevel:7,desc:'+6% followers from fight wins. Every entrance gets noticed.',prestige:6},
-  {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'LEGENDARY',minLevel:8,desc:'+8% followers from fight wins.',prestige:8},
-  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'LEGENDARY',minLevel:10,desc:'+10% followers from fight wins.',prestige:10},
-  {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'LEGENDARY',minLevel:13,desc:'+12% followers from fight wins.',prestige:12},
+  {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'EPIC',minLevel:8,desc:'+8% followers from fight wins.',prestige:8},
+  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'EPIC',minLevel:10,desc:'+10% followers from fight wins.',prestige:10},
+  {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'EPIC',minLevel:13,desc:'+12% followers from fight wins.',prestige:12},
   {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+18% followers from fight wins.',prestige:18},
   {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% followers from fight wins.',prestige:20},
   {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% followers from fight wins.',prestige:25}
 ];
+
+const gearCategoryEffectByRarity={
+  COMMON:{auraBonus:1,healthRecoverySpeed:2500,energyRecoverySpeed:100},
+  RARE:{auraBonus:2,healthRecoverySpeed:5000,energyRecoverySpeed:200},
+  EPIC:{auraBonus:3,healthRecoverySpeed:7500,energyRecoverySpeed:300},
+  LEGENDARY:{auraBonus:5,healthRecoverySpeed:10000,energyRecoverySpeed:500}
+};
+for(const item of gearItems){
+  const effect=gearCategoryEffectByRarity[item.rarity]||gearCategoryEffectByRarity.COMMON;
+  delete item.prestige;
+  delete item.auraBonus;
+  delete item.healthRecoverySpeed;
+  delete item.energyRecoverySpeed;
+  if(item.category==='Fight Gear')item.desc=item.desc.split('.')[0]+'.';
+  else if(item.category==='Bling'){item.auraBonus=effect.auraBonus;item.desc=`+${effect.auraBonus} effective Aura while equipped.`}
+  else if(item.category==='Lifestyle'){item.healthRecoverySpeed=effect.healthRecoverySpeed;item.desc=`Health recovery is ${effect.healthRecoverySpeed/1000} seconds faster while equipped.`}
+  else if(item.category==='Property & Rides'){item.energyRecoverySpeed=effect.energyRecoverySpeed;item.desc=`Energy recovery is ${(effect.energyRecoverySpeed/1000).toFixed(1)} seconds faster while equipped.`}
+}
 
 const endorsementDefs = [
   {id:'bobs-auto',icon:'🔧',brand:"Bob's Auto Shop",product:'Local mechanic and hometown fight sponsor',followersRequired:0},
