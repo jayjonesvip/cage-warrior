@@ -434,6 +434,9 @@ test('Feed summarizes followers and all known followed accounts',()=>{
   assert.match(game,/\$\('#feedFollowersCount'\)\.textContent=fmt\(state\.fans\)/);
   assert.match(game,/\$\('#feedFollowingCount'\)\.textContent=fmt\(feedFollowingTotal\(\)\)/);
   assert.match(game,/function mergedSocialPosts\(localPosts,remotePosts\)/);
+  assert.match(game,/createdAt:new Date\(\)\.toISOString\(\)/);
+  assert.match(game,/function socialPostTime\(post\)/);
+  assert.match(game,/\.sort\(\(a,b\)=>socialPostTime\(b\)-socialPostTime\(a\)\)/);
   assert.match(game,/posts=sharedReady\?mergedSocialPosts\(localPosts,sharedSocialPosts\):localPosts/);
   assert.match(game,/addSocialPosts\(reporterPosts\);saveState\(\);renderSocial\(\);queueSharedPosts/);
   assert.match(styles,/\.feed-network-summary\{display:grid;grid-template-columns:1fr 1fr/);
