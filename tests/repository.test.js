@@ -201,6 +201,9 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
   assert.doesNotMatch(game,/sendPostFightTextReply|post_fight_text_replied/);
   assert.match(styles,/\.post-fight-message-thread\{[^}]*width:min\(100%,420px\)[^}]*border-radius:18px/);
+  const copyContext={};vm.runInNewContext(strings,copyContext);const contacts=copyContext.CAGE_STRINGS.postFightTexts.contacts;
+  assert.equal(contacts.length,5);
+  contacts.forEach(contact=>{assert.equal(contact.win.length,10,`${contact.name} needs ten win texts`);assert.equal(contact.loss.length,10,`${contact.name} needs ten loss texts`);assert.ok(contact.titleWin.length>=3,`${contact.name} needs varied title texts`)});
 });
 
 test('beating Vaso unlocks and opens the persistent Diego first contract',()=>{
