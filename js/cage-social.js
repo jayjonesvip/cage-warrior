@@ -62,6 +62,15 @@
 
     async function loadOwnProfile(expectedProfileId=''){return database.selectOwnCageProfile(expectedProfileId)}
 
+    async function loadCareer(expectedProfileId=''){
+      const data=await database.loadCageCareer(expectedProfileId);
+      return Array.isArray(data)?data[0]||null:data;
+    }
+
+    async function saveCareer(state,expectedProfileId=''){
+      return database.saveCageCareer(state,expectedProfileId);
+    }
+
     async function loadProfileCount(){
       const data=await database.countCageProfiles();
       const value=Array.isArray(data)?data[0]:data;
@@ -101,7 +110,7 @@
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
     async function publishSponsorPost(sponsorId){return database.insertCageSponsorPost(sponsorId)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

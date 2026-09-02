@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.86';
+  const ICON_ASSET_VERSION = '2.7.87';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -84,6 +84,11 @@
   let sharedSocialError='';
   let sharedSocialSyncPromise=null;
   let sharedSocialRefreshTimer=null;
+  let cloudCareerSaveTimer=null;
+  let cloudCareerSavePromise=null;
+  let cloudCareerSaveDirty=false;
+  let cloudCareerEnabled=true;
+  let careerRestoreNotice='';
   let sharedSocialNoticeShown=false;
   let sharedSocialInteractionsRemaining=0;
   let feedFilter='all';
@@ -110,6 +115,8 @@
     {id:'striker',icon:'🥊',name:'STRIKER',text:'+1 Power and Speed. Better stand-up offense and knockout pressure.',stats:{power:1,speed:1},plan:'striker'},
     {id:'grappler',icon:'🔒',name:'GRAPPLER',text:'+1 Power and Cardio. Better takedowns, control, and submissions.',stats:{power:1,cardio:1},plan:'grappler'}
   ];
+  const LOADOUT_CATEGORIES=['Fight Gear','Bling','Property & Rides','Lifestyle'];
+  const LOADOUT_FILTER_BY_CATEGORY={'Fight Gear':'combat',Bling:'bling','Property & Rides':'property',Lifestyle:'lifestyle'};
   function normalizeMajorArchetype(value){return ['control','submission','wrestleBox','wrestle','wrestler','grappler'].includes(value)?'grappler':['pressure','counter','brawler','trickster','technician','endurance','tank','cardio','striker'].includes(value)?'striker':''}
   state = loadState();
   const fighterCities = [
@@ -255,8 +262,6 @@
   function opponentAvailable(o){return LOGIC.opponentAvailable(o,opponentContext())}
 
   const FIGHT_ROUNDS=fightRule('fightStructure.scheduledRounds',3),FIGHT_ENERGY_COST=fightRule('energyEconomy.fightEnergyCost',25),MINIMUM_ACTION_ENERGY_EXCLUSIVE=fightRule('energyEconomy.minimumEnergyToStartConsumingActionExclusive',0),ENERGY_RECOVERY_INTERVAL=fightRule('energyEconomy.energyRecoveryIntervalMilliseconds',5000),HEALTH_RECOVERY_INTERVAL=fightRule('energyEconomy.healthRecoveryIntervalMilliseconds',60000),OFFLINE_RECOVERY_CAP=fightRule('energyEconomy.offlineRecoveryCapMilliseconds',28800000),FOLLOWER_OFFLINE_CAP=fightRule('followerRewards.offlineCapHours',48)*60*60*1000,DAILY_FIGHT_LIMIT=fightRule('fightStructure.dailyFightLimit',10),MINIMUM_FIGHT_HEALTH=fightRule('fightStructure.minimumHealthForMedicalClearance',20);
-  const LOADOUT_CATEGORIES=['Fight Gear','Bling','Property & Rides','Lifestyle'];
-  const LOADOUT_FILTER_BY_CATEGORY={'Fight Gear':'combat',Bling:'bling','Property & Rides':'property',Lifestyle:'lifestyle'};
   const hasActionEnergy=()=>state.energy>MINIMUM_ACTION_ENERGY_EXCLUSIVE;
 
   function itemCategory(id){return gearItems.find(item=>item.id===id)?.category||''}
@@ -293,6 +298,29 @@
     const primary=readRaw(SAVE_KEY);careerSaveKnown=primary!==null;
     return LOGIC.selectStoredState({primary,backup:readRaw(SAVE_BACKUP_KEY),legacy:readRaw('fytr-save-v1')},normalizeState,defaultState);
   }
+  function recoveredStateFromProfile(profile){
+    const avatar=fighterAvatars.find(item=>item.id===String(profile?.fighter_avatar||'')),name=normalizeIdentityName(profile?.handle),city=String(profile?.city||''),style=normalizeMajorArchetype(profile?.archetype);if(!profile?.id||!avatar||!name||!city||!style)return null;
+    const stats=Object.assign({},avatar.stats),keys=['power','speed','chin','cardio'],baseTotal=keys.reduce((sum,key)=>sum+stats[key],0),targetTotal=Math.max(baseTotal,Math.floor(Number(profile.attribute_total))||baseTotal);for(let point=0;point<targetTotal-baseTotal;point++)stats[keys[point%keys.length]]++;
+    return normalizeState(Object.assign(structuredClone(defaultState),{name,nameLocked:true,fighterCity:city,fighterStyle:style,fighterAvatar:avatar.id,fighterBaseStats:Object.assign({},avatar.stats),stats,level:Math.max(1,Math.floor(Number(profile.level))||1),wins:Math.max(0,Math.floor(Number(profile.wins))||0),losses:Math.max(0,Math.floor(Number(profile.losses))||0),rankingHistory:Array.isArray(profile.ranking_history)?profile.ranking_history:[],socialProfileId:String(profile.id),socialAccountCreated:true,postFightTutorialSeen:(Number(profile.wins)||0)+(Number(profile.losses)||0)>0,rookieShowcasePending:false,firstContractPending:false}));
+  }
+  async function restoreRemoteCareer(){
+    if(!SHARED_FEED?.configured?.())return false;
+    try{
+      const remote=await SHARED_FEED.loadCareer?.();
+      if(remote&&typeof remote==='object'&&!Array.isArray(remote)){const restored=normalizeState(remote);if(!LOGIC.isBlankCareer(restored)){state=restored;careerRestoreNotice='CAREER RESTORED FROM CLOUD';saveState();return true}}
+    }catch(error){if(error?.status===404||/load_cage_career|schema cache/i.test(String(error?.message||'')))cloudCareerEnabled=false}
+    try{
+      const profile=await SHARED_FEED.loadOwnProfile?.(),restored=recoveredStateFromProfile(profile);if(!restored)return false;state=restored;careerRestoreNotice='CAREER IDENTITY RECOVERED · FUTURE PROGRESS WILL SYNC';saveState();return true;
+    }catch{return false}
+  }
+  function scheduleCloudCareerSave(){
+    if(!cloudCareerEnabled||!state.nameLocked||!state.socialProfileId||!SHARED_FEED?.saveCareer)return;cloudCareerSaveDirty=true;clearTimeout(cloudCareerSaveTimer);cloudCareerSaveTimer=setTimeout(flushCloudCareerSave,900);
+  }
+  async function flushCloudCareerSave(){
+    clearTimeout(cloudCareerSaveTimer);cloudCareerSaveTimer=null;if(cloudCareerSavePromise||!cloudCareerSaveDirty||!cloudCareerEnabled)return false;cloudCareerSaveDirty=false;const expectedProfileId=state.socialProfileId,snapshot=structuredClone(state);
+    cloudCareerSavePromise=SHARED_FEED.saveCareer(snapshot,expectedProfileId).then(()=>true).catch(error=>{if(error?.status===404||/save_cage_career|schema cache/i.test(String(error?.message||'')))cloudCareerEnabled=false;else cloudCareerSaveDirty=true;return false}).finally(()=>{cloudCareerSavePromise=null;if(cloudCareerSaveDirty)scheduleCloudCareerSave()});return cloudCareerSavePromise;
+  }
+  if(LOGIC.isBlankCareer(state))await restoreRemoteCareer();
   function saveState(){
     let current;try{current=localStorage.getItem(SAVE_KEY)}catch(e){current=undefined}
     if(!LOGIC.shouldPersistCareer(retirementPending,careerSaveKnown,current))return;
@@ -300,7 +328,7 @@
     try{
       if(LOGIC.shouldBackupRaw(current,normalizeState))localStorage.setItem(SAVE_BACKUP_KEY,current);
     }catch(e){/* A backup is helpful but must never block the primary save. */}
-    try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));careerSaveKnown=true;saveWarningShown=false}
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));careerSaveKnown=true;saveWarningShown=false;scheduleCloudCareerSave()}
     catch(e){if(!saveWarningShown){saveWarningShown=true;setTimeout(()=>toast('SAVE FAILED · Check browser storage before closing.','#ff766d'),0)}}
   }
   function todayKey(){return LOGIC.localDateKey()}
@@ -329,8 +357,9 @@
   function showRecoveryReport(){
     if(!recoveryReport)return;const parts=[];if(recoveryReport.followers)parts.push(`+${fmt(recoveryReport.followers)} FOLLOWERS`);if(recoveryReport.energy)parts.push(`+${recoveryReport.energy} ENERGY`);if(recoveryReport.health)parts.push(`+${recoveryReport.health} HEALTH`);if(recoveryReport.refunded)parts.push('FIGHT BOOKING REFUNDED');const away=!!recoveryReport.followers;recoveryReport=null;toast(`${away?'WHILE YOU WERE AWAY':'WELCOME BACK'} · ${parts.join(' · ')}`,'#78dfff');
   }
+  function showCareerRestoreNotice(){if(!careerRestoreNotice)return;const message=careerRestoreNotice;careerRestoreNotice='';toast(message,'#78dfff')}
   landingFeature=globalThis.CAGE_LANDING.createLandingFeature({
-    $,logic:LOGIC,getState:()=>state,getRank:()=>rankName(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(()=>{showRecoveryReport();if(!offerRookieShowcase())offerFirstContractOpponent()},180),onChampionshipChange:renderOpponents
+    $,logic:LOGIC,getState:()=>state,getRank:()=>rankName(),getChampionship:()=>sharedChampionship,setChampionship:setSharedChampionship,sharedFeed:SHARED_FEED,sharedUi:SHARED_UI,trackEvent,tap:()=>sfx.tap(),onEntered:()=>setTimeout(()=>{showCareerRestoreNotice();showRecoveryReport();if(!offerRookieShowcase())offerFirstContractOpponent()},180),onChampionshipChange:renderOpponents
   });
   function enterGameFromLanding(){landingFeature.enter()}
   function cageStatus(){
@@ -1308,7 +1337,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.86" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.87" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

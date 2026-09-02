@@ -84,6 +84,20 @@ test('new careers use explicit save version 31',()=>{
   assert.match(game,/source\.version\)\)\|\|0\)<27\)s\.xp=LOGIC\.rescaleXpProgress/);
 });
 
+test('completed careers restore from private cloud saves before the landing screen renders',()=>{
+  const migration=read('supabase/migrations/20260902160000_private_cloud_career_saves.sql');
+  assert.match(migration,/create table if not exists public\.cage_career_saves/);
+  assert.match(migration,/alter table public\.cage_career_saves enable row level security/);
+  assert.match(migration,/revoke all on table public\.cage_career_saves from public, anon, authenticated/);
+  assert.match(migration,/create or replace function public\.load_cage_career\(\)/);
+  assert.match(migration,/create or replace function public\.save_cage_career\(p_state jsonb\)/);
+  assert.match(game,/if\(LOGIC\.isBlankCareer\(state\)\)await restoreRemoteCareer\(\);\s*function saveState/);
+  assert.match(game,/const remote=await SHARED_FEED\.loadCareer/);
+  assert.match(game,/const profile=await SHARED_FEED\.loadOwnProfile/);
+  assert.match(game,/scheduleCloudCareerSave\(\)/);
+  assert.ok(game.indexOf("const LOADOUT_CATEGORIES=")<game.indexOf('state = loadState();'),'save normalization dependencies must initialize before reading stored careers');
+});
+
 test('fighter-name shuffle is a compact action beside the proposed name',()=>{
   assert.match(html,/class="fighter-name-draft-row"[\s\S]*class="fighter-name-preview"[\s\S]*id="fighterNameSuggestion"[\s\S]*id="newFighterNameBtn"/);
   assert.match(html,/id="newFighterNameBtn"[^>]*aria-label="Shuffle fighter name"/);
@@ -839,6 +853,7 @@ test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
   assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('class="matchup-poster"'));
   assert.match(game,/tapeStatsToggle'\)\.addEventListener\('click',openTapeStats\)/);
   assert.match(styles,/\.matchup-promo-card \.tape-actions\{grid-template-columns:\.8fr 1\.45fr/);
+  assert.match(styles,/\.matchup-promo-card \.tape-actions\{[^}]*width:100%;max-width:none/);
 });
 
 test('promo poster fits without scrolling and keeps fighter billing collision-free',()=>{
@@ -940,7 +955,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 30','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 31','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);

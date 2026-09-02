@@ -173,6 +173,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
       ]);
       if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
+      if (url.endsWith('/rest/v1/rpc/load_cage_career')) return jsonResponse({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true });
+      if (url.endsWith('/rest/v1/rpc/save_cage_career')) return jsonResponse('2026-09-02T16:00:00Z');
       if (url.endsWith('/rest/v1/rpc/publish_cage_post')) return jsonResponse({ id: 8 });
       if (url.endsWith('/rest/v1/rpc/publish_cage_ceo_post')) return jsonResponse({ id: 9, post_kind: 'ceo' });
       return jsonResponse({ message: 'unexpected request' }, 500);
@@ -187,6 +189,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const profileCount = await client.loadProfileCount();
   const opponents = await client.loadOpponentCandidates(4, 12);
   const remaining = await client.loadInteractionAllowance();
+  const career = await client.loadCareer();
+  const careerSavedAt = await client.saveCareer({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true }, session.user.id);
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
   await client.publishCeoPost('city_offer');
   const retired = await client.retireProfile();
@@ -200,6 +204,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.equal(profileCount, 27);
   assert.equal(opponents[0].handle, 'GoldenTornadoNYC');
   assert.equal(remaining, 3);
+  assert.equal(career.name, 'WhiteDrizzlePHX');
+  assert.equal(careerSavedAt, '2026-09-02T16:00:00Z');
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));
   const claimBody = JSON.parse(authenticated.find(request => request.url.endsWith('claim_cage_identity')).options.body);
@@ -215,6 +221,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.deepEqual(ceoPostBody, { p_event_key: 'city_offer' });
   const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
   assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
+  const careerSaveBody = JSON.parse(authenticated.find(request => request.url.endsWith('save_cage_career')).options.body);
+  assert.deepEqual(careerSaveBody, { p_state: { version: 31, name: 'WhiteDrizzlePHX', nameLocked: true } });
   assert.ok(authenticated.some(request => request.url.includes(`id=eq.${session.user.id}`)));
 });
 
@@ -229,6 +237,8 @@ test('an existing career never creates a replacement identity when its network s
   });
 
   await assert.rejects(client.loadOwnProfile(session.user.id), /network session missing/i);
+  await assert.rejects(client.loadCareer(session.user.id), /network session missing/i);
+  await assert.rejects(client.saveCareer({ version: 31 }, session.user.id), /network session missing/i);
   assert.equal(calls.length, 0);
 });
 

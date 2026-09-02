@@ -134,9 +134,11 @@ Retiring as champion passes the belt to the highest-ranked eligible active fight
 
 ## Save migration
 
-Current saves use state version 30. Migration preserves identity, avatar, hometown, archetype, level, XP progress percentage, record, attributes, followers, Aura, gear, equipped gear, active perks, opponents, rivalry, championship, and Feed history. Legacy Hype converts directly to Aura; new careers begin at 0 Aura. Existing careers begin with no Circuit loss streak.
+Current saves use state version 31. Migration preserves identity, avatar, hometown, archetype, level, XP progress percentage, record, attributes, followers, Aura, gear, equipped gear, active perks, opponents, rivalry, championship, and Feed history. Legacy Hype converts directly to Aura; new careers begin at 0 Aura. Existing careers begin with no Circuit loss streak.
 
 Migration proportionally rescales existing XP into the balanced curve, adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps and a safe Aura snapshot for follower accrual, assigns the sponsor supported by the current follower total while retaining sponsor history, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
+
+Completed careers save locally first and then sync an authenticated, private Supabase backup. When the local save is missing or invalid, startup restores that backup before rendering the landing screen. Older fighters without a full backup can recover their permanent public identity, record, level, portrait, hometown, archetype, and ranked attribute total from their owned profile; subsequent progress then uses the full private backup.
 
 ## Editable fight rules
 
