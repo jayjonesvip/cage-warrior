@@ -161,6 +161,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
       if (url.endsWith('/auth/v1/signup')) return jsonResponse(session);
       if (url.endsWith('/rest/v1/rpc/claim_cage_identity')) return jsonResponse({ id: session.user.id, handle: 'WhiteDrizzlePHX' });
       if (url.endsWith('/rest/v1/rpc/sync_cage_profile')) return jsonResponse({ id: session.user.id, handle: 'WhiteDrizzlePHX' });
+      if (url.endsWith('/rest/v1/rpc/sync_cage_ranking')) return jsonResponse({ id: session.user.id, handle: 'WhiteDrizzlePHX', attribute_total: 24, ranking_history: [] });
       if (url.endsWith('/rest/v1/rpc/retire_cage_profile')) return jsonResponse({ id: session.user.id, handle: 'WhiteDrizzlePHX', retired_at: '2026-08-10T12:00:00Z' });
       if (url.includes('/rest/v1/cage_feed_posts?')) return jsonResponse([{ id: 7, post_kind: 'player', body: 'Back to work.' }]);
       if (url.includes('/rest/v1/cage_profiles?')) return jsonResponse([
@@ -178,8 +179,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
     },
   });
 
-  const claimed = await client.claimIdentity({ candidates: ['WhiteDrizzlePHX','BlueViperPHX'], city: 'phoenix', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 1, wins: 0, losses: 0 });
-  const profile = await client.registerProfile({ fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2 });
+  const claimed = await client.claimIdentity({ candidates: ['WhiteDrizzlePHX','BlueViperPHX'], city: 'phoenix', archetype: 'brawler', fighterAvatar: 'fighter-07', level: 1, wins: 0, losses: 0, attributeTotal: 20, rankingHistory: [] });
+  const profile = await client.registerProfile({ fighterAvatar: 'fighter-07', level: 4, wins: 7, losses: 2, attributeTotal: 24, rankingHistory: [{won:true,quality:65}] });
   const feed = await client.loadFeed(50);
   const roster = await client.loadProfiles(100);
   const ownProfile = await client.loadOwnProfile();
@@ -205,6 +206,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.deepEqual(claimBody, { p_candidates: ['WhiteDrizzlePHX','BlueViperPHX'], p_city: 'phoenix', p_archetype: 'brawler', p_fighter_avatar: 'fighter-07', p_level: 1, p_wins: 0, p_losses: 0 });
   const syncBody = JSON.parse(authenticated.find(request => request.url.endsWith('sync_cage_profile')).options.body);
   assert.deepEqual(syncBody, { p_level: 4, p_wins: 7, p_losses: 2, p_fighter_avatar: 'fighter-07' });
+  const rankBodies = authenticated.filter(request => request.url.endsWith('sync_cage_ranking')).map(request=>JSON.parse(request.options.body));
+  assert.deepEqual(rankBodies,[{p_attribute_total:20,p_ranking_history:[]},{p_attribute_total:24,p_ranking_history:[{won:true,quality:65}]}]);
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');

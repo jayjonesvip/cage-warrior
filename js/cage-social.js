@@ -23,7 +23,9 @@
         p_losses:profile.losses,
         p_fighter_avatar:profile.fighterAvatar
       });
-      return Array.isArray(data)?data[0]||null:data;
+      const base=Array.isArray(data)?data[0]||null:data;
+      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
+      return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
 
     async function claimIdentity(profile){
@@ -36,7 +38,9 @@
         p_wins:profile.wins,
         p_losses:profile.losses
       });
-      return Array.isArray(data)?data[0]||null:data;
+      const base=Array.isArray(data)?data[0]||null:data;
+      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
+      return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
 
     async function retireProfile(){

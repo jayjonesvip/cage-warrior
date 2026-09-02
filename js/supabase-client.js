@@ -131,6 +131,7 @@
     async function rpc(name,args){return authenticatedRequest(`/rest/v1/rpc/${encodeURIComponent(name)}`,{method:'POST',body:args})}
 
     async function registerCageProfile(values){return rpc('sync_cage_profile',values)}
+    async function syncCageRanking(values){return rpc('sync_cage_ranking',values)}
     async function claimCageIdentity(values){return rpc('claim_cage_identity',values)}
     async function retireCageProfile(){return rpc('retire_cage_profile',{})}
     async function getCageChampionship(){return rpc('get_cage_championship',{})}
@@ -142,11 +143,11 @@
     }
 
     async function selectCageProfiles(limit){
-      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
+      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
     }
 
     async function selectOwnCageProfile(expectedUserId=''){
-      const active=await ensureSession(expectedUserId),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`,{},expectedUserId);
+      const active=await ensureSession(expectedUserId),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`,{},expectedUserId);
       return Array.isArray(rows)?rows[0]||null:null;
     }
 
@@ -157,7 +158,7 @@
     async function insertCageCeoPost(eventKey){return rpc('publish_cage_ceo_post',{p_event_key:eventKey})}
     async function insertCageSponsorPost(sponsorId){return rpc('publish_cage_sponsor_post',{p_sponsor_id:sponsorId})}
 
-    return {configured,ensureSession,registerCageProfile,claimCageIdentity,retireCageProfile,getCageChampionship,beginCageChampionshipChallenge,settleCageChampionshipChallenge,selectCageFeed,selectCageProfiles,selectOwnCageProfile,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,insertCageSponsorPost,sessionUserId:()=>session?.user?.id||''};
+    return {configured,ensureSession,registerCageProfile,syncCageRanking,claimCageIdentity,retireCageProfile,getCageChampionship,beginCageChampionshipChallenge,settleCageChampionshipChallenge,selectCageFeed,selectCageProfiles,selectOwnCageProfile,countCageProfiles,selectCageOpponentCandidates,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,insertCageSponsorPost,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};

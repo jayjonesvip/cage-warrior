@@ -98,6 +98,13 @@ test('World Rank uses fight quality, recent form, and permanent attributes witho
   assert.match(game,/LOGIC\.rankingFightEntry\(\{won:win/);
   assert.doesNotMatch(game,/attributeTotal:[^;\n]*(effectiveStat|equippedGear)/);
   assert.match(read('README.md'),/50% résumé, 25% quality of defeated opposition, 15% recent form, and 10% permanent base attributes/);
+  const migration=read('supabase/migrations/20260902120000_hybrid_world_rank.sql');
+  assert.match(migration,/add column if not exists attribute_total integer not null default 20/);
+  assert.match(migration,/add column if not exists ranking_history jsonb not null default '\[\]'::jsonb/);
+  assert.match(migration,/create or replace function public\.sync_cage_ranking/);
+  assert.match(migration,/create or replace function public\.cage_world_rank_score/);
+  assert.match(read('js/cage-social.js'),/database\.syncCageRanking\(\{p_attribute_total:profile\.attributeTotal,p_ranking_history:profile\.rankingHistory\}\)/);
+  assert.match(read('js/supabase-client.js'),/attribute_total,ranking_history/);
 });
 
 test('migration does not erase followers when a legacy social flag is false',()=>{
