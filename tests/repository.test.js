@@ -71,8 +71,8 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 28',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*28/);
+test('new careers use explicit save version 29',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*29/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
   assert.match(game,/circuitLossStreak:0/);
@@ -822,7 +822,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 28','balanced XP curve'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 29','balanced XP curve'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);

@@ -70,11 +70,13 @@ Fight results focus on career progress instead of currency:
 - Zero, one, or two Attribute Points based on opponent level
 - XP
 - Followers
-- Hype changes
+- Aura changes and cosmetic status titles
 - Victory Pack progress or a gear reveal
 - Rivalry and championship outcomes
 
 Same-day opponent XP rules remain: full XP for the first same-level win, half XP for one runback, then zero XP. Lower-level opponents award no XP or Attribute Points. Winning against one also costs five percent of current followers, rounded up, and the matchup preview and result screen both disclose that fan backlash.
+
+Aura replaces the former Hype meter without replacing Followers. It starts at 0, runs from 0–100, and multiplies follower momentum without changing fight odds. Home presents the cosmetic tiers `UNKNOWN`, `GETTING NOTICED`, `MAGNETIC`, `SUPERSTAR`, and `ICONIC`. Ordinary on-level wins grant +2 Aura, same-level ratings upsets +5, title wins +10, title defenses +6, ordinary losses −7, and forfeits −10. Lower-level wins lose—and higher-level wins earn—`ceil((fighter level × opponent level) × 0.25)` Aura. Accepted Feed callouts use a fixed stake instead: +5 Aura for a win at any level and −10 for a loss or forfeit; callout wins are exempt from lower-level follower backlash while retaining normal XP and Attribute Point rules.
 
 ## Gear and Victory Packs
 
@@ -128,7 +130,7 @@ Retiring as champion passes the belt to the highest-ranked eligible active fight
 
 ## Save migration
 
-Current saves use state version 28. Migration preserves identity, avatar, hometown, archetype, level, XP progress percentage, record, attributes, followers, Hype, gear, equipped gear, active perks, opponents, rivalry, championship, and Feed history. Existing careers begin with no Circuit loss streak.
+Current saves use state version 29. Migration preserves identity, avatar, hometown, archetype, level, XP progress percentage, record, attributes, followers, Aura, gear, equipped gear, active perks, opponents, rivalry, championship, and Feed history. Legacy Hype converts directly to Aura; new careers begin at 0 Aura. Existing careers begin with no Circuit loss streak.
 
 Migration proportionally rescales existing XP into the balanced curve, adds zero unspent Attribute Points to existing careers, adds passive-recovery timestamps, assigns the sponsor supported by the current follower total while retaining sponsor history, removes obsolete economy/activity fields, and clears interrupted legacy activities. A valid career is not reset merely because old fields are present.
 

@@ -1,6 +1,6 @@
 {
   "_context": "Editable Cage Grind fight simulation, progression, and passive resource rules.",
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "fightStructure": {"scheduledRounds": 3, "dailyFightLimit": 10, "minimumHealthForMedicalClearance": 20},
   "energyEconomy": {"maximumEnergy": 100, "fightEnergyCost": 25, "minimumEnergyToStartConsumingActionExclusive": 0, "energyRecoveryIntervalMilliseconds": 5000, "healthRecoveryIntervalMilliseconds": 60000, "offlineRecoveryCapMilliseconds": 28800000},
   "exchangeCounts": {"slowPaceMinimum": 6, "slowPaceMaximum": 7, "fastPaceMinimum": 9, "fastPaceMaximum": 11},
@@ -10,6 +10,7 @@
   "startingCondition": {"fullConditionMinimumHealthPercent": 90, "slightlyReducedConditionMinimumHealthPercent": 70, "reducedConditionMinimumHealthPercent": 50, "fullCondition": 100, "slightlyReducedCondition": 95, "reducedCondition": 88, "badlyReducedCondition": 78},
   "persistentHealthDamage": {"landedAttack": 1, "knockdown": 4, "knockoutOrTechnicalKnockoutLoss": 12, "submissionLoss": 8, "totalDamageMultiplier": 1.25, "victoryMinimum": 5, "decisionLossMinimum": 10, "submissionLossMinimum": 15, "knockoutOrTechnicalKnockoutLossMinimum": 20},
   "roundScoring": {"damageWeight": 1.35, "landedAttackWeight": 1, "takedownWeight": 5, "controlSecondsDivisor": 12, "knockdownWeight": 14, "dominantRoundMargin": 20},
-  "experienceRewards": {"victoryBaseExperiencePoints": 26, "victoryExperiencePointsPerOpponentLevel": 9, "earlyCareerExperienceBonusMaximum": 20, "earlyCareerExperienceBonusReductionPerOpponentLevel": 5, "lossExperienceMultiplier": 0.375, "rankedFightExperienceMultiplier": 1.2, "championshipFightExperienceMultiplier": 1.3, "upsetVictoryExperienceMultiplier": 1.25, "lowerLevelOpponentExperienceMultiplier": 0, "lowerLevelOpponentFollowerLossPercent": 5, "worldTitleVictoryExperienceBonus": 25, "sameDayRunbackExperienceMultiplier": 0.5, "winHypeGain": 8, "exhaustedOpponentHypeChange": -7},
+  "experienceRewards": {"victoryBaseExperiencePoints": 26, "victoryExperiencePointsPerOpponentLevel": 9, "earlyCareerExperienceBonusMaximum": 20, "earlyCareerExperienceBonusReductionPerOpponentLevel": 5, "lossExperienceMultiplier": 0.375, "rankedFightExperienceMultiplier": 1.2, "championshipFightExperienceMultiplier": 1.3, "upsetVictoryExperienceMultiplier": 1.25, "lowerLevelOpponentExperienceMultiplier": 0, "lowerLevelOpponentFollowerLossPercent": 5, "worldTitleVictoryExperienceBonus": 25, "sameDayRunbackExperienceMultiplier": 0.5},
+  "auraRewards": {"normalWin": 2, "lowerLevelWinMultiplier": 0.25, "higherLevelWinMultiplier": 0.25, "upsetWin": 5, "titleWin": 10, "titleDefenseWin": 6, "normalLoss": -7, "forfeit": -10, "calloutWin": 5, "calloutLoss": -10, "exhaustedOpponent": -7, "ceoRecognition": 3},
   "attributePointRewards": {"victoryAgainstLowerLevelOpponent": 0, "victoryAgainstSameLevelOpponent": 1, "victoryAgainstHigherLevelOpponent": 2}
 }

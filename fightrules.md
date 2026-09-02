@@ -25,7 +25,13 @@ Selected equipped Fight Gear may reduce the Energy interval to 4 seconds. Only t
 
 ## Fight rewards
 
-A legitimate win grants one permanent Attribute Point, fight XP, Followers, a Hype change, eligible Victory Pack progress, and rivalry or championship progress when applicable.
+A legitimate win grants permanent Attribute Points based on opponent level, fight XP, Followers, an Aura change, eligible Victory Pack progress, and rivalry or championship progress when applicable. Aura starts at 0, ranges from 0–100, and increases follower momentum without changing combat odds.
+
+Accepted Feed callouts use a fixed Aura stake: a win grants +5 Aura at any opponent level and a loss or forfeit costs 10 Aura. These callout wins do not trigger lower-level follower backlash, though ordinary XP and Attribute Point rules still apply.
+
+An ordinary lower-level win costs `ceil((fighter level × opponent level) × 0.25)` Aura in addition to the existing five-percent follower backlash. The matchup preview calculates and discloses this Aura consequence before the fight.
+
+An ordinary higher-level win earns `ceil((fighter level × opponent level) × 0.25)` Aura. A same-level ratings upset retains the fixed +5 Aura reward. Title bouts and accepted callouts use their fixed rewards instead of stacking the scaled amount.
 
 Losses and forfeitures do not grant Attribute Points. A forfeit grants no XP or Victory Pack progress.
 

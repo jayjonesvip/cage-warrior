@@ -107,7 +107,8 @@
     const now=Date.now(),savedAt=finite(raw.lastSave,now),legacyRecoveryAt=savedAt>0&&savedAt<=now?savedAt:now,validTimestamp=(value,fallback=legacyRecoveryAt)=>{const timestamp=finite(value,fallback);return timestamp>0&&timestamp<=now?timestamp:fallback};
     state.energyRecoveryAt=validTimestamp(raw.energyRecoveryAt);
     state.healthRecoveryAt=validTimestamp(raw.healthRecoveryAt);
-    state.hype=clamp(finite(state.hype,defaults.hype),0,100);
+    const savedAura=Number.isFinite(Number(raw.aura))?raw.aura:Number.isFinite(Number(raw.hype))?raw.hype:state.aura;
+    state.aura=clamp(finite(savedAura,defaults.aura??defaults.hype??0),0,100);
     const stats=state.stats&&typeof state.stats==='object'&&!Array.isArray(state.stats)?state.stats:{};
     state.stats={};
     for(const key of ['power','speed','chin','cardio'])state.stats[key]=Math.max(1,Math.round(finite(stats[key],defaults.stats[key])));
@@ -127,7 +128,7 @@
       'cash','careerEarnings','freeLoot','trainerOn','trainingInjury','treatmentAvailable',
       'blackjackHand','cageDiceResult','horseRaceResult','lastAutographPrice',
       'activeTraining','trainingSession','activeRecovery','recoverySession','restSession',
-      'activeHustle','hustleSession','publicitySession','autographSession','activeActivity','activitySession'
+      'activeHustle','hustleSession','publicitySession','autographSession','activeActivity','activitySession','hype'
     ])delete state[obsolete];
     return state;
   }
@@ -289,11 +290,33 @@
 
   function opponentXpTier(winsToday=0,opponentLevel=null,playerLevel=null){
     const wins=nonNegativeWhole(winsToday);
-    if(opponentLevel!==null&&playerLevel!==null&&whole(opponentLevel)<whole(playerLevel))return {wins,multiplier:fightRule('experienceRewards.lowerLevelOpponentExperienceMultiplier',0),hypeChange:fightRule('experienceRewards.winHypeGain',8),tier:'lower_level',shortLabel:'NO XP · LOWER LEVEL',tapeLabel:'NO XP · LOWER-LEVEL OPPONENT',resultLabel:'LOWER LEVEL · NO XP'};
-    if(wins>=2){const hypeChange=fightRule('experienceRewards.exhaustedOpponentHypeChange',-7),hypeLabel=`${hypeChange>0?'+':''}${hypeChange} HYPE`;return {wins,multiplier:0,hypeChange,tier:'exhausted',shortLabel:`NO XP · ${hypeLabel}`,tapeLabel:`NO XP · ${hypeLabel}`,resultLabel:`NO XP · ${hypeLabel}`}}
-    const hypeGain=fightRule('experienceRewards.winHypeGain',8),repeatMultiplier=fightRule('experienceRewards.sameDayRunbackExperienceMultiplier',.5),repeatPercent=Math.round(repeatMultiplier*100);
-    if(wins===1)return {wins,multiplier:repeatMultiplier,hypeChange:hypeGain,tier:'repeat',shortLabel:`${repeatPercent}% XP`,tapeLabel:`${repeatPercent}% XP · SAME-DAY RUNBACK`,resultLabel:`RUNBACK · ${repeatPercent}% XP`};
-    return {wins:0,multiplier:1,hypeChange:hypeGain,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'};
+    if(opponentLevel!==null&&playerLevel!==null&&whole(opponentLevel)<whole(playerLevel))return {wins,multiplier:fightRule('experienceRewards.lowerLevelOpponentExperienceMultiplier',0),tier:'lower_level',shortLabel:'NO XP · LOWER LEVEL',tapeLabel:'NO XP · LOWER-LEVEL OPPONENT',resultLabel:'LOWER LEVEL · NO XP'};
+    if(wins>=2)return {wins,multiplier:0,tier:'exhausted',shortLabel:'NO XP · STALE MATCHUP',tapeLabel:'NO XP · STALE MATCHUP',resultLabel:'NO XP · STALE MATCHUP'};
+    const repeatMultiplier=fightRule('experienceRewards.sameDayRunbackExperienceMultiplier',.5),repeatPercent=Math.round(repeatMultiplier*100);
+    if(wins===1)return {wins,multiplier:repeatMultiplier,tier:'repeat',shortLabel:`${repeatPercent}% XP`,tapeLabel:`${repeatPercent}% XP · SAME-DAY RUNBACK`,resultLabel:`RUNBACK · ${repeatPercent}% XP`};
+    return {wins:0,multiplier:1,tier:'full',shortLabel:'FULL XP',tapeLabel:'FULL XP · FIRST WIN TODAY',resultLabel:'FULL XP'};
+  }
+
+  function auraTitle(value=0){
+    const aura=clamp(whole(value),0,100);
+    if(aura>=80)return {key:'iconic',label:'ICONIC',minimum:80,maximum:100};
+    if(aura>=60)return {key:'superstar',label:'SUPERSTAR',minimum:60,maximum:79};
+    if(aura>=40)return {key:'magnetic',label:'MAGNETIC',minimum:40,maximum:59};
+    if(aura>=20)return {key:'noticed',label:'GETTING NOTICED',minimum:20,maximum:39};
+    return {key:'unknown',label:'UNKNOWN',minimum:0,maximum:19};
+  }
+
+  function auraFightChange({won=false,forfeited=false,callout=false,playerLevel=1,opponentLevel=1,upset=false,titleWon=false,titleDefense=false,exhausted=false}={}){
+    if(callout)return fightRule(won?'auraRewards.calloutWin':'auraRewards.calloutLoss',won?5:-10);
+    if(forfeited)return fightRule('auraRewards.forfeit',-10);
+    if(!won)return fightRule('auraRewards.normalLoss',-7);
+    if(titleWon)return fightRule('auraRewards.titleWin',10);
+    if(titleDefense)return fightRule('auraRewards.titleDefenseWin',6);
+    if(exhausted)return fightRule('auraRewards.exhaustedOpponent',-7);
+    if(whole(opponentLevel,1)<whole(playerLevel,1))return -Math.ceil(whole(playerLevel,1)*whole(opponentLevel,1)*fightRule('auraRewards.lowerLevelWinMultiplier',.25));
+    if(whole(opponentLevel,1)>whole(playerLevel,1))return Math.ceil(whole(playerLevel,1)*whole(opponentLevel,1)*fightRule('auraRewards.higherLevelWinMultiplier',.25));
+    if(upset)return fightRule('auraRewards.upsetWin',5);
+    return fightRule('auraRewards.normalWin',2);
   }
 
   function nextOpponentXpStage(stageToday=0,won=false){
@@ -424,7 +447,7 @@
   }
   function socialInteractionReward(seed){
     const value=nonNegativeWhole(seed);
-    return {followers:5+value%8,hype:1+Math.floor(value/8)%3};
+    return {followers:5+value%8,aura:1+Math.floor(value/8)%3};
   }
   function normalizeFighterIdentity(value){
     const name=String(value||'').replace(/[^A-Za-z0-9_]+/g,'').slice(0,32);
@@ -506,5 +529,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,perkLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,perkLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
 });

@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 global.CAGE_FIGHT_RULES=require('../js/fight-rules.js');
 const logic=require('../js/game-logic.js');
 
-const defaults={level:1,xp:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,maxEnergy:100,energy:100,maxHealth:100,health:100,hype:0,stats:{power:5,speed:5,chin:5,cardio:5},lastSave:0};
+const defaults={level:1,xp:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,maxEnergy:100,energy:100,maxHealth:100,health:100,aura:0,stats:{power:5,speed:5,chin:5,cardio:5},lastSave:0};
 const state=(overrides={})=>Object.assign(structuredClone(defaults),overrides);
 
 test('core migration preserves career data and adds simplified fields',()=>{
@@ -19,6 +19,45 @@ test('core migration preserves career data and adds simplified fields',()=>{
   assert.ok(Number.isFinite(migrated.energyRecoveryAt));
   assert.ok(Number.isFinite(migrated.healthRecoveryAt));
   for(const key of ['cash','careerEarnings','trainerOn','trainingInjury'])assert.equal(key in migrated,false,key);
+});
+
+test('legacy Hype migrates directly to Aura and new careers start at zero',()=>{
+  const migrated=logic.normalizeCoreState(state(),defaults,{hype:43});
+  const fresh=logic.normalizeCoreState(state(),defaults,{});
+  assert.equal(migrated.aura,43);
+  assert.equal('hype' in migrated,false);
+  assert.equal(fresh.aura,0);
+});
+
+test('Aura cosmetic titles advance at the intended thresholds',()=>{
+  assert.equal(logic.auraTitle(0).label,'UNKNOWN');
+  assert.equal(logic.auraTitle(20).label,'GETTING NOTICED');
+  assert.equal(logic.auraTitle(40).label,'MAGNETIC');
+  assert.equal(logic.auraTitle(60).label,'SUPERSTAR');
+  assert.equal(logic.auraTitle(80).label,'ICONIC');
+});
+
+test('Aura fight rewards distinguish ordinary, marquee, stale, and callout results',()=>{
+  assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:5}),2);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:4}),-5);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:4,opponentLevel:3}),-3);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:7,opponentLevel:6}),-11);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:4,opponentLevel:5}),5);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:7,opponentLevel:8}),14);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:5,upset:true}),5);
+  assert.equal(logic.auraFightChange({won:true,titleWon:true}),10);
+  assert.equal(logic.auraFightChange({won:true,titleDefense:true}),6);
+  assert.equal(logic.auraFightChange({won:true,exhausted:true}),-7);
+  assert.equal(logic.auraFightChange({won:false}),-7);
+  assert.equal(logic.auraFightChange({won:false,forfeited:true}),-10);
+  assert.equal(logic.auraFightChange({won:true,callout:true,playerLevel:10,opponentLevel:1}),5);
+  assert.equal(logic.auraFightChange({won:false,callout:true}),-10);
+});
+
+test('social interactions award followers and Aura without reviving Hype',()=>{
+  const reward=logic.socialInteractionReward(17);
+  assert.deepEqual(reward,{followers:6,aura:3});
+  assert.equal('hype' in reward,false);
 });
 
 test('migration clears interrupted legacy activity sessions',()=>{

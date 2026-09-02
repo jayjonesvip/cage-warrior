@@ -147,7 +147,7 @@ opponentNames: {
     {profile:'media', text:'{opponent} hands {name} a loss by {finish}.'},
     {profile:'media', text:'{name} comes up short as {opponent} wins by {finish}. Attention turns to the next camp.'},
     {profile:'rival', author:'{opponent}', text:'Respect for taking the fight, {name}. But tonight belonged to me.'},
-    {profile:'hater', text:'The hype train needed brakes. {name} just found them.'},
+    {profile:'hater', text:'The bandwagon needed brakes. {name} just found them.'},
     {profile:'fan', text:'Losses happen. Still here, still following, and waiting for the comeback.'}
   ]
 },
@@ -247,7 +247,7 @@ interactions: {
     'One Daily Drop, every day. Guaranteed collectible. Do not ask who packed it.',
     'Followers open sponsor doors—and falling below a milestone can cost you the deal. Build back and they can return.',
     'The right equipped gear can cut Energy charging from five seconds to four. Best perk only.',
-    'Followers build your status. Hype makes sure the division notices.',
+    'Followers measure your audience. Aura measures how strongly the fight world feels your presence.',
     'CageGrindCEO: Records get attention. Finishes get phone calls.',
     'A title only unlocks the champion. Nobody mails you a belt—you take it from the man holding it.',
     'CageGrindCEO: Win when the lights are brightest and I will know your name.',
