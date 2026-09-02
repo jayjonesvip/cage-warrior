@@ -10,7 +10,7 @@ const root=path.resolve(__dirname,'..');
 
 test('fight-rules.json is valid and uses the current schema',()=>{
   const document=JSON.parse(fs.readFileSync(path.join(root,'fight-rules.json'),'utf8'));
-  assert.equal(document.schemaVersion,5);
+  assert.equal(document.schemaVersion,6);
   assert.equal(document.energyEconomy.energyRecoveryIntervalMilliseconds,5000);
   assert.equal(document.energyEconomy.healthRecoveryIntervalMilliseconds,60000);
   assert.equal(document.energyEconomy.maximumEnergy,100);
@@ -19,10 +19,16 @@ test('fight-rules.json is valid and uses the current schema',()=>{
   assert.equal(document.computerGeneratedOpponentDifficulty.compoundingGrowthStartsAtLevel,7);
   assert.equal(document.computerGeneratedOpponentDifficulty.attributeGrowthMultiplierPerLevel,1.01);
   assert.equal(document.experienceRewards.lowerLevelOpponentFollowerLossPercent,5);
+  assert.equal(document.followerRewards.fightPayoutMultiplier,.75);
+  assert.equal(document.followerRewards.completedLossMultiplier,.15);
+  assert.equal(document.followerRewards.offlineCapHours,48);
   assert.equal(document.auraRewards.calloutWin,5);
   assert.equal(document.auraRewards.calloutLoss,-10);
   assert.equal(document.auraRewards.lowerLevelWinMultiplier,.25);
   assert.equal(document.auraRewards.higherLevelWinMultiplier,.25);
+  assert.equal(document.fightFinishes.rockedExchanges,2);
+  assert.equal(document.fightFinishes.maximumRockedChance,.16);
+  assert.equal(document.fightFinishes.submissionBaseChance,.07);
   assert.deepEqual(document.attributePointRewards,{victoryAgainstLowerLevelOpponent:0,victoryAgainstSameLevelOpponent:1,victoryAgainstHigherLevelOpponent:2});
 });
 

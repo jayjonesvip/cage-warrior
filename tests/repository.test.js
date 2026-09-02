@@ -71,13 +71,15 @@ test('obsolete activity files and assets were removed',()=>{
   }
 });
 
-test('new careers use explicit save version 29',()=>{
-  assert.match(game,/const STATE_VERSION\s*=\s*29/);
+test('new careers use explicit save version 30',()=>{
+  assert.match(game,/const STATE_VERSION\s*=\s*30/);
   assert.match(game,/version:STATE_VERSION/);
   assert.match(game,/attributePoints:0/);
   assert.match(game,/circuitLossStreak:0/);
   assert.match(game,/energyRecoveryAt:Date\.now\(\)/);
   assert.match(game,/healthRecoveryAt:Date\.now\(\)/);
+  assert.match(game,/followersUpdatedAt:Date\.now\(\)/);
+  assert.match(game,/followersAccrualAura:0/);
   assert.match(game,/source\.version\)\)\|\|0\)<27\)s\.xp=LOGIC\.rescaleXpProgress/);
 });
 
@@ -138,11 +140,27 @@ test('below-full Health opens fights without invoking removed Training code',()=
 });
 
 test('passive recovery updates the HUD without rebuilding clickable opponent rows',()=>{
-  const recoveryBody=game.match(/function updatePassiveRecovery\(\)\{([\s\S]*?)\n  \}/)?.[1]||'';
+  const recoveryBody=game.match(/function updatePassiveRecovery\([^)]*\)\{([\s\S]*?)\n  \}/)?.[1]||'';
   assert.match(recoveryBody,/renderResourceHud\(\)/);
   assert.doesNotMatch(recoveryBody,/updateUI\(\)/);
   assert.match(game,/state\.health>=state\.maxHealth/);
   assert.match(game,/state\.health>=MINIMUM_FIGHT_HEALTH/);
+});
+
+test('Aura passively grows followers and refreshes sponsor eligibility',()=>{
+  assert.match(logic,/function followersPerHour\(aura=0\)/);
+  assert.match(logic,/function passiveFollowerGrowth\(state,now=Date\.now\(\),offlineCap=FOLLOWER_OFFLINE_CAP\)/);
+  assert.match(game,/LOGIC\.passiveFollowerGrowth\(state,now,FOLLOWER_OFFLINE_CAP\)/);
+  assert.match(game,/syncSponsorProgress\(\)/);
+  assert.match(game,/WHILE YOU WERE AWAY · \+\$\{fmt\(followerGrowth\.followers\)\} FOLLOWERS/);
+  assert.match(game,/document\.addEventListener\('visibilitychange',[\s\S]*updatePassiveRecovery\(true\)/);
+  assert.match(game,/window\.addEventListener\('pageshow',[\s\S]*updatePassiveRecovery\(true\)/);
+});
+
+test('fight follower rewards use Aura and the reduced payout helper',()=>{
+  assert.match(logic,/function fightFollowerReward\(\{opponentBaseFollowers=0,aura=0/);
+  assert.match(game,/LOGIC\.fightFollowerReward\(\{opponentBaseFollowers:o\.fans,aura:state\.aura/);
+  assert.match(game,/if\(!fight\.forfeited\)fans=changeFollowers\(LOGIC\.fightFollowerReward\(\{opponentBaseFollowers:o\.fans,won:false\}\)\)/);
 });
 
 test('Energy recovery popup reports accumulated Energy once',()=>{
@@ -195,7 +213,8 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   for(const asset of ['contact-wife.jpg','contact-mom.jpg','contact-grandma.jpg','contact-brother-tommy.png','contact-agent-carl.png'])assert.match(strings,new RegExp(`assets/${asset.replace('.','\\.')}`));
   assert.match(strings,/postFightTexts:[\s\S]*chance: \.32[\s\S]*relationship:'WIFE'[\s\S]*relationship:'AGENT'/);
   assert.match(game,/const notable=titleWon\|\|titleFight\|\|\(won&&winStreak>0&&winStreak%5===0\)/);
-  assert.match(game,/pendingPostFightText=selectPostFightText\(\{won:win,forfeited:!!fight\.forfeited,titleWon,titleFight:!!o\.globalChampionship/);
+  assert.match(game,/pendingPostFightText=selectPostFightText\(\{won:win,forfeited:!!fight\.forfeited,lowerLevelWin,titleWon,titleFight:!!o\.globalChampionship/);
+  assert.match(game,/if\(forfeited\|\|lowerLevelWin\|\|!contacts\.length\)return null/);
   assert.match(game,/function showPostFightFollowup\(\)\{if\(showPendingPostFightText\(\)\)return true/);
   assert.match(html,/id="postFightMessageInput"[^>]*placeholder="Replies unavailable"[^>]*disabled/);
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
@@ -379,6 +398,14 @@ test('Feed summarizes followers and all known followed accounts',()=>{
   assert.doesNotMatch(styles,/\.feed-filter-bar/);
 });
 
+test('fighter post preview uses a compact redraft action and Cancel returns to selection',()=>{
+  assert.match(html,/fighter-post-draft-row[\s\S]*id="fighterPostRedraft"[^>]*aria-label="Generate a new draft"[\s\S]*id="fighterPostSend"[^>]*>SEND</);
+  assert.doesNotMatch(html,/CHANGE FIGHTER|POST TO THE FEED/);
+  assert.match(game,/function cancelFighterPostComposer\(\)\{[\s\S]*if\(!fighterPostTarget\)\{closeFighterPostComposer\(\);return\}[\s\S]*fighterPostSearchStep/);
+  assert.match(game,/fighterPostClose'\)\.addEventListener\('click',cancelFighterPostComposer\)/);
+  assert.match(styles,/\.fighter-post-draft-row\{[^}]*grid-template-columns:minmax\(0,1fr\) 40px/);
+});
+
 test('fight feed runs at the default speed without a speed control',()=>{
   assert.doesNotMatch(html,/id="speedBtn"|id="fightControls"|sim-control/);
   assert.doesNotMatch(game,/fightSpeed|toggleFightSpeed|speedBtn|fightControls/);
@@ -393,7 +420,7 @@ test('live fight log separates structure, consequences, routine flavor, and repe
   assert.match(game,/text:`ROUND \$\{item\.round\} ENDS`,className:'round-divider'/);
   assert.doesNotMatch(game,/className:'round-end'/);
   assert.match(styles,/\.action-line\.round-divider\{[^}]*border:0;[^}]*background:transparent;[^}]*text-align:center/);
-  assert.match(game,/consequential=!divider&&!summary&&\/\(\^\|\\s\)\(opp\|big\|ko\|plan-edge\|plan-even\|plan-exposed\)/);
+  assert.match(game,/consequential=!divider&&!summary&&\/\(\^\|\\s\)\(opp\|big\|ko\|rocked\|plan-edge\|plan-even\|plan-exposed\)/);
   assert.match(styles,/\.action-line\.consequential\{[^}]*border-width:1px;[^}]*font-size:12px;font-weight:750/);
   assert.match(game,/class="event-icon" aria-hidden="true">&#9888;&#65038;/);
   assert.match(styles,/\.action-line:not\(\.consequential\):not\(\.round-divider\):not\(\.unofficial-score\)\{color:#aeb8c3/);
@@ -402,6 +429,17 @@ test('live fight log separates structure, consequences, routine flavor, and repe
   assert.match(styles,/\.action-repeat\{[^}]*border-radius:999px/);
   assert.match(styles,/\.condition\{height:10px/);
   assert.match(styles,/\.action-line\.unofficial-score\{[^}]*border:1px solid #876b2c;[^}]*border-left:3px solid #e6bc56/);
+});
+
+test('rocked fighters and every stoppage receive dedicated live-fight toasts',()=>{
+  assert.match(game,/type:'rocked'/);
+  assert.match(game,/fighterName:D\.name/);
+  assert.match(game,/\$\{String\(item\.fighterName\|\|'FIGHTER'\)\.toUpperCase\(\)\} IS ROCKED!/);
+  assert.match(game,/\['ko','submission'\]\.includes\(item\.type\)/);
+  assert.match(game,/SUBMISSION · \$\{winner\.name\.toUpperCase\(\)\} FORCES \$\{loser\.name\.toUpperCase\(\)\} TO TAP/);
+  assert.match(styles,/#toast\.fight-rocked-toast\{[^}]*border-color:#ff4c49/);
+  assert.match(styles,/#toast\.fight-finish-win\{[^}]*border-color:#36df7c/);
+  assert.match(styles,/#toast\.fight-finish-loss\{[^}]*border-color:#ff4c49/);
 });
 
 test('fight plan starts the bout directly and matchup portraits share one branded surface',()=>{
@@ -614,6 +652,8 @@ test('kettlebell, Smart Watch, and Dill Pickle drops use supplied artwork and ba
 });
 
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
+  assert.match(html,/fight-ladder-heading[\s\S]*World Fight Rankings[\s\S]*id="rosterSummary"/);
+  assert.match(styles,/\.fight-ladder-heading\{[\s\S]*display:grid/);
   for(const token of ['fight-ladder-columns','RANK · FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
   for(const token of ['fight-ranking-list','fight-ranking-row','fightWinRewardPreview','victoryAttributePointReward','data-fight-key'])assert.match(game,new RegExp(token));
   assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
@@ -622,6 +662,16 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
   assert.match(game,/LOGIC\.rankedFightTitleMode/);
   assert.match(game,/fightMode==='ranked'\)return Object\.assign\(\{\},opponent,\{worldRank,titleDefenseComplete:playerIsChampion\}\)/);
+});
+
+test('CageReporter calls out lower-level wins and their follower backlash',()=>{
+  const copyContext={};vm.runInNewContext(strings,copyContext);const pool=copyContext.CAGE_STRINGS.social.cycles.lowerLevelWin;
+  assert.ok(Array.isArray(pool));
+  assert.ok(pool.length>=6);
+  pool.forEach(post=>{assert.equal(post.profile,'media');assert.match(post.text,/followers|audience|fans/i)});
+  assert.match(game,/data\.win&&data\.lowerLevelWin/);
+  assert.match(game,/followersLost:Math\.abs\(fans\)/);
+  assert.match(game,/lowerLevelWin:lowerLevelWin&&!calloutFight/);
 });
 
 test('Fight ladder keeps the current fighter visible but not selectable',()=>{
@@ -822,7 +872,7 @@ test('service worker no longer caches removed activity code or art',()=>{
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 29','balanced XP curve'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 30','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);

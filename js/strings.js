@@ -133,6 +133,16 @@ opponentNames: {
     {profile:'fan', text:'That was the kind of performance that turns a prospect into must-watch television. {name} showed up.'}
   ],
   fightWinHater: {profile:'hater', text:'Everybody relax. One win does not make {name} unbeatable. Book the rematch.'},
+  lowerLevelWin: [
+    {profile:'media', text:'FAN BACKLASH: {name} beat lower-level {opponent}, but lost {followersLost} followers. The audience wants tougher competition.'},
+    {profile:'media', text:'CROWD REACTION: A win is official, but {name} dropped {followersLost} followers after facing down a level. Time to step up.'},
+    {profile:'media', text:'The record improves, the audience does not. {name} lost {followersLost} followers after beating lower-level {opponent}.'},
+    {profile:'media', text:'Cage Grind fans are not impressed by the matchmaking. {name} beat {opponent} and lost {followersLost} followers in the backlash.'},
+    {profile:'media', text:'RESULT WITH A WARNING: {name} gets the win over {opponent}, but {followersLost} followers leave. The next opponent needs to be tougher.'},
+    {profile:'media', text:'The fans have spoken: {name} lost {followersLost} followers after taking a lower-level fight. More challenging competition is expected.'},
+    {profile:'media', text:'WIN, THEN BACKLASH: {name} handled {opponent}, but the level gap cost {followersLost} followers.'},
+    {profile:'media', text:'Level {fighterLevel} {name} defeated Level {opponentLevel} {opponent}. The mismatch cost {followersLost} followers, and fans want a real test next.'}
+  ],
   fightStreakHeadline: [
     {profile:'media', text:'WIN STREAK: {name} has now won {winStreak} straight. The division has to pay attention.'},
     {profile:'media', text:'{winStreak} IN A ROW: {name} keeps rolling. The rest of the division is on notice.'},

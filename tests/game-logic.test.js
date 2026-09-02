@@ -18,6 +18,8 @@ test('core migration preserves career data and adds simplified fields',()=>{
   assert.equal(migrated.attributePoints,0);
   assert.ok(Number.isFinite(migrated.energyRecoveryAt));
   assert.ok(Number.isFinite(migrated.healthRecoveryAt));
+  assert.ok(Number.isFinite(migrated.followersUpdatedAt));
+  assert.equal(migrated.followersAccrualAura,0);
   for(const key of ['cash','careerEarnings','trainerOn','trainingInjury'])assert.equal(key in migrated,false,key);
 });
 
@@ -25,6 +27,7 @@ test('legacy Hype migrates directly to Aura and new careers start at zero',()=>{
   const migrated=logic.normalizeCoreState(state(),defaults,{hype:43});
   const fresh=logic.normalizeCoreState(state(),defaults,{});
   assert.equal(migrated.aura,43);
+  assert.equal(migrated.followersAccrualAura,43);
   assert.equal('hype' in migrated,false);
   assert.equal(fresh.aura,0);
 });
@@ -87,6 +90,15 @@ test('legacy saves seed passive recovery from their existing save timestamp',()=
   assert.equal(migrated.healthRecoveryAt,lastSave);
 });
 
+test('legacy saves initialize follower accrual at migration time without a retroactive award',()=>{
+  const raw=state({fans:900,aura:50,lastSave:Date.now()-72*3_600_000});
+  const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);
+  assert.ok(migrated.followersUpdatedAt>raw.lastSave);
+  assert.equal(migrated.followersAccrualAura,50);
+  assert.equal(logic.passiveFollowerGrowth(migrated,migrated.followersUpdatedAt).followers,0);
+  assert.equal(migrated.fans,900);
+});
+
 test('Energy remains continuous and is never normalized to battery quarters',()=>{
   const migrated=logic.normalizeCoreState(state({energy:63.8}),defaults,{energy:63.8});
   assert.equal(migrated.energy,63);
@@ -133,6 +145,67 @@ test('future timestamps from clock changes do not grant recovery',()=>{
   assert.deepEqual(logic.passiveRecovery(fighter,10_000),{energy:0,health:0});
   assert.equal(fighter.energyRecoveryAt,10_000);
   assert.equal(fighter.healthRecoveryAt,10_000);
+});
+
+test('passive follower rate scales once per ten Aura',()=>{
+  assert.equal(logic.followersPerHour(0),1);
+  assert.equal(logic.followersPerHour(9),1);
+  assert.equal(logic.followersPerHour(50),6);
+  assert.equal(logic.followersPerHour(59),6);
+  assert.equal(logic.followersPerHour(100),11);
+});
+
+test('passive followers accrue completed hours and preserve partial-hour progress',()=>{
+  const hour=3_600_000,fighter=state({fans:10,aura:50,followersUpdatedAt:1000,followersAccrualAura:50});
+  assert.deepEqual(logic.passiveFollowerGrowth(fighter,1000+hour+30*60_000),{followers:6,hours:1,rate:6,aura:50,changed:true});
+  assert.equal(fighter.fans,16);
+  assert.equal(fighter.followersUpdatedAt,1000+hour);
+  assert.equal(logic.passiveFollowerGrowth(fighter,1000+2*hour-1).followers,0);
+  assert.equal(logic.passiveFollowerGrowth(fighter,1000+2*hour).followers,6);
+});
+
+test('passive followers cap offline accrual at 48 hours',()=>{
+  const hour=3_600_000,now=1000+72*hour,fighter=state({fans:0,aura:100,followersUpdatedAt:1000,followersAccrualAura:100});
+  const result=logic.passiveFollowerGrowth(fighter,now);
+  assert.equal(result.hours,48);
+  assert.equal(result.followers,528);
+  assert.equal(fighter.followersUpdatedAt,now);
+  assert.equal(logic.passiveFollowerGrowth(fighter,now).followers,0);
+});
+
+test('invalid and backward follower timestamps reset without granting followers',()=>{
+  const invalid=state({fans:20,aura:50,followersUpdatedAt:'bad',followersAccrualAura:50}),backward=state({fans:20,aura:50,followersUpdatedAt:20_000,followersAccrualAura:50});
+  assert.equal(logic.passiveFollowerGrowth(invalid,10_000).followers,0);
+  assert.equal(invalid.followersUpdatedAt,10_000);
+  assert.equal(logic.passiveFollowerGrowth(backward,10_000).followers,0);
+  assert.equal(backward.followersUpdatedAt,10_000);
+  assert.equal(invalid.fans,20);
+  assert.equal(backward.fans,20);
+});
+
+test('an in-progress follower hour retains its saved Aura rate',()=>{
+  const hour=3_600_000,fighter=state({fans:0,aura:0,followersUpdatedAt:1000,followersAccrualAura:0});
+  fighter.aura=50;
+  assert.equal(logic.passiveFollowerGrowth(fighter,1000+hour/2).followers,0);
+  assert.equal(logic.passiveFollowerGrowth(fighter,1000+hour).followers,1);
+  assert.equal(fighter.followersAccrualAura,50);
+  assert.equal(logic.passiveFollowerGrowth(fighter,1000+2*hour).followers,6);
+});
+
+test('fight followers apply the twenty-five percent reduction without changing forfeits',()=>{
+  const base={opponentBaseFollowers:746,aura:50,followerPerks:0,upset:false,rivalry:false,won:true};
+  assert.equal(logic.fightFollowerReward({...base,randomMultiplier:.9}),755);
+  assert.equal(logic.fightFollowerReward({...base,randomMultiplier:1}),839);
+  assert.equal(logic.fightFollowerReward({...base,randomMultiplier:1.2}),1007);
+  assert.equal(logic.fightFollowerReward({...base,followerPerks:20,upset:true,rivalry:true,randomMultiplier:1}),1448);
+  assert.equal(logic.fightFollowerReward({opponentBaseFollowers:746,won:false}),84);
+  assert.equal(logic.fightFollowerReward({opponentBaseFollowers:746,won:false,forfeited:true}),0);
+});
+
+test('passive followers immediately affect sponsor eligibility',()=>{
+  const hour=3_600_000,fighter=state({fans:499,aura:0,followersUpdatedAt:1000,followersAccrualAura:0}),sponsors=[{id:'bob',followersRequired:0},{id:'gary',followersRequired:500}];
+  logic.passiveFollowerGrowth(fighter,1000+hour);
+  assert.equal(logic.sponsorProgress(sponsors,fighter.fans).active.id,'gary');
 });
 
 test('full recovery time accounts for a partially elapsed interval',()=>{
@@ -253,6 +326,28 @@ test('fight damage and starting condition remain active',()=>{
   assert.equal(logic.finalFightHealthLoss({rawDamage:0,forfeited:true,finish:'FORFEIT'}),0);
   assert.equal(logic.startingFightCondition(95,100),100);
   assert.ok(logic.startingFightCondition(45,100)<100);
+});
+
+test('significant strikes can rock either fighter without making every shot a finish',()=>{
+  assert.equal(logic.rockedChance({significant:false,power:20,chin:1,damage:30}),0);
+  assert.equal(logic.rockedChance({significant:true,power:5,chin:5,damage:6}),.025);
+  assert.equal(logic.rockedChance({significant:true,power:10,chin:5,damage:11,aggressive:true}),.13);
+  assert.equal(logic.rockedChance({significant:true,power:99,chin:1,damage:99,aggressive:true}),.16);
+});
+
+test('rocked fighters recover from Chin and Cardio or remain vulnerable to a follow-up',()=>{
+  assert.equal(logic.rockedRecoveryChance({chin:5,cardio:5,exchangesRocked:1}),.565);
+  assert.ok(Math.abs(logic.rockedRecoveryChance({chin:5,cardio:5,exchangesRocked:2})-.765)<Number.EPSILON);
+  assert.equal(logic.knockoutFinishChance({targetCondition:50,rocked:false,damage:10,power:10,chin:5}),0);
+  assert.ok(logic.knockoutFinishChance({targetCondition:50,rocked:true,damage:10,power:10,chin:5})>.2);
+  assert.ok(logic.knockoutFinishChance({targetCondition:50,rocked:true,knockdown:true,damage:10,power:10,chin:5})>.4);
+});
+
+test('grappling finish pressure rises against a rocked opponent',()=>{
+  const normal=logic.submissionFinishChance({speed:5,opponentSpeed:5,cardio:5,opponentCardio:5,targetCondition:100});
+  const rocked=logic.submissionFinishChance({speed:5,opponentSpeed:5,cardio:5,opponentCardio:5,targetCondition:100,rocked:true});
+  assert.equal(normal,.07);
+  assert.equal(rocked,.14);
 });
 
 test('lower-level opponents award zero XP and same-level runbacks award half',()=>{

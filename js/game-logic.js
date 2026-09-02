@@ -14,6 +14,8 @@
   const ENERGY_RECOVERY_INTERVAL=5000;
   const HEALTH_RECOVERY_INTERVAL=60000;
   const OFFLINE_RECOVERY_CAP=8*60*60*1000;
+  const FOLLOWER_HOUR=60*60*1000;
+  const FOLLOWER_OFFLINE_CAP=48*FOLLOWER_HOUR;
 
   function localDateKey(value=new Date()){
     const date=value instanceof Date?value:new Date(value);
@@ -109,6 +111,8 @@
     state.healthRecoveryAt=validTimestamp(raw.healthRecoveryAt);
     const savedAura=Number.isFinite(Number(raw.aura))?raw.aura:Number.isFinite(Number(raw.hype))?raw.hype:state.aura;
     state.aura=clamp(finite(savedAura,defaults.aura??defaults.hype??0),0,100);
+    const savedFollowersAt=Number(raw.followersUpdatedAt);state.followersUpdatedAt=Number.isFinite(savedFollowersAt)&&savedFollowersAt>0&&savedFollowersAt<=now?savedFollowersAt:now;
+    state.followersAccrualAura=clamp(whole(raw.followersAccrualAura,state.aura),0,100);
     const stats=state.stats&&typeof state.stats==='object'&&!Array.isArray(state.stats)?state.stats:{};
     state.stats={};
     for(const key of ['power','speed','chin','cardio'])state.stats[key]=Math.max(1,Math.round(finite(stats[key],defaults.stats[key])));
@@ -171,6 +175,24 @@
     return result;
   }
 
+  function followersPerHour(aura=0){return Math.max(0,Math.round(fightRule('followerRewards.passiveBasePerHour',1)))+Math.floor(clamp(finite(aura),0,100)/Math.max(1,fightRule('followerRewards.auraPerFollowerStep',10)))}
+
+  function passiveFollowerGrowth(state,now=Date.now(),offlineCap=FOLLOWER_OFFLINE_CAP){
+    const current=Math.max(0,finite(now,Date.now())),currentAura=clamp(whole(state?.aura),0,100),saved=Number(state?.followersUpdatedAt),savedAura=clamp(whole(state?.followersAccrualAura,currentAura),0,100),cap=Math.max(FOLLOWER_HOUR,finite(offlineCap,FOLLOWER_OFFLINE_CAP));
+    if(!Number.isFinite(saved)||saved<=0||saved>current){state.followersUpdatedAt=current;state.followersAccrualAura=currentAura;return {followers:0,hours:0,rate:followersPerHour(currentAura),aura:currentAura,changed:true}}
+    const elapsed=current-saved,cappedElapsed=Math.min(elapsed,cap),hours=Math.floor(cappedElapsed/FOLLOWER_HOUR),rate=followersPerHour(savedAura);
+    if(hours<1)return {followers:0,hours:0,rate,aura:savedAura,changed:false};
+    const followers=hours*rate,remainder=cappedElapsed-hours*FOLLOWER_HOUR;state.fans=nonNegativeWhole(state.fans)+followers;state.followersUpdatedAt=elapsed>cap?current-remainder:saved+hours*FOLLOWER_HOUR;state.followersAccrualAura=currentAura;
+    return {followers,hours,rate,aura:savedAura,changed:true};
+  }
+
+  function fightFollowerReward({opponentBaseFollowers=0,aura=0,followerPerks=0,upset=false,rivalry=false,randomMultiplier=1,won=true,forfeited=false}={}){
+    if(forfeited)return 0;
+    const base=Math.max(0,finite(opponentBaseFollowers)),fightMultiplier=fightRule('followerRewards.fightPayoutMultiplier',.75);
+    if(!won)return Math.round(base*fightRule('followerRewards.completedLossMultiplier',.15)*fightMultiplier);
+    return Math.round(base*(1+clamp(finite(aura),0,100)/100)*(1+Math.max(0,finite(followerPerks))/100)*(upset?1.25:1)*(rivalry?1.15:1)*clamp(finite(randomMultiplier,1),.9,1.2)*fightMultiplier);
+  }
+
   function recoveryTimeRemaining(value,maximum,lastRecoveryAt,interval,now=Date.now()){
     const missing=Math.max(0,Math.ceil(finite(maximum,100)-finite(value)));
     if(!missing)return 0;
@@ -211,7 +233,7 @@
     if(rookieShowcase)return {tone:'favorable',headline:'LET US SEE WHAT YOU HAVE',message:'A clean opening test. Stay composed and make the first contract count.'};
     if(titleBout&&playerIsChampion)return {tone:'title',headline:'PROTECT THE BELT',message:'Every ranked challenger can take what you earned. Do not overlook this defense.'};
     if(titleBout)return {tone:levelDifference>0||ratingEdge<=-4?'danger':'title',headline:'YOUR TITLE SHOT',message:levelDifference>0||ratingEdge<=-4?'You are the underdog on paper, but one win changes everything.':'This is the moment you climbed for. Fight smart and take the belt.'};
-    if(levelDifference<0)return {tone:'avoid',headline:'FAN BACKLASH',message:`A win pays no XP or Attribute Points, and costs ${fightRule('experienceRewards.lowerLevelOpponentFollowerLossPercent',5)}% of your followers.`};
+    if(levelDifference<0){const auraCost=Math.abs(auraFightChange({won:true,playerLevel,opponentLevel}));return {tone:'avoid',headline:'FAN BACKLASH',message:`A win pays no XP or Attribute Points, costs ${fightRule('experienceRewards.lowerLevelOpponentFollowerLossPercent',5)}% of your followers, and loses ${auraCost} Aura.`}}
     if(levelDifference>=2||ratingEdge<=-8)return {tone:'danger',headline:'HIGH-RISK FIGHT',message:`You are out of your league on paper. A win still earns ${points} Attribute Points.`};
     if(levelDifference>0)return {tone:'step-up',headline:'STEP-UP FIGHT',message:`A real test of your skills. The risk comes with ${points} Attribute Points.`};
     if(ratingEdge>=4)return {tone:'favorable',headline:'GOOD TEST OF SKILLS',message:'You have the edge, but this opponent is at your level. Go earn the point.'};
@@ -264,6 +286,31 @@
     if(healthPercent>=fightRule('startingCondition.slightlyReducedConditionMinimumHealthPercent',70))return fightRule('startingCondition.slightlyReducedCondition',95);
     if(healthPercent>=fightRule('startingCondition.reducedConditionMinimumHealthPercent',50))return fightRule('startingCondition.reducedCondition',88);
     return fightRule('startingCondition.badlyReducedCondition',78);
+  }
+
+  function rockedChance({significant=false,power=0,chin=0,damage=0,aggressive=false}={}){
+    if(!significant)return 0;
+    const chance=fightRule('fightFinishes.significantStrikeRockedBaseChance',.025)+Math.max(0,finite(power)-finite(chin))*fightRule('fightFinishes.powerVsChinRockedChancePerPoint',.01)+Math.max(0,finite(damage)-6)*fightRule('fightFinishes.damageRockedChancePerPoint',.008)+(aggressive?fightRule('fightFinishes.aggressiveRockedChanceBonus',.015):0);
+    return clamp(chance,0,fightRule('fightFinishes.maximumRockedChance',.16));
+  }
+
+  function rockedRecoveryChance({chin=0,cardio=0,exchangesRocked=1}={}){
+    const chance=fightRule('fightFinishes.rockedRecoveryBaseChance',.38)+Math.max(0,finite(chin))*fightRule('fightFinishes.rockedRecoveryChinPerPoint',.025)+Math.max(0,finite(cardio))*fightRule('fightFinishes.rockedRecoveryCardioPerPoint',.012)+(whole(exchangesRocked)>=2?fightRule('fightFinishes.rockedRecoverySecondExchangeBonus',.2):0);
+    return clamp(chance,0,fightRule('fightFinishes.maximumRockedRecoveryChance',.9));
+  }
+
+  function knockoutFinishChance({targetCondition=100,rocked=false,knockdown=false,damage=0,power=0,chin=0}={}){
+    const condition=clamp(finite(targetCondition,100),0,100);
+    if(condition<=0)return 1;
+    const existing=knockdown&&condition<28?.48:condition<10?.3:0;
+    if(!rocked)return existing;
+    const rockedChance=fightRule('fightFinishes.rockedFinishBaseChance',.09)+Math.max(0,finite(damage)-6)*fightRule('fightFinishes.rockedFinishDamageChancePerPoint',.012)+Math.max(0,finite(power)-finite(chin))*fightRule('fightFinishes.rockedFinishPowerVsChinPerPoint',.01)+(knockdown?fightRule('fightFinishes.rockedFinishKnockdownBonus',.22):0)+(100-condition)*.0015;
+    return clamp(Math.max(existing,rockedChance),0,fightRule('fightFinishes.maximumRockedFinishChance',.58));
+  }
+
+  function submissionFinishChance({speed=0,opponentSpeed=0,cardio=0,opponentCardio=0,targetCondition=100,signature=false,rocked=false}={}){
+    const chance=fightRule('fightFinishes.submissionBaseChance',.07)+(finite(speed)-finite(opponentSpeed))*fightRule('fightFinishes.submissionSpeedEdgeChancePerPoint',.012)+(finite(cardio)-finite(opponentCardio))*fightRule('fightFinishes.submissionCardioEdgeChancePerPoint',.008)+(100-clamp(finite(targetCondition,100),0,100))*fightRule('fightFinishes.submissionConditionChancePerPoint',.001)+(signature?fightRule('fightFinishes.submissionSignatureBonus',.05):0)+(rocked?fightRule('fightFinishes.submissionRockedBonus',.07):0);
+    return clamp(chance,fightRule('fightFinishes.minimumSubmissionChance',.05),fightRule('fightFinishes.maximumSubmissionChance',.38));
   }
 
   function liveFightHealthDamage({landed=false,knockdown=false,finish=''}={}){
@@ -529,5 +576,5 @@
     };
   }
 
-  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,perkLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
+  return {clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,gearLoadoutLimit,perkLoadoutLimit,fightScore,playerTrailing,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,normalizeGearDrop};
 });
