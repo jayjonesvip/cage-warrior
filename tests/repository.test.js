@@ -665,9 +665,13 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
 });
 
 test('CageReporter calls out lower-level wins and their follower backlash',()=>{
-  const copyContext={};vm.runInNewContext(strings,copyContext);const pool=copyContext.CAGE_STRINGS.social.cycles.lowerLevelWin;
+  const copyContext={};vm.runInNewContext(strings,copyContext);const cycles=copyContext.CAGE_STRINGS.social.cycles,pool=cycles.lowerLevelWin;
   assert.ok(Array.isArray(pool));
-  assert.ok(pool.length>=6);
+  for(const key of ['fightWin','lowerLevelWin','fightStreakHeadline','fightLoss']){
+    const reporterPool=cycles[key].filter(post=>post.profile==='media');
+    assert.equal(reporterPool.length,10,`${key} needs ten CageReporter variants`);
+    assert.ok(reporterPool.some(post=>/verdict|no excuses|no sugarcoating|take note|tougher|important|dangerous|questions/i.test(post.text)),`${key} needs an editorial voice`);
+  }
   pool.forEach(post=>{assert.equal(post.profile,'media');assert.match(post.text,/followers|audience|fans/i)});
   assert.match(game,/data\.win&&data\.lowerLevelWin/);
   assert.match(game,/followersLost:Math\.abs\(fans\)/);

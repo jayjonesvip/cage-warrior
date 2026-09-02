@@ -98,8 +98,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.52',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.52',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.79',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.79',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -123,12 +123,16 @@ opponentNames: {
     sponsorDropped:'{brand} has dropped @{name} after the fighter fell below its follower requirement. Rebuild the audience and the door can reopen.',
   cycles: {
   fightWin: [
-    {profile:'media', text:'RESULT: {name} defeats {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'{name} takes the win over {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'OFFICIAL: {name} gets past {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'{name} leaves with the victory after defeating {opponent} by {finish}.{titleSuffix}'},
-    {profile:'media', text:'Another win for {name}. {opponent} falls by {finish}.{titleSuffix}'},
-    {profile:'media', text:'{name} handles business against {opponent}, earning the win by {finish}.{titleSuffix}'},
+    {profile:'media', text:'RESULT: {name} defeats {opponent} by {finish}. Clean result, no excuses.{titleSuffix}'},
+    {profile:'media', text:'{name} takes the win over {opponent} by {finish}. That was control, not luck.{titleSuffix}'},
+    {profile:'media', text:'OFFICIAL: {name} gets past {opponent} by {finish}. The division should take note.{titleSuffix}'},
+    {profile:'media', text:'{name} leaves with the victory after defeating {opponent} by {finish}. A professional night from start to finish.{titleSuffix}'},
+    {profile:'media', text:'Another win for {name}. {opponent} falls by {finish}, and the résumé keeps getting harder to dismiss.{titleSuffix}'},
+    {profile:'media', text:'{name} handles business against {opponent}, earning the win by {finish}. Exactly what a serious contender is supposed to do.{titleSuffix}'},
+    {profile:'media', text:'STATEMENT MADE: {name} defeats {opponent} via {finish}. That performance will improve the matchmaking options.{titleSuffix}'},
+    {profile:'media', text:'No controversy tonight. {name} beats {opponent} by {finish} and earns every bit of the result.{titleSuffix}'},
+    {profile:'media', text:'{name} defeats {opponent} by {finish}. The result was decisive; the next assignment should be tougher.{titleSuffix}'},
+    {profile:'media', text:'CageReporter verdict: {name} was the better fighter tonight, getting past {opponent} via {finish}.{titleSuffix}'},
     {profile:'rival', author:'{opponent}', text:'Enjoy the win, {name}. If they book it again, I know what changes.'},
     {profile:'fan', text:'That was the kind of performance that turns a prospect into must-watch television. {name} showed up.'}
   ],
@@ -141,21 +145,34 @@ opponentNames: {
     {profile:'media', text:'RESULT WITH A WARNING: {name} gets the win over {opponent}, but {followersLost} followers leave. The next opponent needs to be tougher.'},
     {profile:'media', text:'The fans have spoken: {name} lost {followersLost} followers after taking a lower-level fight. More challenging competition is expected.'},
     {profile:'media', text:'WIN, THEN BACKLASH: {name} handled {opponent}, but the level gap cost {followersLost} followers.'},
-    {profile:'media', text:'Level {fighterLevel} {name} defeated Level {opponentLevel} {opponent}. The mismatch cost {followersLost} followers, and fans want a real test next.'}
+    {profile:'media', text:'Level {fighterLevel} {name} defeated Level {opponentLevel} {opponent}. The mismatch cost {followersLost} followers, and fans want a real test next.'},
+    {profile:'media', text:'Easy work, expensive choice. {name} beat lower-level {opponent}, then watched {followersLost} followers walk away.'},
+    {profile:'media', text:'CageReporter verdict: {name} got the win, but beating down the ladder impressed nobody. The bill was {followersLost} followers.'}
   ],
   fightStreakHeadline: [
     {profile:'media', text:'WIN STREAK: {name} has now won {winStreak} straight. The division has to pay attention.'},
     {profile:'media', text:'{winStreak} IN A ROW: {name} keeps rolling. The rest of the division is on notice.'},
     {profile:'media', text:'The run continues. {name} pushes the winning streak to {winStreak}.'},
-    {profile:'media', text:'{name} extends the streak to {winStreak} wins. Momentum is hard to ignore.'}
+    {profile:'media', text:'{name} extends the streak to {winStreak} wins. Momentum is hard to ignore.'},
+    {profile:'media', text:'This is no longer one good night. {name} has won {winStreak} straight, and the pattern is obvious.'},
+    {profile:'media', text:'{winStreak} consecutive wins for {name}. The division is running out of excuses.'},
+    {profile:'media', text:'{name} keeps answering every question. Win number {winStreak} makes the next matchup even more important.'},
+    {profile:'media', text:'The streak is real: {name} reaches {winStreak} straight wins and looks more dangerous each time out.'},
+    {profile:'media', text:'{name} has stacked {winStreak} wins in a row. Opponents know what is coming and still have not stopped it.'},
+    {profile:'media', text:'CageReporter verdict: {winStreak} straight is not a coincidence. {name} has earned a bigger test.'}
   ],
   fightStreakHater: {profile:'hater', text:'{winStreak} straight? Wake me up when {name} beats someone I picked.'},
   fightLoss: [
-    {profile:'media', text:'RESULT: {name} falls to {opponent} by {finish}.'},
-    {profile:'media', text:'{opponent} defeats {name} by {finish}.'},
-    {profile:'media', text:'OFFICIAL: {name} comes up short against {opponent} by {finish}.'},
-    {profile:'media', text:'{opponent} hands {name} a loss by {finish}.'},
-    {profile:'media', text:'{name} comes up short as {opponent} wins by {finish}. Attention turns to the next camp.'},
+    {profile:'media', text:'RESULT: {name} falls to {opponent} by {finish}. There is no hiding from that result.'},
+    {profile:'media', text:'{opponent} defeats {name} by {finish}. The better fighter won tonight.'},
+    {profile:'media', text:'OFFICIAL: {name} comes up short against {opponent} by {finish}. The adjustments never arrived.'},
+    {profile:'media', text:'{opponent} hands {name} a loss by {finish}. Back to the gym—this one exposed real holes.'},
+    {profile:'media', text:'{name} comes up short as {opponent} wins by {finish}. The next camp needs answers, not excuses.'},
+    {profile:'media', text:'No sugarcoating it: {opponent} beats {name} by {finish}. That was a hard lesson under the lights.'},
+    {profile:'media', text:'{name} loses to {opponent} by {finish}. The tape will be uncomfortable, which is exactly why it matters.'},
+    {profile:'media', text:'Credit where it belongs: {opponent} defeats {name} by {finish} and shuts down the game plan.'},
+    {profile:'media', text:'A setback does not erase the climb, but {name} was second best tonight. {opponent} wins by {finish}.'},
+    {profile:'media', text:'CageReporter verdict: {name} was beaten clearly by {opponent} via {finish}. The response starts now.'},
     {profile:'rival', author:'{opponent}', text:'Respect for taking the fight, {name}. But tonight belonged to me.'},
     {profile:'hater', text:'The bandwagon needed brakes. {name} just found them.'},
     {profile:'fan', text:'Losses happen. Still here, still following, and waiting for the comeback.'}
