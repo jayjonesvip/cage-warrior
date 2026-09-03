@@ -409,8 +409,9 @@ test('Home visually leads with the fighter profile before career details',()=>{
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;flex-direction:column\}/);
   assert.match(styles,/#careerGameContent>\.hero\{order:1\}/);
   assert.match(styles,/#careerIdentityCard\{order:2\}/);
+  assert.match(styles,/#homeFightSkin\{order:3\}/);
   assert.match(html,/class="card career-after-setup home-ticker"/);
-  assert.match(styles,/>\.home-ticker\{order:3\}/);
+  assert.match(styles,/>\.home-ticker\{order:4\}/);
   assert.doesNotMatch(html,/FIGHT\. IMPROVE\. CLIMB\.|career-guide|choice-action/);
   assert.doesNotMatch(styles,/career-guide|choice-action|choice-grid/);
   assert.doesNotMatch(game,/\[data-go\]/);
@@ -649,12 +650,27 @@ test('each loadout category owns one distinct career effect',()=>{
   assert.match(game,/\+\$\{auraGear\} BLING/);
 });
 
-test('top-tier Property rarity and Main Event Ring Gear use the revised balance',()=>{
+test('every Gear category has the same eight-item rarity curve',()=>{
+  const catalogSource=definitions.slice(definitions.indexOf('const gearItems'),definitions.indexOf('const gearCategoryEffectByRarity'));
+  const items=[...catalogSource.matchAll(/\{id:'([^']+)',category:'([^']+)',name:'([^']+)',icon:'[^']+',(?:assetExt:'[^']+',)?rarity:'([^']+)'/g)].map(match=>({id:match[1],category:match[2],name:match[3],rarity:match[4]}));
+  assert.equal(items.length,32);
+  for(const category of ['Fight Gear','Bling','Lifestyle','Property & Rides']){
+    const categoryItems=items.filter(item=>item.category===category);
+    assert.equal(categoryItems.length,8,category);
+    assert.deepEqual(Object.fromEntries(['COMMON','RARE','EPIC','LEGENDARY'].map(rarity=>[rarity,categoryItems.filter(item=>item.rarity===rarity).length])),{COMMON:4,RARE:2,EPIC:1,LEGENDARY:1},category);
+  }
   assert.match(definitions,/EPIC:\{auraBonus:3,healthRecoverySpeed:7500,energyRecoverySpeed:300\}/);
-  for(const id of ['sports-car','house','supercar'])assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+rarity:'EPIC'`));
-  for(const id of ['luxury-yacht','private-jet','mansion'])assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+rarity:'LEGENDARY'`));
-  assert.match(definitions,/id:'main-event-kit'[^\n]+bonuses:\{power:3,speed:3,chin:3,cardio:3\}/);
+  assert.match(definitions,/id:'private-jet'[^\n]+rarity:'EPIC'/);
+  assert.match(definitions,/id:'mansion'[^\n]+rarity:'LEGENDARY'/);
+  assert.match(definitions,/id:'performance-treadmill'[^\n]+rarity:'EPIC'[^\n]+stat:'cardio',bonus:6/);
+  assert.match(definitions,/id:'heavy-bag'[^\n]+rarity:'LEGENDARY'[^\n]+stat:'power',bonus:9/);
   assert.match(game,/if\(g\?\.bonuses\?\.\[key\]\)v\+=g\.bonuses\[key\]/);
+});
+
+test('trimmed Gear items stay outside the active drop catalog',()=>{
+  const cuts=['bourbon','cuban-cigars','fur-coat','diamond-watch','ice-ring','tennis-shoes','small-gym-dog','victory-bucket','hot-coffee','iced-coffee','dog','flagship-phone','shrimp-cocktail','white-loafers','concert-grand','performance-jet-ski','coastal-speedboat','house','supercar','luxury-yacht'];
+  const catalogSource=definitions.slice(definitions.indexOf('const gearItems'),definitions.indexOf('const gearCategoryEffectByRarity'));
+  for(const id of cuts)assert.doesNotMatch(catalogSource,new RegExp(`id:'${id}'`),id);
 });
 
 test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
@@ -727,25 +743,65 @@ test('Energy Drink collectible uses the Surge Core can artwork',()=>{
   assert.ok(!fs.existsSync(path.join(root,'assets/icons/energy-drink.jpg')));
 });
 
-test('corner-store Lifestyle drops include three commons and one rare with artwork',()=>{
-  for(const id of ['hot-coffee','iced-coffee','tinned-sardines']){
+test('recovery-focused Lifestyle drops retain supplied artwork',()=>{
+  for(const id of ['energy-drink','tinned-sardines','dill-pickle','fight-fuel-protein']){
     assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'Lifestyle'[^\\n]+rarity:'COMMON'`));
     assert.ok(fs.existsSync(path.join(root,`assets/icons/${id}.png`)),id);
   }
-  assert.match(definitions,/id:'white-loafers'[^\n]+category:'Lifestyle'[^\n]+rarity:'RARE'/);
-  assert.ok(fs.existsSync(path.join(root,'assets/icons/white-loafers.png')));
+  for(const id of ['meal-plan','hot-tub'])assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'Lifestyle'[^\\n]+rarity:'RARE'`));
 });
 
-test('kettlebell, Smart Watch, and Dill Pickle drops use supplied artwork and balanced rarities',()=>{
+test('Kettlebell, Smart Watch, and Dill Pickle remain in the balanced catalog',()=>{
   const drops=[
     ['kettle-bell','Fight Gear','COMMON'],
-    ['smart-watch','Bling','RARE'],
+    ['smart-watch','Bling','COMMON'],
     ['dill-pickle','Lifestyle','COMMON']
   ];
   for(const [id,category,rarity] of drops){
     assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'${category}'[^\\n]+rarity:'${rarity}'`));
     assert.ok(fs.existsSync(path.join(root,`assets/icons/${id}.png`)),id);
   }
+});
+
+test('Combat loadout uses training gear instead of fight apparel',()=>{
+  const retired=['mouth','shoes','wraps','mma-shorts','rookie-gloves','gloves','blackout-kit','storm-gloves','cobalt-kit','champ-gloves','main-event-kit'];
+  for(const id of retired)assert.doesNotMatch(definitions,new RegExp(`id:'${id}'[^\\n]+category:'Fight Gear'`));
+  const training=[
+    ['speed-bag','RARE'],
+    ['performance-treadmill','EPIC'],
+    ['heavy-bag','LEGENDARY']
+  ];
+  for(const [id,rarity] of training){
+    assert.match(definitions,new RegExp(`id:'${id}'[^\\n]+category:'Fight Gear'[^\\n]+rarity:'${rarity}'`));
+    assert.ok(fs.existsSync(path.join(root,`assets/icons/${id}.jpg`)),id);
+  }
+  assert.match(definitions,/id:'headgear'[^\n]+assetExt:'jpg'[^\n]+rarity:'RARE'[^\n]+stat:'chin',bonus:4/);
+  assert.ok(fs.existsSync(path.join(root,'assets/icons/headgear.jpg')));
+});
+
+test('Aura fight skins appear on Home and stay outside perks and drops',()=>{
+  assert.match(html,/id="homeFightSkin"[\s\S]*AURA · AUTOMATIC[\s\S]*id="homeFightSkinGloves"[\s\S]*id="homeFightSkinWraps"[\s\S]*id="homeFightSkinMouthguard"[\s\S]*id="homeFightSkinShorts"/);
+  assert.match(styles,/\.home-fight-skin\{[^}]*--fight-skin-accent/);
+  assert.match(styles,/\.home-fight-skin-display\{[^}]*display:grid/);
+  const skinStart=definitions.indexOf('const auraFightSkins');
+  const gearStart=definitions.indexOf('const gearItems');
+  assert.ok(skinStart>=0&&skinStart<gearStart);
+  const skins=[
+    ['unknown','GRAY',0,19],
+    ['noticed','CYAN',20,39],
+    ['magnetic','PURPLE',40,59],
+    ['superstar','GOLD',60,79],
+    ['iconic','ORANGE',80,100]
+  ];
+  for(const [key,color,minimum,maximum] of skins){
+    assert.match(definitions,new RegExp(`key:'${key}'[^\\n]+colorName:'${color}'[^\\n]+minimum:${minimum},maximum:${maximum}`));
+    for(const piece of ['gloves','wraps','mouthguard','shorts'])assert.ok(fs.existsSync(path.join(root,`assets/skins/aura-${key}-${piece}.jpg`)),`${key} ${piece}`);
+  }
+  const gearSource=definitions.slice(gearStart,definitions.indexOf('const endorsementDefs'));
+  assert.doesNotMatch(gearSource,/aura-(?:unknown|noticed|magnetic|superstar|iconic)-(?:gloves|wraps|mouthguard|shorts)/);
+  assert.match(game,/function currentAuraFightSkin\(\)/);
+  assert.match(game,/fightSkinCard\.style\.setProperty\('--fight-skin-accent',fightSkin\.accent\)/);
+  assert.equal((game.match(/currentAuraFightSkin\(\)\.accent/g)||[]).length,3);
 });
 
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{

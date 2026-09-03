@@ -453,9 +453,9 @@ test('Victory Pack progress remains capped and eligibility requires an on-level 
 });
 
 test('gear drops are validated without economy fields',()=>{
-  const drop=logic.normalizeGearDrop({item:{id:'wraps',name:'Wraps',category:'Fight Gear'},rarity:'COMMON',count:1,reason:'VICTORY'});
-  assert.equal(drop.item.id,'wraps');
-  assert.equal(drop.rarity,'COMMON');
+  const drop=logic.normalizeGearDrop({item:{id:'heavy-bag',name:'Championship Heavy Bag',category:'Fight Gear'},rarity:'LEGENDARY',count:1,reason:'VICTORY'});
+  assert.equal(drop.item.id,'heavy-bag');
+  assert.equal(drop.rarity,'LEGENDARY');
   assert.equal(logic.normalizeGearDrop({item:{},rarity:'COMMON'}),null);
 });
 

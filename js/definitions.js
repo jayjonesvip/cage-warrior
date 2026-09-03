@@ -52,71 +52,53 @@ const fighterAvatars = [
   {id:'fighter-44',asset:'assets/avatars/fighter-avatar-44.png',stats:{power:4,speed:4,chin:5,cardio:7}}
 ];
 
+const auraFightSkins = [
+  {key:'unknown',label:'UNKNOWN',colorName:'GRAY',minimum:0,maximum:19,accent:'#a7b0bd',glovesAsset:'assets/skins/aura-unknown-gloves.jpg',wrapsAsset:'assets/skins/aura-unknown-wraps.jpg',mouthguardAsset:'assets/skins/aura-unknown-mouthguard.jpg',shortsAsset:'assets/skins/aura-unknown-shorts.jpg'},
+  {key:'noticed',label:'GETTING NOTICED',colorName:'CYAN',minimum:20,maximum:39,accent:'#63ddff',glovesAsset:'assets/skins/aura-noticed-gloves.jpg',wrapsAsset:'assets/skins/aura-noticed-wraps.jpg',mouthguardAsset:'assets/skins/aura-noticed-mouthguard.jpg',shortsAsset:'assets/skins/aura-noticed-shorts.jpg'},
+  {key:'magnetic',label:'MAGNETIC',colorName:'PURPLE',minimum:40,maximum:59,accent:'#c49aff',glovesAsset:'assets/skins/aura-magnetic-gloves.jpg',wrapsAsset:'assets/skins/aura-magnetic-wraps.jpg',mouthguardAsset:'assets/skins/aura-magnetic-mouthguard.jpg',shortsAsset:'assets/skins/aura-magnetic-shorts.jpg'},
+  {key:'superstar',label:'SUPERSTAR',colorName:'GOLD',minimum:60,maximum:79,accent:'#ffdc78',glovesAsset:'assets/skins/aura-superstar-gloves.jpg',wrapsAsset:'assets/skins/aura-superstar-wraps.jpg',mouthguardAsset:'assets/skins/aura-superstar-mouthguard.jpg',shortsAsset:'assets/skins/aura-superstar-shorts.jpg'},
+  {key:'iconic',label:'ICONIC',colorName:'ORANGE',minimum:80,maximum:100,accent:'#ffb84f',glovesAsset:'assets/skins/aura-iconic-gloves.jpg',wrapsAsset:'assets/skins/aura-iconic-wraps.jpg',mouthguardAsset:'assets/skins/aura-iconic-mouthguard.jpg',shortsAsset:'assets/skins/aura-iconic-shorts.jpg'}
+];
+
 const gearItems = [
   // Fight Gear — earned from wins; minLevel controls when an item enters the permanent drop pool.
-  {id:'wraps',category:'Fight Gear',name:'Stiff Hand Wraps',icon:'🩹',rarity:'COMMON',minLevel:1,desc:'+1 Power. Your first real piece of kit.',stat:'power',bonus:1},
-  {id:'mouth',category:'Fight Gear',name:'Boil-Bite Guard',icon:'🦷',rarity:'COMMON',minLevel:1,desc:'+1 Chin. Keep the teeth you started with.',stat:'chin',bonus:1},
-  {id:'mma-shorts',category:'Fight Gear',name:'MMA Shorts',icon:'🩳',assetExt:'jpg',rarity:'COMMON',minLevel:1,desc:'+1 Speed. Flexible fight-night gear built for clean movement.',stat:'speed',bonus:1},
-  {id:'rookie-gloves',category:'Fight Gear',name:'Rookie Blue Gloves',icon:'🥊',rarity:'COMMON',minLevel:2,desc:'+2 Power. Entry-level leather, honest pop.',stat:'power',bonus:2},
-  {id:'shoes',category:'Fight Gear',name:'Canvas Fight Shoes',icon:'👟',rarity:'COMMON',minLevel:2,desc:'+2 Speed. Better footing in ugly scrambles.',stat:'speed',bonus:2},
+  {id:'medicine-ball',category:'Fight Gear',name:'Medicine Ball',icon:'🏐',rarity:'COMMON',minLevel:1,desc:'+2 Chin. Core strength keeps the body ready for impact.',stat:'chin',bonus:2},
+  {id:'agility-ladder',category:'Fight Gear',name:'Agility Ladder',icon:'🪜',rarity:'COMMON',minLevel:1,desc:'+2 Speed. Clean footwork starts with clean repetitions.',stat:'speed',bonus:2},
   {id:'rope',category:'Fight Gear',name:'Weighted Rope',icon:'➰',rarity:'COMMON',minLevel:2,desc:'+2 Cardio. Energy recharges every 4 seconds while equipped.',stat:'cardio',bonus:2,energyRecoverySpeed:1000},
   {id:'kettle-bell',category:'Fight Gear',name:'Kettlebell',icon:'🏋️',rarity:'COMMON',minLevel:2,desc:'+2 Power. Old iron builds honest strength.',stat:'power',bonus:2},
-  {id:'gloves',category:'Fight Gear',name:'Blue Steel Gloves',icon:'🥊',rarity:'RARE',minLevel:4,desc:'+4 Power. The first gloves people notice.',stat:'power',bonus:4},
-  {id:'headgear',category:'Fight Gear',name:'Old School Headgear',icon:'🪖',rarity:'RARE',minLevel:4,desc:'+4 Chin. Built like a truck tire.',stat:'chin',bonus:4},
-  {id:'blackout-kit',category:'Fight Gear',name:'Blackout Ring Kit',icon:'🩳',rarity:'RARE',minLevel:5,desc:'+3 Speed. Walk out looking like business.',stat:'speed',bonus:3},
-  {id:'storm-gloves',category:'Fight Gear',name:'Storm-Cage Gloves',icon:'🥊',rarity:'EPIC',minLevel:7,desc:'+6 Power. Main-card leather with a mean snap.',stat:'power',bonus:6},
-  {id:'cobalt-kit',category:'Fight Gear',name:'Cobalt Walkout Set',icon:'🥋',rarity:'EPIC',minLevel:8,desc:'+5 Cardio. Energy recharges every 4 seconds while equipped.',stat:'cardio',bonus:5,energyRecoverySpeed:1000},
-  {id:'champ-gloves',category:'Fight Gear',name:'Championship Gloves',icon:'🥊',rarity:'LEGENDARY',minLevel:11,desc:'+9 Power. Gold-trimmed and level-gated for a reason.',stat:'power',bonus:9},
-  {id:'main-event-kit',category:'Fight Gear',name:'Main Event Ring Gear',icon:'🩳',rarity:'LEGENDARY',minLevel:13,desc:'+3 Power, Speed, Chin, and Cardio.',bonuses:{power:3,speed:3,chin:3,cardio:3}},
+  {id:'headgear',category:'Fight Gear',name:'Blue Corner Headgear',icon:'🪖',assetExt:'jpg',rarity:'RARE',minLevel:4,desc:'+4 Chin. Hard sparring without wasting damage.',stat:'chin',bonus:4},
+  {id:'speed-bag',category:'Fight Gear',name:'Leather Speed Bag',icon:'🥊',assetExt:'jpg',rarity:'RARE',minLevel:4,desc:'+4 Speed. Fast hands are built one rhythm at a time.',stat:'speed',bonus:4},
+  {id:'performance-treadmill',category:'Fight Gear',name:'Performance Treadmill',icon:'🏃',assetExt:'jpg',rarity:'EPIC',minLevel:8,desc:'+6 Cardio. Championship conditioning starts before the cage door closes.',stat:'cardio',bonus:6},
+  {id:'heavy-bag',category:'Fight Gear',name:'Championship Heavy Bag',icon:'🥊',assetExt:'jpg',rarity:'LEGENDARY',minLevel:11,desc:'+9 Power. Thousands of hard rounds live in the leather.',stat:'power',bonus:9},
 
-  // Bling — increases followers earned from fight wins
-  {id:'bourbon',category:'Bling',name:'Small-Batch Bourbon',icon:'🥃',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins. Save it for after the fight.',prestige:1},
-  {id:'steel-chain',category:'Bling',name:'Steel Chain',icon:'⛓️',rarity:'RARE',minLevel:2,desc:'+3% followers from fight wins.',prestige:3},
-  {id:'cuban-cigars',category:'Bling',name:'Cuban Cigars',icon:'🚬',rarity:'RARE',minLevel:4,desc:'+5% followers from fight wins. Victory-lounge material.',prestige:5},
-  {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+5% followers from fight wins.',prestige:5},
-  {id:'smart-watch',category:'Bling',name:'Smart Watch',icon:'⌚',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins. Track the camp and look sharp doing it.',prestige:4},
-  {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'EPIC',minLevel:5,desc:'+8% followers from fight wins.',prestige:8},
-  {id:'fur-coat',category:'Bling',name:'Full-Length Fur Coat',icon:'🧥',rarity:'EPIC',minLevel:7,desc:'+10% followers from fight wins. Every entrance becomes a photo op.',prestige:10},
-  {id:'diamond-grill',category:'Bling',name:'Diamond Grill',icon:'😁',rarity:'EPIC',minLevel:6,desc:'+10% followers from fight wins. Smile for the face-off cameras.',prestige:10},
-  {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:7,desc:'+12% followers from fight wins.',prestige:12},
-  {id:'diamond-watch',category:'Bling',name:'Diamond Fight Watch',icon:'⌚',rarity:'LEGENDARY',minLevel:10,desc:'+18% followers from fight wins.',prestige:18},
-  {id:'designer-sunglasses',category:'Bling',name:'Designer Sunglasses',icon:'🕶️',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins. Cameras flash; you never blink.',prestige:4},
-  {id:'diamond-cluster-ring',category:'Bling',name:'Diamond Cluster Ring',icon:'💍',rarity:'EPIC',minLevel:8,desc:'+12% followers from fight wins. A full face of championship-grade ice.',prestige:12},
-  {id:'ice-ring',category:'Bling',name:'Iced-Out Signet Ring',icon:'💎',rarity:'LEGENDARY',minLevel:13,desc:'+25% followers from fight wins.',prestige:25},
+  // Bling — raises effective Aura while equipped.
+  {id:'steel-chain',category:'Bling',name:'Steel Chain',icon:'⛓️',rarity:'COMMON',minLevel:1,desc:'A first piece that catches the camera.'},
+  {id:'designer-sunglasses',category:'Bling',name:'Designer Sunglasses',icon:'🕶️',rarity:'COMMON',minLevel:1,desc:'Cameras flash; you never blink.'},
+  {id:'blue-watch',category:'Bling',name:'Blue-Face Watch',icon:'⌚',rarity:'COMMON',minLevel:2,desc:'A clean entrance starts at the wrist.'},
+  {id:'smart-watch',category:'Bling',name:'Smart Watch',icon:'⌚',rarity:'COMMON',minLevel:2,desc:'Track the camp and look sharp doing it.'},
+  {id:'gold-necklace',category:'Bling',name:'Heavy Gold Necklace',icon:'📿',rarity:'RARE',minLevel:4,desc:'Heavy enough to announce itself.'},
+  {id:'diamond-grill',category:'Bling',name:'Diamond Grill',icon:'😁',rarity:'RARE',minLevel:5,desc:'Smile for the face-off cameras.'},
+  {id:'diamond-cluster-ring',category:'Bling',name:'Diamond Cluster Ring',icon:'💍',rarity:'EPIC',minLevel:8,desc:'A full face of championship-grade ice.'},
+  {id:'champ-ring',category:'Bling',name:'Cage Champion Ring',icon:'💍',rarity:'LEGENDARY',minLevel:11,desc:'Only the biggest careers carry this much shine.'},
 
-  // Lifestyle — collectible status perks and follower growth.
-  {id:'tennis-shoes',category:'Lifestyle',name:'Fresh Tennis Shoes',icon:'👟',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins.',prestige:1},
-  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'png',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins.',prestige:1},
-  {id:'small-gym-dog',category:'Lifestyle',name:'Small Gym Dog',icon:'🐶',rarity:'COMMON',minLevel:1,desc:'A little corner companion. +1% followers from fight wins.',prestige:1},
-  {id:'victory-bucket',category:'Lifestyle',name:'Victory Chicken Bucket',icon:'🍗',rarity:'COMMON',minLevel:1,desc:'A post-fight feast. +1% followers from fight wins.',prestige:1},
-  {id:'hot-coffee',category:'Lifestyle',name:'Hot Coffee',icon:'☕',rarity:'COMMON',minLevel:1,desc:'Early roadwork starts here. +1% followers from fight wins.',prestige:1},
-  {id:'iced-coffee',category:'Lifestyle',name:'Iced Coffee',icon:'🥤',rarity:'COMMON',minLevel:1,desc:'Cold caffeine for a long fight camp. +1% followers from fight wins.',prestige:1},
-  {id:'tinned-sardines',category:'Lifestyle',name:'Tinned Sardines',icon:'🐟',rarity:'COMMON',minLevel:1,desc:'Old-school corner fuel. +1% followers from fight wins.',prestige:1},
-  {id:'dill-pickle',category:'Lifestyle',name:'Dill Pickle',icon:'🥒',rarity:'COMMON',minLevel:1,desc:'Electrolytes reduce Health recovery to one point every 55 seconds.',healthRecoverySpeed:5000},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'+2% followers from fight wins.',prestige:2,sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.92'},
-  {id:'dog',category:'Lifestyle',name:'Gym Dog',icon:'🐕',rarity:'RARE',minLevel:3,desc:'The gym mascot keeps your corner loose. +3% followers from fight wins.',prestige:3},
-  {id:'flagship-phone',category:'Lifestyle',name:'Flagship Phone',icon:'📱',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins.',prestige:4},
-  {id:'shrimp-cocktail',category:'Lifestyle',name:'Victory Shrimp Cocktail',icon:'🍤',rarity:'RARE',minLevel:3,desc:'+4% followers from fight wins.',prestige:4},
-  {id:'white-loafers',category:'Lifestyle',name:'White Loafers',icon:'👞',rarity:'RARE',minLevel:3,desc:'Clean shoes for the post-fight cameras. +4% followers from fight wins.',prestige:4},
-  {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'EPIC',minLevel:4,desc:'+6% followers from fight wins.',prestige:6},
-  {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'EPIC',minLevel:6,desc:'+8% followers from fight wins.',prestige:8},
-  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'LEGENDARY',minLevel:8,desc:'+10% followers from fight wins.',prestige:10},
-  {id:'concert-grand',category:'Lifestyle',name:'Concert Grand Piano',icon:'🎹',rarity:'LEGENDARY',minLevel:10,desc:'A champion learns to switch off. +12% followers from fight wins.',prestige:12},
-  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'+15% followers from fight wins.',prestige:15},
+  // Lifestyle — accelerates Health recovery while equipped.
+  {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'png',rarity:'COMMON',minLevel:1,desc:'Quick recovery fuel between sessions.'},
+  {id:'tinned-sardines',category:'Lifestyle',name:'Tinned Sardines',icon:'🐟',rarity:'COMMON',minLevel:1,desc:'Old-school protein for a hard camp.'},
+  {id:'dill-pickle',category:'Lifestyle',name:'Dill Pickle',icon:'🥒',rarity:'COMMON',minLevel:1,desc:'Electrolytes for the long recovery window.'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Clean protein for the next session.',sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.94'},
+  {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'RARE',minLevel:4,desc:'Every recovery meal handled.'},
+  {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'RARE',minLevel:6,desc:'Heat, rest, and another round tomorrow.'},
+  {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'EPIC',minLevel:8,desc:'Recovery resources without leaving home.'},
+  {id:'chef',category:'Lifestyle',name:'Full-Time Fight Chef',icon:'👨‍🍳',rarity:'LEGENDARY',minLevel:11,desc:'Championship nutrition around the clock.'},
 
-  // Property & rides — career status and follower reach
+  // Property & Rides — accelerates Energy recovery while equipped.
   {id:'used-car',category:'Property & Rides',name:'Used Car',icon:'🚗',rarity:'COMMON',minLevel:1,desc:'+1% followers from fight wins. It starts most of the time.',prestige:1},
   {id:'sky-blue-scooter',category:'Property & Rides',name:'Sky Blue Scooter',icon:'🛵',rarity:'COMMON',minLevel:2,desc:'+2% followers from fight wins. Cheap wheels, loud arrival.',prestige:2},
-  {id:'midnight-cruiser',category:'Property & Rides',name:'Midnight Cruiser',icon:'🏍️',rarity:'RARE',minLevel:4,desc:'+3% followers from fight wins. Built for the long road.',prestige:3},
-  {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'EPIC',minLevel:5,desc:'+5% followers from fight wins. You finally leave the gym couch.',prestige:5},
-  {id:'redline-superbike',category:'Property & Rides',name:'Redline Superbike',icon:'🏍️',rarity:'EPIC',minLevel:7,desc:'+6% followers from fight wins. The parking lot hears you coming.',prestige:6},
-  {id:'performance-jet-ski',category:'Property & Rides',name:'Performance Jet Ski',icon:'🌊',rarity:'RARE',minLevel:4,desc:'+3% followers from fight wins. Fast water, faster clips.',prestige:3},
-  {id:'coastal-speedboat',category:'Property & Rides',name:'Coastal Speedboat',icon:'🚤',rarity:'EPIC',minLevel:7,desc:'+6% followers from fight wins. Every entrance gets noticed.',prestige:6},
-  {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'EPIC',minLevel:8,desc:'+8% followers from fight wins.',prestige:8},
-  {id:'house',category:'Property & Rides',name:'Modern Fighter House',icon:'🏠',rarity:'EPIC',minLevel:10,desc:'+10% followers from fight wins.',prestige:10},
-  {id:'supercar',category:'Property & Rides',name:'Midnight Supercar',icon:'🏁',rarity:'EPIC',minLevel:13,desc:'+12% followers from fight wins.',prestige:12},
-  {id:'luxury-yacht',category:'Property & Rides',name:'Luxury Yacht',icon:'🛥️',rarity:'LEGENDARY',minLevel:14,desc:'+18% followers from fight wins.',prestige:18},
-  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'LEGENDARY',minLevel:15,desc:'+20% followers from fight wins.',prestige:20},
+  {id:'midnight-cruiser',category:'Property & Rides',name:'Midnight Cruiser',icon:'🏍️',rarity:'COMMON',minLevel:3,desc:'Built for the long road.'},
+  {id:'apartment',category:'Property & Rides',name:'Downtown Apartment',icon:'🏢',rarity:'COMMON',minLevel:4,desc:'A quiet base between camps.'},
+  {id:'redline-superbike',category:'Property & Rides',name:'Redline Superbike',icon:'🏍️',rarity:'RARE',minLevel:6,desc:'The parking lot hears you coming.'},
+  {id:'sports-car',category:'Property & Rides',name:'Blue Sports Car',icon:'🏎️',rarity:'RARE',minLevel:8,desc:'Fast travel, faster recovery.'},
+  {id:'private-jet',category:'Property & Rides',name:'Private Jet',icon:'✈️',rarity:'EPIC',minLevel:12,desc:'Cross the circuit without losing the day.'},
   {id:'mansion',category:'Property & Rides',name:'Champion Mansion',icon:'🏰',rarity:'LEGENDARY',minLevel:16,desc:'+25% followers from fight wins.',prestige:25}
 ];
 
