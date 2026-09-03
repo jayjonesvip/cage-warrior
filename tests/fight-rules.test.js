@@ -25,6 +25,9 @@ test('fight-rules.json is valid and uses the current schema',()=>{
   assert.equal(document.auraRewards.calloutWin,5);
   assert.equal(document.auraRewards.calloutLoss,-10);
   assert.equal(document.auraRewards.lowerLevelWinMultiplier,.25);
+  assert.equal(document.auraRewards.lowerLevelWinBasePenalty,3);
+  assert.equal(document.auraRewards.lowerLevelWinPenaltyPerAdditionalLevel,2);
+  assert.equal(document.auraRewards.lowerLevelWinMaximumPenalty,10);
   assert.equal(document.auraRewards.higherLevelWinMultiplier,.25);
   assert.equal(document.fightFinishes.rockedExchanges,2);
   assert.equal(document.fightFinishes.maximumRockedChance,.16);

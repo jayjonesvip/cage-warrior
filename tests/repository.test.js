@@ -25,6 +25,18 @@ test('all first-party JavaScript parses without a build step',()=>{
   }
 });
 
+test('fighter creation offers all fifty portrait avatars',()=>{
+  assert.equal((definitions.match(/id:'fighter-\d{2}'/g)||[]).length,50);
+  for(let number=45;number<=50;number+=1){
+    const suffix=String(number).padStart(2,'0');
+    const asset=`assets/avatars/fighter-avatar-${suffix}.png`;
+    assert.match(definitions,new RegExp(`id:'fighter-${suffix}'[^\\n]+asset:'${asset.replaceAll('/','\\/')}'`));
+    const bytes=fs.readFileSync(path.join(root,asset));
+    assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],asset);
+    assert.ok([4,6].includes(bytes[25]),`${asset} has an alpha channel`);
+  }
+});
+
 test('removed canvas hero renderer has no stale runtime references',()=>{
   assert.doesNotMatch(game,/\bdrawHero\b/);
   assert.doesNotMatch(game,/\bdrawFighter\b/);
@@ -193,6 +205,14 @@ test('Aura passively grows followers and refreshes sponsor eligibility',()=>{
   assert.match(game,/WHILE YOU WERE AWAY · \+\$\{fmt\(followerGrowth\.followers\)\} FOLLOWERS/);
   assert.match(game,/document\.addEventListener\('visibilitychange',[\s\S]*updatePassiveRecovery\(true\)/);
   assert.match(game,/window\.addEventListener\('pageshow',[\s\S]*updatePassiveRecovery\(true\)/);
+});
+
+test('positive Aura gains slow across status tiers while penalties stay full strength',()=>{
+  assert.match(logic,/function auraGrowthMultiplier\(value=0\)/);
+  assert.match(logic,/function scaledAuraGain\(value,currentAura=0\)/);
+  assert.match(logic,/return gain>0\?Math\.max\(1,Math\.round\(gain\*auraGrowthMultiplier\(currentAura\)\)\):Math\.round\(gain\)/);
+  assert.match(game,/LOGIC\.socialInteractionReward\([^\n]+,state\.aura\)/);
+  assert.match(game,/LOGIC\.scaledAuraGain\([^\n]+state\.aura\)/);
 });
 
 test('fight follower rewards use Aura and the reduced payout helper',()=>{
@@ -673,6 +693,21 @@ test('trimmed Gear items stay outside the active drop catalog',()=>{
   for(const id of cuts)assert.doesNotMatch(catalogSource,new RegExp(`id:'${id}'`),id);
 });
 
+test('retired drop artwork is preserved outside the active icon catalog',()=>{
+  const legacyDrops={
+    'fight-gear':['wraps.png','mouth.png','mma-shorts.jpg','rookie-gloves.png','shoes.png','gloves.png','blackout-kit.png','storm-gloves.png','cobalt-kit.png','champ-gloves.png','main-event-kit.png'],
+    bling:['bourbon.png','cuban-cigars.png','fur-coat.png','diamond-watch.png','ice-ring.png'],
+    lifestyle:['tennis-shoes.png','small-gym-dog.png','victory-bucket.png','hot-coffee.png','iced-coffee.png','dog.png','flagship-phone.png','shrimp-cocktail.png','white-loafers.png','concert-grand.png'],
+    'property-rides':['performance-jet-ski.png','coastal-speedboat.png','house.png','supercar.png','luxury-yacht.png']
+  };
+  assert.equal(Object.values(legacyDrops).flat().length,31);
+  for(const [category,files] of Object.entries(legacyDrops))for(const file of files){
+    assert.ok(fs.existsSync(path.join(root,'assets/legacy-drops',category,file)),`${category}/${file}`);
+    assert.ok(!fs.existsSync(path.join(root,'assets/icons',file)),`active icons/${file}`);
+  }
+  assert.ok(fs.existsSync(path.join(root,'assets/legacy-drops/README.md')));
+});
+
 test('Gear keeps an eight-thumbnail active loadout dock above navigation',()=>{
   assert.match(html,/id="gearLoadoutDock"[^>]*hidden/);
   assert.match(html,/class="gear-loadout-label"[^>]*>ACTIVE LOADOUT</);
@@ -705,6 +740,10 @@ test('Gear uses full-card loadouts, rarity collections, filters, and no meaningl
   assert.match(styles,/\.gear\.collectible-card\.rarity-card-common:after,\.gear\.collectible-card\.rarity-card-common \.gear-flair\{display:none\}/);
   assert.match(styles,/\.gear\.collectible-card\.equipped-full\{/);
   assert.match(styles,/\.gear-equipped-full-check\{/);
+  assert.match(game,/class="gear-top"><span class="rarity-tag">\$\{rarity\}<\/span>\$\{equippedMark\}<\/div>/);
+  assert.match(styles,/\.gear-equipped-full-check\{position:static;/);
+  assert.match(styles,/\.collectible-card \.gear-icon\{position:absolute;inset:0;[^}]*width:auto;height:auto;[^}]*padding:8px;overflow:hidden/);
+  assert.match(styles,/\.collectible-card \.gear-icon \.icon-asset\{object-fit:contain;object-position:center\}/);
   assert.match(styles,/\.gear-filter-tabs\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
   assert.match(game,/function moveGearFilter\(key\)/);
@@ -795,7 +834,12 @@ test('Aura fight skins appear on Home and stay outside perks and drops',()=>{
   ];
   for(const [key,color,minimum,maximum] of skins){
     assert.match(definitions,new RegExp(`key:'${key}'[^\\n]+colorName:'${color}'[^\\n]+minimum:${minimum},maximum:${maximum}`));
-    for(const piece of ['gloves','wraps','mouthguard','shorts'])assert.ok(fs.existsSync(path.join(root,`assets/skins/aura-${key}-${piece}.jpg`)),`${key} ${piece}`);
+    for(const piece of ['gloves','wraps','mouthguard','shorts']){
+      const asset=`assets/skins/aura-${key}-${piece}.png`;
+      const bytes=fs.readFileSync(path.join(root,asset));
+      assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],`${key} ${piece} is a PNG`);
+      assert.ok([4,6].includes(bytes[25]),`${key} ${piece} has an alpha channel`);
+    }
   }
   const gearSource=definitions.slice(gearStart,definitions.indexOf('const endorsementDefs'));
   assert.doesNotMatch(gearSource,/aura-(?:unknown|noticed|magnetic|superstar|iconic)-(?:gloves|wraps|mouthguard|shorts)/);

@@ -42,9 +42,9 @@ test('Aura cosmetic titles advance at the intended thresholds',()=>{
 
 test('Aura fight rewards distinguish ordinary, marquee, stale, and callout results',()=>{
   assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:5}),2);
-  assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:4}),-5);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:4}),-3);
   assert.equal(logic.auraFightChange({won:true,playerLevel:4,opponentLevel:3}),-3);
-  assert.equal(logic.auraFightChange({won:true,playerLevel:7,opponentLevel:6}),-11);
+  assert.equal(logic.auraFightChange({won:true,playerLevel:7,opponentLevel:6}),-3);
   assert.equal(logic.auraFightChange({won:true,playerLevel:4,opponentLevel:5}),5);
   assert.equal(logic.auraFightChange({won:true,playerLevel:7,opponentLevel:8}),14);
   assert.equal(logic.auraFightChange({won:true,playerLevel:5,opponentLevel:5,upset:true}),5);
@@ -55,6 +55,26 @@ test('Aura fight rewards distinguish ordinary, marquee, stale, and callout resul
   assert.equal(logic.auraFightChange({won:false,forfeited:true}),-10);
   assert.equal(logic.auraFightChange({won:true,callout:true,playerLevel:10,opponentLevel:1}),5);
   assert.equal(logic.auraFightChange({won:false,callout:true}),-10);
+});
+
+test('positive Aura growth slows by status while penalties stay at full strength',()=>{
+  assert.deepEqual([0,20,40,60,80].map(logic.auraGrowthMultiplier),[1,.8,.6,.4,.25]);
+  assert.deepEqual([0,20,40,60,80].map(currentAura=>logic.auraFightChange({won:true,upset:true,currentAura})),[5,4,3,2,1]);
+  assert.deepEqual([0,20,40,60,80].map(currentAura=>logic.auraFightChange({won:true,titleWon:true,currentAura})),[10,8,6,4,3]);
+  assert.equal(logic.auraFightChange({won:false,currentAura:80}),-7);
+  assert.equal(logic.auraFightChange({won:false,forfeited:true,currentAura:80}),-10);
+  assert.equal(logic.socialInteractionReward(17,0).aura,3);
+  assert.equal(logic.socialInteractionReward(17,60).aura,1);
+});
+
+test('lower-level title fights keep their Aura penalty instead of awarding a title bonus',()=>{
+  assert.equal(logic.auraFightChange({won:true,titleWon:true,playerLevel:10,opponentLevel:5,currentAura:80}),-10);
+  assert.equal(logic.auraFightChange({won:true,titleDefense:true,playerLevel:10,opponentLevel:5,currentAura:80}),-10);
+  assert.equal(logic.auraFightChange({won:true,titleDefense:true,playerLevel:10,opponentLevel:10,currentAura:80}),2);
+});
+
+test('lower-level Aura penalties use the level gap and never exceed ten',()=>{
+  assert.deepEqual([1,2,3,4,5,10].map(gap=>logic.lowerLevelAuraPenalty(20,20-gap)),[3,5,7,9,10,10]);
 });
 
 test('social interactions award followers and Aura without reviving Hype',()=>{

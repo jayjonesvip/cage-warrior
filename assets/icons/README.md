@@ -10,6 +10,10 @@ is missing or cannot load, the original symbol remains visible. Square,
 transparent artwork at 256×256 or 512×512 is recommended. After adding a new
 file, use a hard refresh if the browser previously cached the missing image.
 
+Artwork for retired gear drops is preserved by category in
+[`../legacy-drops/`](../legacy-drops/README.md). Those files are archival and
+are not part of the active drop catalog.
+
 ## Interface and fight icons
 
 | Filename | Current fallback | Used for |
@@ -102,89 +106,51 @@ file, use a hard refresh if the browser previously cached the missing image.
 
 ## Fight Gear icons
 
-| Filename | Current fallback | Item |
-| --- | --- | --- |
-| `wraps.png` | 🩹 | Stiff Hand Wraps |
-| `mouth.png` | 🦷 | Boil-Bite Guard |
-| `rookie-gloves.png` | 🥊 | Rookie Blue Gloves |
-| `shoes.png` | 👟 | Canvas Fight Shoes |
-| `rope.png` | ➰ | Weighted Rope |
-| `gloves.png` | 🥊 | Blue Steel Gloves |
-| `headgear.png` | 🪖 | Old School Headgear |
-| `blackout-kit.png` | 🩳 | Blackout Ring Kit |
-| `storm-gloves.png` | 🥊 | Storm-Cage Gloves |
-| `cobalt-kit.png` | 🥋 | Cobalt Walkout Set |
-| `champ-gloves.png` | 🥊 | Championship Gloves |
-| `main-event-kit.png` | 🩳 | Main Event Ring Gear |
+| Filename | Item |
+| --- | --- |
+| `rope.png` | Weighted Rope |
+| `kettle-bell.png` | Kettlebell |
+| `headgear.jpg` | Blue Corner Headgear |
+| `speed-bag.jpg` | Leather Speed Bag |
+| `performance-treadmill.jpg` | Performance Treadmill |
+| `heavy-bag.jpg` | Championship Heavy Bag |
 
 ## Bling icons
 
-| Filename | Current fallback | Item |
-| --- | --- | --- |
-| `steel-chain.png` | ⛓️ | Steel Chain |
-| `blue-watch.png` | ⌚ | Blue-Face Watch |
-| `gold-necklace.png` | 📿 | Heavy Gold Necklace |
-| `champ-ring.png` | 💍 | Cage Champion Ring |
-| `diamond-watch.png` | ⌚ | Diamond Fight Watch |
-| `ice-ring.png` | 💎 | Iced-Out Signet Ring |
+| Filename | Item |
+| --- | --- |
+| `steel-chain.png` | Steel Chain |
+| `designer-sunglasses.png` | Designer Sunglasses |
+| `blue-watch.png` | Blue-Face Watch |
+| `smart-watch.png` | Smart Watch |
+| `gold-necklace.png` | Heavy Gold Necklace |
+| `diamond-grill.png` | Diamond Grill |
+| `diamond-cluster-ring.png` | Diamond Cluster Ring |
+| `champ-ring.png` | Cage Champion Ring |
 
 ## Lifestyle icons
 
-| Filename | Current fallback | Item |
-| --- | --- | --- |
-| `small-gym-dog.png` | 🐶 | Small Gym Dog |
-| `dog.png` | 🐕 | Gym Dog |
-| `meal-plan.png` | 🥩 | Fight Camp Meal Plan |
-| `hot-tub.png` | 🛁 | Backyard Hot Tub |
-| `home-gym.png` | 🏋️ | Private Home Gym |
-| `chef.png` | 👨‍🍳 | Full-Time Fight Chef |
+| Filename | Item |
+| --- | --- |
+| `energy-drink.png` | Energy Drink |
+| `tinned-sardines.png` | Tinned Sardines |
+| `dill-pickle.png` | Dill Pickle |
+| `fight-fuel-protein.png` | ALLMAX ISOFLEX |
+| `fight-fuel-protein-qr.png` | ALLMAX ISOFLEX affiliate QR |
+| `meal-plan.png` | Fight Camp Meal Plan |
+| `hot-tub.png` | Backyard Hot Tub |
+| `home-gym.png` | Private Home Gym |
+| `chef.png` | Full-Time Fight Chef |
 
 ## Property and ride icons
 
-| Filename | Current fallback | Item |
-| --- | --- | --- |
-| `apartment.png` | 🏢 | Downtown Apartment |
-| `sports-car.png` | 🏎️ | Blue Sports Car |
-| `house.png` | 🏠 | Modern Fighter House |
-| `supercar.png` | 🏁 | Midnight Supercar |
-| `mansion.png` | 🏰 | Champion Mansion |
-
-## Added lifestyle collection artwork
-
 | Filename | Item |
 | --- | --- |
-| `victory-bucket.png` | Victory Chicken Bucket |
-| `fight-fuel-protein.png` | ALLMAX ISOFLEX sponsored product cutout |
-| `fight-fuel-protein-qr.png` | ALLMAX ISOFLEX affiliate campaign QR |
-| `flagship-phone.png` | Flagship Phone |
-| `concert-grand.png` | Concert Grand Piano |
+| `used-car.png` | Used Car |
 | `sky-blue-scooter.png` | Sky Blue Scooter |
 | `midnight-cruiser.png` | Midnight Cruiser |
+| `apartment.png` | Downtown Apartment |
 | `redline-superbike.png` | Redline Superbike |
-| `diamond-grill.png` | Diamond Grill |
-
-## Luxury drop artwork
-
-These supplied assets use transparent PNG artwork so they sit cleanly on gear cards.
-
-| Filename | Item |
-| --- | --- |
-| `designer-sunglasses.png` | Designer Sunglasses |
-| `diamond-cluster-ring.png` | Diamond Cluster Ring |
-| `shrimp-cocktail.png` | Victory Shrimp Cocktail |
-| `performance-jet-ski.png` | Performance Jet Ski |
-| `coastal-speedboat.png` | Coastal Speedboat |
-| `luxury-yacht.png` | Luxury Yacht |
+| `sports-car.png` | Blue Sports Car |
 | `private-jet.png` | Private Jet |
-
-## Corner-store drop artwork
-
-| Filename | Item | Rarity |
-| --- | --- | --- |
-| `hot-coffee.png` | Hot Coffee | Common |
-| `iced-coffee.png` | Iced Coffee | Common |
-| `tinned-sardines.png` | Tinned Sardines | Common |
-| `white-loafers.png` | White Loafers | Rare |
-| `kettle-bell.png` | Kettlebell | Common |
-| `smart-watch.png` | Smart Watch | Rare |
-| `dill-pickle.png` | Dill Pickle | Common |
+| `mansion.png` | Champion Mansion |
