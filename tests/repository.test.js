@@ -49,6 +49,10 @@ test('seeded circuit migration supplies two read-only opponents per level from 2
   assert.match(migration,/create or replace function public\.get_cage_opponent_candidates/);
   assert.match(migration,/from public\.cage_seed_fighters as seed/);
   assert.match(migration,/create or replace function public\.get_cage_seed_fighter_roster/);
+  assert.match(read('js/supabase-client.js'),/get_cage_seed_fighter_roster/);
+  assert.match(read('js/cage-social.js'),/loadSeedFighterRoster/);
+  assert.match(game,/SHARED_FEED\.loadSeedFighterRoster\(\)/);
+  assert.match(game,/profile\.seeded===true&&\['power','speed','chin','cardio'\]/);
   assert.match(migration,/where seed\.active and lower\(seed\.handle\)=lower\(v_candidate\)/);
   assert.doesNotMatch(migration,/insert into auth\.users/i);
 });
@@ -945,9 +949,10 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
 test('real ranked fighters remain available to new Level 1 careers',()=>{
   assert.doesNotMatch(game,/!profile\.isChampion&&profile\.fights<1/);
   assert.match(game,/loadOpponentCandidates\(state\.level,20\)/);
+  assert.match(game,/loadSeedFighterRoster\(\)/);
   assert.match(game,/if\(ranked\.length\)state\.roster=/);
   assert.match(game,/Promise\.allSettled\(\[SHARED_FEED\.loadFeed/);
-  assert.match(game,/if\(!profilesLoaded&&!candidatesLoaded\)throw/);
+  assert.match(game,/if\(!profilesLoaded&&!candidatesLoaded&&!seedsLoaded\)throw/);
   assert.match(game,/if\(championshipResult\.status==='fulfilled'\)/);
 });
 

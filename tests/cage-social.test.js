@@ -171,6 +171,9 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
       if (url.endsWith('/rest/v1/rpc/get_cage_opponent_candidates')) return jsonResponse([
         { id: otherId, handle: 'GoldenTornadoNYC', level: 4, fighter_avatar: 'fighter-08', archetype: 'counter' },
       ]);
+      if (url.endsWith('/rest/v1/rpc/get_cage_seed_fighter_roster')) return jsonResponse([
+        { id: 'ca6e0000-0000-4000-8000-000000020001', handle: 'DominicanWildfireMIA', level: 2, fighter_avatar: 'fighter-49', archetype: 'grappler', power: 3, speed: 7, chin: 6, cardio: 7, attribute_total: 23, ranking_history: [{ won: true, quality: 50 }] },
+      ]);
       if (url.endsWith('/rest/v1/rpc/get_cage_profile_count')) return jsonResponse(27);
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
       if (url.endsWith('/rest/v1/rpc/load_cage_career')) return jsonResponse({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true });
@@ -188,6 +191,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const ownProfile = await client.loadOwnProfile();
   const profileCount = await client.loadProfileCount();
   const opponents = await client.loadOpponentCandidates(4, 12);
+  const seeded = await client.loadSeedFighterRoster();
   const remaining = await client.loadInteractionAllowance();
   const career = await client.loadCareer();
   const careerSavedAt = await client.saveCareer({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true }, session.user.id);
@@ -203,6 +207,10 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.equal(ownProfile.id, session.user.id);
   assert.equal(profileCount, 27);
   assert.equal(opponents[0].handle, 'GoldenTornadoNYC');
+  assert.equal(seeded[0].handle, 'DominicanWildfireMIA');
+  assert.equal(seeded[0].seeded, true);
+  assert.equal(seeded[0].attributeTotal, 23);
+  assert.deepEqual(seeded[0].rankingHistory, [{ won: true, quality: 50 }]);
   assert.equal(remaining, 3);
   assert.equal(career.name, 'WhiteDrizzlePHX');
   assert.equal(careerSavedAt, '2026-09-02T16:00:00Z');
@@ -221,6 +229,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.deepEqual(ceoPostBody, { p_event_key: 'city_offer' });
   const opponentBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_opponent_candidates')).options.body);
   assert.deepEqual(opponentBody, { p_level: 4, p_limit: 12 });
+  const seedRosterBody = JSON.parse(authenticated.find(request => request.url.endsWith('get_cage_seed_fighter_roster')).options.body);
+  assert.deepEqual(seedRosterBody, {});
   const careerSaveBody = JSON.parse(authenticated.find(request => request.url.endsWith('save_cage_career')).options.body);
   assert.deepEqual(careerSaveBody, { p_state: { version: 31, name: 'WhiteDrizzlePHX', nameLocked: true } });
   assert.ok(authenticated.some(request => request.url.includes(`id=eq.${session.user.id}`)));

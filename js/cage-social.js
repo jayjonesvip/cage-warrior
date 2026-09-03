@@ -57,7 +57,12 @@
       const count=Math.max(1,Math.min(1000,Math.floor(Number(limit))||100));
       const rows=await database.selectCageProfiles(count);
       const active=await database.ensureSession();
-      return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id):[];
+      return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id).map(normalizeRankingProfile):[];
+    }
+
+    function normalizeRankingProfile(row){
+      if(!row||typeof row!=='object')return row;
+      return {...row,attributeTotal:Number(row.attribute_total??row.attributeTotal),rankingHistory:Array.isArray(row.ranking_history)?row.ranking_history:Array.isArray(row.rankingHistory)?row.rankingHistory:[]};
     }
 
     async function loadOwnProfile(expectedProfileId=''){return database.selectOwnCageProfile(expectedProfileId)}
@@ -82,6 +87,11 @@
       const count=Math.max(1,Math.min(20,Math.floor(Number(limit))||12));
       const rows=await database.selectCageOpponentCandidates(tier,count);
       return Array.isArray(rows)?rows:[];
+    }
+
+    async function loadSeedFighterRoster(){
+      const rows=await database.selectCageSeedFighterRoster();
+      return Array.isArray(rows)?rows.map(row=>({...normalizeRankingProfile(row),seeded:true})):[];
     }
 
     async function loadInteractionAllowance(){
@@ -110,7 +120,7 @@
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
     async function publishSponsorPost(sponsorId){return database.insertCageSponsorPost(sponsorId)}
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};
