@@ -37,6 +37,22 @@ test('fighter creation offers all fifty portrait avatars',()=>{
   }
 });
 
+test('seeded circuit migration supplies two read-only opponents per level from 2 through 15',()=>{
+  const migration=read('supabase/migrations/20260903120000_seed_circuit_fighters.sql');
+  const rows=[...migration.matchAll(/\('ca6e0000-0000-4000-8000-000000(\d{2})000[12]'::uuid/g)];
+  assert.equal(rows.length,28);
+  for(let level=2;level<=15;level+=1){
+    assert.equal(rows.filter(match=>Number(match[1])===level).length,2,`level ${level}`);
+  }
+  assert.match(migration,/create table if not exists public\.cage_seed_fighters/);
+  assert.match(migration,/base_power\+base_speed\+base_chin\+base_cardio=20/);
+  assert.match(migration,/create or replace function public\.get_cage_opponent_candidates/);
+  assert.match(migration,/from public\.cage_seed_fighters as seed/);
+  assert.match(migration,/create or replace function public\.get_cage_seed_fighter_roster/);
+  assert.match(migration,/where seed\.active and lower\(seed\.handle\)=lower\(v_candidate\)/);
+  assert.doesNotMatch(migration,/insert into auth\.users/i);
+});
+
 test('removed canvas hero renderer has no stale runtime references',()=>{
   assert.doesNotMatch(game,/\bdrawHero\b/);
   assert.doesNotMatch(game,/\bdrawFighter\b/);
