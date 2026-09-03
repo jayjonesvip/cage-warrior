@@ -744,26 +744,12 @@ test('retired drop artwork is preserved outside the active icon catalog',()=>{
   assert.ok(fs.existsSync(path.join(root,'assets/legacy-drops/README.md')));
 });
 
-test('Gear keeps an eight-thumbnail active loadout footer inside its card',()=>{
-  assert.match(html,/class="card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"[\s\S]*id="gearLoadoutDock"/);
+test('Gear keeps guidance compact and has no global active-loadout footer',()=>{
+  assert.match(html,/class="card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"/);
   assert.match(html,/class="gear-info-popover"[\s\S]*About Gear collectibles[\s\S]*duplicates never stack/);
   assert.doesNotMatch(html,/class="section-note">Collectibles come from fight wins/);
-  assert.match(html,/id="gearLoadoutDock"[^>]*hidden/);
-  assert.match(html,/class="gear-loadout-label"[^>]*>ACTIVE LOADOUT</);
-  assert.match(html,/id="gearLoadoutSlots"/);
-  assert.match(game,/function renderGearLoadoutDock\(\)/);
-  assert.match(game,/LOADOUT_CATEGORIES=\['Fight Gear','Bling','Property & Rides','Lifestyle'\]/);
-  assert.match(game,/Array\.from\(\{length:LOGIC\.loadoutCategoryLimit\(\)\}/);
-  assert.match(game,/slotRoot\.innerHTML=LOADOUT_CATEGORIES\.map\(group\)\.join\(''\)/);
-  assert.match(game,/class="gear-loadout-thumb add-slot"[^>]*data-loadout-category/);
-  assert.doesNotMatch(game,/gear-loadout-thumb locked/);
-  assert.match(styles,/\.gear-page-card>\.gear-loadout-dock\{position:relative;[^}]*flex:0 0 70px/);
-  assert.match(styles,/\.gear-loadout-groups\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(styles,/\.gear-loadout-label\{position:absolute;top:4px;left:50%;transform:translateX\(-50%\)/);
-  assert.match(styles,/\.loadout-group-bling\{--loadout-group:#f4c85a\}/);
-  assert.match(styles,/\.loadout-group-property-rides\{--loadout-group:#64d898\}/);
-  assert.match(game,/rarity-slot-\$\{rarity\}/);
-  assert.match(styles,/\.gear-loadout-thumb\.rarity-slot-rare\{border-color:#75e9ff/);
+  assert.doesNotMatch(html,/id="gearLoadoutDock"|id="gearLoadoutSlots"|ACTIVE LOADOUT/);
+  assert.doesNotMatch(game,/function renderGearLoadoutDock\(\)/);
 });
 
 test('Gear uses a fixed card shell, flat filters, rarity collections, and no meaningless duplicate badges',()=>{
@@ -787,9 +773,13 @@ test('Gear uses a fixed card shell, flat filters, rarity collections, and no mea
   assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
   assert.match(styles,/\.gear-filter-tabs\{flex:0 0 auto;width:100%;margin:0;padding:0;border:0;[^}]*border-radius:0/);
   assert.match(styles,/\.gear-card-scroll\{flex:1 1 auto;min-height:0;overflow-y:auto/);
+  assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-block\{display:block\}/);
   assert.match(game,/function moveGearFilter\(key\)/);
   assert.match(game,/headerHost\.replaceChildren/);
-  assert.match(game,/querySelector\('\.gear-loadout-shop-block'\)\?\.remove\(\)/);
+  assert.match(game,/class="gear-loadout-shop-block"/);
+  assert.match(game,/Array\.from\(\{length:loadoutLimit\}/);
+  assert.match(game,/collectibleCardHtml\(activeItems\[index\],\{loadoutCard:true\}\)/);
+  assert.match(game,/loadoutEmptyCardHtml\(cat,index,hasAvailable\)/);
 });
 
 test('Gear merges available and anonymous undiscovered cards into rarity groups',()=>{
@@ -809,9 +799,8 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
   assert.match(styles,/\.gear-level-lock\{position:absolute/);
 });
 
-test('desktop navigation and the in-card loadout footer reserve their space',()=>{
+test('desktop navigation and Gear card reserve their space without a footer gap',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
-  assert.match(styles,/\.gear-page-card>\.gear-loadout-dock\{right:auto;bottom:auto;left:auto;height:86px;padding:16px 18px 8px\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
   assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:0\}/);
 });
