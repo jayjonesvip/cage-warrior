@@ -151,6 +151,10 @@ test('World Rank uses fight quality, recent form, and permanent attributes witho
   assert.match(migration,/create or replace function public\.cage_world_rank_score/);
   assert.match(read('js/cage-social.js'),/database\.syncCageRanking\(\{p_attribute_total:profile\.attributeTotal,p_ranking_history:profile\.rankingHistory\}\)/);
   assert.match(read('js/supabase-client.js'),/attribute_total,ranking_history/);
+  const confidenceMigration=read('supabase/migrations/20260903160000_rebalance_world_rank_confidence.sql');
+  assert.match(confidenceMigration,/\(wins\+2\)\/\(wins\+losses\+4\)/);
+  assert.match(confidenceMigration,/proven_win_rate\*75/);
+  assert.match(logic,/provenWinPercentage=fights\?\(wins\+2\)\/\(fights\+4\):0/);
 });
 
 test('migration does not erase followers when a legacy social flag is false',()=>{

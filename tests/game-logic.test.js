@@ -420,6 +420,16 @@ test('hybrid ranking rewards opponent quality, recent form, and permanent attrib
   assert.equal(skill[0].id,'developed');
 });
 
+test('hybrid ranking requires a proven record before rewarding an undefeated percentage',()=>{
+  const ranked=logic.rankFighters([
+    {id:'one-fight',handle:'OneFight',level:1,wins:1,losses:0,attributeTotal:21},
+    {id:'prospect',handle:'Prospect',level:5,wins:12,losses:1,attributeTotal:25},
+    {id:'veteran',handle:'Veteran',level:15,wins:51,losses:27,attributeTotal:76}
+  ],null,25);
+  assert.deepEqual(ranked.map(row=>row.id),['veteran','prospect','one-fight']);
+  assert.ok(ranked[2].provenWinPercentage<ranked[2].winPercentage);
+});
+
 test('ranking fight history grades opponent difficulty deterministically',()=>{
   assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}),{won:true,quality:50});
   assert.deepEqual(logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true}),{won:false,quality:75});

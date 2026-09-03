@@ -568,8 +568,8 @@
   }
 
   function rankingComponents(profile){
-    const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses,winPercentage=fights?wins/fights:0,history=(Array.isArray(profile?.rankingHistory)?profile.rankingHistory:[]).filter(entry=>entry&&typeof entry==='object').slice(-10),recentScore=history.length?history.filter(entry=>entry.won===true).length/history.length*100:winPercentage*100,qualityWins=history.filter(entry=>entry.won===true),qualityScore=qualityWins.length?qualityWins.reduce((sum,entry)=>sum+clamp(finite(entry.quality,50),0,100),0)/qualityWins.length:50,attributeTotal=Math.max(20,finite(profile?.attributeTotal,20+Math.max(0,whole(profile?.level,1)-1))),resumeScore=winPercentage*75+Math.min(fights,50)/50*25,skillScore=clamp(attributeTotal/150*100,0,100),score=resumeScore*.5+qualityScore*.25+recentScore*.15+skillScore*.1;
-    return {score,resumeScore,qualityScore,recentScore,skillScore,attributeTotal,winPercentage,fights};
+    const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses,winPercentage=fights?wins/fights:0,provenWinPercentage=fights?(wins+2)/(fights+4):0,history=(Array.isArray(profile?.rankingHistory)?profile.rankingHistory:[]).filter(entry=>entry&&typeof entry==='object').slice(-10),recentScore=history.length?history.filter(entry=>entry.won===true).length/history.length*100:provenWinPercentage*100,qualityWins=history.filter(entry=>entry.won===true),qualityScore=qualityWins.length?qualityWins.reduce((sum,entry)=>sum+clamp(finite(entry.quality,50),0,100),0)/qualityWins.length:50,attributeTotal=Math.max(20,finite(profile?.attributeTotal,20+Math.max(0,whole(profile?.level,1)-1))),resumeScore=provenWinPercentage*75+Math.min(fights,50)/50*25,skillScore=clamp(attributeTotal/150*100,0,100),score=resumeScore*.5+qualityScore*.25+recentScore*.15+skillScore*.1;
+    return {score,resumeScore,qualityScore,recentScore,skillScore,attributeTotal,winPercentage,provenWinPercentage,fights};
   }
 
   function rankFighters(profiles,championship=null,limit=25){
