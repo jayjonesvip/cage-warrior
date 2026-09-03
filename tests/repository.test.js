@@ -68,7 +68,7 @@ test('HTML ids are unique',()=>{
 });
 
 test('literal game selectors point at existing or intentionally dynamic ids',()=>{
-  const dynamic=new Set(['cornerPlanGrid']);
+  const dynamic=new Set(['cornerPlanGrid','fightRankingsLoadMore']);
   const ids=new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(match=>match[1]));
   const selectors=[...game.matchAll(/\$\('#([A-Za-z][\w-]*)[^']*'\)/g)].map(match=>match[1]);
   for(const id of new Set(selectors))assert.ok(ids.has(id)||dynamic.has(id),id);
@@ -174,11 +174,13 @@ test('obsolete economy helpers are not exported from core logic',()=>{
   for(const name of ['receiveMoney','formatMoney','fightPurse','cashBonus','recoveryPrice','hustleReward'])assert.doesNotMatch(exportBlock,new RegExp(`\\b${name}\\b`),name);
 });
 
-test('persistent HUD exposes continuous charging and Health recovery status',()=>{
-  assert.match(html,/id="energyRecoveryStatus"/);
-  assert.match(html,/id="healthRecoveryStatus"/);
-  assert.match(game,/CHARGING · FULL IN/);
-  assert.match(game,/RECOVERING · FULL IN/);
+test('persistent HUD swaps inline values for compact live recovery countdowns',()=>{
+  assert.doesNotMatch(html,/recovery-status/);
+  assert.match(game,/formatHudRecoveryCountdown/);
+  assert.match(game,/`full in \$\{formatHudRecoveryCountdown/);
+  assert.match(game,/Math\.floor\(totalSeconds\/60\)/);
+  assert.match(game,/padStart\(2,'0'\)/);
+  assert.match(styles,/#hudEnergyText\.recovering\{color:#4a9bf0\}#hudHealthText\.recovering\{color:#5cc978\}/);
   assert.match(game,/setInterval\(updatePassiveRecovery,1000\)/);
   assert.match(game,/visibilitychange/);
   assert.match(game,/pageshow/);
@@ -217,7 +219,7 @@ test('passive recovery updates the HUD without rebuilding clickable opponent row
   const recoveryBody=game.match(/function updatePassiveRecovery\([^)]*\)\{([\s\S]*?)\n  \}/)?.[1]||'';
   assert.match(recoveryBody,/renderResourceHud\(\)/);
   assert.doesNotMatch(recoveryBody,/updateUI\(\)/);
-  assert.match(game,/state\.health>=state\.maxHealth/);
+  assert.match(game,/state\.health<state\.maxHealth/);
   assert.match(game,/state\.health>=MINIMUM_FIGHT_HEALTH/);
 });
 
@@ -250,10 +252,14 @@ test('Energy recovery popup reports accumulated Energy once',()=>{
   assert.match(html,/id="hudEnergyDelta"/);
 });
 
-test('battery cells display proportional continuous charge',()=>{
-  assert.match(game,/--charge/);
-  assert.match(styles,/var\(--charge/);
-  assert.equal((html.match(/<i><\/i>/g)||[]).length>=4,true);
+test('Energy uses eight discrete pips while Health remains a smooth vitality bar',()=>{
+  const batteryMarkup=html.match(/id="energyBattery"[\s\S]*?<\/div>/)?.[0]||'';
+  assert.equal((batteryMarkup.match(/<i><\/i>/g)||[]).length,8);
+  assert.match(game,/chargedEnergyPips=Math\.ceil/);
+  assert.match(game,/classList\.toggle\('charged',index<chargedEnergyPips\)/);
+  assert.doesNotMatch(game,/--charge/);
+  assert.match(styles,/\.energy-battery i\.charged\{background:#4a9bf0/);
+  assert.match(styles,/\.health-hud \.hud-meter i[\s\S]*?#3fae5c,#5cc978/);
 });
 
 test('Attribute Point assignment has one source of truth above Fight rankings',()=>{
@@ -366,6 +372,7 @@ test('reward metrics count in sequence with positive and non-positive feedback',
   assert.match(game,/rewardBad\(negative=false\)/);
   assert.match(game,/rewardParticles\(box,positive,index\)/);
   assert.match(game,/function setRewardClaimReady\(ready\)/);
+  assert.match(game,/\$\$\('#resultModal button'\)\.forEach\(action=>\{action\.disabled=!ready\}\)/);
   assert.match(game,/if\(rewards\)\{setRewardClaimReady\(false\);requestAnimationFrame\(animateRewardMetrics\)\}/);
   assert.match(game,/setRewardClaimReady\(false\)/);
   assert.match(game,/remaining===0\)setRewardClaimReady\(true\)/);
@@ -596,6 +603,10 @@ test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
   assert.match(styles,/top:0/);
   assert.match(styles,/\.resource-hud\.is-stuck\{box-shadow:0 4px 10px/);
   assert.match(styles,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/height:88px;padding:10px 12px/);
+  assert.match(styles,/\.hud-condition-row\{height:24px[\s\S]*?gap:14px/);
+  assert.match(styles,/\.hud-attributes-row\{height:24px[\s\S]*?gap:10px/);
+  assert.match(game,/value\/10\*100/);
   assert.match(html,/resource-hud-sentinel/);
 });
 
@@ -622,11 +633,13 @@ test('sponsors can drop and return as follower totals cross milestones',()=>{
   assert.match(read('js/strings.js'),/sponsorReturning:/);
 });
 
-test('drop offers live at the top of Gear and flag its navigation when ready',()=>{
+test('Daily Drop lives at the top of Gear while the install CTA stays on Home',()=>{
   const home=html.slice(html.indexOf('data-screen="home"'),html.indexOf('data-screen="fight"'));
   const gear=html.slice(html.indexOf('data-screen="gear"'),html.lastIndexOf('</main>'));
-  assert.doesNotMatch(home,/id="(?:gearDropOffer|dailyBtn|installGameBtn)"/);
-  assert.match(gear,/id="gearDropOffer"[\s\S]*id="dailyBtn"[\s\S]*id="installGameBtn"[\s\S]*id="gearShop"/);
+  assert.match(home,/id="homeInstallCta"[\s\S]*id="installGameBtn"[\s\S]*RETIRE THIS FIGHTER/);
+  assert.doesNotMatch(home,/FREE DROP/);
+  assert.match(gear,/id="gearDropOffer"[\s\S]*id="dailyBtn"[\s\S]*id="gearShop"/);
+  assert.doesNotMatch(gear,/id="installGameBtn"|INSTALL GAME · FREE DROP/);
   assert.match(game,/gearNav\.classList\.toggle\('drop-ready',dailyAvailable\)/);
   assert.match(game,/Gear, Daily Drop ready/);
   assert.match(styles,/\.navbtn\.drop-ready/);
@@ -638,13 +651,11 @@ test('Daily Drop offer uses a dramatic gold pack treatment without changing clai
   assert.match(styles,/\.daily\{[^}]*linear-gradient\(#ffe47a[^}]*font-family:"Oswald"/);
   assert.match(styles,/@keyframes dailyDropShine/);
   assert.match(styles,/\.daily-drop-card\.claimed\{[^}]*min-height:0/);
-  assert.match(html,/id="installOfferHideBtn"[^>]*hidden>HIDE<\/button>/);
-  assert.match(game,/INSTALL_OFFER_DISMISS_KEY = 'cage-grind-install-offer-hidden'/);
-  assert.match(game,/sessionStorage\.getItem\(INSTALL_OFFER_DISMISS_KEY\)==='1'/);
-  assert.match(game,/gearDropOffer\.hidden=!ready\|\|\(installAvailable&&installOfferDismissed\)/);
-  assert.match(game,/sessionStorage\.setItem\(INSTALL_OFFER_DISMISS_KEY,'1'\)/);
+  assert.match(styles,/\.home-install-cta\{[^}]*display:flex/);
+  assert.match(game,/function renderHomeInstallCta\(\)/);
+  assert.match(game,/cta\.hidden=!ready\|\|installed;button\.hidden=!ready\|\|installed/);
+  assert.doesNotMatch(game,/INSTALLING · YOUR FREE DROP|INSTALL DROP|install_reward_claimed/);
   assert.match(styles,/\.daily-drop-card\[hidden\]\{display:none\}/);
-  assert.doesNotMatch(game,/installOfferDismissed[^\n]*saveState/);
 });
 
 test('single-action modal footers fill their card width',()=>{
@@ -652,8 +663,9 @@ test('single-action modal footers fill their card width',()=>{
   assert.match(styles,/\.modal-actions\.single-action>button\{width:100%\}/);
 });
 
-test('fight, championship, opponents, rankings, gear, packs, and Feed remain present',()=>{
-  for(const token of ['id="opponentList"','id="openRankingsBtn"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
+test('fight, championship, opponents, gear, packs, and Feed remain present',()=>{
+  for(const token of ['id="opponentList"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
+  assert.doesNotMatch(html,/id="openRankingsBtn"|World Standings|TOP 25 RANKINGS/);
   assert.doesNotMatch(html,/id="worldTitleCard"/);
   assert.match(game,/rankFighters/);
   assert.match(game,/settleChampionshipResult/);
@@ -877,6 +889,13 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.match(styles,/\.fight-ladder-heading\{[\s\S]*display:grid/);
   for(const token of ['fight-ladder-columns','RANK · FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
   for(const token of ['fight-ranking-list','fight-ranking-row','fightWinRewardPreview','victoryAttributePointReward','data-fight-key'])assert.match(game,new RegExp(token));
+  assert.match(game,/const FIGHT_RANKING_BATCH_SIZE=50/);
+  assert.match(game,/rankedEntries\.slice\(0,visibleFightRankingCount\)/);
+  assert.match(game,/visibleFightRankingCount\+=FIGHT_RANKING_BATCH_SIZE/);
+  assert.match(game,/#opponentList'\)\.addEventListener\('scroll',maybeLoadMoreFightRankings,\{passive:true\}\)/);
+  assert.match(game,/scroller\.scrollTop\+scroller\.clientHeight<scroller\.scrollHeight-240/);
+  assert.match(styles,/#opponentList\{[^}]*overflow-y:auto/);
+  assert.match(html,/fight-ladder-footer[^>]*>Tap a fighter for the Tale of the Tape/);
   assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
   assert.doesNotMatch(html,/data-opponent-filter/);
   assert.match(game,/onChampionshipChange:renderOpponents/);
@@ -909,7 +928,7 @@ test('Fight ladder keeps the current fighter visible but not selectable',()=>{
 });
 
 test('Fight ladder switches to detailed columns from its card width, not viewport width',()=>{
-  assert.match(styles,/\.fight-ladder\{container-type:inline-size;container-name:fight-ladder\}/);
+  assert.match(styles,/\.fight-ladder\{[^}]*display:flex[^}]*overflow:hidden[^}]*container-type:inline-size;container-name:fight-ladder\}/);
   assert.match(styles,/@container fight-ladder \(min-width:660px\)/);
   assert.doesNotMatch(styles,/@media \(min-width:700px\)\{\s*\.fight-ladder-columns/);
 });
@@ -926,7 +945,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
   assert.match(game,/if\(win\)\{[\s\S]*?state\.wins\+\+;state\.winStreak\+\+/);
   assert.match(game,/\}else\{[\s\S]*?state\.losses\+\+;state\.winStreak=0/);
-  assert.match(html,/Their wins and losses count on your professional record and streak/);
+  assert.match(html,/Tap a fighter for the Tale of the Tape; on-level wins earn 1 Attribute Point/);
   assert.match(game,/CAGE CIRCUIT REMATCH/);
   assert.match(game,/circuitRematches\.length>1/);
   assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
@@ -946,7 +965,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
   for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
   assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
-  assert.match(html,/Two generated on-level Cage Circuit fighters stay at the top/);
+  assert.match(html,/on-level wins earn 1 Attribute Point, higher-level wins earn 2, and lower-level wins earn none/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 

@@ -30,16 +30,15 @@ button { transition:background-color .12s ease,border-color .12s ease,color .12s
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px solid #58a6ff; outline-offset:2px }
 #app { border-color:var(--line); background:var(--bg) }
 #app::before { display:none }
-.topbar, .resource-hud, .bottom-nav { border-color:var(--line); background:#161b22; box-shadow:0 1px 0 #010409 }
+.topbar, .bottom-nav { border-color:var(--line); background:#161b22; box-shadow:0 1px 0 #010409 }
+.resource-hud { border-color:#1f2937; background:#0d1117 }
 .resource-hud.is-stuck { box-shadow:0 4px 10px rgb(0 0 0 / 38%),0 1px 0 rgb(64 154 255 / 12%) }
 .logo { filter:drop-shadow(0 2px 2px #010409) }
 .identity .name, .career-progress-summary>b, .top-progress b { font-weight:700 }
 .identity .sub, .top-progress, .career-progress-summary .top-progress b { color:#8c9aa8 }
-.hud-resource, .hud-attribute, .card, .choice, .opponent, .gear, .action, .social-post, .modal-dialog, .result-card { border-color:var(--line); background-color:var(--panel); box-shadow:none }
-.hud-resource, .hud-attribute { border-radius:6px }
+.card, .choice, .opponent, .gear, .action, .social-post, .modal-dialog, .result-card { border-color:var(--line); background-color:var(--panel); box-shadow:none }
 .hud-resource span, .hud-attribute span, .card small, .choice p, .gear p { color:var(--muted) }
-.hud-meter, .hud-attribute .mini { border-color:var(--line); background:#010409; box-shadow:none }
-.energy-hud .hud-meter i, .health-hud .hud-meter i, .hud-attribute .mini i { background:var(--blue) }
+.hud-meter, .hud-attribute .mini { border-color:transparent; background:#1a2230; box-shadow:none }
 .main, .screen, .fight-screen, .gear-screen, .feed-screen { background-color:var(--bg) }
 .card-title, .shop-head, .opponents-head, .fight-section-head { border-color:var(--line); background:var(--panel2) }
 .choice, .opponent, .gear, .action, .social-post { background-image:none }
