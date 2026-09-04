@@ -41,6 +41,8 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px so
 .hud-meter, .hud-attribute .mini { border-color:transparent; background:#1a2230; box-shadow:none }
 .main, .screen, .fight-screen, .gear-screen, .feed-screen { background-color:var(--bg) }
 .card-title, .shop-head, .opponents-head, .fight-section-head { border-color:var(--line); background:var(--panel2) }
+.page-subhead, .home-profile-section-heading { border-color:var(--line); background:#0d1117 }
+.page-footer, .home-coach-footer, .gear-card-footer, .fight-ladder-footer, .feed-action-dock { border-color:var(--line); background:#161b22 }
 .choice, .opponent, .gear, .action, .social-post { background-image:none }
 .opponent.ranked, .opponent.recommended { border-color:#388bfd }
 .bottom-nav .navbtn { border-color:transparent; background:transparent; color:#8b949e; box-shadow:none }
