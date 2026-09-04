@@ -461,15 +461,17 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
 });
 
-test('Home uses one fixed Career Identity card with an internal scroll and coach footer',()=>{
+test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
-  assert.match(html,/class="card-title career-after-setup">Career Identity/);
+  assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
+  assert.match(html,/id="careerIdentityCard"><div class="card-title">Career Identity <small>CAREER DETAILS<\/small><\/div>/);
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
   assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
   assert.match(styles,/\.home-career-scroll>\.career-after-setup\{flex:0 0 auto\}/);
   assert.match(styles,/\.home-career-scroll>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
   assert.match(styles,/#homeFightSkin\{order:2\}/);
   assert.match(styles,/#careerIdentityCard\{order:3\}/);
+  assert.match(styles,/\.home-fight-skin-accessories\{display:flex;justify-content:center;gap:1px;margin:1px auto -3px\}/);
   assert.match(html,/class="career-after-setup home-coach-footer"><small>COACH'S NOTES<\/small>/);
   assert.match(styles,/\.home-coach-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
   assert.match(styles,/\.home-coach-footer \.ticker span\{display:-webkit-box;overflow:hidden;line-height:1\.3;-webkit-box-orient:vertical;-webkit-line-clamp:3\}/);
