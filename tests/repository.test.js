@@ -803,6 +803,9 @@ test('desktop navigation and Gear card reserve their space without a footer gap'
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
   assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:0\}/);
+  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{display:flex;min-height:inherit;flex-direction:column\}/);
+  assert.match(styles,/\.gear-page-card\{height:auto;min-height:clamp\(390px,62dvh,680px\);flex:1 1 0\}/);
+  assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
