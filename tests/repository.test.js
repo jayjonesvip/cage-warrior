@@ -194,6 +194,8 @@ test('top bar stays compact and leaves XP progression on the Home card',()=>{
   assert.doesNotMatch(styles,/\.logo\{width:112px;height:50px/);
   assert.doesNotMatch(styles,/\.logo\{flex-basis:104px;width:104px;height:60px/);
   assert.match(styles,/\.career-progress-summary> b\.rank-status\{color:#7ddcff\}/);
+  assert.match(topbar,/class="ti ti-flame"[^>]*aria-hidden="true"/);
+  assert.match(styles,/\.top-progress \.ti-flame\{[^}]*background:#f39a3f/);
   assert.match(game,/progressText\.classList\.toggle\('rank-status',!state\.attributePoints&&!!headerRanking\?\.position\)/);
 });
 
@@ -275,6 +277,10 @@ test('Attribute Point assignment has one source of truth above Fight rankings',(
   assert.match(styles,/\.attribute-assignment-stat button\{appearance:none/);
   assert.match(styles,/\.attribute-point-badge\{[^}]*background:#22c55e;[^}]*color:#052e13/);
   assert.match(styles,/\.attribute-assignment-stat button\{[^}]*border-radius:50%;background:#22c55e;color:#052e13/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(1\) b\{color:#e2685f\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(2\) b\{color:#e0b84a\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(3\) b\{color:#a888e8\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(4\) b\{color:#5cc978\}/);
   assert.match(game,/attributeAssignmentExpanded = false/);
   assert.match(game,/toggleAttributeAssignment/);
   assert.match(game,/subtitle\.textContent=attributeAssignmentExpanded\?'Choose one permanent upgrade'/);
@@ -746,13 +752,21 @@ test('retired drop artwork is preserved outside the active icon catalog',()=>{
 
 test('Gear keeps guidance compact and has no global active-loadout footer',()=>{
   assert.match(html,/class="card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"/);
-  assert.match(html,/class="gear-info-popover"[\s\S]*About Gear collectibles[\s\S]*duplicates never stack/);
+  assert.match(html,/class="gear-info-popover"[\s\S]*About Gear collectibles[\s\S]*Drops reveal undiscovered items/);
   assert.doesNotMatch(html,/class="section-note">Collectibles come from fight wins/);
   assert.doesNotMatch(html,/id="gearLoadoutDock"|id="gearLoadoutSlots"|ACTIVE LOADOUT/);
   assert.doesNotMatch(game,/function renderGearLoadoutDock\(\)/);
 });
 
-test('Gear uses a fixed card shell, flat filters, rarity collections, and no meaningless duplicate badges',()=>{
+test('Victory Packs and Daily Drops only award undiscovered collectibles',()=>{
+  assert.match(game,/function eligibleGearAtLevel\(level,rarity\)\{return LOGIC\.undiscoveredCollectibles\(gearItems,ownedGearIds\(\),level,rarity\)\}/);
+  assert.doesNotMatch(game,/chooseGearWithDuplicateReroll/);
+  assert.equal((game.match(/state\.gearCounts\[item\.id\]=1/g)||[]).length,2);
+  assert.match(game,/ALL 32 COLLECTIBLES FOUND/);
+  assert.match(game,/NEW COLLECTIBLES UNLOCK AS YOU LEVEL UP/);
+});
+
+test('Gear uses a fixed card shell, flat filters, rarity collections, and no quantity badges',()=>{
   assert.match(html,/class="gear-filter-tabs"[^>]*id="gearFilterTabs"/);
   for(const filter of ['combat','bling','property','lifestyle'])assert.match(html,new RegExp(`role="tab" data-gear-filter="${filter}"`));
   assert.doesNotMatch(html,/data-gear-filter="all"/);
@@ -802,7 +816,8 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
 test('desktop navigation and Gear card reserve their space without a footer gap',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
-  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:0\}/);
+  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:28px\}/);
+  assert.match(styles,/@media \(min-width:1100px\)\{\.screen\[data-screen="gear"\]\.active\{padding-bottom:40px\}/);
   assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{display:flex;min-height:inherit;flex-direction:column\}/);
   assert.match(styles,/\.gear-page-card\{height:auto;min-height:clamp\(390px,62dvh,680px\);flex:1 1 0\}/);
   assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);

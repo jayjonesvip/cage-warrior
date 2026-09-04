@@ -52,7 +52,7 @@ The four-cell battery remains a visual aid, but Energy is continuous from 0–10
 
 Selected equipped Fight Gear can improve the Energy tick from 5 seconds to 4 seconds. Only the best equipped recovery perk applies, and the interval never drops below 4 seconds.
 
-Equipping the Dill Pickle collectible improves the Health tick from 60 seconds to 55 seconds. Duplicate copies do not stack this recovery perk.
+Equipping the Dill Pickle collectible improves the Health tick from 60 seconds to 55 seconds.
 
 ### Health
 
@@ -90,7 +90,7 @@ Eligible wins against opponents at the fighter's level or higher advance the fou
 
 XP and Victory Pack progress are shown as full-width Home progression rows above sponsorship, keeping the fighter portrait focused on identity, record, and the current sponsor.
 
-Collectibles are permanent. Each Gear category shows unique collection progress as owned collectibles out of the total available in that category; duplicate copies do not inflate this count. Every owned card equips inline. A compact eight-thumbnail dock above the Gear navigation shows four Fight Gear slots and four career-perk slots without duplicating the card controls. Fight Gear controls combat attributes and, on selected items, faster Energy charging. Bling, Lifestyle, and Property & Rides share career-perk slots for follower and recovery bonuses. Both slot groups begin with two active slots and unlock all four at Level 8. Duplicate quantities are recorded but perks do not stack by quantity.
+Collectibles are permanent, and every drop reveals an undiscovered, level-eligible item until the 32-item collection is complete. Each Gear category shows collection progress as owned collectibles out of the total available. Every owned card equips inline, with two active slots in each category. Fight Gear controls combat attributes and, on selected items, faster Energy charging. Bling, Lifestyle, and Property & Rides provide Aura and recovery bonuses.
 
 The Gear page keeps the Daily Drop, its next-drop countdown, and the installation Drop together above the collection. When a Daily Drop is ready, the Gear navigation item receives a gold action indicator. The Daily Drop grants a guaranteed collectible; it does not grant currency or manually refill resources.
 

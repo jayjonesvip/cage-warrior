@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.104';
+  const ICON_ASSET_VERSION = '2.7.105';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -412,12 +412,9 @@
     for(let i=minRank;i<weights.length;i++){cursor-=weights[i];if(cursor<0)return gearRarityOrder[i]}
     return gearRarityOrder[minRank];
   }
-  function eligibleGearAtLevel(level,rarity){return gearItems.filter(g=>(g.minLevel||1)<=level&&g.rarity===rarity)}
-  function chooseGearWithDuplicateReroll(pool,random){
-    let item=pool[Math.floor(random()*pool.length)];
-    if(state.gear.includes(item.id)&&pool.length>1){const rerollPool=pool.filter(candidate=>candidate.id!==item.id);item=rerollPool[Math.floor(random()*rerollPool.length)]}
-    return item;
-  }
+  function ownedGearIds(){return gearItems.filter(item=>gearCount(item.id)>0).map(item=>item.id)}
+  function eligibleGearAtLevel(level,rarity){return LOGIC.undiscoveredCollectibles(gearItems,ownedGearIds(),level,rarity)}
+  function chooseGear(pool,random){return pool[Math.floor(random()*pool.length)]}
   function awardDeterministicGearDrop({opponent,titleWon=false,guaranteed=false,progressSteps=1}){
     state.gearWinsSinceDrop=LOGIC.nextVictoryPackProgress(state.gearWinsSinceDrop,progressSteps);
     const random=seededRandom(hashSeed(`${state.gearSeed}|${state.wins}|${opponent.key}|${state.level}|gear-v1`)),packReady=LOGIC.victoryPackReady(state.gearWinsSinceDrop);
@@ -426,19 +423,20 @@
     for(let r=rank-1;!pool.length&&r>=minRank;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     for(let r=rank+1;!pool.length&&r<gearRarityOrder.length;r++){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     if(!pool.length)return null;
-    const item=chooseGearWithDuplicateReroll(pool,random),isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;state.gearWinsSinceDrop=0;ensureLoadout();
-    return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:guaranteed?'FIRST WIN DROP':titleWon?'CHAMPIONSHIP DROP':'VICTORY PACK'};
+    const item=chooseGear(pool,random);state.gear.push(item.id);state.gearCounts[item.id]=1;state.gearWinsSinceDrop=0;ensureLoadout();
+    return {item,rarity,count:1,isNew:true,guaranteed:true,reason:guaranteed?'FIRST WIN DROP':titleWon?'CHAMPIONSHIP DROP':'VICTORY PACK'};
   }
   function awardDailyCollectible(date){
     const random=seededRandom(hashSeed(`${state.gearSeed}|${date}|${state.level}|daily-collectible-v1`)),minRank=0;let rarity=rollGearRarity(state.level,random()),rank=gearRarityOrder.indexOf(rarity),pool=eligibleGearAtLevel(state.level,rarity);
     for(let r=rank-1;!pool.length&&r>=minRank;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     for(let r=rank+1;!pool.length&&r<gearRarityOrder.length;r++){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
-    if(!pool.length)return null;const item=chooseGearWithDuplicateReroll(pool,random),isNew=!state.gear.includes(item.id);if(isNew)state.gear.push(item.id);state.gearCounts[item.id]=gearCount(item.id)+1;ensureLoadout();return {item,rarity,count:state.gearCounts[item.id],isNew,guaranteed:true,reason:'DAILY DROP'};
+    if(!pool.length)return null;const item=chooseGear(pool,random);state.gear.push(item.id);state.gearCounts[item.id]=1;ensureLoadout();return {item,rarity,count:1,isNew:true,guaranteed:true,reason:'DAILY DROP'};
   }
   function victoryPackResultHtml({earned=false,eligible=false,steps=0,lowerLevel=false,repeatEligible=true,titleWon=false,firstCareerWin=false}={}){
     const progress=earned?4:clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),title=earned?'VICTORY PACK EARNED':eligible?`VICTORY PACK ${progress}/4`:'VICTORY PACK UNCHANGED';
     let detail=progress>=3?'NEXT ELIGIBLE WIN GUARANTEES A PACK':'WIN AT YOUR LEVEL OR HIGHER TO ADVANCE';
     if(earned)detail=titleWon?'TITLE WIN · RARE+ PACK GUARANTEED':firstCareerWin?'FIRST WIN PACK GUARANTEED':'METER COMPLETE · PACK READY';
+    else if(!eligibleGearAtLevel(state.level,'').length)detail=ownedGearIds().length>=gearItems.length?'ALL 32 COLLECTIBLES FOUND':'ALL UNLOCKED COLLECTIBLES FOUND · LEVEL UP FOR MORE';
     else if(lowerLevel)detail='LOWER-LEVEL OPPONENTS DO NOT ADVANCE THE METER';
     else if(!repeatEligible)detail='THIS REPEAT WIN DOES NOT ADVANCE THE METER';
     else if(steps===2)detail='PERFORMANCE WIN · +2 VICTORY PACK PROGRESS';
@@ -850,7 +848,7 @@
     const subtitles={'Fight Gear':'Attribute bonuses','Bling':'Aura bonuses','Lifestyle':'Health recovery','Property & Rides':'Energy recovery'};
     $$('#gearFilterTabs [data-gear-filter]').forEach(button=>{const selected=button.dataset.gearFilter===gearFilter;button.setAttribute('aria-selected',String(selected));button.tabIndex=selected?0:-1});
     const loadoutLimit=LOGIC.loadoutCategoryLimit();
-    const categoryByFilter={combat:'Fight Gear',bling:'Bling',property:'Property & Rides',lifestyle:'Lifestyle'},visibleOrder=[categoryByFilter[gearFilter]||'Fight Gear'],sections=visibleOrder.map(cat=>{const categoryItems=gearItems.filter(g=>g.category===cat),items=owned.filter(g=>g.category===cat),undiscoveredItems=categoryItems.filter(g=>gearCount(g.id)<1);const categoryTotal=categoryItems.length,collectionStatus=`${items.length} / ${categoryTotal} COLLECTIBLES`,fightGear=cat==='Fight Gear',activeItems=equippedForCategory(cat).map(id=>items.find(item=>item.id===id)).filter(Boolean),loadoutStatus=`${activeItems.length}/${loadoutLimit} EQUIPPED`,status=`<span>${collectionStatus}</span><small>${loadoutStatus}</small>`,availableItems=items.filter(item=>!activeItems.includes(item)),auraBonus=activeItems.reduce((sum,item)=>sum+(Number(item.auraBonus)||0),0),healthBonus=activeItems.reduce((sum,item)=>sum+(Number(item.healthRecoverySpeed)||0),0),energyBonus=activeItems.reduce((sum,item)=>sum+(Number(item.energyRecoverySpeed)||0),0),activeEffects=[auraBonus?`+${auraBonus} EFFECTIVE AURA`:'',healthBonus?`HEALTH EVERY ${Math.round((HEALTH_RECOVERY_INTERVAL-healthBonus)/1000)} SEC`:'',energyBonus?`ENERGY EVERY ${((ENERGY_RECOVERY_INTERVAL-energyBonus)/1000).toFixed(1)} SEC`:''].filter(Boolean),note=fightGear?'Two active Combat slots. Duplicates do not stack.':activeEffects.length?`ACTIVE · ${activeEffects.join(' · ')}`:`Choose up to ${loadoutLimit} active ${cat} items.`,hasAvailable=availableItems.some(item=>state.level>=(item.minLevel||1)),loadoutCards=Array.from({length:loadoutLimit},(_,index)=>activeItems[index]?collectibleCardHtml(activeItems[index],{loadoutCard:true}):loadoutEmptyCardHtml(cat,index,hasAvailable)).join(''),loadoutBlock=`<div class="gear-loadout-shop-block"><div class="gear-subhead"><b>YOUR LOADOUT</b><span>${activeItems.length}/${loadoutLimit}</span></div><div class="gear-grid gear-loadout-shop-grid">${loadoutCards}</div></div>`;return `<section class="shop-section" id="gear-panel-${gearFilter}" role="tabpanel" aria-labelledby="gear-tab-${gearFilter}"><div class="shop-head"><div><b id="gear-${gearCategorySlug(cat)}">${cat}</b><small>${subtitles[cat]}</small></div><span class="shop-status">${status}</span></div><div class="loadout-note${fightGear?'':' perk-category-note'}">${note}</div>${loadoutBlock}${collectionBlockHtml(cat,availableItems,undiscoveredItems)}</section>`}).join('');
+    const categoryByFilter={combat:'Fight Gear',bling:'Bling',property:'Property & Rides',lifestyle:'Lifestyle'},visibleOrder=[categoryByFilter[gearFilter]||'Fight Gear'],sections=visibleOrder.map(cat=>{const categoryItems=gearItems.filter(g=>g.category===cat),items=owned.filter(g=>g.category===cat),undiscoveredItems=categoryItems.filter(g=>gearCount(g.id)<1);const categoryTotal=categoryItems.length,collectionStatus=`${items.length} / ${categoryTotal} COLLECTIBLES`,fightGear=cat==='Fight Gear',activeItems=equippedForCategory(cat).map(id=>items.find(item=>item.id===id)).filter(Boolean),loadoutStatus=`${activeItems.length}/${loadoutLimit} EQUIPPED`,status=`<span>${collectionStatus}</span><small>${loadoutStatus}</small>`,availableItems=items.filter(item=>!activeItems.includes(item)),auraBonus=activeItems.reduce((sum,item)=>sum+(Number(item.auraBonus)||0),0),healthBonus=activeItems.reduce((sum,item)=>sum+(Number(item.healthRecoverySpeed)||0),0),energyBonus=activeItems.reduce((sum,item)=>sum+(Number(item.energyRecoverySpeed)||0),0),activeEffects=[auraBonus?`+${auraBonus} EFFECTIVE AURA`:'',healthBonus?`HEALTH EVERY ${Math.round((HEALTH_RECOVERY_INTERVAL-healthBonus)/1000)} SEC`:'',energyBonus?`ENERGY EVERY ${((ENERGY_RECOVERY_INTERVAL-energyBonus)/1000).toFixed(1)} SEC`:''].filter(Boolean),note=fightGear?'Choose up to two active Combat items.':activeEffects.length?`ACTIVE · ${activeEffects.join(' · ')}`:`Choose up to ${loadoutLimit} active ${cat} items.`,hasAvailable=availableItems.some(item=>state.level>=(item.minLevel||1)),loadoutCards=Array.from({length:loadoutLimit},(_,index)=>activeItems[index]?collectibleCardHtml(activeItems[index],{loadoutCard:true}):loadoutEmptyCardHtml(cat,index,hasAvailable)).join(''),loadoutBlock=`<div class="gear-loadout-shop-block"><div class="gear-subhead"><b>YOUR LOADOUT</b><span>${activeItems.length}/${loadoutLimit}</span></div><div class="gear-grid gear-loadout-shop-grid">${loadoutCards}</div></div>`;return `<section class="shop-section" id="gear-panel-${gearFilter}" role="tabpanel" aria-labelledby="gear-tab-${gearFilter}"><div class="shop-head"><div><b id="gear-${gearCategorySlug(cat)}">${cat}</b><small>${subtitles[cat]}</small></div><span class="shop-status">${status}</span></div><div class="loadout-note${fightGear?'':' perk-category-note'}">${note}</div>${loadoutBlock}${collectionBlockHtml(cat,availableItems,undiscoveredItems)}</section>`}).join('');
     const shop=$('#gearShop'),headerHost=$('#gearCardHeader');shop.innerHTML=sections;const header=shop.querySelector('.shop-head');headerHost.replaceChildren(...(header?[header]:[]));
   }
   function setGearFilter(filter){if(!['combat','bling','property','lifestyle'].includes(filter)||gearFilter===filter)return;gearFilter=filter;try{sessionStorage.setItem(GEAR_FILTER_KEY,filter)}catch{/* session-only fallback remains in memory */}renderGear();sfx.tap()}
@@ -892,7 +890,7 @@
   }
   function maybeGrantInstallReward(){}
   function claimDaily(){
-    const today=todayKey();if(state.lastDaily===today)return;initAudio();const gearDrop=awardDailyCollectible(today);state.lastDaily=today;trackEvent('daily_reward_claimed',{gear_id:gearDrop?.item?.id||'none',gear_rarity:gearDrop?.rarity?.toLowerCase()||'none',new_item:!!gearDrop?.isNew});updateUI();if(!gearDrop){toast('DAILY DROP SAVED','#f4c34a');return}openDropClaim(gearDrop,{kind:'daily',eyebrow:'ONE FREE PACK EVERY DAY',title:'DAILY DROP',message:'Reveal today’s guaranteed collectible.'});
+    const today=todayKey();if(state.lastDaily===today)return;initAudio();const gearDrop=awardDailyCollectible(today);state.lastDaily=today;trackEvent('daily_reward_claimed',{gear_id:gearDrop?.item?.id||'none',gear_rarity:gearDrop?.rarity?.toLowerCase()||'none',new_item:!!gearDrop?.isNew});updateUI();if(!gearDrop){toast(ownedGearIds().length>=gearItems.length?'COLLECTION COMPLETE':'NEW COLLECTIBLES UNLOCK AS YOU LEVEL UP','#f4c34a');return}openDropClaim(gearDrop,{kind:'daily',eyebrow:'ONE FREE PACK EVERY DAY',title:'DAILY DROP',message:'Reveal today’s guaranteed collectible.'});
   }
 
   function emptyFightStats(){return {attempted:0,landed:0,sig:0,takedowns:0,control:0,damage:0,kd:0}}
@@ -1335,7 +1333,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.104" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.105" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1343,7 +1341,7 @@
     if(!normalized||!item){
       console.error('Cage Grind could not render a gear drop.',pendingResultDrop);resultDropRevealed=true;$('#dropClaimStage').innerHTML='<div class="drop-claim-saved"><b>DROP SAVED</b><span>Your reward is safe in Gear.</span></div>';$('#dropRevealBtn').hidden=true;$('#dropCloseBtn').hidden=false;$('#dropCloseBtn').focus();toast('DROP SAVED · OPEN GEAR TO VIEW IT','#f4c34a');return true;
     }
-    const drop=Object.assign({},normalized,{item}),status=drop.isNew?'NEW ITEM':`OWNED ×${drop.count}`;$('#dropClaimStage').innerHTML=collectibleCardHtml(item,{dropStatus:status});$('#dropRevealBtn').hidden=true;$('#dropCloseBtn').hidden=false;resultDropRevealed=true;$('#dropCloseBtn').focus();
+    const drop=Object.assign({},normalized,{item});$('#dropClaimStage').innerHTML=collectibleCardHtml(item,{dropStatus:'NEW ITEM'});$('#dropRevealBtn').hidden=true;$('#dropCloseBtn').hidden=false;resultDropRevealed=true;$('#dropCloseBtn').focus();
     trackEvent('gear_drop_revealed',{gear_id:item.id,gear_rarity:drop.rarity.toLowerCase(),is_new:drop.isNew,drop_reason:drop.reason.toLowerCase().replace(/\s+/g,'_')});
     try{sfx.coin()}catch(error){console.warn('Drop sound unavailable.',error)}
     try{confettiBurst()}catch(error){console.warn('Drop celebration unavailable.',error)}

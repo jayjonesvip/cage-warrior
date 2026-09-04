@@ -44,7 +44,7 @@ Losses and forfeitures do not grant Attribute Points. A forfeit grants no XP or 
 
 ## Victory Packs
 
-Wins against the player's level or higher can advance the four-step Victory Pack meter. A first career win guarantees a pack. Duplicate handling and rarity selection remain deterministic so reloading cannot reroll a saved outcome.
+Wins against the player's level or higher can advance the four-step Victory Pack meter. A first career win guarantees a pack. Drops always select an undiscovered, level-eligible collectible, and rarity selection remains deterministic so reloading cannot reroll a saved outcome.
 
 ## Championships
 

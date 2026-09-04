@@ -98,8 +98,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.104',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.104',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.105',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.105',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -270,7 +270,7 @@ interactions: {
     'Adapting takes focus, kid. Round one reads him, round two adjusts, round three owns the answer.',
     'No shop, no shortcuts. Beat fighters at your level or higher and fill the Victory Pack meter.',
     'Four Victory Pack segments earn the sealed pack. A big performance can fill two.',
-    'Duplicate on the first draw? The locker rerolls once in the same rarity. After that, the result stands.',
+    'Every pack reveals an undiscovered collectible from your unlocked pool.',
     'One Daily Drop, every day. Guaranteed collectible. Do not ask who packed it.',
     'Followers open sponsor doors—and falling below a milestone can cost you the deal. Build back and they can return.',
     'The right equipped gear can cut Energy charging from five seconds to four. Best perk only.',

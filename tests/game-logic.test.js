@@ -489,6 +489,18 @@ test('gear drops are validated without economy fields',()=>{
   assert.equal(logic.normalizeGearDrop({item:{},rarity:'COMMON'}),null);
 });
 
+test('collectible drops exclude owned and level-locked items',()=>{
+  const items=[
+    {id:'owned',rarity:'COMMON',minLevel:1},
+    {id:'new-common',rarity:'COMMON',minLevel:2},
+    {id:'new-rare',rarity:'RARE',minLevel:2},
+    {id:'locked',rarity:'COMMON',minLevel:4}
+  ];
+  assert.deepEqual(logic.undiscoveredCollectibles(items,['owned'],2,'COMMON').map(item=>item.id),['new-common']);
+  assert.deepEqual(logic.undiscoveredCollectibles(items,['owned'],2).map(item=>item.id),['new-common','new-rare']);
+  assert.deepEqual(logic.undiscoveredCollectibles(items,['owned','new-common','new-rare'],2),[]);
+});
+
 test('countdown formatting supports Energy and Health timers',()=>{
   assert.equal(logic.formatCountdown(444000),'00:07:24');
   assert.equal(logic.formatCountdown(0),'00:00:00');
