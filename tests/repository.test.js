@@ -448,14 +448,20 @@ test('Career Identity shows the next sponsor goal instead of duplicating the cur
 });
 
 test('Home presents XP and Victory Pack progress before sponsorship',()=>{
+  const auraIndex=html.indexOf('id="careerAuraTrack"');
   const xpIndex=html.indexOf('id="careerXpLevel"');
   const packIndex=html.indexOf('id="victoryPackMeter"');
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
   const heroIndex=html.indexOf('<div class="hero career-after-setup">');
-  assert.ok(heroIndex>=0&&xpIndex>=0&&packIndex>xpIndex&&sponsorIndex>packIndex);
+  assert.ok(heroIndex>=0&&auraIndex>=0&&xpIndex>auraIndex&&packIndex>xpIndex&&sponsorIndex>packIndex);
+  assert.match(html,/class="home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
+  assert.match(html,/id="careerAuraTrack"[^>]*role="progressbar"/);
+  assert.match(html,/id="careerAuraProgress"/);
   assert.match(html,/id="careerXpTrack"[^>]*role="progressbar"/);
   assert.match(html,/id="victoryPackTrack"[^>]*role="progressbar"/);
   assert.match(game,/\$\('#careerXpFill'\)\.style\.width/);
+  assert.match(game,/\$\('#careerAuraFill'\)\.style\.width/);
+  assert.match(game,/nextAuraSkin\?`\$\{auraTitle\.label\} → \$\{nextAuraSkin\.label\}`/);
   assert.match(game,/\$\('#victoryPackFill'\)\.style\.width/);
   assert.match(styles,/\.career-token\.career-progression-goal\{grid-column:1\/-1!important/);
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
@@ -465,6 +471,9 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
   assert.match(html,/id="careerIdentityCard"><div class="home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerWorldRank"/);
+  assert.match(game,/\$\('#careerWorldRank'\)\.textContent=careerRanking\.position\?`#\$\{careerRanking\.position\}`:'UNRANKED'/);
+  assert.match(styles,/#careerIdentityCard \.career-identity-grid \.career-token:last-child\{grid-column:auto\}/);
   assert.match(html,/id="homeFightSkin"><div class="home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
   assert.match(styles,/\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
