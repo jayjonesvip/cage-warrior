@@ -472,7 +472,8 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(styles,/#homeFightSkin\{order:2\}/);
   assert.match(styles,/#careerIdentityCard\{order:3\}/);
   assert.match(styles,/\.home-fight-skin-accessories\{display:flex;justify-content:center;gap:1px;margin:1px auto -3px\}/);
-  assert.match(html,/class="career-after-setup home-coach-footer"><small>COACH'S NOTES<\/small>/);
+  assert.match(html,/class="career-after-setup home-coach-footer"><div class="ticker"><i class="pulse-dot"><\/i><span id="tickerText">/);
+  assert.doesNotMatch(html,/COACH'S NOTES/);
   assert.match(styles,/\.home-coach-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
   assert.match(styles,/\.home-coach-footer \.ticker span\{display:-webkit-box;overflow:hidden;line-height:1\.3;-webkit-box-orient:vertical;-webkit-line-clamp:3\}/);
   assert.match(styles,/\.home-career-scroll>\.career-identity-details,\.home-career-scroll>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
