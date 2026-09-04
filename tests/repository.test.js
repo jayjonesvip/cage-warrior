@@ -698,7 +698,10 @@ test('career perks equip inline with the same treatment as Fight Gear',()=>{
   assert.match(game,/activePerkBonus\('healthRecoverySpeed'\)/);
   assert.match(game,/const perk=g\.category!==\'Fight Gear\'/);
   assert.doesNotMatch(styles,/\.perk-loadout-panel\{/);
-  assert.match(styles,/\.perk-category-note\{/);
+  assert.match(game,/activeEffect=fightGear\?'':activeEffects\.length\?`ACTIVE ·/);
+  assert.match(game,/class="gear-loadout-heading"/);
+  assert.doesNotMatch(game,/Choose up to two active Combat items/);
+  assert.doesNotMatch(game,/class="loadout-note/);
 });
 
 test('each loadout category owns one distinct career effect',()=>{
@@ -813,14 +816,16 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
   assert.match(styles,/\.gear-level-lock\{position:absolute/);
 });
 
-test('desktop navigation and Gear card reserve their space without a footer gap',()=>{
+test('full-height page cards share navigation spacing and keep scrolling internal',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
-  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{padding-bottom:28px\}/);
-  assert.match(styles,/@media \(min-width:1100px\)\{\.screen\[data-screen="gear"\]\.active\{padding-bottom:40px\}/);
-  assert.match(styles,/\.screen\[data-screen="gear"\]\.active\{display:flex;min-height:inherit;flex-direction:column\}/);
-  assert.match(styles,/\.gear-page-card\{height:auto;min-height:clamp\(390px,62dvh,680px\);flex:1 1 0\}/);
+  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{padding-bottom:28px\}/);
+  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden\}/);
+  assert.match(styles,/\.screen\[data-screen="gear"\] #gearDropOffer\{flex:0 0 auto\}/);
+  assert.match(styles,/\.gear-page-card\{height:auto;min-height:0;flex:1 1 0\}/);
+  assert.match(styles,/@media \(min-width:1100px\)\{\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
   assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);
+  assert.doesNotMatch(html,/class="gear-card-footer"/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
