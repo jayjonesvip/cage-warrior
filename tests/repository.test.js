@@ -762,9 +762,11 @@ test('retired drop artwork is preserved outside the active icon catalog',()=>{
   assert.ok(fs.existsSync(path.join(root,'assets/legacy-drops/README.md')));
 });
 
-test('Gear keeps guidance compact and has no global active-loadout footer',()=>{
+test('Gear keeps guidance in a fixed card footer and has no global active-loadout footer',()=>{
   assert.match(html,/class="card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"/);
-  assert.match(html,/class="gear-info-popover"[\s\S]*About Gear collectibles[\s\S]*Drops reveal undiscovered items/);
+  assert.match(html,/class="gear-card-footer">Collectibles come from fight wins and the Daily Drop\. Drops reveal undiscovered items as they unlock; equip up to two per category\.<\/footer>/);
+  assert.doesNotMatch(html,/gear-info-popover|About Gear collectibles/);
+  assert.match(styles,/\.gear-card-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
   assert.doesNotMatch(html,/class="section-note">Collectibles come from fight wins/);
   assert.doesNotMatch(html,/id="gearLoadoutDock"|id="gearLoadoutSlots"|ACTIVE LOADOUT/);
   assert.doesNotMatch(game,/function renderGearLoadoutDock\(\)/);
@@ -835,7 +837,9 @@ test('full-height page cards share navigation spacing and keep scrolling interna
   assert.match(styles,/\.gear-page-card\{height:auto;min-height:0;flex:1 1 0\}/);
   assert.match(styles,/@media \(min-width:1100px\)\{\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
   assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);
-  assert.doesNotMatch(html,/class="gear-card-footer"/);
+  assert.match(html,/class="gear-card-footer"/);
+  assert.match(styles,/\.fight-ladder>\.fight-ladder-footer\{height:64px;flex:0 0 64px;/);
+  assert.match(styles,/\.feed-action-dock\{[^}]*height:64px;/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
