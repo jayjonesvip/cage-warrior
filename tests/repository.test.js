@@ -793,10 +793,23 @@ test('Gear keeps guidance in a fixed card footer and has no global active-loadou
 
 test('Victory Packs and Daily Drops only award undiscovered collectibles',()=>{
   assert.match(game,/function eligibleGearAtLevel\(level,rarity\)\{return LOGIC\.undiscoveredCollectibles\(gearItems,ownedGearIds\(\),level,rarity\)\}/);
+  assert.match(game,/function autoEquipNewDrop\(item\)\{/);
+  assert.match(game,/equippedForCategory\(item\.category\)\.length>=LOGIC\.loadoutCategoryLimit\(\)/);
+  assert.equal((game.match(/const autoEquipped=autoEquipNewDrop\(item\)/g)||[]).length,2);
   assert.doesNotMatch(game,/chooseGearWithDuplicateReroll/);
   assert.equal((game.match(/state\.gearCounts\[item\.id\]=1/g)||[]).length,2);
   assert.match(game,/ALL 32 COLLECTIBLES FOUND/);
   assert.match(game,/NEW COLLECTIBLES UNLOCK AS YOU LEVEL UP/);
+});
+
+test('Daily Drop claimed state always displays its reset countdown',()=>{
+  assert.match(game,/dailyClaimed=ready&&!dailyAvailable/);
+  assert.doesNotMatch(game,/installOfferDismissed|INSTALL_OFFER_DISMISS_KEY|installAvailable=ready&&!dailyAvailable/);
+  assert.doesNotMatch(html,/installOfferHideBtn/);
+});
+
+test('card titles cast a subtle shadow over their card content',()=>{
+  assert.match(styles,/\.card-title\{[^}]*box-shadow:0 7px 14px #0008/);
 });
 
 test('Gear uses a fixed card shell, flat filters, rarity collections, and no quantity badges',()=>{

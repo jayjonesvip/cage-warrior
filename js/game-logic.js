@@ -602,6 +602,7 @@
       rarity,
       count:Math.max(1,nonNegativeWhole(drop.count,1)),
       isNew:drop.isNew===true,
+      autoEquipped:drop.autoEquipped===true,
       reason:typeof drop.reason==='string'&&drop.reason.trim()?drop.reason.trim():'GEAR DROP',
       extras:typeof drop.extras==='string'?drop.extras:''
     };
