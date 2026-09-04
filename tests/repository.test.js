@@ -454,7 +454,7 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
   const heroIndex=html.indexOf('<div class="hero career-after-setup">');
   assert.ok(heroIndex>=0&&auraIndex>=0&&xpIndex>auraIndex&&packIndex>xpIndex&&sponsorIndex>packIndex);
-  assert.match(html,/class="home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
+  assert.match(html,/class="page-subhead home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
   assert.match(html,/id="careerAuraTrack"[^>]*role="progressbar"/);
   assert.match(html,/id="careerAuraProgress"/);
   assert.match(html,/id="careerXpTrack"[^>]*role="progressbar"/);
@@ -468,29 +468,30 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
 });
 
 test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
-  assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
+  assert.match(html,/class="card build-card home-career-card page-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
-  assert.match(html,/id="careerIdentityCard"><div class="home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(html,/id="careerIdentityCard"><div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
   assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerWorldRank"/);
   assert.match(game,/\$\('#careerWorldRank'\)\.textContent=careerRanking\.position\?`#\$\{careerRanking\.position\}`:'UNRANKED'/);
   assert.match(styles,/#careerIdentityCard \.career-identity-grid \.career-token:last-child\{grid-column:auto\}/);
-  assert.match(html,/id="homeFightSkin"><div class="home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
-  assert.match(styles,/\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
-  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
-  assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
+  assert.match(html,/id="homeFightSkin"><div class="page-subhead home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
+  assert.match(styles,/\.page-subhead,\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;gap:0\}/);
+  assert.match(styles,/\.home-career-scroll\{display:flex;flex-direction:column\}/);
+  assert.match(styles,/\.page-scroll\{min-height:0;flex:1 1 auto;overflow-y:auto/);
   assert.match(styles,/\.home-career-scroll>\.career-after-setup\{flex:0 0 auto\}/);
   assert.match(styles,/\.home-career-scroll>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
   assert.match(styles,/#homeFightSkin\{order:2\}/);
   assert.match(styles,/#careerIdentityCard\{order:3\}/);
   assert.match(styles,/\.home-fight-skin-accessories\{display:flex;justify-content:center;gap:1px;margin:1px auto -3px\}/);
-  assert.match(html,/class="career-after-setup home-coach-footer"><div class="ticker"><i class="pulse-dot"><\/i><span id="tickerText">/);
+  assert.match(html,/class="career-after-setup home-coach-footer page-footer"><div class="ticker"><i class="pulse-dot"><\/i><span id="tickerText">/);
   assert.doesNotMatch(html,/COACH'S NOTES/);
-  assert.match(styles,/\.home-coach-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
+  assert.match(styles,/\.page-footer,\.home-coach-footer,\.gear-card-footer,\.fight-ladder-footer,\.feed-action-dock\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
   assert.match(styles,/\.home-coach-footer \.ticker span\{display:-webkit-box;overflow:hidden;line-height:1\.3;-webkit-box-orient:vertical;-webkit-line-clamp:3\}/);
   assert.match(styles,/\.home-career-scroll>\.career-identity-details,\.home-career-scroll>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
   assert.match(styles,/#app\.career-setup #careerGameContent,#app\.career-setup \.home-career-scroll\{display:contents\}/);
   const homeCard=html.slice(html.indexOf('id="careerGameContent"'),html.indexOf('<section class="screen" data-screen="feed">'));
-  assert.ok(homeCard.indexOf('class="career-after-setup retirement-card"')<homeCard.indexOf('class="career-after-setup home-coach-footer"'));
+  assert.ok(homeCard.indexOf('class="career-after-setup retirement-card"')<homeCard.indexOf('class="career-after-setup home-coach-footer page-footer"'));
   assert.doesNotMatch(html,/FIGHT\. IMPROVE\. CLIMB\.|career-guide|choice-action/);
   assert.doesNotMatch(styles,/career-guide|choice-action|choice-grid/);
   assert.doesNotMatch(game,/\[data-go\]/);
@@ -668,19 +669,22 @@ test('Daily Drop lives at the top of Gear while the install CTA stays on Home',(
   const gear=html.slice(html.indexOf('data-screen="gear"'),html.lastIndexOf('</main>'));
   assert.match(home,/id="homeInstallCta"[\s\S]*id="installGameBtn"[\s\S]*RETIRE THIS FIGHTER/);
   assert.doesNotMatch(home,/FREE DROP/);
-  assert.match(gear,/id="gearDropOffer"[\s\S]*id="dailyBtn"[\s\S]*id="gearShop"/);
+  assert.match(gear,/id="gearDropOffer"[\s\S]*id="dailyBtn"[\s\S]*id="dailyDropResetClock"[\s\S]*id="gearShop"/);
   assert.doesNotMatch(gear,/id="installGameBtn"|INSTALL GAME · FREE DROP/);
   assert.match(game,/gearNav\.classList\.toggle\('drop-ready',dailyAvailable\)/);
   assert.match(game,/Gear, Daily Drop ready/);
   assert.match(styles,/\.navbtn\.drop-ready/);
 });
 
-test('Daily Drop offer uses a dramatic gold pack treatment without changing claimed state',()=>{
+test('Daily Drop offer uses a dramatic gold pack treatment and shares the Fight reset timer',()=>{
   assert.match(styles,/\.daily-drop-card\{[^}]*min-height:198px[^}]*border:2px solid #c7962e[^}]*radial-gradient\(circle at 21% 48%,#ffc8324d/);
   assert.match(styles,/\.daily-drop-pack\{[^}]*height:165px[^}]*animation:dailyDropHover/);
   assert.match(styles,/\.daily\{[^}]*linear-gradient\(#ffe47a[^}]*font-family:"Oswald"/);
   assert.match(styles,/@keyframes dailyDropShine/);
-  assert.match(styles,/\.daily-drop-card\.claimed\{[^}]*min-height:0/);
+  assert.match(html,/id="fightResetClock"[^>]*>[\s\S]*class="daily-reset-clock career-after-setup" id="dailyDropResetClock"/);
+  assert.match(html,/id="dailyDropResetClock"[^>]*>[\s\S]*id="dailyDropCountdown" data-daily-reset-clock/);
+  assert.match(game,/dailyDropResetClock\.hidden=!dailyClaimed/);
+  assert.doesNotMatch(styles,/\.daily-drop-card\.claimed/);
   assert.match(styles,/\.home-install-cta\{[^}]*display:flex/);
   assert.match(game,/function renderHomeInstallCta\(\)/);
   assert.match(game,/cta\.hidden=!ready\|\|installed;button\.hidden=!ready\|\|installed/);
@@ -778,10 +782,10 @@ test('retired drop artwork is preserved outside the active icon catalog',()=>{
 });
 
 test('Gear keeps guidance in a fixed card footer and has no global active-loadout footer',()=>{
-  assert.match(html,/class="card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"/);
-  assert.match(html,/class="gear-card-footer">Collectibles come from fight wins and the Daily Drop\. Drops reveal undiscovered items as they unlock; equip up to two per category\.<\/footer>/);
+  assert.match(html,/class="card page-card gear-page-card"[\s\S]*id="gearCardHeader"[\s\S]*id="gearFilterTabs"[\s\S]*id="gearShop"/);
+  assert.match(html,/class="page-footer gear-card-footer">Collectibles come from fight wins and the Daily Drop\. Drops reveal undiscovered items as they unlock; equip up to two per category\.<\/footer>/);
   assert.doesNotMatch(html,/gear-info-popover|About Gear collectibles/);
-  assert.match(styles,/\.gear-card-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
+  assert.match(styles,/\.page-footer,\.home-coach-footer,\.gear-card-footer,\.fight-ladder-footer,\.feed-action-dock\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
   assert.doesNotMatch(html,/class="section-note">Collectibles come from fight wins/);
   assert.doesNotMatch(html,/id="gearLoadoutDock"|id="gearLoadoutSlots"|ACTIVE LOADOUT/);
   assert.doesNotMatch(game,/function renderGearLoadoutDock\(\)/);
@@ -815,11 +819,11 @@ test('Gear uses a fixed card shell, flat filters, rarity collections, and no qua
   assert.match(styles,/\.gear-filter-tabs\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
   assert.match(styles,/\.gear-filter-tabs\{flex:0 0 auto;width:100%;margin:0;padding:0;border:0;[^}]*border-radius:0/);
-  assert.match(styles,/\.gear-card-scroll\{flex:1 1 auto;min-height:0;overflow-y:auto/);
+  assert.match(styles,/\.page-scroll\{min-height:0;flex:1 1 auto;overflow-y:auto/);
   assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-block\{display:block;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none\}/);
   assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-grid\{padding:7px\}/);
   assert.match(game,/function moveGearFilter\(key\)/);
-  assert.match(game,/headerHost\.replaceChildren/);
+  assert.match(game,/\$\('#gearCategoryTitle'\)\.textContent=headerCat/);
   assert.match(game,/class="gear-loadout-shop-block"/);
   assert.match(game,/Array\.from\(\{length:loadoutLimit\}/);
   assert.match(game,/collectibleCardHtml\(activeItems\[index\],\{loadoutCard:true\}\)/);
@@ -846,16 +850,26 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
 
 test('full-height page cards share navigation spacing and keep scrolling internal',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
-  assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
-  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{padding-bottom:10px\}/);
-  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden\}/);
-  assert.match(styles,/\.screen\[data-screen="gear"\] #gearDropOffer\{flex:0 0 auto\}/);
-  assert.match(styles,/\.gear-page-card\{height:auto;min-height:0;flex:1 1 0\}/);
-  assert.match(styles,/@media \(min-width:1100px\)\{\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
-  assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);
-  assert.match(html,/class="gear-card-footer"/);
-  assert.match(styles,/\.fight-ladder>\.fight-ladder-footer\{height:64px;flex:0 0 64px;/);
-  assert.match(styles,/\.feed-action-dock\{[^}]*height:64px;/);
+  assert.match(styles,/\.page-card\{display:flex;flex:1 1 0;[^}]*margin-bottom:0/);
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden;padding-bottom:10px\}/);
+  assert.match(styles,/\.screen\[data-screen="gear"\] :is\(#gearDropOffer,#dailyDropResetClock\),\.screen\[data-screen="fight"\] :is\(#fightResetClock,\.fight-attribute-assignment\)\{flex:0 0 auto\}/);
+  assert.match(styles,/@media \(min-width:1100px\)\{#app:not\(\.career-setup\) \.screen\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
+  assert.match(styles,/\.page-scroll\{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none\}/);
+  assert.match(html,/class="page-footer gear-card-footer"/);
+  assert.match(html,/class="page-footer fight-ladder-footer"/);
+  assert.match(html,/class="page-footer feed-action-dock"/);
+  assert.match(styles,/\.page-footer,\.home-coach-footer,\.gear-card-footer,\.fight-ladder-footer,\.feed-action-dock\{height:64px;flex:0 0 64px;/);
+});
+
+test('Home, Fight, Gear, and Feed reuse the same page shell classes',()=>{
+  for(const token of ['home-career-card page-card','page-card feed-page-card','fight-ladder page-card','page-card gear-page-card'])assert.match(html,new RegExp(token));
+  for(const token of ['page-scroll home-career-scroll','page-scroll feed-list','page-scroll" id="opponentList"','page-scroll gear-card-scroll'])assert.match(html,new RegExp(token));
+  assert.match(html,/id="gearCardHeader"><span class="page-title-copy"><b id="gearCategoryTitle">/);
+  assert.match(html,/id="gearCategorySubtitle"/);
+  assert.match(html,/id="gearCategoryStatus"/);
+  assert.match(game,/class="page-subhead fight-ranking-group/);
+  assert.match(game,/class="page-subhead gear-subhead/);
+  assert.doesNotMatch(game,/class="shop-head"|headerHost\.replaceChildren|gearCategorySlug/);
 });
 
 test('Energy Drink collectible uses the Surge Core can artwork',()=>{
@@ -941,7 +955,7 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.match(game,/visibleFightRankingCount\+=FIGHT_RANKING_BATCH_SIZE/);
   assert.match(game,/#opponentList'\)\.addEventListener\('scroll',maybeLoadMoreFightRankings,\{passive:true\}\)/);
   assert.match(game,/scroller\.scrollTop\+scroller\.clientHeight<scroller\.scrollHeight-240/);
-  assert.match(styles,/#opponentList\{[^}]*overflow-y:auto/);
+  assert.match(styles,/\.page-scroll\{[^}]*overflow-y:auto/);
   assert.match(html,/fight-ladder-footer[^>]*>Tap a fighter for the Tale of the Tape/);
   assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
   assert.doesNotMatch(html,/data-opponent-filter/);
@@ -980,7 +994,8 @@ test('Fight ladder keeps the current fighter visible but not selectable',()=>{
 });
 
 test('Fight ladder switches to detailed columns from its card width, not viewport width',()=>{
-  assert.match(styles,/\.fight-ladder\{[^}]*display:flex[^}]*overflow:hidden[^}]*container-type:inline-size;container-name:fight-ladder\}/);
+  assert.match(styles,/\.fight-ladder\{[^}]*container-type:inline-size;container-name:fight-ladder\}/);
+  assert.match(styles,/\.page-card\{display:flex;[^}]*overflow:hidden\}/);
   assert.match(styles,/@container fight-ladder \(min-width:660px\)/);
   assert.doesNotMatch(styles,/@media \(min-width:700px\)\{\s*\.fight-ladder-columns/);
 });
