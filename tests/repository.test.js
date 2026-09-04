@@ -620,7 +620,7 @@ test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
   assert.match(styles,/top:0/);
   assert.match(styles,/\.resource-hud\.is-stuck\{box-shadow:0 4px 10px/);
   assert.match(styles,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(styles,/height:88px;padding:10px 12px/);
+  assert.match(styles,/height:80px;padding:10px 12px/);
   assert.match(styles,/\.hud-condition-row\{height:24px[\s\S]*?gap:14px/);
   assert.match(styles,/\.hud-attributes-row\{height:24px[\s\S]*?gap:10px/);
   assert.match(game,/value\/10\*100/);
