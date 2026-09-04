@@ -346,20 +346,16 @@
 
   function auraTitle(value=0){
     const aura=clamp(whole(value),0,100);
-    if(aura>=80)return {key:'iconic',label:'ICONIC',minimum:80,maximum:100};
-    if(aura>=60)return {key:'superstar',label:'SUPERSTAR',minimum:60,maximum:79};
-    if(aura>=40)return {key:'magnetic',label:'MAGNETIC',minimum:40,maximum:59};
-    if(aura>=20)return {key:'noticed',label:'GETTING NOTICED',minimum:20,maximum:39};
-    return {key:'unknown',label:'UNKNOWN',minimum:0,maximum:19};
+    if(aura>=99)return {key:'legend',label:'LEGEND',minimum:99,maximum:100};
+    if(aura>=80)return {key:'iconic',label:'ICONIC',minimum:80,maximum:98};
+    if(aura>=60)return {key:'elite',label:'ELITE',minimum:60,maximum:79};
+    if(aura>=40)return {key:'mainstream',label:'MAINSTREAM',minimum:40,maximum:59};
+    return {key:'obscure',label:'OBSCURE',minimum:0,maximum:39};
   }
 
   function auraGrowthMultiplier(value=0){
-    const aura=clamp(whole(value),0,100);
-    if(aura>=80)return .25;
-    if(aura>=60)return .4;
-    if(aura>=40)return .6;
-    if(aura>=20)return .8;
-    return 1;
+    const multipliers={obscure:1,mainstream:.8,elite:.6,iconic:.4,legend:.25};
+    return multipliers[auraTitle(value).key]??1;
   }
 
   function scaledAuraGain(value,currentAura=0){

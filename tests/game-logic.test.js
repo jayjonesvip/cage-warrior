@@ -33,11 +33,11 @@ test('legacy Hype migrates directly to Aura and new careers start at zero',()=>{
 });
 
 test('Aura cosmetic titles advance at the intended thresholds',()=>{
-  assert.equal(logic.auraTitle(0).label,'UNKNOWN');
-  assert.equal(logic.auraTitle(20).label,'GETTING NOTICED');
-  assert.equal(logic.auraTitle(40).label,'MAGNETIC');
-  assert.equal(logic.auraTitle(60).label,'SUPERSTAR');
-  assert.equal(logic.auraTitle(80).label,'ICONIC');
+  assert.deepEqual([0,39].map(value=>logic.auraTitle(value).label),['OBSCURE','OBSCURE']);
+  assert.deepEqual([40,59].map(value=>logic.auraTitle(value).label),['MAINSTREAM','MAINSTREAM']);
+  assert.deepEqual([60,79].map(value=>logic.auraTitle(value).label),['ELITE','ELITE']);
+  assert.deepEqual([80,98].map(value=>logic.auraTitle(value).label),['ICONIC','ICONIC']);
+  assert.deepEqual([99,100].map(value=>logic.auraTitle(value).label),['LEGEND','LEGEND']);
 });
 
 test('Aura fight rewards distinguish ordinary, marquee, stale, and callout results',()=>{
@@ -58,13 +58,13 @@ test('Aura fight rewards distinguish ordinary, marquee, stale, and callout resul
 });
 
 test('positive Aura growth slows by status while penalties stay at full strength',()=>{
-  assert.deepEqual([0,20,40,60,80].map(logic.auraGrowthMultiplier),[1,.8,.6,.4,.25]);
-  assert.deepEqual([0,20,40,60,80].map(currentAura=>logic.auraFightChange({won:true,upset:true,currentAura})),[5,4,3,2,1]);
-  assert.deepEqual([0,20,40,60,80].map(currentAura=>logic.auraFightChange({won:true,titleWon:true,currentAura})),[10,8,6,4,3]);
+  assert.deepEqual([0,40,60,80,99].map(logic.auraGrowthMultiplier),[1,.8,.6,.4,.25]);
+  assert.deepEqual([0,40,60,80,99].map(currentAura=>logic.auraFightChange({won:true,upset:true,currentAura})),[5,4,3,2,1]);
+  assert.deepEqual([0,40,60,80,99].map(currentAura=>logic.auraFightChange({won:true,titleWon:true,currentAura})),[10,8,6,4,3]);
   assert.equal(logic.auraFightChange({won:false,currentAura:80}),-7);
   assert.equal(logic.auraFightChange({won:false,forfeited:true,currentAura:80}),-10);
   assert.equal(logic.socialInteractionReward(17,0).aura,3);
-  assert.equal(logic.socialInteractionReward(17,60).aura,1);
+  assert.equal(logic.socialInteractionReward(17,80).aura,1);
 });
 
 test('lower-level title fights keep their Aura penalty instead of awarding a title bonus',()=>{

@@ -464,7 +464,8 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
 test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
-  assert.match(html,/id="careerIdentityCard"><div class="card-title">Career Identity <small>CAREER DETAILS<\/small><\/div>/);
+  assert.match(html,/id="careerIdentityCard"><div class="home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(styles,/\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
   assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
   assert.match(styles,/\.home-career-scroll>\.career-after-setup\{flex:0 0 auto\}/);
@@ -893,16 +894,16 @@ test('Aura fight skins appear on Home and stay outside perks and drops',()=>{
   const gearStart=definitions.indexOf('const gearItems');
   assert.ok(skinStart>=0&&skinStart<gearStart);
   const skins=[
-    ['unknown','GRAY',0,19],
-    ['noticed','CYAN',20,39],
-    ['magnetic','PURPLE',40,59],
-    ['superstar','GOLD',60,79],
-    ['iconic','ORANGE',80,100]
+    ['obscure','unknown','GRAY',0,39],
+    ['mainstream','noticed','CYAN',40,59],
+    ['elite','magnetic','PURPLE',60,79],
+    ['iconic','iconic','ORANGE',80,98],
+    ['legend','superstar','GOLD',99,100]
   ];
-  for(const [key,color,minimum,maximum] of skins){
+  for(const [key,assetKey,color,minimum,maximum] of skins){
     assert.match(definitions,new RegExp(`key:'${key}'[^\\n]+colorName:'${color}'[^\\n]+minimum:${minimum},maximum:${maximum}`));
     for(const piece of ['gloves','wraps','mouthguard','shorts']){
-      const asset=`assets/skins/aura-${key}-${piece}.png`;
+      const asset=`assets/skins/aura-${assetKey}-${piece}.png`;
       const bytes=fs.readFileSync(path.join(root,asset));
       assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],`${key} ${piece} is a PNG`);
       assert.ok([4,6].includes(bytes[25]),`${key} ${piece} has an alpha channel`);
