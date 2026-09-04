@@ -451,9 +451,8 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   const xpIndex=html.indexOf('id="careerXpLevel"');
   const packIndex=html.indexOf('id="victoryPackMeter"');
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
-  const heroIndex=html.indexOf('<div class="hero">');
-  assert.ok(xpIndex>=0&&packIndex>xpIndex&&sponsorIndex>packIndex);
-  assert.ok(packIndex<heroIndex,'Victory Pack progress belongs above the fighter portrait');
+  const heroIndex=html.indexOf('<div class="hero career-after-setup">');
+  assert.ok(heroIndex>=0&&xpIndex>=0&&packIndex>xpIndex&&sponsorIndex>packIndex);
   assert.match(html,/id="careerXpTrack"[^>]*role="progressbar"/);
   assert.match(html,/id="victoryPackTrack"[^>]*role="progressbar"/);
   assert.match(game,/\$\('#careerXpFill'\)\.style\.width/);
@@ -462,17 +461,20 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
 });
 
-test('Home visually leads with the fighter profile before career details',()=>{
-  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;flex-direction:column\}/);
-  assert.match(styles,/#careerGameContent>\.hero\{order:1\}/);
+test('Home uses one Career Identity card led by full-width fighter artwork',()=>{
+  assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
+  assert.match(html,/class="card-title career-after-setup">Career Identity/);
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;flex-direction:column;gap:0;overflow:hidden\}/);
+  assert.match(styles,/#careerGameContent>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
   assert.match(styles,/#careerIdentityCard\{order:2\}/);
   assert.match(styles,/#homeFightSkin\{order:3\}/);
-  assert.match(html,/class="card career-after-setup home-ticker"/);
-  assert.match(styles,/>\.home-ticker\{order:4\}/);
+  assert.match(html,/class="career-after-setup home-ticker"/);
+  assert.match(styles,/#careerGameContent>\.home-ticker\{order:4\}/);
+  assert.match(styles,/\.home-career-card>\.career-identity-details,\.home-career-card>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
+  assert.match(styles,/#app\.career-setup #careerGameContent\{display:contents\}/);
   assert.doesNotMatch(html,/FIGHT\. IMPROVE\. CLIMB\.|career-guide|choice-action/);
   assert.doesNotMatch(styles,/career-guide|choice-action|choice-grid/);
   assert.doesNotMatch(game,/\[data-go\]/);
-  assert.match(styles,/#careerGameContent\{display:contents!important\}/);
 });
 
 test('Feed summarizes followers and all known followed accounts',()=>{
@@ -806,6 +808,7 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
   assert.match(game,/UNDISCOVERED<\/b><small>FIND IN A DROP/);
   assert.match(game,/function collectionBlockHtml\(category,availableItems,undiscoveredItems\)/);
   assert.match(game,/AVAILABLE \+ UNDISCOVERED/);
+  assert.match(styles,/\.gear-collection-subhead>span\{min-width:0;height:auto;padding:0;place-items:initial;border:0;border-radius:0/);
   assert.match(game,/\$\{available\.map\(item=>collectibleCardHtml\(item\)\)\.join\(''\)\}\$\{hidden\.map/);
   assert.match(game,/const lockIcon=levelLocked\?'<span class="gear-level-lock"/);
   assert.match(game,/levelLocked\?`<button class="equip-btn" type="button" disabled>LOCKED/);
