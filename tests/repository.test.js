@@ -948,6 +948,11 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
   assert.match(game,/LOGIC\.rankedFightTitleMode/);
   assert.match(game,/fightMode==='ranked'\)return Object\.assign\(\{\},opponent,\{worldRank,titleDefenseComplete:playerIsChampion\}\)/);
+  assert.match(game,/reward\.xp===0\?' class="zero"'/);
+  assert.match(game,/reward\.points===0\?' class="zero"'/);
+  assert.match(game,/xp-note\$\{reward\.xpPenalty\?' penalty':''\}/);
+  assert.match(styles,/\.fight-rank-rewards>:is\(b,em\)\.zero\{color:#7d8995\}/);
+  assert.match(styles,/\.fight-rank-rewards>small\.xp-note\.penalty\{color:#c47e79\}/);
 });
 
 test('CageReporter calls out lower-level wins and their follower backlash',()=>{
