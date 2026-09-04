@@ -464,8 +464,9 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
 test('Home uses one fixed Career Identity card with an internal scroll and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Career Identity/);
-  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
   assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
+  assert.match(styles,/\.home-career-scroll>\.career-after-setup\{flex:0 0 auto\}/);
   assert.match(styles,/\.home-career-scroll>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
   assert.match(styles,/#homeFightSkin\{order:2\}/);
   assert.match(styles,/#careerIdentityCard\{order:3\}/);
