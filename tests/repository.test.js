@@ -471,7 +471,8 @@ test('Home uses one fixed Career Identity card with an internal scroll and coach
   assert.match(styles,/#homeFightSkin\{order:2\}/);
   assert.match(styles,/#careerIdentityCard\{order:3\}/);
   assert.match(html,/class="career-after-setup home-coach-footer"><small>COACH'S NOTES<\/small>/);
-  assert.match(styles,/\.home-coach-footer\{height:42px;flex:0 0 42px;[^}]*border-top:1px solid/);
+  assert.match(styles,/\.home-coach-footer\{height:64px;flex:0 0 64px;[^}]*border-top:1px solid/);
+  assert.match(styles,/\.home-coach-footer \.ticker span\{display:-webkit-box;overflow:hidden;line-height:1\.3;-webkit-box-orient:vertical;-webkit-line-clamp:3\}/);
   assert.match(styles,/\.home-career-scroll>\.career-identity-details,\.home-career-scroll>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
   assert.match(styles,/#app\.career-setup #careerGameContent,#app\.career-setup \.home-career-scroll\{display:contents\}/);
   const homeCard=html.slice(html.indexOf('id="careerGameContent"'),html.indexOf('<section class="screen" data-screen="feed">'));
@@ -826,7 +827,7 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
 test('full-height page cards share navigation spacing and keep scrolling internal',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
-  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{padding-bottom:28px\}/);
+  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{padding-bottom:10px\}/);
   assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden\}/);
   assert.match(styles,/\.screen\[data-screen="gear"\] #gearDropOffer\{flex:0 0 auto\}/);
   assert.match(styles,/\.gear-page-card\{height:auto;min-height:0;flex:1 1 0\}/);
