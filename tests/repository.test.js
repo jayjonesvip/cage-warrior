@@ -803,7 +803,8 @@ test('Gear uses a fixed card shell, flat filters, rarity collections, and no qua
   assert.match(styles,/\.gear-filter-tabs button\[aria-selected="true"\]/);
   assert.match(styles,/\.gear-filter-tabs\{flex:0 0 auto;width:100%;margin:0;padding:0;border:0;[^}]*border-radius:0/);
   assert.match(styles,/\.gear-card-scroll\{flex:1 1 auto;min-height:0;overflow-y:auto/);
-  assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-block\{display:block\}/);
+  assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-block\{display:block;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none\}/);
+  assert.match(styles,/\.gear-card-scroll \.gear-loadout-shop-grid\{padding:7px\}/);
   assert.match(game,/function moveGearFilter\(key\)/);
   assert.match(game,/headerHost\.replaceChildren/);
   assert.match(game,/class="gear-loadout-shop-block"/);
