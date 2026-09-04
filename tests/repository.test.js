@@ -465,6 +465,7 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
   assert.match(html,/id="careerIdentityCard"><div class="home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(html,/id="homeFightSkin"><div class="home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
   assert.match(styles,/\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;margin-bottom:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
   assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
@@ -509,7 +510,10 @@ test('Feed summarizes followers and all known followed accounts',()=>{
   assert.match(game,/posts=sharedReady\?mergedSocialPosts\(localPosts,sharedSocialPosts\):localPosts/);
   assert.match(game,/addSocialPosts\(reporterPosts\);saveState\(\);renderSocial\(\);queueSharedPosts/);
   assert.match(styles,/\.feed-network-summary\{display:grid;grid-template-columns:1fr 1fr/);
-  assert.match(styles,/\.feed-network-summary>div:last-child\{text-align:right\}/);
+  assert.match(styles,/\.feed-network-summary>div\{min-width:0;display:flex;align-items:center;gap:6px/);
+  assert.match(styles,/\.feed-network-summary>div:last-child\{justify-content:flex-end;text-align:right\}/);
+  assert.match(styles,/\.feed-network-summary small\{display:inline;[^}]*white-space:nowrap\}/);
+  assert.match(styles,/\.feed-network-summary b\{display:inline;margin:0;[^}]*white-space:nowrap\}/);
   assert.doesNotMatch(styles,/\.feed-network-summary[^}]*border|\.feed-network-summary>div\+div/);
   assert.match(styles,/\.feed-header-filters button\.active\{color:#70d9ff/);
   assert.doesNotMatch(html,/feed-page-note|Mentions isolates posts addressed to you/);
