@@ -461,17 +461,20 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
 });
 
-test('Home uses one Career Identity card led by full-width fighter artwork',()=>{
+test('Home uses one fixed Career Identity card with an internal scroll and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Career Identity/);
-  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;flex-direction:column;gap:0;overflow:hidden\}/);
-  assert.match(styles,/#careerGameContent>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
-  assert.match(styles,/#careerIdentityCard\{order:2\}/);
-  assert.match(styles,/#homeFightSkin\{order:3\}/);
-  assert.match(html,/class="career-after-setup home-ticker"/);
-  assert.match(styles,/#careerGameContent>\.home-ticker\{order:4\}/);
-  assert.match(styles,/\.home-career-card>\.career-identity-details,\.home-career-card>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
-  assert.match(styles,/#app\.career-setup #careerGameContent\{display:contents\}/);
+  assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;width:100%;min-height:0;flex:1 1 0;flex-direction:column;gap:0;overflow:hidden\}/);
+  assert.match(styles,/\.home-career-scroll\{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;overflow-y:auto;[^}]*scrollbar-width:none\}/);
+  assert.match(styles,/\.home-career-scroll>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
+  assert.match(styles,/#homeFightSkin\{order:2\}/);
+  assert.match(styles,/#careerIdentityCard\{order:3\}/);
+  assert.match(html,/class="career-after-setup home-coach-footer"><small>COACH'S NOTES<\/small>/);
+  assert.match(styles,/\.home-coach-footer\{height:42px;flex:0 0 42px;[^}]*border-top:1px solid/);
+  assert.match(styles,/\.home-career-scroll>\.career-identity-details,\.home-career-scroll>\.home-fight-skin,[^}]*width:100%;margin:0;border:0;border-top:1px solid/);
+  assert.match(styles,/#app\.career-setup #careerGameContent,#app\.career-setup \.home-career-scroll\{display:contents\}/);
+  const homeCard=html.slice(html.indexOf('id="careerGameContent"'),html.indexOf('<section class="screen" data-screen="feed">'));
+  assert.ok(homeCard.indexOf('class="career-after-setup retirement-card"')<homeCard.indexOf('class="career-after-setup home-coach-footer"'));
   assert.doesNotMatch(html,/FIGHT\. IMPROVE\. CLIMB\.|career-guide|choice-action/);
   assert.doesNotMatch(styles,/career-guide|choice-action|choice-grid/);
   assert.doesNotMatch(game,/\[data-go\]/);
@@ -822,11 +825,11 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
 test('full-height page cards share navigation spacing and keep scrolling internal',()=>{
   assert.match(styles,/#app:has\(\.resource-hud\.is-stuck\) \.bottomnav\{top:0\}/);
   assert.match(styles,/\.gear-page-card\{display:flex;[^}]*margin-bottom:0/);
-  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{padding-bottom:28px\}/);
-  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden\}/);
+  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{padding-bottom:28px\}/);
+  assert.match(styles,/\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{display:flex;height:calc\(100dvh - 230px - var\(--safe-top\) - var\(--safe-bottom\)\);min-height:0;flex-direction:column;overflow:hidden\}/);
   assert.match(styles,/\.screen\[data-screen="gear"\] #gearDropOffer\{flex:0 0 auto\}/);
   assert.match(styles,/\.gear-page-card\{height:auto;min-height:0;flex:1 1 0\}/);
-  assert.match(styles,/@media \(min-width:1100px\)\{\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
+  assert.match(styles,/@media \(min-width:1100px\)\{\.screen:is\(\[data-screen="feed"\],\[data-screen="gear"\]\)\.active,#app:not\(\.career-setup\) \.screen\[data-screen="home"\]\.active\{height:calc\(100dvh - 150px - var\(--safe-top\)\);padding-bottom:40px\}/);
   assert.match(styles,/\.gear-card-scroll\{scrollbar-width:none\}\.gear-card-scroll::-webkit-scrollbar\{display:none\}/);
   assert.doesNotMatch(html,/class="gear-card-footer"/);
 });
