@@ -928,6 +928,7 @@ test('Aura fight skins appear on Home and stay outside perks and drops',()=>{
   assert.match(game,/function currentAuraFightSkin\(\)/);
   assert.match(game,/fightSkinCard\.style\.setProperty\('--fight-skin-accent',fightSkin\.accent\)/);
   assert.equal((game.match(/currentAuraFightSkin\(\)\.accent/g)||[]).length,3);
+  assert.match(styles,/\.hero-art img\{[^}]*mask-image:linear-gradient\(90deg,transparent 0,#000 10%,#000 90%,transparent 100%\)/);
 });
 
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
