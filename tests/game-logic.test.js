@@ -342,6 +342,15 @@ test('five consecutive on-level or higher wins award one daily fight bonus',()=>
   assert.deepEqual(logic.applyDailyFightStreak(counters,{won:true,playerLevel:4,opponentLevel:3,requiredStreak:5}),{qualifies:false,awarded:false,streak:0});
 });
 
+test('higher Aura provides only a small final-round comeback edge',()=>{
+  const trailingPlayer=[{scoreP:9,scoreO:10},{scoreP:9,scoreO:10}],trailingOpponent=[{scoreP:10,scoreO:9},{scoreP:10,scoreO:9}];
+  assert.equal(logic.auraComebackEdge({round:2,rounds:trailingPlayer,playerAura:100,opponentAura:0}),0);
+  assert.equal(logic.auraComebackEdge({round:3,rounds:trailingPlayer,playerAura:100,opponentAura:0}),.03);
+  assert.equal(logic.auraComebackEdge({round:3,rounds:trailingOpponent,playerAura:0,opponentAura:100}),-.03);
+  assert.equal(logic.auraComebackEdge({round:3,rounds:trailingPlayer,playerAura:20,opponentAura:80}),0);
+  assert.equal(logic.auraComebackEdge({round:3,rounds:[],playerAura:100,opponentAura:0}),0);
+});
+
 test('level-up resources raise Health maximum without filling resources',()=>{
   const fighter=state({energy:31,health:42,maxHealth:100});
   logic.applyLevelUpResources(fighter);

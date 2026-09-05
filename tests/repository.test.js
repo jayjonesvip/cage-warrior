@@ -447,13 +447,14 @@ test('Career Identity shows the next sponsor goal instead of duplicating the cur
   assert.match(styles,/\.career-sponsor-progress-track/);
 });
 
-test('Home presents XP and Victory Pack progress before sponsorship',()=>{
-  const auraIndex=html.indexOf('id="careerAuraTrack"');
+test('Home presents Career Progression in XP, Aura, Sponsor, Victory Pack, and Daily Heat order',()=>{
   const xpIndex=html.indexOf('id="careerXpLevel"');
-  const packIndex=html.indexOf('id="victoryPackMeter"');
+  const auraIndex=html.indexOf('id="careerAuraTrack"');
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
+  const packIndex=html.indexOf('id="victoryPackMeter"');
+  const heatIndex=html.indexOf('id="dailyFightBonusMeter"');
   const heroIndex=html.indexOf('<div class="hero career-after-setup">');
-  assert.ok(heroIndex>=0&&auraIndex>=0&&xpIndex>auraIndex&&packIndex>xpIndex&&sponsorIndex>packIndex);
+  assert.ok(heroIndex>=0&&xpIndex>=0&&auraIndex>xpIndex&&sponsorIndex>auraIndex&&packIndex>sponsorIndex&&heatIndex>packIndex);
   assert.match(html,/class="page-subhead home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
   assert.match(html,/id="careerAuraTrack"[^>]*role="progressbar"/);
   assert.match(html,/id="careerAuraProgress"/);
@@ -473,7 +474,7 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
 test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card page-card" id="careerGameContent"/);
   assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
-  assert.match(html,/id="careerIdentityCard"><div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
   assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerWorldRank"/);
   assert.match(game,/\$\('#careerWorldRank'\)\.textContent=careerRanking\.position\?`#\$\{careerRanking\.position\}`:'UNRANKED'/);
   assert.match(styles,/#careerIdentityCard \.career-identity-grid \.career-token:last-child\{grid-column:auto\}/);
@@ -805,6 +806,16 @@ test('Victory Packs and Daily Drops only award undiscovered collectibles',()=>{
   assert.match(game,/NEW COLLECTIBLES UNLOCK AS YOU LEVEL UP/);
 });
 
+test('Aura can create a visible but bounded final-round crowd comeback edge',()=>{
+  assert.match(logic,/function auraComebackEdge\(/);
+  assert.match(logic,/if\(whole\(round\)!==3\)return 0/);
+  assert.match(game,/crowdEdge=LOGIC\.auraComebackEdge\(\{round,rounds:sim\.rounds,playerAura:sim\.playerAura,opponentAura:sim\.opponentAura\}\)/);
+  assert.match(game,/THE FANS ARE TRYING TO WILL \$\{favorite\.name\.toUpperCase\(\)\}'S COMEBACK INTO EXISTENCE/);
+  assert.match(game,/THE CROWD CAN LIFT ITS FAVORITE WHEN A COMEBACK IS NEEDED/);
+  assert.doesNotMatch(game,/CROWD AURA|HIGHER AURA (?:SPARKS|CAN SPARK)/);
+  assert.match(styles,/\.action-line\.crowd-surge\{[^}]*border-color:#f3a447/);
+});
+
 test('Daily Drop claimed state always displays its reset countdown',()=>{
   assert.match(game,/dailyClaimed=ready&&!dailyAvailable/);
   assert.doesNotMatch(game,/installOfferDismissed|INSTALL_OFFER_DISMISS_KEY|installAvailable=ready&&!dailyAvailable/);
@@ -872,7 +883,7 @@ test('Gear merges available and anonymous undiscovered cards into rarity groups'
   assert.match(game,/UNDISCOVERED<\/b><small>FIND IN A DROP/);
   assert.match(game,/function collectionBlockHtml\(category,availableItems,undiscoveredItems\)/);
   assert.match(game,/AVAILABLE \+ UNDISCOVERED/);
-  assert.match(styles,/\.gear-collection-subhead>span\{min-width:0;height:auto;padding:0;place-items:initial;border:0;border-radius:0/);
+  assert.match(styles,/\.gear-collection-subhead>span\{min-width:0;height:auto;padding:0;place-items:initial;border:0;border-radius:0[^}]*text-align:left/);
   assert.match(game,/\$\{available\.map\(item=>collectibleCardHtml\(item\)\)\.join\(''\)\}\$\{hidden\.map/);
   assert.match(game,/const lockIcon=levelLocked\?'<span class="gear-level-lock"/);
   assert.match(game,/levelLocked\?`<button class="equip-btn" type="button" disabled>LOCKED/);
