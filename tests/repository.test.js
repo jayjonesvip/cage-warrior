@@ -1156,7 +1156,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/function opponentCountryBadge\(code\)/);
   assert.match(game,/assets\/flags\/\$\{country\.iso\}\.svg\?v=\$\{ICON_ASSET_VERSION\}/);
   assert.match(game,/countryBadge=country\?opponentCountryBadge\(opponent\.country\):''/);
-  assert.match(game,/tapeCountry\.innerHTML=opponentCountryBadge\(f\.o\.country\)/);
+  assert.match(game,/country:f.o.country,style:f.o.tendency/);
   assert.match(game,/-\$\{fightRule\('experienceRewards\.lowerLevelOpponentFollowerLossPercent',5\)\}% FOLLOWERS/);
   assert.match(game,/XP USED TODAY/);
   assert.match(styles,/\.fight-ranking-row\.circuit/);
@@ -1241,14 +1241,17 @@ test('promo poster fits without scrolling and keeps fighter billing collision-fr
   assert.doesNotMatch(styles,/\.matchup-poster-title em\{[^}]*border-bottom/);
 });
 
-test('favorite designation lives in Tale of the Tape instead of the promo poster',()=>{
-  assert.match(html,/id="tapeStatsPlayerFavorite" hidden><i aria-hidden="true">★<\/i>Favorite/);
-  assert.match(html,/id="tapeStatsOppFavorite" hidden><i aria-hidden="true">★<\/i>Favorite/);
-  assert.match(game,/\$\('#tapeStatsPlayerFavorite'\)\.hidden=!playerFavorite/);
-  assert.match(game,/\$\('#tapeStatsOppFavorite'\)\.hidden=!oppFavorite/);
-  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\{[^}]*display:inline-flex[^}]*border:0[^}]*background:transparent[^}]*color:#e7b84d/);
-  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite i\{[^}]*color:#f2bd43/);
-  assert.match(styles,/\.tape-stats-fighters \.tape-stats-favorite\[hidden\]\{display:none\}/);
+test('favorite designation is written into stacked fighter bios',()=>{
+  assert.match(html,/class="tape-stats-bios"/);
+  assert.doesNotMatch(html,/id="tapeStatsPlayerFavorite"|id="tapeStatsOppFavorite"/);
+  assert.match(game,/favorite:playerFavorite/);
+  assert.match(game,/favorite:oppFavorite/);
+  const helper=game.slice(game.indexOf('  function statsFighterBio('),game.indexOf('  function renderStatsFightSkin('));
+  const context={fighterCities:[{id:'chicago',name:'CHICAGO'}],opponentCountry:()=>({name:'Brazil'})};
+  vm.createContext(context);vm.runInContext(helper,context);
+  assert.equal(vm.runInContext("statsFighterBio({city:'chicago',style:'striker',wins:12,losses:1,favorite:true})",context),'A striker from Chicago with a 12-1 pro record. Comes in as the favorite on attributes.');
+  assert.match(vm.runInContext("statsFighterBio({country:'BRA',style:'grappler',even:true})",context),/A grappler from Brazil.*evenly matched/);
+  assert.match(vm.runInContext("statsFighterBio({})",context),/Cage Circuit.*underdog/);
 });
 
 test('Tale of the Tape makes tied attributes explicit and keeps opponent values legible',()=>{
@@ -1273,12 +1276,11 @@ test('career breakthrough modal uses flat materials and emphasizes the actionabl
   assert.doesNotMatch(styles,/\.level-up-card:before\{[^}]*repeating-conic-gradient/);
 });
 
-test('fighter locations live in Tale of the Tape instead of the promo portraits',()=>{
-  assert.match(html,/id="tapeStatsPlayerCity">CG<\/span>/);
-  assert.match(html,/id="tapeStatsOppCity">CG<\/span>/);
-  assert.match(game,/\$\('#tapeStatsPlayerCity'\)\.textContent=fighterCityCode\(state\.fighterCity\)/);
-  assert.match(game,/const tapeCountry=\$\('#tapeStatsOppCity'\)/);
-  assert.match(styles,/\.tape-stats-fighters \.tape-stats-city\{[^}]*position:static[^}]*display:inline-grid/);
+test('fighter bios use full locations without city badges',()=>{
+  assert.doesNotMatch(html,/id="tapeStatsPlayerCity"|id="tapeStatsOppCity"/);
+  assert.match(game,/city:state.fighterCity/);
+  assert.match(game,/city:f.o.networkCity,country:f.o.country/);
+  assert.match(styles,/\.tape-stats-bios h3\{[^}]*overflow-wrap:anywhere/);
 });
 
 test('promo poster uses a bundled condensed font and three-part card billing',()=>{
