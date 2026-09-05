@@ -19,6 +19,32 @@ const steel=read('css/github-steel.css');
 const readme=read('README.md');
 const serviceWorker=read('service-worker.js');
 
+test('Fight Skins appear only in Compare Stats and render the saved cosmetic tier',()=>{
+  const statsStart=html.indexOf('id="tapeStatsPanel"'),attributesStart=html.indexOf('id="tapeAttributes"');
+  for(const id of ['tapeStatsPlayerSkin','tapeStatsOpponentSkin']){
+    assert.ok(html.indexOf('id="'+id+'"')>statsStart);
+    assert.ok(html.indexOf('id="'+id+'"')<attributesStart);
+  }
+  assert.doesNotMatch(html,/id="tapePlayerSkin"|id="tapeOpponentSkin"/);
+  assert.match(game,/fightSkinAura:Math.floor\(effectiveAura\(\)\)/);
+  assert.match(game,/Number\(profile.fight_skin_aura\)/);
+  assert.match(game,/renderStatsFightSkin\('#tapeStatsOpponentSkin',f.o.fightSkinAura\|\|0\)/);
+  const skinDefinition=definitions.match(/const auraFightSkins = \[[\s\S]*?\n\];/)[0];
+  const renderer=game.slice(game.indexOf('  function renderStatsFightSkin('),game.indexOf('  function fillTape('));
+  const container={innerHTML:'',style:{setProperty(name,value){this[name]=value}}};
+  const context={LOGIC:require('../js/game-logic.js'),$:()=>container,ICON_ASSET_VERSION:'test'};
+  vm.createContext(context);
+  vm.runInContext(skinDefinition+'\n'+renderer,context);
+  for(const [aura,label] of [[0,'OBSCURE'],[40,'MAINSTREAM'],[60,'ELITE'],[80,'ICONIC'],[99,'LEGEND'],[100,'LEGEND']]){
+    vm.runInContext('renderStatsFightSkin("#test",'+aura+')',context);
+    assert.ok(container.innerHTML.includes('<b>'+label+'</b>'));
+    const images=[...container.innerHTML.matchAll(/src="([^"?]+)\?v=test"/g)];
+    assert.equal(images.length,4);
+    images.forEach(([,asset])=>assert.ok(fs.existsSync(path.join(root,asset)),asset));
+  }
+  assert.equal(container.style['--fight-skin-accent'],'#ffdc78');
+});
+
 test('all seven sponsors have five distinct brand reaction messages',()=>{
   const context={};vm.runInNewContext(strings,context);
   const pools=context.CAGE_STRINGS.sponsorHighlights;
@@ -1171,19 +1197,8 @@ test('matchup opens as a Las Vegas promo poster with event billing',()=>{
   assert.match(styles,/\.matchup-poster-title span\{[^}]*font-family:"Bebas Neue",Impact[^}]*white-space:nowrap/);
 });
 
-test('matchup shows public cosmetic kits and keeps actions outside its scroll body',()=>{
-  assert.match(html,/id="tapePlayerSkin"/);
-  assert.match(html,/id="tapeOpponentSkin"/);
-  assert.match(game,/renderTapeFightSkin\('#tapePlayerSkin',f\.playerAura\)/);
-  assert.match(game,/renderTapeFightSkin\('#tapeOpponentSkin',f\.o\.network\?f\.o\.aura:0\)/);
-  assert.match(game,/Number\(profile\.fight_skin_aura\)/);
-  assert.match(game,/fightSkinAura:Math\.floor\(effectiveAura\(\)\)/);
-  assert.match(styles,/\.matchup-promo-card \.matchup-poster\{flex:1 1 auto;overflow-y:auto/);
-  assert.match(styles,/\.tape-fight-skin-items\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-});
-
 test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
-  assert.match(html,/class="matchup-tools"[\s\S]*id="tapeStatsToggle"[^>]*>COMPARE STATS<\/button>[\s\S]*id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
+  assert.match(html,/class="matchup-tools"[\s\S]*id="tapeStatsToggle"[^>]*>TALE OF THE TAPE<\/button>[\s\S]*id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
   assert.match(html,/id="tapeStatsPanel"[\s\S]*id="tapeAttributes"/);
   assert.match(html,/id="tapeBreakdownTitle">FIGHT DETAILS<\/h2>/);
   assert.ok(html.indexOf('id="tapeStatsToggle"')<html.indexOf('class="matchup-poster"'));
