@@ -1187,6 +1187,13 @@ test('desktop Fight layout uses a single-column navigation rail and centered det
 
 test('Tale of the Tape includes dynamic agent matchup advice',()=>{
   for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
+  assert.equal((html.match(/id="tapeAgentRead"/g)||[]).length,1);
+  assert.match(html,/class="tape-agent-avatar" src="assets\/contact-agent-carl.png\?v=[^"]+" alt="Agent Carl"/);
+  assert.ok(fs.existsSync(path.join(root,'assets/contact-agent-carl.png')));
+  assert.match(styles,/\.tape-agent-avatar\{[^}]*width:44px;height:44px/);
+  assert.ok(html.indexOf('id="tapeAgentRead"')>html.indexOf('id="tapeStatsPanel"'));
+  assert.ok(html.indexOf('id="tapeAgentRead"')<html.indexOf('class="tape-stats-bios"'));
+  assert.ok(html.indexOf('id="tapeAgentRead"')<html.indexOf('id="tapeBreakdown"'));
   assert.match(game,/LOGIC\.matchupAdvice/);
   assert.match(styles,/\.tape-agent-read/);
 });
@@ -1251,6 +1258,9 @@ test('favorite designation is written into stacked fighter bios',()=>{
   vm.createContext(context);vm.runInContext(helper,context);
   assert.equal(vm.runInContext("statsFighterBio({city:'chicago',style:'striker',wins:12,losses:1,favorite:true})",context),'A striker from Chicago with a 12-1 pro record. Comes in as the favorite on attributes.');
   assert.match(vm.runInContext("statsFighterBio({country:'BRA',style:'grappler',even:true})",context),/A grappler from Brazil.*evenly matched/);
+  assert.equal(vm.runInContext("statsFighterBio({city:'chicago',style:'striker',wins:18,losses:4,even:true,showEven:false})",context),'A striker from Chicago with a 18-4 pro record.');
+  assert.match(game,/favorite:oppFavorite,showEven:false,even:/);
+  assert.match(styles,/\.tape-stats-bios p\{[^}]*text-align:left/);
   assert.match(vm.runInContext("statsFighterBio({})",context),/Cage Circuit.*underdog/);
 });
 
