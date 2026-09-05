@@ -92,10 +92,10 @@ test('the five primary screens include the persistent Open Gym page',()=>{
 });
 
 test('Open Gym runs reward-free scouting and persists the latest report',()=>{
-  assert.match(html,/data-screen="gym"[\s\S]*?id="sparTargetChoices"[\s\S]*?id="startSparBtn"[\s\S]*?id="sparReport"/);
+  assert.match(html,/data-screen="gym"[\s\S]*?id="sparTargetChoices"[\s\S]*?id="sparReport"[\s\S]*?class="spar-action-dock"><button[^>]*id="startSparBtn"[\s\S]*?class="page-footer open-gym-footer"/);
   assert.match(html,/Test a matchup without spending Energy or affecting your record, rewards, ranking, or streaks/);
   assert.match(game,/sparringTarget:'level',lastSparringReport:null/);
-  assert.match(game,/state\.lastSparringReport=createSparringReport\(target\)/);
+  assert.match(game,/state\.lastSparringReport=report/);
   assert.match(game,/playerIsChampion[\s\S]*?'contender'/);
 });
 
