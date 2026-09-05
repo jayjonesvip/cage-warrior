@@ -56,6 +56,29 @@ test('Open Gym reuses checked Fight Plan controls with a scoped green palette',(
   assert.doesNotMatch(styles,/\.spar-plan-row button\.active\{/);
 });
 
+test('game pages use four typography tokens without targeting landing pages or modals',()=>{
+  const start=styles.indexOf('/* Four-size typography'),end=styles.indexOf('\n.open-gym-impact',start);
+  const typography=styles.slice(start,end<0?undefined:end);
+  assert.match(typography,/--type-heading:13px;--type-subheading:11px;--type-normal:10px;--type-small:9px/);
+  assert.match(typography,/#app :is\(\.screen,\.topbar,\.resource-hud,\.bottomnav\)/);
+  assert.match(typography,/font-size:var\(--game-text-size\)!important/);
+  assert.match(typography,/--game-text-size:var\(--type-small\)/);
+  assert.match(typography,/--game-text-size:var\(--type-subheading\)/);
+  assert.match(typography,/--game-text-size:var\(--type-heading\)/);
+  assert.doesNotMatch(typography,/\.landing-page|\.modal-overlay|#fightOverlay|#resultModal/);
+});
+
+test('modals use a separate four-size scale and preserve impact numbers and icons',()=>{
+  const typography=styles.slice(styles.indexOf('/* Modal typography.'),styles.indexOf('/* Four-size typography'));
+  assert.match(typography,/--modal-title:24px;--modal-subheading:13px;--modal-body:12px;--modal-small:10px/);
+  assert.match(typography,/:is\(\.modal-overlay,\.tape-breakdown-sheet,\.fight-plan-card,\.level-up-overlay,#resultModal\)/);
+  assert.match(typography,/font-size:var\(--modal-text-size\)!important/);
+  for(const role of ['title','subheading','body','small'])assert.ok(typography.includes('--modal-text-size:var(--modal-'+role+')'));
+  assert.match(typography,/#resultTitle,\.rewardbox>b,\.level-up-number>strong,\.level-up-reward>b/);
+  assert.match(typography,/\[aria-label\^="Close"\]/);
+  assert.doesNotMatch(typography,/#fightOverlay|\.landing-page|\.screen|\.topbar|\.bottomnav/);
+});
+
 test('all seven sponsors have five distinct brand reaction messages',()=>{
   const context={};vm.runInNewContext(strings,context);
   const pools=context.CAGE_STRINGS.sponsorHighlights;
