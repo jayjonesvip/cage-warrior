@@ -328,9 +328,18 @@ test('zero Energy cannot start a fight',()=>{
   assert.equal(logic.bookFight(fighter,'opponent',25).reason,'energy');
 });
 
-test('daily counters retain only the fight count',()=>{
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-08-28',fight:4,train:3,hustle:2},'2026-08-28'),{date:'2026-08-28',fight:4});
-  assert.deepEqual(logic.dailyCountersFor({},'2026-08-28'),{date:'2026-08-28',fight:0});
+test('daily counters retain fight count and same-day bonus progress',()=>{
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true,train:3,hustle:2},'2026-08-28'),{date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true});
+  assert.deepEqual(logic.dailyCountersFor({},'2026-08-28'),{date:'2026-08-28',fight:0,qualifyingWinStreak:0,bonusFightAwarded:false});
+});
+
+test('five consecutive on-level or higher wins award one daily fight bonus',()=>{
+  const counters={qualifyingWinStreak:0,bonusFightAwarded:false};
+  for(let win=1;win<=4;win+=1)assert.deepEqual(logic.applyDailyFightStreak(counters,{won:true,playerLevel:4,opponentLevel:4,requiredStreak:5}),{qualifies:true,awarded:false,streak:win});
+  assert.deepEqual(logic.applyDailyFightStreak(counters,{won:true,playerLevel:4,opponentLevel:5,requiredStreak:5}),{qualifies:true,awarded:true,streak:5});
+  assert.equal(logic.applyDailyFightStreak(counters,{won:true,playerLevel:4,opponentLevel:5,requiredStreak:5}).awarded,false);
+  assert.deepEqual(logic.applyDailyFightStreak(counters,{won:false,playerLevel:4,opponentLevel:5,requiredStreak:5}),{qualifies:false,awarded:false,streak:0});
+  assert.deepEqual(logic.applyDailyFightStreak(counters,{won:true,playerLevel:4,opponentLevel:3,requiredStreak:5}),{qualifies:false,awarded:false,streak:0});
 });
 
 test('level-up resources raise Health maximum without filling resources',()=>{

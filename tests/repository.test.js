@@ -459,10 +459,13 @@ test('Home presents XP and Victory Pack progress before sponsorship',()=>{
   assert.match(html,/id="careerAuraProgress"/);
   assert.match(html,/id="careerXpTrack"[^>]*role="progressbar"/);
   assert.match(html,/id="victoryPackTrack"[^>]*role="progressbar"/);
+  assert.match(html,/id="dailyFightBonusTrack"[^>]*role="progressbar"/);
+  assert.match(html,/id="dailyFightBonusProgressText"/);
   assert.match(game,/\$\('#careerXpFill'\)\.style\.width/);
   assert.match(game,/\$\('#careerAuraFill'\)\.style\.width/);
   assert.match(game,/nextAuraSkin\?`\$\{auraTitle\.label\} → \$\{nextAuraSkin\.label\}`/);
   assert.match(game,/\$\('#victoryPackFill'\)\.style\.width/);
+  assert.match(game,/\$\('#dailyFightBonusFill'\)\.style\.width/);
   assert.match(styles,/\.career-token\.career-progression-goal\{grid-column:1\/-1!important/);
   assert.doesNotMatch(styles,/\.victory-pack-meter\{position:absolute/);
 });
@@ -806,6 +809,19 @@ test('Daily Drop claimed state always displays its reset countdown',()=>{
   assert.match(game,/dailyClaimed=ready&&!dailyAvailable/);
   assert.doesNotMatch(game,/installOfferDismissed|INSTALL_OFFER_DISMISS_KEY|installAvailable=ready&&!dailyAvailable/);
   assert.doesNotMatch(html,/installOfferHideBtn/);
+});
+
+test('daily fights use a twelve-bout limit with one three-fight qualifying streak bonus',()=>{
+  assert.match(rules,/"dailyFightLimit": 12/);
+  assert.match(rules,/"dailyBonusQualifyingWinStreak": 5/);
+  assert.match(rules,/"dailyBonusFights": 3/);
+  assert.match(game,/function updateDailyBonusStreak\(won,opponentLevel,playerLevel\)/);
+  assert.match(game,/LOGIC\.applyDailyFightStreak\(state\.dailyCounters,\{won,opponentLevel,playerLevel,requiredStreak:DAILY_BONUS_WIN_STREAK\}\)\.awarded/);
+  assert.match(logic,/const qualifies=won===true&&whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
+  assert.match(logic,/counters\.bonusFightAwarded!==true&&counters\.qualifyingWinStreak>=target/);
+  assert.match(game,/DAILY HEAT BONUS · \+\$\{DAILY_BONUS_FIGHTS\} FIGHTS/);
+  assert.match(game,/DAILY HEAT RESET · LOWER-LEVEL WIN NOT ELIGIBLE/);
+  assert.match(game,/DAILY HEAT · LOWER-LEVEL WIN NOT ELIGIBLE/);
 });
 
 test('card titles cast a subtle shadow over their card content',()=>{

@@ -10,7 +10,8 @@ const root=path.resolve(__dirname,'..');
 
 test('fight-rules.json is valid and uses the current schema',()=>{
   const document=JSON.parse(fs.readFileSync(path.join(root,'fight-rules.json'),'utf8'));
-  assert.equal(document.schemaVersion,6);
+  assert.equal(document.schemaVersion,7);
+  assert.deepEqual(document.fightStructure,{scheduledRounds:3,dailyFightLimit:12,dailyBonusQualifyingWinStreak:5,dailyBonusFights:3,minimumHealthForMedicalClearance:20});
   assert.equal(document.energyEconomy.energyRecoveryIntervalMilliseconds,5000);
   assert.equal(document.energyEconomy.healthRecoveryIntervalMilliseconds,60000);
   assert.equal(document.energyEconomy.maximumEnergy,100);
@@ -39,13 +40,15 @@ test('rule loader keeps safe edits and rejects out-of-range values',()=>{
   const normalized=rules.normalize({
     energyEconomy:{energyRecoveryIntervalMilliseconds:4000,maximumEnergy:999},
     experienceRewards:{sameDayRunbackExperienceMultiplier:.9,lowerLevelOpponentFollowerLossPercent:7},
-    fightStructure:{dailyFightLimit:12}
+    fightStructure:{dailyFightLimit:14,dailyBonusQualifyingWinStreak:6,dailyBonusFights:4}
   });
   assert.equal(normalized.energyEconomy.energyRecoveryIntervalMilliseconds,4000);
   assert.equal(normalized.energyEconomy.maximumEnergy,100);
   assert.equal(normalized.experienceRewards.sameDayRunbackExperienceMultiplier,.5);
   assert.equal(normalized.experienceRewards.lowerLevelOpponentFollowerLossPercent,7);
-  assert.equal(normalized.fightStructure.dailyFightLimit,12);
+  assert.equal(normalized.fightStructure.dailyFightLimit,14);
+  assert.equal(normalized.fightStructure.dailyBonusQualifyingWinStreak,6);
+  assert.equal(normalized.fightStructure.dailyBonusFights,4);
 });
 
 test('removed activity and economy sections are absent from rules',()=>{

@@ -23,7 +23,7 @@
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.124';
+  const ICON_ASSET_VERSION = '2.7.125';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -39,7 +39,7 @@
     energy:100,maxEnergy:100,health:100,maxHealth:100,aura:0,followersUpdatedAt:Date.now(),followersAccrualAura:0,
     energyRecoveryAt:Date.now(),healthRecoveryAt:Date.now(),
     stats:{power:5,speed:5,chin:5,cardio:5},
-    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,dailyCounters:{date:'',fight:0},dailyOpponentWins:{date:'',wins:{}},
+    gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,dailyCounters:{date:'',fight:0,qualifyingWinStreak:0,bonusFightAwarded:false},dailyOpponentWins:{date:'',wins:{}},
     activeEndorsement:null,endorsementHistory:[],sponsorAnnouncementPending:'',lastSave:Date.now(),lastDaily:'',installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialLastMentionSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialLastRemoteMentionPostId:0,socialConsumedChallengePostIds:[],socialChallengeResults:{},socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',lastTitleLossSeenId:0,hasHeldWorldTitle:false,
     pendingFight:null,pendingChampionshipResult:null,fightPlanPreference:{pace:'slow',offense:'conservative',tactics:'stick'},
@@ -261,7 +261,7 @@
   function opponentState(o){return LOGIC.opponentState(o,opponentContext())}
   function opponentAvailable(o){return LOGIC.opponentAvailable(o,opponentContext())}
 
-  const FIGHT_ROUNDS=fightRule('fightStructure.scheduledRounds',3),FIGHT_ENERGY_COST=fightRule('energyEconomy.fightEnergyCost',25),MINIMUM_ACTION_ENERGY_EXCLUSIVE=fightRule('energyEconomy.minimumEnergyToStartConsumingActionExclusive',0),ENERGY_RECOVERY_INTERVAL=fightRule('energyEconomy.energyRecoveryIntervalMilliseconds',5000),HEALTH_RECOVERY_INTERVAL=fightRule('energyEconomy.healthRecoveryIntervalMilliseconds',60000),OFFLINE_RECOVERY_CAP=fightRule('energyEconomy.offlineRecoveryCapMilliseconds',28800000),FOLLOWER_OFFLINE_CAP=fightRule('followerRewards.offlineCapHours',48)*60*60*1000,DAILY_FIGHT_LIMIT=fightRule('fightStructure.dailyFightLimit',10),MINIMUM_FIGHT_HEALTH=fightRule('fightStructure.minimumHealthForMedicalClearance',20);
+  const FIGHT_ROUNDS=fightRule('fightStructure.scheduledRounds',3),FIGHT_ENERGY_COST=fightRule('energyEconomy.fightEnergyCost',25),MINIMUM_ACTION_ENERGY_EXCLUSIVE=fightRule('energyEconomy.minimumEnergyToStartConsumingActionExclusive',0),ENERGY_RECOVERY_INTERVAL=fightRule('energyEconomy.energyRecoveryIntervalMilliseconds',5000),HEALTH_RECOVERY_INTERVAL=fightRule('energyEconomy.healthRecoveryIntervalMilliseconds',60000),OFFLINE_RECOVERY_CAP=fightRule('energyEconomy.offlineRecoveryCapMilliseconds',28800000),FOLLOWER_OFFLINE_CAP=fightRule('followerRewards.offlineCapHours',48)*60*60*1000,DAILY_FIGHT_LIMIT=fightRule('fightStructure.dailyFightLimit',12),DAILY_BONUS_WIN_STREAK=fightRule('fightStructure.dailyBonusQualifyingWinStreak',5),DAILY_BONUS_FIGHTS=fightRule('fightStructure.dailyBonusFights',3),MINIMUM_FIGHT_HEALTH=fightRule('fightStructure.minimumHealthForMedicalClearance',20);
   const hasActionEnergy=()=>state.energy>MINIMUM_ACTION_ENERGY_EXCLUSIVE;
 
   function itemCategory(id){return gearItems.find(item=>item.id===id)?.category||''}
@@ -451,8 +451,11 @@
   }
   function opponentWinsToday(o){ensureDailyCounters();return clamp(Math.floor(Number(state.dailyOpponentWins.wins[o?.key]))||0,0,2)}
   function opponentXpTier(o){return LOGIC.opponentXpTier(opponentWinsToday(o),o?.min,state.level)}
-  function sessionsLeft(type,max){ensureDailyCounters();return Math.max(0,max-(state.dailyCounters[type]||0))}
-  function setLimitBadge(selector,text){const badge=$(selector);if(!badge)return;badge.textContent=text;badge.classList.toggle('exhausted',/^0\b.*\bLEFT$/.test(text)||text==='FIGHT TO UNLOCK')}
+  function sessionsLeft(type,max){ensureDailyCounters();const limit=max+(type==='fight'&&state.dailyCounters.bonusFightAwarded?DAILY_BONUS_FIGHTS:0);return Math.max(0,limit-(state.dailyCounters[type]||0))}
+  function updateDailyBonusStreak(won,opponentLevel,playerLevel){
+    return LOGIC.applyDailyFightStreak(state.dailyCounters,{won,opponentLevel,playerLevel,requiredStreak:DAILY_BONUS_WIN_STREAK}).awarded;
+  }
+  function setLimitBadge(selector,text){const badge=$(selector);if(!badge)return;if(selector==='#fightLimitText'){const fightsLeft=parseInt(text,10)||0,streak=state.dailyCounters.qualifyingWinStreak||0;badge.title=state.dailyCounters.bonusFightAwarded?`${DAILY_BONUS_FIGHTS} bonus fights earned today`:`${streak}/${DAILY_BONUS_WIN_STREAK} on-level or higher win streak toward ${DAILY_BONUS_FIGHTS} bonus fights`;text=state.dailyCounters.bonusFightAwarded?`${fightsLeft} LEFT · +${DAILY_BONUS_FIGHTS} EARNED`:`${fightsLeft} LEFT · BONUS ${streak}/${DAILY_BONUS_WIN_STREAK}`;badge.setAttribute('aria-label',`${text}. ${badge.title}`)}badge.textContent=text;badge.classList.toggle('exhausted',/^0\b/.test(text)||text==='FIGHT TO UNLOCK')}
   function updateDailyResetClocks(){
     const date=todayKey(),clocks=$$('[data-daily-reset-clock]');
     if(dailyResetDate&&date!==dailyResetDate){dailyResetDate=date;ensureDailyCounters();updateUI();return}
@@ -559,9 +562,11 @@
   function spendEnergy(n){const energySpent=LOGIC.spendEnergy(state,n);if(!energySpent){toast('ENERGY IS EMPTY · CHARGING AUTOMATICALLY','#ff766d');return 0}return energySpent}
 
   function updateUI(){
+    ensureDailyCounters();
     const careerRank=rankName(),rankText=$('#rankText');$('#fightNightDay').textContent=localFightNightDay();$('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;rankText.textContent=careerRank;rankText.classList.toggle('world-champion',careerRank==='WORLD CHAMPION');
     const headerRanking=currentRanking(),progressText=$('#progressText');progressText.textContent=state.attributePoints?`${state.attributePoints} POINT${state.attributePoints===1?'':'S'}`:(headerRanking?.position?`RANK #${headerRanking.position}`:'UNRANKED');progressText.classList.toggle('rank-status',!state.attributePoints&&!!headerRanking?.position);$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageStatus').textContent=cageStatus();$('#heroLevel').textContent=`LVL ${state.level}`;
     const victoryPackProgress=clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),victoryPackMeter=$('#victoryPackMeter');$('#victoryPackProgressText').textContent=`${victoryPackProgress} / 4 WINS`;$('#victoryPackFill').style.width=`${victoryPackProgress*25}%`;$('#victoryPackTrack').setAttribute('aria-valuenow',String(victoryPackProgress));$('#victoryPackHint').textContent=victoryPackProgress>=3?'NEXT ELIGIBLE WIN GUARANTEES':'WIN AT YOUR LEVEL OR HIGHER';victoryPackMeter.classList.toggle('ready',victoryPackProgress>=3);
+    const dailyFightStreak=clamp(state.dailyCounters.qualifyingWinStreak||0,0,DAILY_BONUS_WIN_STREAK),dailyFightBonusEarned=state.dailyCounters.bonusFightAwarded===true,dailyFightBonusMeter=$('#dailyFightBonusMeter');$('#dailyFightBonusProgressText').textContent=dailyFightBonusEarned?`+${DAILY_BONUS_FIGHTS} FIGHTS EARNED`:`${dailyFightStreak} / ${DAILY_BONUS_WIN_STREAK} WINS`;$('#dailyFightBonusFill').style.width=`${dailyFightStreak/DAILY_BONUS_WIN_STREAK*100}%`;$('#dailyFightBonusTrack').setAttribute('aria-valuenow',String(dailyFightStreak));$('#dailyFightBonusHint').textContent=dailyFightBonusEarned?'DAILY BONUS ACTIVE':'WIN STRAIGHT AT YOUR LEVEL OR HIGHER';$('#dailyFightBonusMeta').textContent=dailyFightBonusEarned?'AVAILABLE UNTIL LOCAL MIDNIGHT':`+${DAILY_BONUS_FIGHTS} FIGHTS · RESETS AT MIDNIGHT`;dailyFightBonusMeter.classList.toggle('ready',dailyFightBonusEarned);
     renderResourceHud();
     const currentXp=Math.floor(state.xp),neededXp=xpNeed();$('#careerXpLevel').textContent=`LEVEL ${state.level} → LEVEL ${state.level+1}`;$('#careerXpProgress').textContent=`${Math.max(0,neededXp-currentXp)} XP NEEDED`;$('#careerXpProgressMeta').textContent=`${currentXp} / ${neededXp} XP`;$('#careerXpFill').style.width=`${clamp(currentXp/Math.max(1,neededXp)*100,0,100)}%`;$('#careerXpTrack').setAttribute('aria-valuemax',String(neededXp));$('#careerXpTrack').setAttribute('aria-valuenow',String(currentXp));
     $('#auraText').textContent=Math.floor(effectiveAura());
@@ -1296,6 +1301,9 @@
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;if(circuitOpponent&&!fight.forfeited){o.lastDefeatedPlayerAt=Date.now();state.circuitLossStreak++}state.losses++;state.winStreak=0;if(!fight.forfeited)fans=changeFollowers(LOGIC.fightFollowerReward({opponentBaseFollowers:o.fans,won:false}));state.aura=clamp(state.aura+auraBaseChange,0,100);auraAppliedChange=state.aura-auraBefore;sfx.lose();
       if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
+    const dailyStreakBefore=state.dailyCounters.qualifyingWinStreak||0,dailyBonusAwarded=updateDailyBonusStreak(win,o.min,state.level);
+    if(dailyBonusAwarded)lootNotes.push({kind:'milestone',text:`DAILY HEAT BONUS · +${DAILY_BONUS_FIGHTS} FIGHTS`});
+    else if(lowerLevelWin)lootNotes.push({kind:'penalty',text:dailyStreakBefore?`DAILY HEAT RESET · LOWER-LEVEL WIN NOT ELIGIBLE`:`DAILY HEAT · LOWER-LEVEL WIN NOT ELIGIBLE`});
     pendingPostFightText=selectPostFightText({won:win,forfeited:!!fight.forfeited,lowerLevelWin,titleWon,titleFight:!!o.globalChampionship,winStreak:state.winStreak,opponent:o.name});
     state.rankingHistory=[...state.rankingHistory,LOGIC.rankingFightEntry({won:win,playerLevel:state.level,opponentLevel:o.min,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship})].slice(-10);
     if(firstContractUnlocked){state.firstContractPending=true;ensureFirstContractOpponent();trackEvent('first_contract_unlocked',{opponent_key:FIRST_CONTRACT.key,source_opponent_key:o.key})}ensureRoster();state.dailyOpponentWins.wins[o.key]=LOGIC.nextOpponentXpStage(winsToday,win);
@@ -1336,7 +1344,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.124" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.125" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

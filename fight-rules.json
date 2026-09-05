@@ -1,7 +1,7 @@
 {
   "_context": "Editable Cage Grind fight simulation, progression, and passive resource rules.",
-  "schemaVersion": 6,
-  "fightStructure": {"scheduledRounds": 3, "dailyFightLimit": 10, "minimumHealthForMedicalClearance": 20},
+  "schemaVersion": 7,
+  "fightStructure": {"scheduledRounds": 3, "dailyFightLimit": 12, "dailyBonusQualifyingWinStreak": 5, "dailyBonusFights": 3, "minimumHealthForMedicalClearance": 20},
   "energyEconomy": {"maximumEnergy": 100, "fightEnergyCost": 25, "minimumEnergyToStartConsumingActionExclusive": 0, "energyRecoveryIntervalMilliseconds": 5000, "healthRecoveryIntervalMilliseconds": 60000, "offlineRecoveryCapMilliseconds": 28800000},
   "exchangeCounts": {"slowPaceMinimum": 6, "slowPaceMaximum": 7, "fastPaceMinimum": 9, "fastPaceMaximum": 11},
   "computerGeneratedOpponentDifficulty": {"baseAttributeRatingAtLevelOne": 4, "linearAttributeRatingGainPerLevel": 1.1, "compoundingGrowthStartsAtLevel": 7, "attributeGrowthMultiplierPerLevel": 1.01, "opponentCardDifficultyStep": 0.7, "individualAttributeVariationStep": 0.45},
