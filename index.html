@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.7.149" />
+<meta name="app-version" content="2.7.150" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -42,10 +42,10 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="css/styles.css?v=2.7.149">
-<link rel="stylesheet" href="css/shared.css?v=2.7.149">
-<link rel="stylesheet" href="css/landing.css?v=2.7.149">
-<link rel="stylesheet" href="css/github-steel.css?v=2.7.149">
+<link rel="stylesheet" href="css/styles.css?v=2.7.150">
+<link rel="stylesheet" href="css/shared.css?v=2.7.150">
+<link rel="stylesheet" href="css/landing.css?v=2.7.150">
+<link rel="stylesheet" href="css/github-steel.css?v=2.7.150">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <body class="landing-active">
 <section class="landing-page" id="landingPage" aria-labelledby="landingTitle">
   <main class="landing-card">
-    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.149" alt="" aria-hidden="true">
+    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.150" alt="" aria-hidden="true">
     <img class="landing-logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <p class="landing-eyebrow" id="landingEyebrow">THE FIGHT STARTS NOW</p>
     <h1 id="landingTitle"><span id="landingTitleLead">BUILD. FIGHT.</span><br><span class="accent" id="landingTitleAccent">BECOME.</span></h1>
@@ -211,11 +211,8 @@
         <div class="card-title"><span class="page-title-copy"><b>Open Gym</b><small>SCOUT SPAR · ONE ROUND</small></span><span class="open-gym-impact">NO CAREER IMPACT</span></div>
         <div class="page-scroll open-gym-scroll">
           <div class="page-subhead"><b>SCOUT A FIGHTER</b><span>TOP 25</span></div>
-          <details class="spar-fighter-picker" id="sparFighterPicker" open>
-            <summary><b id="sparSelectedSummary">Choose from the top 25 ranked fighters</b><small id="sparSelectedMeta">No official fight. No career impact.</small><span>SELECT SPARRING CLONE</span></summary>
-            <div class="spar-target-grid fight-plan-toggle" id="sparTargetChoices" role="group" aria-label="Choose a ranked fighter to clone"></div>
-          </details>
-          <div class="page-subhead"><b>FIGHT PLAN</b><span>MAKE YOUR THREE CALLS</span></div>
+          <button class="spar-fighter-picker" id="sparFighterPicker" type="button" aria-haspopup="dialog" aria-controls="sparScoutModal"><b id="sparSelectedSummary">Choose from the top 25 ranked fighters</b><small id="sparSelectedMeta">No official fight. No career impact.</small><span>SELECT SPARRING CLONE</span></button>
+          <div class="page-subhead"><b>FIGHT PLAN</b><span id="sparPlanStatus">SELECT A SCOUT TO SET YOUR PLAN</span></div>
           <div class="spar-plan-panel">
             <div class="spar-plan-row"><span><b>PACE</b><small>Control your output</small></span><div class="fight-plan-toggle" role="group" aria-label="Sparring pace"><button type="button" data-spar-setting="pace" data-spar-value="slow">MEASURED</button><button type="button" data-spar-setting="pace" data-spar-value="fast">HIGH OUTPUT</button></div></div>
             <div class="spar-plan-row"><span><b>OFFENSE</b><small>Choose your risk</small></span><div class="fight-plan-toggle" role="group" aria-label="Sparring offense"><button type="button" data-spar-setting="offense" data-spar-value="conservative">DISCIPLINED</button><button type="button" data-spar-setting="offense" data-spar-value="aggressive">PRESSURE</button></div></div>
@@ -229,14 +226,14 @@
           <div class="page-subhead"><b>LATEST SCOUTING REPORT</b><span id="sparReportDate">AWAITING SESSION</span></div>
           <div class="spar-report" id="sparReport" aria-live="polite"></div>
         </div>
-        <div class="spar-action-dock"><button class="spar-start-btn" id="startSparBtn" type="button">START ONE-ROUND SPAR</button></div>
+        <div class="spar-action-dock"><button class="spar-start-btn" id="startSparBtn" type="button" disabled>START ONE-ROUND SPAR</button><button class="spar-start-btn" id="sparRematchBtn" type="button" hidden>REMATCH · ADJUST FIGHT PLAN</button></div>
         <footer class="page-footer open-gym-footer">Test a matchup without spending Energy or affecting your record, rewards, ranking, or streaks.</footer>
       </section>
     </section>
 
     <section class="screen" data-screen="gear">
       <section class="card daily-drop-card career-after-setup" id="gearDropOffer" hidden aria-live="polite" aria-labelledby="gearDropTitle">
-        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.149" alt="" aria-hidden="true">
+        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.150" alt="" aria-hidden="true">
         <div class="daily-drop-copy"><small id="gearDropEyebrow">ONE FREE PACK EVERY DAY</small><h2 id="gearDropTitle">DAILY DROP</h2><p id="gearDropDescription">Guaranteed collectible</p></div>
         <button class="daily" id="dailyBtn" type="button"><span id="dailyBtnLabel">CLAIM DAILY DROP</span></button>
       </section>
@@ -257,11 +254,11 @@
   </div>
 
   <nav class="bottomnav" hidden>
-    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.149" alt="" aria-hidden="true"></span>Home</button>
-    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.149" alt="" aria-hidden="true"></span>Fight</button>
-    <button class="navbtn" data-nav="gym"><span class="ni"><img src="assets/icons/nav-train.png?v=2.7.149" alt="" aria-hidden="true"></span>Gym</button>
-    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.149" alt="" aria-hidden="true"></span>Gear</button>
-    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.149" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
+    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.150" alt="" aria-hidden="true"></span>Home</button>
+    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.150" alt="" aria-hidden="true"></span>Fight</button>
+    <button class="navbtn" data-nav="gym"><span class="ni"><img src="assets/icons/nav-train.png?v=2.7.150" alt="" aria-hidden="true"></span>Gym</button>
+    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.150" alt="" aria-hidden="true"></span>Gear</button>
+    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.150" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
   </nav>
 
   <div class="modal-overlay" id="retireCareerModal" aria-hidden="true">
@@ -304,6 +301,17 @@
     </div>
   </div>
 
+  <div class="modal-overlay open-gym-card" id="sparScoutModal" aria-hidden="true">
+    <section class="gig-modal spar-scout-dialog" role="dialog" aria-modal="true" aria-labelledby="sparScoutTitle">
+      <header><small>OPEN GYM · TOP 25</small><h2 id="sparScoutTitle">Scout a Fighter</h2></header>
+      <div class="fighter-post-search spar-scout-search">
+        <input id="sparScoutSearch" type="search" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="SEARCH BY @HANDLE" aria-label="Search scouting fighters by handle">
+        <div class="fighter-post-results" id="sparTargetChoices" role="group" aria-label="Choose a ranked fighter to clone"></div>
+      </div>
+      <div class="modal-actions single-action"><button class="modal-cancel" id="sparScoutClose" type="button">CLOSE</button></div>
+    </section>
+  </div>
+
   <div class="modal-overlay" id="loadoutFullModal" aria-hidden="true">
     <div class="gig-modal loadout-dialog" role="dialog" aria-modal="true" aria-labelledby="loadoutFullTitle" aria-describedby="loadoutFullDescription">
       <span class="loadout-dialog-kicker" id="loadoutFullKicker">FIGHT GEAR · 2/2 SLOTS</span>
@@ -315,7 +323,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.149" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.150" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -399,7 +407,7 @@
         <button class="tape-breakdown-backdrop" id="tapeStatsBackdrop" type="button" aria-label="Close Tale of the Tape"></button>
         <section class="tape-breakdown-sheet tape-stats-sheet" role="dialog" aria-modal="true" aria-labelledby="tapeStatsTitle">
           <header><div><small>MATCHUP COMPARISON</small><h2 id="tapeStatsTitle">TALE OF THE TAPE</h2></div><button id="tapeStatsClose" type="button" aria-label="Close Tale of the Tape">×</button></header>
-          <div class="tape-agent-read even" id="tapeAgentRead" role="status"><img class="tape-agent-avatar" src="assets/contact-agent-carl.png?v=2.7.149" alt="Agent Carl"><small>AGENT'S READ</small><div><b id="tapeAgentHeadline">RIGHT-SIZED FIGHT</b><span id="tapeAgentMessage">A good test of your skills.</span></div></div>
+          <div class="tape-agent-read even" id="tapeAgentRead" role="status"><img class="tape-agent-avatar" src="assets/contact-agent-carl.png?v=2.7.150" alt="Agent Carl"><small>AGENT'S READ</small><div><b id="tapeAgentHeadline">RIGHT-SIZED FIGHT</b><span id="tapeAgentMessage">A good test of your skills.</span></div></div>
           <div class="tape-stats-bios">
             <article><small>YOU</small><h3 id="tapeStatsPlayerName">ROOKIE</h3><p id="tapeStatsPlayerMeta"></p></article>
             <article><small>OPPONENT</small><h3 id="tapeStatsOppName">OPPONENT</h3><p id="tapeStatsOppMeta"></p></article>
@@ -429,7 +437,7 @@
 
       <div class="sim-stage hidden" id="planStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.149" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.150" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>BUILD THE FIGHT PLAN</small></div>
           <div class="fight-plan-card">
             <span class="fight-plan-kicker">FINAL INSTRUCTIONS</span>
@@ -467,7 +475,7 @@
   <div class="modal-overlay drop-claim-modal" id="dropClaimModal" aria-hidden="true">
     <section class="drop-claim-dialog" role="dialog" aria-modal="true" aria-labelledby="dropClaimTitle" aria-describedby="dropClaimMessage">
       <header class="drop-claim-copy"><small id="dropClaimEyebrow">SEALED CAGE GRIND PACK</small><h2 id="dropClaimTitle">DROP READY</h2><p id="dropClaimMessage">Reveal your collectible.</p></header>
-      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.149" alt="Sealed Cage Grind collectible pack"></div>
+      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.150" alt="Sealed Cage Grind collectible pack"></div>
       <div class="drop-claim-rewards" id="dropClaimRewards" hidden></div>
       <button class="drop-claim-action" id="dropRevealBtn" type="button">REVEAL DROP</button>
       <button class="drop-claim-action close" id="dropCloseBtn" type="button" hidden>CLOSE</button>
@@ -486,7 +494,7 @@
     <section class="result-stage result-rewards-stage" id="resultRewardsStage" aria-label="Fight rewards" hidden>
       <h3 class="result-rewards-title">REWARDS EARNED</h3>
       <div class="championship-result-status" id="championshipResultStatus" hidden role="status" aria-live="polite"></div>
-      <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.149" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+      <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.150" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
       <div class="rewards"><div class="rewardbox"><b id="rewardPrimary">+1</b><small id="rewardPrimaryLabel">Attribute Point</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
       <div class="result-bonuses" id="resultBonuses" hidden></div>
       <section class="daily-heat-result" id="dailyHeatResult" aria-label="Daily Heat progress"><header><span><small>🔥 DAILY HEAT</small><b id="dailyHeatResultTitle">QUALIFYING WIN STREAK</b></span><strong id="dailyHeatResultCount">0/5</strong></header><div class="daily-heat-result-pips" id="dailyHeatResultPips" aria-hidden="true"></div><footer id="dailyHeatResultDetail">WIN AT YOUR LEVEL OR ABOVE YOUR RANK · +3 FIGHTS AT 5</footer></section>
@@ -528,17 +536,17 @@
   </section>
 </div>
 
-<script src="js/fight-rules.js?v=2.7.149"></script>
-<script src="js/game-logic.js?v=2.7.149"></script>
-<script src="js/shared-ui.js?v=2.7.149"></script>
-<script src="js/strings.js?v=2.7.149"></script>
-<script src="js/analytics.js?v=2.7.149"></script>
-<script src="js/supabase-client.js?v=2.7.149"></script>
-<script src="js/cage-social.js?v=2.7.149"></script>
-<script src="js/landing.js?v=2.7.149"></script>
-<script src="js/fight-plan.js?v=2.7.149"></script>
-<script src="js/definitions.js?v=2.7.149"></script>
-<script src="js/game.js?v=2.7.149"></script>
-<script src="js/pwa.js?v=2.7.149"></script>
+<script src="js/fight-rules.js?v=2.7.150"></script>
+<script src="js/game-logic.js?v=2.7.150"></script>
+<script src="js/shared-ui.js?v=2.7.150"></script>
+<script src="js/strings.js?v=2.7.150"></script>
+<script src="js/analytics.js?v=2.7.150"></script>
+<script src="js/supabase-client.js?v=2.7.150"></script>
+<script src="js/cage-social.js?v=2.7.150"></script>
+<script src="js/landing.js?v=2.7.150"></script>
+<script src="js/fight-plan.js?v=2.7.150"></script>
+<script src="js/definitions.js?v=2.7.150"></script>
+<script src="js/game.js?v=2.7.150"></script>
+<script src="js/pwa.js?v=2.7.150"></script>
 </body>
 </html>
