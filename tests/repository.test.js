@@ -74,31 +74,40 @@ test('literal game selectors point at existing or intentionally dynamic ids',()=
   for(const id of new Set(selectors))assert.ok(ids.has(id)||dynamic.has(id),id);
 });
 
-test('primary navigation contains only Home, Fight, Gear, and Feed',()=>{
+test('primary navigation places Open Gym directly after Fight',()=>{
   const nav=[...html.matchAll(/<button class="navbtn[^>]*data-nav="([^"]+)"/g)].map(match=>match[1]);
-  assert.deepEqual(nav,['home','fight','gear','feed']);
+  assert.deepEqual(nav,['home','fight','gym','gear','feed']);
 });
 
 test('primary navigation renders the custom PNG icon set directly',()=>{
   for(const name of ['home','fight','gear','feed'])assert.match(html,new RegExp(`assets/icons/nav-${name}\\.png\\?v=`),name);
+  assert.match(html,/assets\/icons\/nav-train\.png\?v=/);
   assert.doesNotMatch(html,/data-icon-name="nav-(?:home|fight|gear|feed)"/);
   assert.match(styles,/\.navbtn \.ni img/);
 });
 
-test('only four primary screens remain',()=>{
+test('the five primary screens include the persistent Open Gym page',()=>{
   const screens=[...html.matchAll(/<section class="screen[^>]*data-screen="([^"]+)"/g)].map(match=>match[1]);
-  assert.deepEqual(screens,['home','feed','fight','gear']);
+  assert.deepEqual(screens,['home','feed','fight','gym','gear']);
+});
+
+test('Open Gym runs reward-free scouting and persists the latest report',()=>{
+  assert.match(html,/data-screen="gym"[\s\S]*?id="sparTargetChoices"[\s\S]*?id="startSparBtn"[\s\S]*?id="sparReport"/);
+  assert.match(html,/Test a matchup without spending Energy or affecting your record, rewards, ranking, or streaks/);
+  assert.match(game,/sparringTarget:'level',lastSparringReport:null/);
+  assert.match(game,/state\.lastSparringReport=createSparringReport\(target\)/);
+  assert.match(game,/playerIsChampion[\s\S]*?'contender'/);
 });
 
 test('removed manual activity interfaces are absent',()=>{
   const removedIds=['trainScreen','hustleScreen','restModal','recoveryModal','blackjackModal','cageDiceModal','horseRaceModal','autographModal'];
   for(const id of removedIds)assert.doesNotMatch(html,new RegExp(`id="${id}"`),id);
-  assert.doesNotMatch(styles,/training-injury|trainer-toggle|sparring|horse-race|blackjack|cage-dice|data-nav="train"/i);
+  assert.doesNotMatch(styles,/training-injury|trainer-toggle|horse-race|blackjack|cage-dice|data-nav="train"/i);
   assert.doesNotMatch(steel,/training|trainer|sparring|horse-race|blackjack|cage-dice|hustle/i);
 });
 
 test('obsolete activity files and assets were removed',()=>{
-  for(const file of ['js/underground-buzz.js','assets/cage-dice.jpg','assets/racehorse-right.png','assets/home-training.png','assets/home-hustle.png','assets/icons/nav-train.png','assets/icons/nav-hustle.png','assets/icons/rest.png','assets/icons/rideshare-driver.jpg','assets/icons/surgecore-energy-drink.png']){
+  for(const file of ['js/underground-buzz.js','assets/cage-dice.jpg','assets/racehorse-right.png','assets/home-training.png','assets/home-hustle.png','assets/icons/nav-hustle.png','assets/icons/rest.png','assets/icons/rideshare-driver.jpg','assets/icons/surgecore-energy-drink.png']){
     assert.equal(fs.existsSync(path.join(root,file)),false,file);
   }
 });
@@ -657,7 +666,7 @@ test('sticky status dashboard remains native CSS sticky and overlay-safe',()=>{
 });
 
 test('mobile navigation and attribute grids avoid horizontal scrolling',()=>{
-  assert.match(styles,/\.bottomnav\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles,/\.bottomnav\{grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.attribute-assignment-grid\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles,/@media \(max-width:699px\)\{\.attribute-assignment-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(styles,/\.fight-attribute-assignment\{padding:0;border-color:#22c55e;background:#111c2e/);
@@ -820,8 +829,10 @@ test('Victory Packs and Daily Drops only award undiscovered collectibles',()=>{
 test('Home invites award a server-validated nonduplicate referral drop after the invited fighter competes',()=>{
   const home=html.slice(html.indexOf('data-screen="home"'),html.indexOf('data-screen="fight"'));
   assert.match(home,/home-invite-heading"><b>FIGHTER REFERRALS<\/b><span>INVITE REWARDS<\/span>[\s\S]*id="inviteFighterBtn"[^>]*>INVITE<[\s\S]*RETIRE THIS FIGHTER/);
+  assert.match(home,/home-danger-heading"><b>DANGER ZONE<\/b><span>PERMANENT ACTION<\/span>[\s\S]*RETIRE THIS FIGHTER/);
   assert.match(home,/guaranteed drop when they create a fighter and complete their first fight/i);
   assert.match(game,/url\.searchParams\.set\('invite',state\.socialProfileId\)/);
+  assert.match(game,/I just started Cage Grind and it's brutal in the best way\. Come build your fighter and throw down —/);
   assert.match(game,/await SHARED_FEED\.qualifyReferral\(\)/);
   assert.match(game,/awardReferralCollectible\(referral\.referralId\)/);
   assert.match(game,/eligibleGearAtLevel\(state\.level,rarity\)/);
@@ -932,12 +943,13 @@ test('full-height page cards share navigation spacing and keep scrolling interna
   assert.match(html,/class="page-footer gear-card-footer"/);
   assert.match(html,/class="page-footer fight-ladder-footer"/);
   assert.match(html,/class="page-footer feed-action-dock"/);
+  assert.match(html,/class="page-footer open-gym-footer"/);
   assert.match(styles,/\.page-footer,\.home-coach-footer,\.gear-card-footer,\.fight-ladder-footer,\.feed-action-dock\{height:64px;flex:0 0 64px;/);
 });
 
-test('Home, Fight, Gear, and Feed reuse the same page shell classes',()=>{
-  for(const token of ['home-career-card page-card','page-card feed-page-card','fight-ladder page-card','page-card gear-page-card'])assert.match(html,new RegExp(token));
-  for(const token of ['page-scroll home-career-scroll','page-scroll feed-list','page-scroll" id="opponentList"','page-scroll gear-card-scroll'])assert.match(html,new RegExp(token));
+test('Home, Fight, Gym, Gear, and Feed reuse the same page shell classes',()=>{
+  for(const token of ['home-career-card page-card','page-card feed-page-card','fight-ladder page-card','page-card open-gym-card','page-card gear-page-card'])assert.match(html,new RegExp(token));
+  for(const token of ['page-scroll home-career-scroll','page-scroll feed-list','page-scroll" id="opponentList"','page-scroll open-gym-scroll','page-scroll gear-card-scroll'])assert.match(html,new RegExp(token));
   assert.match(html,/id="gearCardHeader"><span class="page-title-copy"><b id="gearCategoryTitle">/);
   assert.match(html,/id="gearCategorySubtitle"/);
   assert.match(html,/id="gearCategoryStatus"/);
@@ -1251,15 +1263,16 @@ test('saved generated opponents are rebalanced to the fight-first curve',()=>{
   assert.match(game,/generatedOpponentRatings\(tier,serial,seed,arch,maximumAdvantage\)/);
 });
 
-test('service worker no longer caches removed activity code or art',()=>{
+test('service worker caches Open Gym navigation art but not removed activity code or art',()=>{
   const worker=read('service-worker.js');
-  for(const token of ['underground-buzz','nav-train','nav-hustle','home-training','home-hustle','racehorse','cage-dice'])assert.doesNotMatch(worker,new RegExp(token,'i'),token);
+  for(const token of ['underground-buzz','nav-hustle','home-training','home-hustle','racehorse','cage-dice'])assert.doesNotMatch(worker,new RegExp(token,'i'),token);
+  assert.match(worker,/nav-train\.png/);
   assert.match(worker,/fight-rules\.json/);
 });
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gear, and Feed','state version 31','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gym, Gear, and Feed','state version 31','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);

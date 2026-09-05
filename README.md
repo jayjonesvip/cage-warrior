@@ -12,14 +12,15 @@ The career is intentionally centered on one repeatable loop:
 4. Energy and Health recover automatically.
 5. Fight again, build a following, attract sponsors, collect gear, and climb toward the championship.
 
-Training, sparring, manual resting, recovery-room treatments, side jobs, gambling, and the money economy are not part of the current game.
+Traditional training, manual resting, recovery-room treatments, side jobs, gambling, and the money economy are not part of the current game. Open Gym sparring is a reward-free scouting tool and does not alter career resources or results.
 
 ## Navigation
 
-The simplified four-item navigation is Home, Fight, Gear, and Feed. The four primary pages are:
+The five-item navigation is Home, Fight, Gym, Gear, and Feed. The five primary pages are:
 
 - **Home** — the fighter profile and portrait first, followed by identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and the rotating career ticker.
 - **Fight** — available Attribute Points, a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
+- **Gym** — a one-round scout spar against a same-level, next-level, or champion-caliber test. The player sets Pace, Offense, and Tactics, then receives a persistent grade with attribute and plan advice. Reigning champions instead choose between a same-level test and the top contender. Sessions cost nothing and never affect official career state.
 - **Gear** — Daily and installation Drops, Victory Packs, and collectible cards that equip Fight Gear or career perks directly.
 - **Feed** — follower/following totals, CageReporter coverage, mentions, rivals, sponsors, and player interactions. Following includes known social accounts and ranked fighters.
 
