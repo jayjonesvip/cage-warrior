@@ -819,9 +819,15 @@ test('daily fights use a twelve-bout limit with one three-fight qualifying strea
   assert.match(game,/LOGIC\.applyDailyFightStreak\(state\.dailyCounters,\{won,opponentLevel,playerLevel,requiredStreak:DAILY_BONUS_WIN_STREAK\}\)\.awarded/);
   assert.match(logic,/const qualifies=won===true&&whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
   assert.match(logic,/counters\.bonusFightAwarded!==true&&counters\.qualifyingWinStreak>=target/);
-  assert.match(game,/DAILY HEAT BONUS · \+\$\{DAILY_BONUS_FIGHTS\} FIGHTS/);
-  assert.match(game,/DAILY HEAT RESET · LOWER-LEVEL WIN NOT ELIGIBLE/);
-  assert.match(game,/DAILY HEAT · LOWER-LEVEL WIN NOT ELIGIBLE/);
+  assert.match(html,/id="dailyHeatResult"/);
+  assert.match(html,/id="dailyHeatResultPips"/);
+  assert.match(game,/function renderDailyHeatResult\(/);
+  assert.match(game,/LOWER-LEVEL WIN NOT ELIGIBLE/);
+  assert.match(game,/BONUS FIGHTS UNLOCKED/);
+  assert.match(game,/renderDailyHeatResult\(\{won:win,lowerLevelWin,forfeited:!!fight\.forfeited,dailyStreakBefore,dailyBonusAwarded\}\)/);
+  assert.match(styles,/\.daily-heat-result-pips\{display:grid;grid-template-columns:repeat\(5,1fr\)/);
+  assert.doesNotMatch(game,/kind:'streak'|-FIGHT WIN STREAK/);
+  assert.doesNotMatch(styles,/\.win-streak-bonus/);
 });
 
 test('card titles cast a subtle shadow over their card content',()=>{
