@@ -81,6 +81,13 @@ test('modals use a separate four-size scale and preserve impact numbers and icon
   assert.doesNotMatch(typography,/#fightOverlay|\.landing-page|\.screen|\.topbar|\.bottomnav/);
 });
 
+test('ranking headers wrap without widening the fighter list',()=>{
+  assert.match(styles,/\.fight-ranking-list\{display:grid;grid-template-columns:minmax\(0,1fr\);min-width:0;width:100%/);
+  assert.match(styles,/\.fight-ladder \.fight-ranking-group\{[^}]*flex-wrap:wrap[^}]*white-space:normal/);
+  assert.match(styles,/#app \.screen \.fight-ranking-group>span\{--game-text-size:var\(--type-small\)/);
+  assert.doesNotMatch(styles,/grid-template-columns:34px 50px minmax\(150px,1fr\)/);
+});
+
 test('all seven sponsors have five distinct brand reaction messages',()=>{
   const context={};vm.runInNewContext(strings,context);
   const pools=context.CAGE_STRINGS.sponsorHighlights;
@@ -166,6 +173,8 @@ test('the five primary screens include the persistent Open Gym page',()=>{
 test('Open Gym runs reward-free scouting and persists the latest report',()=>{
   assert.match(html,/id="sparScoutModal"[\s\S]*role="dialog"[\s\S]*id="sparTargetChoices"[\s\S]*id="sparScoutClose"/);
   assert.doesNotMatch(html,/<details[^>]*id="sparFighterPicker"/);
+  assert.match(html,/<button class="spar-fighter-picker" id="sparFighterPicker"[^>]*>SELECT SPARRING CLONE<\/button>/);
+  assert.match(styles,/\.spar-fighter-picker\{[^}]*min-height:44px[^}]*border:1px solid/);
   assert.match(game,/sparFighterPicker'\).addEventListener\('click',openSparScout\)/);
   assert.match(game,/e.key==='Escape'.*closeSparScout\(\)/);
   assert.match(html,/data-screen="gym"[\s\S]*?id="sparFighterPicker"[\s\S]*?id="sparReport"[\s\S]*?class="spar-action-dock"><button[^>]*id="startSparBtn"[\s\S]*?class="page-footer open-gym-footer"/);
