@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.137';
+  const ICON_ASSET_VERSION = '2.7.139';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -45,6 +45,7 @@
   let careerSaveKnown = false;
 
   const defaultState = {
+    personalBests:{fastestFinish:0,biggestUpset:0,bestStreak:0},sponsorHighlightHistory:{},
     version:STATE_VERSION,name:'ROOKIE',nameLocked:false,rookieShowcasePending:false,firstContractPending:false,postFightTutorialSeen:false,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,rankingHistory:[],
     energy:100,maxEnergy:100,health:100,maxHealth:100,aura:0,followersUpdatedAt:Date.now(),followersAccrualAura:0,
     energyRecoveryAt:Date.now(),healthRecoveryAt:Date.now(),
@@ -67,6 +68,7 @@
   let audioCtx = null;
   let currentScreen = 'home';
   let sparringSession = null;
+  let sparringPartnerNames = {};
   const FIGHT_RANKING_BATCH_SIZE=50;
   let visibleFightRankingCount=FIGHT_RANKING_BATCH_SIZE;
   let attributeAssignmentExpanded = false;
@@ -285,6 +287,8 @@
       const source=parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
       const s = Object.assign(structuredClone(defaultState),source);
       LOGIC.normalizeCoreState(s,defaultState,source);
+      s.personalBests=LOGIC.careerHighlights(source.personalBests||{}).records;s.personalBests.bestStreak=Math.max(s.personalBests.bestStreak,s.bestStreak||0);
+      s.sponsorHighlightHistory={};for(const id of ENDORSEMENT_IDS){const entry=source.sponsorHighlightHistory?.[id];if(entry)s.sponsorHighlightHistory[id]={date:String(entry.date||'').slice(0,10),fight:Math.max(0,Number(entry.fight)||0),index:Math.max(0,Math.floor(Number(entry.index)||0))}}
       if((Math.floor(Number(source.version))||0)<27)s.xp=LOGIC.rescaleXpProgress(s.xp,LOGIC.legacyXpRequirement(s.level),LOGIC.xpRequirement(s.level));
       const legacyGear=Array.isArray(s.gear)?s.gear.filter(id=>typeof id==='string'):[];
       const savedCounts=s.gearCounts&&typeof s.gearCounts==='object'&&!Array.isArray(s.gearCounts)?s.gearCounts:{};
@@ -295,7 +299,7 @@
       const legacySponsorId=ENDORSEMENT_IDS.includes(source.activeEndorsement?.id)?source.activeEndorsement.id:'',legacySponsorHistory=Array.isArray(source.endorsementHistory)?source.endorsementHistory:[],sponsor=LOGIC.sponsorProgress(endorsementDefs,s.fans,[...legacySponsorHistory,legacySponsorId].filter(Boolean)),pendingSponsorId=ENDORSEMENT_IDS.includes(source.sponsorAnnouncementPending)?source.sponsorAnnouncementPending:'';s.activeEndorsement=sponsor.active?{id:sponsor.active.id}:null;s.endorsementHistory=sponsor.history;s.sponsorAnnouncementPending=pendingSponsorId===s.activeEndorsement?.id?pendingSponsorId:'';
       delete s.fightInjury;
       s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
-      const normalizePlan=value=>{const plan=value&&typeof value==='object'?value:{};return {pace:['slow','fast'].includes(plan.pace)?plan.pace:'slow',offense:['conservative','aggressive'].includes(plan.offense)?plan.offense:'conservative',tactics:['stick','adapt'].includes(plan.tactics)?plan.tactics:'stick'}};s.fightPlanPreference=normalizePlan(source.fightPlanPreference);s.sparringPlan=normalizePlan(source.sparringPlan);s.sparringTarget=['level','next','champion','contender'].includes(source.sparringTarget)?source.sparringTarget:'level';const savedSpar=source.lastSparringReport&&typeof source.lastSparringReport==='object'?source.lastSparringReport:null;s.lastSparringReport=savedSpar&&['A','B','C','D'].includes(savedSpar.grade)?{createdAt:Math.max(0,Math.floor(Number(savedSpar.createdAt))||0),target:String(savedSpar.target||'').slice(0,16),opponent:String(savedSpar.opponent||'').slice(0,32),opponentMeta:String(savedSpar.opponentMeta||'').slice(0,60),grade:savedSpar.grade,headline:String(savedSpar.headline||'').slice(0,120),attribute:String(savedSpar.attribute||'').slice(0,20),attributeAdvice:String(savedSpar.attributeAdvice||'').slice(0,160),planAdvice:String(savedSpar.planAdvice||'').slice(0,180)}:null;delete s.opponentFilter;delete s.fightModePreference;
+      const normalizePlan=value=>{const plan=value&&typeof value==='object'?value:{};return {pace:['slow','fast'].includes(plan.pace)?plan.pace:'slow',offense:['conservative','aggressive'].includes(plan.offense)?plan.offense:'conservative',tactics:['stick','adapt'].includes(plan.tactics)?plan.tactics:'stick'}};s.fightPlanPreference=normalizePlan(source.fightPlanPreference);s.sparringPlan=normalizePlan(source.sparringPlan);s.sparringTarget=['level','next','champion','contender'].includes(source.sparringTarget)?source.sparringTarget:'level';const savedSpar=source.lastSparringReport&&typeof source.lastSparringReport==='object'?source.lastSparringReport:null;s.lastSparringReport=savedSpar&&['A','B','C','D'].includes(savedSpar.grade)?{createdAt:Math.max(0,Math.floor(Number(savedSpar.createdAt))||0),target:String(savedSpar.target||'').slice(0,16),opponent:String(savedSpar.opponent||'').slice(0,32),opponentMeta:String(savedSpar.opponentMeta||'').slice(0,60),grade:savedSpar.grade,plan:normalizePlan(savedSpar.plan),recognition:String(savedSpar.recognition||'').slice(0,180),headline:String(savedSpar.headline||'').slice(0,120),attribute:String(savedSpar.attribute||'').slice(0,20),attributeAdvice:String(savedSpar.attributeAdvice||'').slice(0,160),planAdvice:String(savedSpar.planAdvice||'').slice(0,180)}:null;delete s.opponentFilter;delete s.fightModePreference;
       const pendingTitle=source.pendingChampionshipResult&&typeof source.pendingChampionshipResult==='object'?source.pendingChampionshipResult:null;s.pendingChampionshipResult=pendingTitle&&Number.isSafeInteger(Number(pendingTitle.challengeId))&&/^[0-9a-f-]{36}$/i.test(String(pendingTitle.challengerId||''))?{challengeId:Number(pendingTitle.challengeId),challengerId:String(pendingTitle.challengerId),challengerWon:pendingTitle.challengerWon===true,mode:['challenge','defense','rematch'].includes(pendingTitle.mode)?pendingTitle.mode:'challenge'}:null;
       delete s.focusTextDeck;delete s.lastFocusTextId;delete s.focusInterruptionDeck;delete s.lastFocusInterruptionId;
       s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);s.socialLastMentionSerial=source.socialLastMentionSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastMentionSerial))||0,0,s.socialSerial);s.socialProfileId=typeof source.socialProfileId==='string'&&/^[0-9a-f-]{36}$/i.test(source.socialProfileId)?source.socialProfileId:'';s.socialLastRemotePostId=Math.max(0,Math.floor(Number(source.socialLastRemotePostId))||0);s.socialLastRemoteMentionPostId=source.socialLastRemoteMentionPostId===undefined?s.socialLastRemotePostId:Math.max(0,Math.floor(Number(source.socialLastRemoteMentionPostId))||0);s.socialConsumedChallengePostIds=Array.isArray(source.socialConsumedChallengePostIds)?[...new Set(source.socialConsumedChallengePostIds.filter(id=>typeof id==='string'&&/^shared-\d+$/.test(id)))].slice(-100):[];const savedChallengeResults=source.socialChallengeResults&&typeof source.socialChallengeResults==='object'&&!Array.isArray(source.socialChallengeResults)?source.socialChallengeResults:{};s.socialChallengeResults=Object.fromEntries(Object.entries(savedChallengeResults).filter(([id,winner])=>/^shared-\d+$/.test(id)&&typeof winner==='string'&&winner.length<=33).slice(-100));s.socialRemoteInitialized=source.socialRemoteInitialized===true;s.socialFollowingCount=Math.max(0,Math.floor(Number(source.socialFollowingCount))||0);const savedHeadlineCounts=source.socialHeadlineCounts&&typeof source.socialHeadlineCounts==='object'&&!Array.isArray(source.socialHeadlineCounts)?source.socialHeadlineCounts:{};s.socialHeadlineCounts={};for(const key of ['fightWin','fightStreak','fightLoss','lowerLevelWin'])s.socialHeadlineCounts[key]=Math.max(0,Math.floor(Number(savedHeadlineCounts[key]))||0);s.ceoEvents=Array.isArray(source.ceoEvents)?[...new Set(source.ceoEvents.filter(key=>typeof key==='string'&&key.length<=40))].slice(-40):[];s.ceoBonusDate=typeof source.ceoBonusDate==='string'?source.ceoBonusDate:'';s.lastTitleLossSeenId=Math.max(0,Math.floor(Number(source.lastTitleLossSeenId))||0);s.hasHeldWorldTitle=source.hasHeldWorldTitle===true;if(!s.socialAccountCreated)s.socialFollowingCount=0;
@@ -760,6 +764,14 @@
   }
   function publishSponsorSigning(sponsor,{returning=false}={}){if(!sponsor||!state.socialAccountCreated)return;state.socialCycle=Math.max(1,state.socialCycle+1);const text=copyText(returning?STRINGS.social.sponsorReturning:STRINGS.social.sponsorSigning,{name:state.name,brand:sponsor.brand});addSocialPosts([{profile:'sponsor',sponsorId:sponsor.id,kind:returning?'sponsor-return':'',text,targetProfileId:state.socialProfileId}]);saveState();if(returning)return;queueMicrotask(async()=>{if(!await connectSharedSocial(false)||!SHARED_FEED.publishSponsorPost)return;try{await SHARED_FEED.publishSponsorPost(sponsor.id);await connectSharedSocial(true)}catch(error){toast('SPONSOR POST SAVED LOCALLY · SHARED FEED WILL RETRY LATER','#ffcf78')}})}
   function publishSponsorDrop(sponsor){if(!sponsor||!state.socialAccountCreated)return;state.socialCycle=Math.max(1,state.socialCycle+1);const text=copyText(STRINGS.social.sponsorDropped,{name:state.name,brand:sponsor.brand});addSocialPosts([{profile:'sponsor',sponsorId:sponsor.id,kind:'sponsor-drop',text,targetProfileId:state.socialProfileId}]);saveState()}
+  function publishSponsorHighlight(moment){
+    const sponsor=state.activeEndorsement?.id,pool=STRINGS.sponsorHighlights?.[sponsor];if(!moment||!pool||!state.socialAccountCreated)return;
+    const previous=state.sponsorHighlightHistory[sponsor],completed=state.wins+state.losses;
+    if(previous&&(previous.date===todayKey()||completed-previous.fight<3))return;
+    const index=previous?(previous.index+1)%pool.length:Math.floor(Math.random()*pool.length);
+    state.sponsorHighlightHistory[sponsor]={date:todayKey(),fight:completed,index};
+    state.socialCycle++;addSocialPosts([{profile:'sponsor',sponsorId:sponsor,kind:'sponsor-highlight',text:copyText(pool[index],{name:state.name,moment}),targetProfileId:state.socialProfileId}]);
+  }
   function ceoCopyKey(eventKey){return eventKey.startsWith('performance_bonus_')?'performanceBonus':eventKey==='debut'?'debut':''}
   function ceoRemoteEventKey(eventKey){return eventKey.startsWith('performance_bonus_')?'performance_bonus':eventKey}
   function publishCeoEvent(eventKey,{sync=true}={}){
@@ -857,6 +869,7 @@
     const historyMode=arguments[1]||'push';
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
+    if(screen==='gym'&&currentScreen!=='gym'&&!sparringSession)refreshSparringPartnerNames();
     const changed=currentScreen!==screen;if(changed&&screen==='fight')visibleFightRankingCount=FIGHT_RANKING_BATCH_SIZE;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
     if(changed&&historyMode!=='none')writeHistory('screen',historyMode);
     if(screen==='feed')connectSharedSocial(true);else{clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null}
@@ -980,15 +993,36 @@
     const level=Math.max(1,Math.floor(Number(tier))||1),seed=hashSeed(`open-gym|${key}|${level}|${state.name}`),serial=1+seed%997,arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),ratings=generatedOpponentRatings(level,serial,seed,arch,1);
     return {key,name:label||identity.name,tier:level,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,...ratings};
   }
-  function sparringTargets(){
+  function sparringMatchups(){
     const circuit=opponents.find(item=>item.circuitFallback&&item.tier===state.level)||generatedSparOpponent(state.level,'level'),playerIsChampion=sharedChampionship?.is_champion===true;
     const levelTarget={id:'level',label:'YOUR LEVEL',meta:`LEVEL ${state.level} · ${circuit.tag||'MIXED STYLE'}`,opponent:circuit};
     if(playerIsChampion){
-      const contender=opponents.find(item=>item.network&&!item.globalChampionship)||generatedSparOpponent(Math.max(1,state.level),'contender','#1 Contender');
+      const contender=opponents.find(item=>item.network)||generatedSparOpponent(Math.max(1,state.level),'contender','#1 Contender');
       return [levelTarget,{id:'contender',label:'#1 CONTENDER',meta:`LEVEL ${contender.tier||state.level} · ${contender.tag||'RANKED STYLE'}`,opponent:contender}];
     }
     const next=generatedSparOpponent(state.level+1,'next'),champion=opponents.find(item=>item.sourceProfileId&&item.sourceProfileId===sharedChampionship?.champion_id)||generatedSparOpponent(sharedChampionship?.champion_level||Math.max(state.level+1,8),'champion',sharedChampionship?.champion_handle||'World Champion');
     return [levelTarget,{id:'next',label:'NEXT LEVEL',meta:`LEVEL ${next.tier} · ${next.tag}`,opponent:next},{id:'champion',label:'WORLD CHAMPION',meta:`LEVEL ${champion.tier||sharedChampionship?.champion_level||state.level} · ${champion.tag||'CHAMPIONSHIP TEST'}`,opponent:champion}];
+  }
+  function refreshSparringPartnerNames(){
+    const previous=new Set(Object.values(sparringPartnerNames)),next={};
+    for(const id of ['level','next','champion','contender']){
+      let name='';
+      for(let attempt=0;attempt<100;attempt++){
+        const country=opponentNameCountries[Math.floor(Math.random()*opponentNameCountries.length)];
+        name=`${country.first[Math.floor(Math.random()*country.first.length)]} ${country.last[Math.floor(Math.random()*country.last.length)]}`;
+        if(!previous.has(name)&&!Object.values(next).includes(name))break;
+      }
+      next[id]=name;
+    }
+    sparringPartnerNames=next;
+  }
+  function sparringTargets(){
+    if(!sparringPartnerNames.level)refreshSparringPartnerNames();
+    const labels={level:'EVEN MATCH',next:'STEP UP',champion:'CHAMPION SCOUT',contender:'CONTENDER SCOUT'};
+    return sparringMatchups().map(target=>{
+      const name=sparringPartnerNames[target.id],source=target.opponent;
+      return {...target,label:name,meta:`${labels[target.id]} · LVL ${source.tier} · ${source.tag||'MIXED STYLE'}`,mirror:['champion','contender'].includes(target.id)&&source.network?`Mirrors @${source.networkHandle||source.name}`:'',opponent:{...source,name}};
+    });
   }
   function sparPlanAdvice(assessment,plan){
     const axis=assessment.axis,value=assessment.components[axis],copy={pace:value<0?(plan.pace==='fast'?'Dial back the output and protect your gas tank.':'Raise the tempo before the round slips away.'):(plan.pace==='fast'?'Your cardio supports the higher output.':'The measured pace keeps your best weapons available.'),offense:value<0?(plan.offense==='aggressive'?'Use disciplined entries; the pressure is creating counters.':'Add pressure when the opening appears; safety is surrendering initiative.'):(plan.offense==='aggressive'?'The pressure creates useful finishing windows.':'Disciplined offense is limiting their counters.'),tactics:value<0?(plan.tactics==='adapt'?'Trust your base style longer before making the switch.':'This matchup calls for an in-round style adjustment.'):(plan.tactics==='adapt'?'The adjustment matches what this opponent is showing.':'Your signature style fits this test.')} ;
@@ -996,12 +1030,12 @@
   }
   function createSparringReport(target){
     const opponent=target.opponent,player={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')},assessment=LOGIC.fightPlanAssessment({player,opponent,plan:state.sparringPlan,fighterStyle:state.fighterStyle,opponentStyle:opponent.tendency,focus:85,adaptationScale:.5}),grade=assessment.score>=.42?'A':assessment.score>=.12?'B':assessment.score>=-.18?'C':'D',headlines={A:'YOU CONTROLLED THE ROUND',B:'THE PLAN HELD UP',C:'THE ROUND STAYED ON A KNIFE EDGE',D:'THE MATCHUP FOUND THE HOLES'},deficits={power:opponent.chin-player.power,speed:opponent.speed-player.speed,chin:opponent.power-player.chin,cardio:opponent.cardio-player.cardio},attribute=Object.entries(deficits).sort((a,b)=>b[1]-a[1])[0][0],attributeCopy={power:'More Power will make your clean entries matter against this opponent’s durability.',speed:'More Speed will help you win the first exchange and exit before the return.',chin:'More Chin will give you room to survive their hardest counters.',cardio:'More Cardio will keep your plan intact when the round accelerates.'};
-    return {createdAt:Date.now(),target:target.id,opponent:opponent.name,opponentMeta:target.meta,grade,headline:headlines[grade],attribute:attribute.toUpperCase(),attributeAdvice:attributeCopy[attribute],planAdvice:sparPlanAdvice(assessment,state.sparringPlan)};
+    return {createdAt:Date.now(),target:target.id,opponent:opponent.name,opponentMeta:target.meta,grade,plan:{...state.sparringPlan},headline:headlines[grade],attribute:attribute.toUpperCase(),attributeAdvice:attributeCopy[attribute],planAdvice:sparPlanAdvice(assessment,state.sparringPlan)};
   }
   function renderOpenGym(){
-const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparringTarget))state.sparringTarget=choices[0].id;$('#sparTargetSummary').textContent=choices.map(choice=>choice.label).join(' · ');$('#sparTargetChoices').innerHTML=choices.map(choice=>`<button class="spar-target${choice.id===state.sparringTarget?' active':''}" type="button" data-spar-target="${choice.id}" aria-pressed="${choice.id===state.sparringTarget}"><b>${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.meta)}</small></button>`).join('');$$('[data-spar-setting]').forEach(button=>{const active=state.sparringPlan[button.dataset.sparSetting]===button.dataset.sparValue;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+    const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparringTarget))state.sparringTarget=choices[0].id;$('#sparTargetChoices').innerHTML=choices.map(choice=>`<button class="spar-target${choice.id===state.sparringTarget?' active':''}" type="button" data-spar-target="${choice.id}" aria-pressed="${choice.id===state.sparringTarget}"><b>${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.meta)}</small>${choice.mirror?`<em>${escapeHtml(choice.mirror)}</em>`:''}</button>`).join('');$$('[data-spar-setting]').forEach(button=>{const active=state.sparringPlan[button.dataset.sparSetting]===button.dataset.sparValue;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
     renderSparringProgress();
-    const report=state.lastSparringReport,date=$('#sparReportDate'),output=$('#sparReport');if(!report){date.textContent='AWAITING SESSION';output.innerHTML='<div class="spar-report-empty">CHOOSE A TEST AND RUN YOUR FIRST SCOUT SPAR</div>';return}date.textContent=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(report.createdAt)).toUpperCase();const gradeClass=report.grade==='D'?'exposed':report.grade==='C'?'even':'';output.innerHTML=`<article class="spar-report-card"><header class="spar-report-head"><span><b>${escapeHtml(report.headline)}</b><small>VS ${escapeHtml(report.opponent)} · ${escapeHtml(report.opponentMeta)}</small></span><strong class="spar-grade ${gradeClass}" aria-label="Scout grade ${report.grade}">${report.grade}</strong></header><div class="spar-report-body"><p>This is a coaching read, not an official result. The tape stays here until your next session.</p><div class="spar-report-grid"><div class="spar-report-note"><small>ATTRIBUTE PRIORITY · ${escapeHtml(report.attribute)}</small><b>${escapeHtml(report.attributeAdvice)}</b></div><div class="spar-report-note"><small>PLAN ADVICE</small><b>${escapeHtml(report.planAdvice)}</b></div></div></div></article>`;
+    const report=state.lastSparringReport,date=$('#sparReportDate'),output=$('#sparReport');if(!report){date.textContent='AWAITING SESSION';output.innerHTML='<div class="spar-report-empty">CHOOSE A TEST AND RUN YOUR FIRST SCOUT SPAR</div>';return}date.textContent=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(report.createdAt)).toUpperCase();const gradeClass=report.grade==='D'?'exposed':report.grade==='C'?'even':'';output.innerHTML=`<article class="spar-report-card"><header class="spar-report-head"><img class="spar-coach-avatar" src="assets/icons/coach-vega.png?v=${ICON_ASSET_VERSION}" alt="Coach Vega"><span><small class="spar-coach-label">COACH VEGA</small><b>${escapeHtml(report.headline)}</b><small>VS ${escapeHtml(report.opponent)} · ${escapeHtml(report.opponentMeta)}</small></span><strong class="spar-grade ${gradeClass}" aria-label="Scout grade ${report.grade}">${report.grade}</strong></header><div class="spar-report-body">${report.recognition?`<p class="spar-coach-recognition">${escapeHtml(report.recognition)}</p>`:''}<p>This is a coaching read, not an official result. The tape stays here until your next session.</p><div class="spar-report-grid"><div class="spar-report-note"><small>ATTRIBUTE PRIORITY · ${escapeHtml(report.attribute)}</small><b>${escapeHtml(report.attributeAdvice)}</b></div><div class="spar-report-note"><small>PLAN ADVICE</small><b>${escapeHtml(report.planAdvice)}</b></div></div></div></article>`;
   }
   function selectSparTarget(id){if(sparringSession||!sparringTargets().some(target=>target.id===id))return;state.sparringTarget=id;saveState();renderOpenGym();sfx.tap()}
   function selectSparSetting(setting,value){const allowed={pace:['slow','fast'],offense:['conservative','aggressive'],tactics:['stick','adapt']};if(sparringSession||!allowed[setting]?.includes(value))return;state.sparringPlan[setting]=value;saveState();renderOpenGym();sfx.tap()}
@@ -1019,6 +1053,7 @@ const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparr
     if(sparringSession||!state.nameLocked)return;
     const target=sparringTargets().find(choice=>choice.id===state.sparringTarget)||sparringTargets()[0],career=state;
     const report=createSparringReport(target);
+    report.recognition=LOGIC.sparImprovement(state.lastSparringReport,report,state.sparringPlan);
     sparringSession={startedAt:performance.now(),phase:-1};renderSparringProgress();sfx.tap();
     if(currentScreen==='gym')$('#sparSession').scrollIntoView({behavior:globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
     const timer=setInterval(()=>{
@@ -1413,6 +1448,10 @@ const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparr
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;if(circuitOpponent&&!fight.forfeited){o.lastDefeatedPlayerAt=Date.now();state.circuitLossStreak++}state.losses++;state.winStreak=0;if(!fight.forfeited)fans=changeFollowers(LOGIC.fightFollowerReward({opponentBaseFollowers:o.fans,won:false}));state.aura=clamp(state.aura+auraBaseChange,0,100);auraAppliedChange=state.aura-auraBefore;sfx.lose();
       if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap with a ${(fight.submissionMove?.name||'submission').toLowerCase()}. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
+    const clock=String(fight.finishClock||'0:00').split(':').map(Number),finishSeconds=(fight.finishRound-1)*300+300-(clock[0]*60+clock[1]);
+    const highlights=LOGIC.careerHighlights(state.personalBests,{won:win,forfeited:fight.forfeited,lowerLevel:lowerLevelWin,finish:fight.method.includes('KO')||fight.method==='SUBMISSION',finishSeconds,ratingGap:oppRating-playerRating,streak:state.winStreak});state.personalBests=highlights.records;
+    const stampBox=$('#personalBestStamps');stampBox.hidden=!highlights.stamps.length;stampBox.innerHTML=highlights.stamps.map(label=>`<span>${escapeHtml(label)}</span>`).join('');
+    if(win&&!lowerLevelWin&&!fight.forfeited)publishSponsorHighlight(highlights.stamps.includes('BIGGEST UPSET')?'a personal-best upset':state.winStreak>=5&&state.winStreak%5===0?`${state.winStreak} straight wins`:highlights.stamps.includes('FASTEST FINISH')?'a new fastest finish':'');
     const dailyStreakBefore=state.dailyCounters.qualifyingWinStreak||0,dailyBonusAwarded=updateDailyBonusStreak(win,o.min,state.level);
     pendingPostFightText=selectPostFightText({won:win,forfeited:!!fight.forfeited,lowerLevelWin,titleWon,titleFight:!!o.globalChampionship,winStreak:state.winStreak,opponent:o.name});
     state.rankingHistory=[...state.rankingHistory,LOGIC.rankingFightEntry({won:win,playerLevel:state.level,opponentLevel:o.min,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship})].slice(-10);
@@ -1470,7 +1509,7 @@ const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparr
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.137" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.139" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

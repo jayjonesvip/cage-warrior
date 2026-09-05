@@ -19,6 +19,16 @@ const steel=read('css/github-steel.css');
 const readme=read('README.md');
 const serviceWorker=read('service-worker.js');
 
+test('all seven sponsors have five distinct brand reaction messages',()=>{
+  const context={};vm.runInNewContext(strings,context);
+  const pools=context.CAGE_STRINGS.sponsorHighlights;
+  assert.equal(Object.keys(pools).length,7);
+  for(const id of ['bobs-auto','garys-bar-grill','volt','ironhide','apex-wireless','northline-auto','titan-global']){
+    assert.equal(pools[id].length,5,id);assert.equal(new Set(pools[id]).size,5,id);
+    for(const message of pools[id]){assert.ok(message.includes('@{name}'));assert.ok(message.includes('{moment}'))}
+  }
+});
+
 test('all first-party JavaScript parses without a build step',()=>{
   for(const file of fs.readdirSync(path.join(root,'js')).filter(name=>name.endsWith('.js'))){
     assert.doesNotThrow(()=>new vm.Script(read(`js/${file}`),{filename:file}),file);

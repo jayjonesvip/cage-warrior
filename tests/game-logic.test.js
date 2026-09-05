@@ -5,6 +5,26 @@ const assert=require('node:assert/strict');
 global.CAGE_FIGHT_RULES=require('../js/fight-rules.js');
 const logic=require('../js/game-logic.js');
 
+test('personal bests require eligible wins and only celebrate strict improvements',()=>{
+  const previous={fastestFinish:90,biggestUpset:8,bestStreak:4};
+  const event={won:true,finish:true,finishSeconds:70,ratingGap:10,streak:5};
+  const result=logic.careerHighlights(previous,event);
+  assert.deepEqual(result.stamps,['FASTEST FINISH','BIGGEST UPSET','NEW BEST STREAK']);
+  assert.deepEqual(previous,{fastestFinish:90,biggestUpset:8,bestStreak:4});
+  assert.deepEqual(logic.careerHighlights(result.records,event).stamps,[]);
+  for(const override of [{won:false},{forfeited:true},{lowerLevel:true}])assert.deepEqual(logic.careerHighlights(previous,{...event,...override}),{records:previous,stamps:[]});
+  assert.deepEqual(logic.careerHighlights({}, {won:true,streak:1,finish:false}).stamps,[]);
+});
+
+test('coach recognizes a better comparable spar and identifies a single plan change',()=>{
+  const previous={target:'level',opponentMeta:'EVEN MATCH · LVL 4 · STRIKER',grade:'C',plan:{pace:'fast',offense:'conservative',tactics:'stick'}},current={...previous,grade:'B'},plan={...previous.plan,pace:'slow'};
+  assert.match(logic.sparImprovement(previous,current,plan),/C → B · That pace change paid off/);
+  assert.equal(logic.sparImprovement(previous,{...current,grade:'C'},plan),'');
+  assert.equal(logic.sparImprovement(previous,{...current,target:'champion'},plan),'');
+  assert.equal(logic.sparImprovement(previous,{...current,opponentMeta:'NEW MATCHUP'},plan),'');
+  assert.equal(logic.sparImprovement(null,current,plan),'');
+});
+
 const defaults={level:1,xp:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,maxEnergy:100,energy:100,maxHealth:100,health:100,aura:0,stats:{power:5,speed:5,chin:5,cardio:5},lastSave:0};
 const state=(overrides={})=>Object.assign(structuredClone(defaults),overrides);
 

@@ -28,6 +28,8 @@ The compact Energy, Health, Power, Speed, Chin, and Cardio dashboard remains sti
 
 ## Fighter creation and progression
 
+Eligible victories can earn gold personal-best stamps for fastest finish, biggest upset, and a new best streak. Finish and upset records start with results observed after this update; existing best streaks are preserved. Lower-level wins and forfeits cannot earn stamps. Open Gym recognizes improved grades on comparable tests and calls out a changed plan choice. Sponsors have five brand-specific reactions each, rotating in the player's saved local Cage Feed after notable finishes, upsets, or five-win streak milestones, at most once per sponsor per local day and at least three fights apart. These reactions do not publish to the global feed.
+
 A new career permanently locks the fighter avatar, twenty-point starting attribute allocation, archetype, hometown, and unique Cage Feed handle.
 
 Level and XP still come from fights. The balanced XP curve keeps Levels 1–5 approachable, then adds a quadratic late-career requirement so higher levels take progressively more victories. Level 15 requires 1,280 XP instead of 680. Attributes always display as whole numbers.

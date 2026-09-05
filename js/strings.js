@@ -1,4 +1,55 @@
 globalThis.CAGE_STRINGS = {
+  sponsorHighlights: {
+    'bobs-auto': [
+      '@{name} just delivered {moment}. We stopped turning wrenches to watch that one. — Bob',
+      '{moment} for @{name}. That engine is running clean. Proud to have our name in the corner.',
+      'The shop radio went quiet for @{name}, then the whole garage erupted. {moment}.',
+      'We fix rattles. @{name} causes them. {moment} — another photo for the shop wall.',
+      'Grease on our hands, pride in our fighter. @{name}: {moment}. See you at the shop.'
+    ],
+    'garys-bar-grill': [
+      '@{name} with {moment}! Every screen at Gary’s was on that fight. Nobody touched their fries.',
+      '{moment} for @{name}. The regulars are still arguing about who cheered loudest.',
+      'The grill stayed hot and @{name} brought the fire: {moment}. Vegas heard our patio tonight.',
+      'Your usual booth is waiting, @{name}. {moment} deserves a spot on the wall at Gary’s.',
+      'We put @{name} on the big screen. They gave us {moment}. Best seat in Vegas is at Gary’s.'
+    ],
+    volt: [
+      '@{name} hit another gear: {moment}. Surge Core in the corner. Full charge in the cage.',
+      '{moment}. @{name} brought the surge when the lights came on.',
+      'Crack a cold Surge Core for @{name}. {moment} — that is how you bring the energy.',
+      'No flat moments in that performance. @{name} delivers {moment}. Stay charged.',
+      'The room needed a reset after that surge. @{name}: {moment}. We back that energy.'
+    ],
+    ironhide: [
+      '{moment} for @{name}. The stitching holds. The fighter delivers. Ironhide Athletics.',
+      'Built for hard rounds, worn by @{name}. {moment} — earned under the lights.',
+      '@{name} gave the kit another story tonight: {moment}. Wear the work.',
+      'Canvas scuffs. Taped hands. {moment}. Proud to outfit @{name}.',
+      'The logo goes on the gear. The credit goes to @{name}: {moment}.'
+    ],
+    'apex-wireless': [
+      'Our notifications are all @{name} tonight. {moment}. Signal received.',
+      '@{name} delivered {moment}. That clip is going straight to the group chat. — Apex Wireless',
+      'Full bars. Full attention. {moment} for @{name}. Stay connected to the climb.',
+      '{moment}. @{name} gave everyone something worth calling home about.',
+      'The replay is making the rounds on our network. @{name}: {moment}. Clear connection. Big moment.'
+    ],
+    'northline-auto': [
+      '@{name} found the passing lane: {moment}. Northline Auto backs the drive.',
+      '{moment}. @{name} kept a steady hand and found another gear.',
+      'The showroom stopped for @{name} tonight. {moment}. That is performance worth watching.',
+      'Control, timing, and the nerve to accelerate. @{name} delivers {moment}. — Northline Auto',
+      'Another mile on the road to the top. @{name}: {moment}. Enjoy the drive home.'
+    ],
+    'titan-global': [
+      '{moment} for @{name}. A local beginning. A worldwide audience. Titan Global.',
+      'Different time zones. Same name on everyone’s lips. @{name}: {moment}.',
+      '@{name} gave our campaign another defining image tonight: {moment}.',
+      'From the walkout to the final bell, the world was watching @{name}. {moment}.',
+      'Our name is behind the fighter. This moment belongs to @{name}: {moment}.'
+    ]
+  },
   fighterIdentity: {
 colors: [
   'Crimson', 'Scarlet', 'Obsidian', 'Blood', 'Chrome', 'Iron', 'Steel',
@@ -98,8 +149,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.137',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.137',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.139',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.139',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
