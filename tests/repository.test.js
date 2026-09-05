@@ -797,10 +797,22 @@ test('career perks equip inline with the same treatment as Fight Gear',()=>{
   assert.match(game,/activePerkBonus\('healthRecoverySpeed'\)/);
   assert.match(game,/const perk=g\.category!==\'Fight Gear\'/);
   assert.doesNotMatch(styles,/\.perk-loadout-panel\{/);
-  assert.match(game,/activeEffect=fightGear\?'':activeEffects\.length\?`ACTIVE ·/);
+  assert.match(game,/activeEffect=activeEffects\.length\?`ACTIVE ·/);
+  assert.match(game,/activeEffects=\[\.\.\.combatLoadoutEffects\(activeItems\)/);
   assert.match(game,/class="gear-loadout-heading"/);
   assert.doesNotMatch(game,/Choose up to two active Combat items/);
   assert.doesNotMatch(game,/class="loadout-note/);
+});
+
+test('combat loadout heading totals equipped attribute perks',()=>{
+  const helper=game.slice(game.indexOf('  function combatLoadoutEffects('),game.indexOf('  function renderGear('));
+  const context={};vm.createContext(context);vm.runInContext(helper,context);
+  const effects=items=>JSON.parse(vm.runInContext('JSON.stringify(combatLoadoutEffects('+JSON.stringify(items)+'))',context));
+  assert.deepEqual(effects([]),[]);
+  assert.deepEqual(effects([{stat:'power',bonus:2}]),['+2 POWER']);
+  assert.deepEqual(effects([{stat:'chin',bonus:2},{stat:'chin',bonus:4}]),['+6 CHIN']);
+  assert.deepEqual(effects([{stat:'cardio',bonus:2},{stat:'power',bonus:9}]),['+9 POWER','+2 CARDIO']);
+  assert.deepEqual(effects([{auraBonus:3}]),[]);
 });
 
 test('each loadout category owns one distinct career effect',()=>{
