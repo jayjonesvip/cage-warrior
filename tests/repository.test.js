@@ -1171,8 +1171,19 @@ test('matchup opens as a Las Vegas promo poster with event billing',()=>{
   assert.match(styles,/\.matchup-poster-title span\{[^}]*font-family:"Bebas Neue",Impact[^}]*white-space:nowrap/);
 });
 
+test('matchup shows public cosmetic kits and keeps actions outside its scroll body',()=>{
+  assert.match(html,/id="tapePlayerSkin"/);
+  assert.match(html,/id="tapeOpponentSkin"/);
+  assert.match(game,/renderTapeFightSkin\('#tapePlayerSkin',f\.playerAura\)/);
+  assert.match(game,/renderTapeFightSkin\('#tapeOpponentSkin',f\.o\.network\?f\.o\.aura:0\)/);
+  assert.match(game,/Number\(profile\.fight_skin_aura\)/);
+  assert.match(game,/fightSkinAura:Math\.floor\(effectiveAura\(\)\)/);
+  assert.match(styles,/\.matchup-promo-card \.matchup-poster\{flex:1 1 auto;overflow-y:auto/);
+  assert.match(styles,/\.tape-fight-skin-items\{display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+});
+
 test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
-  assert.match(html,/class="matchup-tools"[\s\S]*id="tapeStatsToggle"[^>]*>TALE OF THE TAPE<\/button>[\s\S]*id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
+  assert.match(html,/class="matchup-tools"[\s\S]*id="tapeStatsToggle"[^>]*>COMPARE STATS<\/button>[\s\S]*id="tapeTermsToggle"[^>]*>FIGHT DETAILS<\/button>/);
   assert.match(html,/id="tapeStatsPanel"[\s\S]*id="tapeAttributes"/);
   assert.match(html,/id="tapeBreakdownTitle">FIGHT DETAILS<\/h2>/);
   assert.ok(html.indexOf('id="tapeStatsToggle"')<html.indexOf('class="matchup-poster"'));

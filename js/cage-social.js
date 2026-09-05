@@ -24,6 +24,7 @@
         p_fighter_avatar:profile.fighterAvatar
       });
       const base=Array.isArray(data)?data[0]||null:data;
+      if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
       const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
@@ -39,6 +40,7 @@
         p_losses:profile.losses
       });
       const base=Array.isArray(data)?data[0]||null:data;
+      if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
       const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
