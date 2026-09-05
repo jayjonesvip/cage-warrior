@@ -334,7 +334,7 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   contacts.forEach(contact=>{assert.equal(contact.win.length,10,`${contact.name} needs ten win texts`);assert.equal(contact.loss.length,10,`${contact.name} needs ten loss texts`);assert.ok(contact.titleWin.length>=3,`${contact.name} needs varied title texts`)});
 });
 
-test('beating Vaso unlocks and opens the persistent Diego first contract',()=>{
+test('legacy Diego presentation assets remain available while contract eligibility is controlled by core logic',()=>{
   assert.match(game,/key:'first-contract-diego-ramos-br',name:'DiegoRamosBR'/);
   assert.match(game,/assets\/opponents\/diego-ramos-br\.png/);
   assert.match(game,/firstContractUnlocked=LOGIC\.firstContractUnlockEligible\(\{won:win,rookieShowcase:o\.rookieShowcase===true\}\)/);

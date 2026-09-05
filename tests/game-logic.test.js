@@ -95,10 +95,11 @@ test('first-fight tutorial migration hides guidance for established careers',()=
   assert.equal(logic.normalizeCoreState(state({wins:0,losses:0}),defaults,{wins:0,losses:0,postFightTutorialSeen:true}).postFightTutorialSeen,true);
 });
 
-test('first contract unlocks from a Vaso win and migrates a one-win rookie save',()=>{
-  assert.equal(logic.firstContractUnlockEligible({won:true,rookieShowcase:true}),true);
+test('Vaso wins do not unlock Diego and existing pending contracts are retired',()=>{
+  assert.equal(logic.firstContractUnlockEligible({won:true,rookieShowcase:true}),false);
   assert.equal(logic.firstContractUnlockEligible({won:false,rookieShowcase:true}),false);
-  assert.equal(logic.firstContractPending({nameLocked:true,level:1,wins:1,losses:0}),true);
+  assert.equal(logic.firstContractPending({nameLocked:true,level:1,wins:1,losses:0}),false);
+  assert.equal(logic.firstContractPending({savedPending:true,nameLocked:true,level:1,wins:1,losses:0}),false);
   assert.equal(logic.firstContractPending({savedPending:false,nameLocked:true,level:1,wins:1,losses:0}),false);
   assert.equal(logic.firstContractPending({nameLocked:true,level:2,wins:1,losses:0}),false);
 });

@@ -222,13 +222,13 @@
     return points;
   }
 
-  function firstContractPending({savedPending,nameLocked=false,level=1,wins=0,losses=0}={}){
-    if(typeof savedPending==='boolean')return savedPending;
-    return nameLocked===true&&whole(level,1)===1&&nonNegativeWhole(wins)===1&&nonNegativeWhole(losses)===0;
+  function firstContractPending(){
+    // Retire pending Diego contracts from existing saves; Vaso is the only scripted starter.
+    return false;
   }
 
-  function firstContractUnlockEligible({won=false,rookieShowcase=false}={}){
-    return won===true&&rookieShowcase===true;
+  function firstContractUnlockEligible(){
+    return false;
   }
 
   function lowerLevelFollowerPenalty(followers,{won=false,forfeited=false,playerLevel=1,opponentLevel=1}={}){
