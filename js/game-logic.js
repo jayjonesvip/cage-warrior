@@ -589,13 +589,20 @@
     return {heading:'CHECKING THE CHAMPION…',meta:'Title update loading',state:'loading'};
   }
 
-  function rankingFightEntry({won=false,playerLevel=1,opponentLevel=1,ranked=false,championship=false}={}){
-    const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),quality=clamp(50+levelDifference*10+(ranked?5:0)+(championship?15:0),0,100);
+  function rankingFightEntry({won=false,playerLevel=1,opponentLevel=1,ranked=false,championship=false,opponentRank=0}={}){
+    const rank=whole(opponentRank),levelDifference=whole(opponentLevel,1)-whole(playerLevel,1);
+    // Snapshot rank at booking: defenses are graded by challenger rank, not title status.
+    const base=rank>0?(rank===1?95:rank<=5?90:rank<=10?80:rank<=25?65:rank<=50?50:rank<=100?40:30):(ranked||championship?35:20);
+    const quality=clamp(base+clamp(levelDifference*2,-10,5),0,rank>0||ranked||championship?100:25);
     return {won:won===true,quality};
   }
 
   function rankingComponents(profile){
-    const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses,winPercentage=fights?wins/fights:0,provenWinPercentage=fights?(wins+2)/(fights+4):0,history=(Array.isArray(profile?.rankingHistory)?profile.rankingHistory:[]).filter(entry=>entry&&typeof entry==='object').slice(-10),recentScore=history.length?history.filter(entry=>entry.won===true).length/history.length*100:provenWinPercentage*100,qualityWins=history.filter(entry=>entry.won===true),qualityScore=qualityWins.length?qualityWins.reduce((sum,entry)=>sum+clamp(finite(entry.quality,50),0,100),0)/qualityWins.length:50,attributeTotal=Math.max(20,finite(profile?.attributeTotal,20+Math.max(0,whole(profile?.level,1)-1))),resumeScore=provenWinPercentage*75+Math.min(fights,50)/50*25,skillScore=clamp(attributeTotal/150*100,0,100),score=resumeScore*.5+qualityScore*.25+recentScore*.15+skillScore*.1;
+    const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),fights=wins+losses,winPercentage=fights?wins/fights:0,provenWinPercentage=fights?(wins+2)/(fights+4):0;
+    const history=(Array.isArray(profile?.rankingHistory)?profile.rankingHistory:[]).filter(entry=>entry&&typeof entry.won==='boolean').slice(-30),recent=history.slice(-10),quality=entry=>clamp(finite(entry.quality,20),0,100),qualityWins=history.filter(entry=>entry.won),bestWins=qualityWins.map(quality).sort((a,b)=>b-a).slice(0,5);
+    const qualityScore=history.length?(bestWins.reduce((sum,value)=>sum+value,0)/5*.7+(qualityWins.length?qualityWins.reduce((sum,entry)=>sum+quality(entry),0)/qualityWins.length:0)*.3):20;
+    const recentScore=recent.length?recent.reduce((sum,entry)=>sum+(entry.won?50+quality(entry)*.5:quality(entry)*.3),0)/recent.length:provenWinPercentage*100;
+    const attributeTotal=Math.max(20,finite(profile?.attributeTotal,20+Math.max(0,whole(profile?.level,1)-1))),resumeScore=provenWinPercentage*75+Math.min(wins,50)/50*25,skillScore=clamp(attributeTotal/150*100,0,100),score=resumeScore*.30+qualityScore*.45+recentScore*.20+skillScore*.05;
     return {score,resumeScore,qualityScore,recentScore,skillScore,attributeTotal,winPercentage,provenWinPercentage,fights};
   }
 

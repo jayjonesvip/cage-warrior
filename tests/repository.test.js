@@ -162,7 +162,7 @@ test('World Rank uses fight quality, recent form, and permanent attributes witho
   assert.match(game,/rankingHistory:state\.rankingHistory/);
   assert.match(game,/LOGIC\.rankingFightEntry\(\{won:win/);
   assert.doesNotMatch(game,/attributeTotal:[^;\n]*(effectiveStat|equippedGear)/);
-  assert.match(read('README.md'),/50% résumé, 25% quality of defeated opposition, 15% recent form, and 10% permanent base attributes/);
+  assert.match(read('README.md'),/30% résumé, 45% quality of defeated opposition, 20% recent form, and 5% permanent base attributes/);
   const migration=read('supabase/migrations/20260902120000_hybrid_world_rank.sql');
   assert.match(migration,/add column if not exists attribute_total integer not null default 20/);
   assert.match(migration,/add column if not exists ranking_history jsonb not null default '\[\]'::jsonb/);

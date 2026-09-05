@@ -465,14 +465,33 @@ test('hybrid ranking requires a proven record before rewarding an undefeated per
     {id:'prospect',handle:'Prospect',level:5,wins:12,losses:1,attributeTotal:25},
     {id:'veteran',handle:'Veteran',level:15,wins:51,losses:27,attributeTotal:76}
   ],null,25);
-  assert.deepEqual(ranked.map(row=>row.id),['veteran','prospect','one-fight']);
+  assert.deepEqual(ranked.map(row=>row.id),['prospect','veteran','one-fight']);
   assert.ok(ranked[2].provenWinPercentage<ranked[2].winPercentage);
 });
 
 test('ranking fight history grades opponent difficulty deterministically',()=>{
-  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}),{won:true,quality:50});
-  assert.deepEqual(logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true}),{won:false,quality:75});
-  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:12,championship:true}),{won:true,quality:85});
+  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}),{won:true,quality:20});
+  assert.deepEqual(logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true,opponentRank:5}),{won:false,quality:94});
+  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:12,championship:true,opponentRank:1}),{won:true,quality:99});
+});
+
+test('rank snapshots drive quality and title defenses do not inflate weak opposition',()=>{
+  const event={won:true,playerLevel:8,opponentLevel:8,ranked:true};
+  assert.ok(logic.rankingFightEntry({...event,opponentRank:2}).quality>logic.rankingFightEntry({...event,opponentRank:80}).quality+40);
+  assert.deepEqual(logic.rankingFightEntry({...event,opponentRank:80,championship:true}),logic.rankingFightEntry({...event,opponentRank:80}));
+  assert.ok(logic.rankingFightEntry({...event,ranked:false,opponentLevel:99}).quality<=25);
+});
+
+test('ranked wins outweigh circuit farming and major wins survive ten newer bouts',()=>{
+  const entry=rank=>logic.rankingFightEntry({won:true,ranked:rank>0,opponentRank:rank}),circuit=Array.from({length:10},()=>entry(0)),profile={wins:20,losses:4,attributeTotal:50};
+  const farmer=logic.rankingComponents({...profile,wins:50,losses:0,rankingHistory:circuit});
+  const contender=logic.rankingComponents({...profile,rankingHistory:Array.from({length:10},()=>entry(5))});
+  assert.ok(contender.score>farmer.score+15);
+  const major=logic.rankingComponents({...profile,rankingHistory:[entry(2),...circuit]});
+  assert.ok(major.qualityScore>logic.rankingComponents({...profile,rankingHistory:circuit}).qualityScore);
+  const harsh=logic.rankingComponents({...profile,rankingHistory:[{won:false,quality:20}]}),tough=logic.rankingComponents({...profile,rankingHistory:[{won:false,quality:90}]});
+  assert.ok(tough.recentScore>harsh.recentScore);
+  assert.ok(logic.rankingComponents({...profile,losses:40}).resumeScore<logic.rankingComponents(profile).resumeScore);
 });
 
 test('the champion can take normal ranked fights after completing the daily defense',()=>{
