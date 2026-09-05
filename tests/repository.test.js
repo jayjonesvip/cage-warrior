@@ -875,16 +875,16 @@ test('daily fights use a twelve-bout limit with one three-fight qualifying strea
   assert.match(rules,/"dailyFightLimit": 12/);
   assert.match(rules,/"dailyBonusQualifyingWinStreak": 5/);
   assert.match(rules,/"dailyBonusFights": 3/);
-  assert.match(game,/function updateDailyBonusStreak\(won,opponentLevel,playerLevel\)/);
-  assert.match(game,/LOGIC\.applyDailyFightStreak\(state\.dailyCounters,\{won,opponentLevel,playerLevel,requiredStreak:DAILY_BONUS_WIN_STREAK\}\)\.awarded/);
-  assert.match(logic,/const qualifies=won===true&&whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
+  assert.match(game,/function updateDailyBonusStreak\(won,opponentLevel,playerLevel,ranks=\{\}\)/);
+  assert.match(game,/LOGIC\.applyDailyFightStreak\(state\.dailyCounters,\{won,opponentLevel,playerLevel,...ranks,requiredStreak:DAILY_BONUS_WIN_STREAK\}\)\.awarded/);
+  assert.match(logic,/const qualifies=won===true&&\(whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
   assert.match(logic,/counters\.bonusFightAwarded!==true&&counters\.qualifyingWinStreak>=target/);
   assert.match(html,/id="dailyHeatResult"/);
   assert.match(html,/id="dailyHeatResultPips"/);
   assert.match(game,/function renderDailyHeatResult\(/);
   assert.match(game,/LOWER-LEVEL WIN NOT ELIGIBLE/);
   assert.match(game,/BONUS FIGHTS UNLOCKED/);
-  assert.match(game,/renderDailyHeatResult\(\{won:win,lowerLevelWin,forfeited:!!fight\.forfeited,dailyStreakBefore,dailyBonusAwarded\}\)/);
+  assert.match(game,/renderDailyHeatResult\(\{won:win,lowerLevelWin,rankRepeatExhausted:.*?,forfeited:!!fight\.forfeited,dailyStreakBefore,dailyBonusAwarded\}\)/);
   assert.match(styles,/\.daily-heat-result-pips\{display:grid;grid-template-columns:repeat\(5,1fr\)/);
   assert.doesNotMatch(game,/kind:'streak'|-FIGHT WIN STREAK/);
   assert.doesNotMatch(styles,/\.win-streak-bonus/);
@@ -1128,7 +1128,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
   for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
   assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
-  assert.match(html,/on-level wins earn 1 Attribute Point, higher-level wins earn 2, and lower-level wins earn none/);
+  assert.match(html,/on-level wins earn 1 Attribute Point; higher-level or higher-ranked wins earn 2/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 
