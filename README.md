@@ -14,6 +14,8 @@ The career is intentionally centered on one repeatable loop:
 
 Traditional training, manual resting, recovery-room treatments, side jobs, gambling, and the money economy are not part of the current game. Open Gym sparring is a reward-free scouting tool and does not alter career resources or results.
 
+Open Gym's Scout a Fighter picker lists the top 25 World Ranked fighters, excluding your own fighter. Selecting a fighter copies the same opponent attributes and style used by ranked bouts into a sparring clone; the copy stays fixed while you plan and spar. Returning to the gym refreshes the selected matchup. This is not an official bout and never changes either fighter's record. The timed one-round spar and latest coaching report remain available, with the last report saved until another session completes. If ranked fighters are unavailable, sparring stays disabled instead of substituting a generated opponent.
+
 ## Navigation
 
 The five-item navigation is Home, Fight, Gym, Gear, and Feed. The five primary pages are:

@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.148';
+  const ICON_ASSET_VERSION = '2.7.149';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -53,7 +53,7 @@
     gear:[],gearCounts:{},gearSeed:Math.floor(Math.random()*0xffffffff),gearWinsSinceDrop:0,dailyCounters:{date:'',fight:0,qualifyingWinStreak:0,bonusFightAwarded:false},dailyOpponentWins:{date:'',wins:{}},
     activeEndorsement:null,endorsementHistory:[],sponsorAnnouncementPending:'',lastSave:Date.now(),lastDaily:'',installDetected:false,installRewardClaimed:false,
     socialAccountCreated:false,socialFeed:[],socialCycle:0,socialPostedCycle:0,socialSerial:0,socialLastReadSerial:0,socialLastMentionSerial:0,socialProfileId:'',socialLastRemotePostId:0,socialLastRemoteMentionPostId:0,socialConsumedChallengePostIds:[],socialChallengeResults:{},socialRemoteInitialized:false,socialFollowingCount:0,socialHeadlineCounts:{},ceoEvents:[],ceoBonusDate:'',lastTitleLossSeenId:0,hasHeldWorldTitle:false,
-    pendingFight:null,pendingChampionshipResult:null,fightPlanPreference:{pace:'slow',offense:'conservative',tactics:'stick'},sparringPlan:{pace:'slow',offense:'conservative',tactics:'stick'},sparringTarget:'level',lastSparringReport:null,
+    pendingFight:null,pendingChampionshipResult:null,fightPlanPreference:{pace:'slow',offense:'conservative',tactics:'stick'},sparringPlan:{pace:'slow',offense:'conservative',tactics:'stick'},sparringTarget:'',lastSparringReport:null,
     roster:[],rosterSerial:0,circuitLossStreak:0,fighterStyle:'',fighterCity:'',fighterAvatar:'',fighterBaseStats:null,fighterDraftAvatar:'',fighterDraftStats:null,equippedGear:[],equippedPerks:[],leagueInitialized:false
   };
 
@@ -68,7 +68,7 @@
   let audioCtx = null;
   let currentScreen = 'home';
   let sparringSession = null;
-  let sparringPartnerNames = {};
+  let sparringSnapshot = null;
   const FIGHT_RANKING_BATCH_SIZE=50;
   let visibleFightRankingCount=FIGHT_RANKING_BATCH_SIZE;
   let attributeAssignmentExpanded = false;
@@ -299,7 +299,7 @@
       const legacySponsorId=ENDORSEMENT_IDS.includes(source.activeEndorsement?.id)?source.activeEndorsement.id:'',legacySponsorHistory=Array.isArray(source.endorsementHistory)?source.endorsementHistory:[],sponsor=LOGIC.sponsorProgress(endorsementDefs,s.fans,[...legacySponsorHistory,legacySponsorId].filter(Boolean)),pendingSponsorId=ENDORSEMENT_IDS.includes(source.sponsorAnnouncementPending)?source.sponsorAnnouncementPending:'';s.activeEndorsement=sponsor.active?{id:sponsor.active.id}:null;s.endorsementHistory=sponsor.history;s.sponsorAnnouncementPending=pendingSponsorId===s.activeEndorsement?.id?pendingSponsorId:'';
       delete s.fightInjury;
       s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
-      const normalizePlan=value=>{const plan=value&&typeof value==='object'?value:{};return {pace:['slow','fast'].includes(plan.pace)?plan.pace:'slow',offense:['conservative','aggressive'].includes(plan.offense)?plan.offense:'conservative',tactics:['stick','adapt'].includes(plan.tactics)?plan.tactics:'stick'}};s.fightPlanPreference=normalizePlan(source.fightPlanPreference);s.sparringPlan=normalizePlan(source.sparringPlan);s.sparringTarget=['level','next','champion','contender'].includes(source.sparringTarget)?source.sparringTarget:'level';const savedSpar=source.lastSparringReport&&typeof source.lastSparringReport==='object'?source.lastSparringReport:null;s.lastSparringReport=savedSpar&&['A','B','C','D'].includes(savedSpar.grade)?{createdAt:Math.max(0,Math.floor(Number(savedSpar.createdAt))||0),target:String(savedSpar.target||'').slice(0,16),opponent:String(savedSpar.opponent||'').slice(0,32),opponentMeta:String(savedSpar.opponentMeta||'').slice(0,60),grade:savedSpar.grade,plan:normalizePlan(savedSpar.plan),recognition:String(savedSpar.recognition||'').slice(0,180),headline:String(savedSpar.headline||'').slice(0,120),attribute:String(savedSpar.attribute||'').slice(0,20),attributeAdvice:String(savedSpar.attributeAdvice||'').slice(0,160),planAdvice:String(savedSpar.planAdvice||'').slice(0,180)}:null;delete s.opponentFilter;delete s.fightModePreference;
+      const normalizePlan=value=>{const plan=value&&typeof value==='object'?value:{};return {pace:['slow','fast'].includes(plan.pace)?plan.pace:'slow',offense:['conservative','aggressive'].includes(plan.offense)?plan.offense:'conservative',tactics:['stick','adapt'].includes(plan.tactics)?plan.tactics:'stick'}};s.fightPlanPreference=normalizePlan(source.fightPlanPreference);s.sparringPlan=normalizePlan(source.sparringPlan);s.sparringTarget=/^[0-9a-f-]{36}$/i.test(String(source.sparringTarget||''))?source.sparringTarget:'';const savedSpar=source.lastSparringReport&&typeof source.lastSparringReport==='object'?source.lastSparringReport:null;s.lastSparringReport=savedSpar&&['A','B','C','D'].includes(savedSpar.grade)?{createdAt:Math.max(0,Math.floor(Number(savedSpar.createdAt))||0),target:String(savedSpar.target||'').slice(0,64),opponent:String(savedSpar.opponent||'').slice(0,32),opponentMeta:String(savedSpar.opponentMeta||'').slice(0,60),grade:savedSpar.grade,plan:normalizePlan(savedSpar.plan),recognition:String(savedSpar.recognition||'').slice(0,180),headline:String(savedSpar.headline||'').slice(0,120),attribute:String(savedSpar.attribute||'').slice(0,20),attributeAdvice:String(savedSpar.attributeAdvice||'').slice(0,160),planAdvice:String(savedSpar.planAdvice||'').slice(0,180)}:null;delete s.opponentFilter;delete s.fightModePreference;
       const pendingTitle=source.pendingChampionshipResult&&typeof source.pendingChampionshipResult==='object'?source.pendingChampionshipResult:null;s.pendingChampionshipResult=pendingTitle&&Number.isSafeInteger(Number(pendingTitle.challengeId))&&/^[0-9a-f-]{36}$/i.test(String(pendingTitle.challengerId||''))?{challengeId:Number(pendingTitle.challengeId),challengerId:String(pendingTitle.challengerId),challengerWon:pendingTitle.challengerWon===true,mode:['challenge','defense','rematch'].includes(pendingTitle.mode)?pendingTitle.mode:'challenge'}:null;
       delete s.focusTextDeck;delete s.lastFocusTextId;delete s.focusInterruptionDeck;delete s.lastFocusInterruptionId;
       s.socialAccountCreated=typeof source.socialAccountCreated==='boolean'?source.socialAccountCreated:(Number(s.fans)||0)>0;s.socialFeed=Array.isArray(s.socialFeed)?s.socialFeed.filter(p=>p&&typeof p==='object').slice(0,30):[];s.socialCycle=Math.max(0,Math.floor(Number(s.socialCycle))||0);s.socialPostedCycle=clamp(Math.floor(Number(s.socialPostedCycle))||0,0,s.socialCycle);s.socialSerial=Math.max(s.socialFeed.length,Math.floor(Number(s.socialSerial))||0);s.socialLastReadSerial=source.socialLastReadSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastReadSerial))||0,0,s.socialSerial);s.socialLastMentionSerial=source.socialLastMentionSerial===undefined?s.socialSerial:clamp(Math.floor(Number(source.socialLastMentionSerial))||0,0,s.socialSerial);s.socialProfileId=typeof source.socialProfileId==='string'&&/^[0-9a-f-]{36}$/i.test(source.socialProfileId)?source.socialProfileId:'';s.socialLastRemotePostId=Math.max(0,Math.floor(Number(source.socialLastRemotePostId))||0);s.socialLastRemoteMentionPostId=source.socialLastRemoteMentionPostId===undefined?s.socialLastRemotePostId:Math.max(0,Math.floor(Number(source.socialLastRemoteMentionPostId))||0);s.socialConsumedChallengePostIds=Array.isArray(source.socialConsumedChallengePostIds)?[...new Set(source.socialConsumedChallengePostIds.filter(id=>typeof id==='string'&&/^shared-\d+$/.test(id)))].slice(-100):[];const savedChallengeResults=source.socialChallengeResults&&typeof source.socialChallengeResults==='object'&&!Array.isArray(source.socialChallengeResults)?source.socialChallengeResults:{};s.socialChallengeResults=Object.fromEntries(Object.entries(savedChallengeResults).filter(([id,winner])=>/^shared-\d+$/.test(id)&&typeof winner==='string'&&winner.length<=33).slice(-100));s.socialRemoteInitialized=source.socialRemoteInitialized===true;s.socialFollowingCount=Math.max(0,Math.floor(Number(source.socialFollowingCount))||0);const savedHeadlineCounts=source.socialHeadlineCounts&&typeof source.socialHeadlineCounts==='object'&&!Array.isArray(source.socialHeadlineCounts)?source.socialHeadlineCounts:{};s.socialHeadlineCounts={};for(const key of ['fightWin','fightStreak','fightLoss','lowerLevelWin'])s.socialHeadlineCounts[key]=Math.max(0,Math.floor(Number(savedHeadlineCounts[key]))||0);s.ceoEvents=Array.isArray(source.ceoEvents)?[...new Set(source.ceoEvents.filter(key=>typeof key==='string'&&key.length<=40))].slice(-40):[];s.ceoBonusDate=typeof source.ceoBonusDate==='string'?source.ceoBonusDate:'';s.lastTitleLossSeenId=Math.max(0,Math.floor(Number(source.lastTitleLossSeenId))||0);s.hasHeldWorldTitle=source.hasHeldWorldTitle===true;if(!s.socialAccountCreated)s.socialFollowingCount=0;
@@ -869,11 +869,11 @@
     const historyMode=arguments[1]||'push';
     if(!(state.fighterStyle&&state.fighterCity&&state.fighterAvatar&&validFighterAllocation(state.fighterBaseStats)))screen='home';
     if(screen==='feed'&&!ensureSocialFeed())createSocialAccount();
-    if(screen==='gym'&&currentScreen!=='gym'&&!sparringSession)refreshSparringPartnerNames();
+    if(screen==='gym'&&currentScreen!=='gym'&&!sparringSession)sparringSnapshot=null;
     const changed=currentScreen!==screen;if(changed&&screen==='fight')visibleFightRankingCount=FIGHT_RANKING_BATCH_SIZE;currentScreen=screen;$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen));if(changed)trackEvent('game_screen_view',{screen_name:screen});
     if(changed&&historyMode!=='none')writeHistory('screen',historyMode);
     if(screen==='feed')connectSharedSocial(true);else{clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null}
-    sfx.tap();updateUI();if(screen==='fight'&&state.nameLocked)queueMicrotask(()=>connectSharedSocial(true));const appScroll=$('.app-scroll');if(appScroll)appScroll.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
+    sfx.tap();updateUI();if((screen==='fight'||screen==='gym')&&state.nameLocked)queueMicrotask(()=>connectSharedSocial(true));const appScroll=$('.app-scroll');if(appScroll)appScroll.scrollTop=0;if(screen==='feed')$('#socialTimeline').scrollTop=0;
   }
 
   function initStickyDashboard(){
@@ -999,39 +999,11 @@
   function plannedStyleForRound(sim,round){const signature=state.fighterStyle||'striker';return sim.gamePlan?.tactics==='adapt'&&round>1?responsePlanId(sim.o.tendency):signature}
   function adaptationModifier(sim,round){if(sim.gamePlan?.tactics!=='adapt'||round===1)return 0;const focus=Number(sim.focus)||80,execution=focus>=95?.04:focus>=85?.02:focus>=70?0:focus>=60?-.04:-.08;return execution+(round===2?-.025:0)}
   function assessFightPlan(sim=fight,adaptationScale=.5){return LOGIC.fightPlanAssessment({player:sim?.player,opponent:sim?.opp,plan:sim?.gamePlan,fighterStyle:state.fighterStyle,opponentStyle:sim?.o?.tendency,focus:sim?.focus,adaptationScale})}
-  function generatedSparOpponent(tier,key,label){
-    const level=Math.max(1,Math.floor(Number(tier))||1),seed=hashSeed(`open-gym|${key}|${level}|${state.name}`),serial=1+seed%997,arch=rosterPick(opponentArchetypes,seed),identity=generatedOpponentIdentity(seed),ratings=generatedOpponentRatings(level,serial,seed,arch,1);
-    return {key,name:label||identity.name,tier:level,tag:arch.tag,archetype:arch.id,tendency:arch.tendency,...ratings};
-  }
-  function sparringMatchups(){
-    const circuit=opponents.find(item=>item.circuitFallback&&item.tier===state.level)||generatedSparOpponent(state.level,'level'),playerIsChampion=sharedChampionship?.is_champion===true;
-    const levelTarget={id:'level',label:'YOUR LEVEL',meta:`LEVEL ${state.level} · ${circuit.tag||'MIXED STYLE'}`,opponent:circuit};
-    if(playerIsChampion){
-      const contender=opponents.find(item=>item.network)||generatedSparOpponent(Math.max(1,state.level),'contender','#1 Contender');
-      return [levelTarget,{id:'contender',label:'#1 CONTENDER',meta:`LEVEL ${contender.tier||state.level} · ${contender.tag||'RANKED STYLE'}`,opponent:contender}];
-    }
-    const next=generatedSparOpponent(state.level+1,'next'),champion=opponents.find(item=>item.sourceProfileId&&item.sourceProfileId===sharedChampionship?.champion_id)||generatedSparOpponent(sharedChampionship?.champion_level||Math.max(state.level+1,8),'champion',sharedChampionship?.champion_handle||'World Champion');
-    return [levelTarget,{id:'next',label:'NEXT LEVEL',meta:`LEVEL ${next.tier} · ${next.tag}`,opponent:next},{id:'champion',label:'WORLD CHAMPION',meta:`LEVEL ${champion.tier||sharedChampionship?.champion_level||state.level} · ${champion.tag||'CHAMPIONSHIP TEST'}`,opponent:champion}];
-  }
-  function refreshSparringPartnerNames(){
-    const previous=new Set(Object.values(sparringPartnerNames)),next={};
-    for(const id of ['level','next','champion','contender']){
-      let name='';
-      for(let attempt=0;attempt<100;attempt++){
-        const country=opponentNameCountries[Math.floor(Math.random()*opponentNameCountries.length)];
-        name=`${country.first[Math.floor(Math.random()*country.first.length)]} ${country.last[Math.floor(Math.random()*country.last.length)]}`;
-        if(!previous.has(name)&&!Object.values(next).includes(name))break;
-      }
-      next[id]=name;
-    }
-    sparringPartnerNames=next;
-  }
   function sparringTargets(){
-    if(!sparringPartnerNames.level)refreshSparringPartnerNames();
-    const labels={level:'EVEN MATCH',next:'STEP UP',champion:'CHAMPION SCOUT',contender:'CONTENDER SCOUT'};
-    return sparringMatchups().map(target=>{
-      const name=sparringPartnerNames[target.id],source=target.opponent;
-      return {...target,label:name,meta:`${labels[target.id]} · LVL ${source.tier} · ${source.tag||'MIXED STYLE'}`,mirror:['champion','contender'].includes(target.id)&&source.network?`Mirrors @${source.networkHandle||source.name}`:'',opponent:{...source,name}};
+    return currentRanking().fighters.slice(0,25).flatMap((profile,index)=>{
+      if(profile.id===state.socialProfileId||String(profile.handle||'').toLowerCase()===String(state.name||'').toLowerCase())return [];
+      const opponent=state.roster.find(item=>item.network&&item.sourceProfileId===profile.id)||networkOpponentFromProfile(profile,Number(profile.level));if(!opponent)return [];
+      return [{id:opponent.sourceProfileId,label:opponent.networkHandle||opponent.name,meta:`#${index+1} · LVL ${opponent.tier} · ${opponent.tag}`,opponent:{...opponent,worldRank:index+1}}];
     });
   }
   function sparPlanAdvice(assessment,plan){
@@ -1040,18 +1012,25 @@
   }
   function createSparringReport(target){
     const opponent=target.opponent,player={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')},assessment=LOGIC.fightPlanAssessment({player,opponent,plan:state.sparringPlan,fighterStyle:state.fighterStyle,opponentStyle:opponent.tendency,focus:85,adaptationScale:.5}),grade=assessment.score>=.42?'A':assessment.score>=.12?'B':assessment.score>=-.18?'C':'D',headlines={A:'YOU CONTROLLED THE ROUND',B:'THE PLAN HELD UP',C:'THE ROUND STAYED ON A KNIFE EDGE',D:'THE MATCHUP FOUND THE HOLES'},deficits={power:opponent.chin-player.power,speed:opponent.speed-player.speed,chin:opponent.power-player.chin,cardio:opponent.cardio-player.cardio},attribute=Object.entries(deficits).sort((a,b)=>b[1]-a[1])[0][0],attributeCopy={power:'More Power will make your clean entries matter against this opponent’s durability.',speed:'More Speed will help you win the first exchange and exit before the return.',chin:'More Chin will give you room to survive their hardest counters.',cardio:'More Cardio will keep your plan intact when the round accelerates.'};
-    return {createdAt:Date.now(),target:target.id,opponent:opponent.name,opponentMeta:target.meta,grade,plan:{...state.sparringPlan},headline:headlines[grade],attribute:attribute.toUpperCase(),attributeAdvice:attributeCopy[attribute],planAdvice:sparPlanAdvice(assessment,state.sparringPlan)};
+    return {createdAt:Date.now(),target:target.id,opponent:target.label,opponentMeta:target.meta,grade,plan:{...state.sparringPlan},headline:headlines[grade],attribute:attribute.toUpperCase(),attributeAdvice:attributeCopy[attribute],planAdvice:sparPlanAdvice(assessment,state.sparringPlan)};
   }
   function renderOpenGym(){
-    const choices=sparringTargets();if(!choices.some(choice=>choice.id===state.sparringTarget))state.sparringTarget=choices[0].id;$('#sparTargetChoices').innerHTML=choices.map(choice=>`<button class="spar-target${choice.id===state.sparringTarget?' active':''}" type="button" data-spar-target="${choice.id}" aria-pressed="${choice.id===state.sparringTarget}"><b>${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.meta)}</small>${choice.mirror?`<em>${escapeHtml(choice.mirror)}</em>`:''}</button>`).join('');$$('[data-spar-setting]').forEach(button=>{const active=state.sparringPlan[button.dataset.sparSetting]===button.dataset.sparValue;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+    const choices=sparringTargets();
+    if(sparringSnapshot&&sparringSnapshot.id!==state.sparringTarget)sparringSnapshot=null;
+    if(!sparringSnapshot){const saved=choices.find(choice=>choice.id===state.sparringTarget);if(saved)sparringSnapshot=structuredClone(saved)}
+    $('#sparTargetChoices').innerHTML=choices.length?choices.map(choice=>`<button class="spar-target${choice.id===state.sparringTarget?' active':''}" type="button" data-spar-target="${escapeHtml(choice.id)}" aria-pressed="${choice.id===state.sparringTarget}"><b>@${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.meta)}</small></button>`).join(''):'<p class="spar-picker-empty">No ranked fighters available. Connect to the Cage Network and return to scout the top 25.</p>';
+    $('#sparSelectedSummary').textContent=sparringSnapshot?`Sparring clone of @${sparringSnapshot.label}`:'Choose from the top 25 ranked fighters';
+    $('#sparSelectedMeta').textContent=sparringSnapshot?`${sparringSnapshot.meta} · MATCHUP SNAPSHOT`:'No official fight. No career impact.';
+    if(!sparringSnapshot)$('#sparFighterPicker').open=true;
+    $$('[data-spar-setting]').forEach(button=>{const active=state.sparringPlan[button.dataset.sparSetting]===button.dataset.sparValue;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
     renderSparringProgress();
-    const report=state.lastSparringReport,date=$('#sparReportDate'),output=$('#sparReport');if(!report){date.textContent='AWAITING SESSION';output.innerHTML='<div class="spar-report-empty">CHOOSE A TEST AND RUN YOUR FIRST SCOUT SPAR</div>';return}date.textContent=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(report.createdAt)).toUpperCase();const gradeClass=report.grade==='D'?'exposed':report.grade==='C'?'even':'';output.innerHTML=`<article class="spar-report-card"><header class="spar-report-head"><img class="spar-coach-avatar" src="assets/icons/coach-vega.png?v=${ICON_ASSET_VERSION}" alt="Coach Vega"><span><small class="spar-coach-label">COACH VEGA</small><b>${escapeHtml(report.headline)}</b><small>VS ${escapeHtml(report.opponent)} · ${escapeHtml(report.opponentMeta)}</small></span><strong class="spar-grade ${gradeClass}" aria-label="Scout grade ${report.grade}">${report.grade}</strong></header><div class="spar-report-body">${report.recognition?`<p class="spar-coach-recognition">${escapeHtml(report.recognition)}</p>`:''}<p>This is a coaching read, not an official result. The tape stays here until your next session.</p><div class="spar-report-grid"><div class="spar-report-note"><small>ATTRIBUTE PRIORITY · ${escapeHtml(report.attribute)}</small><b>${escapeHtml(report.attributeAdvice)}</b></div><div class="spar-report-note"><small>PLAN ADVICE</small><b>${escapeHtml(report.planAdvice)}</b></div></div></div></article>`;
+    const report=state.lastSparringReport,date=$('#sparReportDate'),output=$('#sparReport');if(!report){date.textContent='AWAITING SESSION';output.innerHTML='<div class="spar-report-empty">CHOOSE A RANKED FIGHTER AND RUN YOUR FIRST SCOUT SPAR</div>';return}date.textContent=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(report.createdAt)).toUpperCase();const gradeClass=report.grade==='D'?'exposed':report.grade==='C'?'even':'';output.innerHTML=`<article class="spar-report-card"><header class="spar-report-head"><img class="spar-coach-avatar" src="assets/icons/coach-vega.png?v=${ICON_ASSET_VERSION}" alt="Coach Vega"><span><small class="spar-coach-label">COACH VEGA</small><b>${escapeHtml(report.headline)}</b><small>VS ${escapeHtml(report.opponent)} · ${escapeHtml(report.opponentMeta)}</small></span><strong class="spar-grade ${gradeClass}" aria-label="Scout grade ${report.grade}">${report.grade}</strong></header><div class="spar-report-body">${report.recognition?`<p class="spar-coach-recognition">${escapeHtml(report.recognition)}</p>`:''}<p>This is a coaching read, not an official result. The tape stays here until your next session.</p><div class="spar-report-grid"><div class="spar-report-note"><small>ATTRIBUTE PRIORITY · ${escapeHtml(report.attribute)}</small><b>${escapeHtml(report.attributeAdvice)}</b></div><div class="spar-report-note"><small>PLAN ADVICE</small><b>${escapeHtml(report.planAdvice)}</b></div></div></div></article>`;
   }
-  function selectSparTarget(id){if(sparringSession||!sparringTargets().some(target=>target.id===id))return;state.sparringTarget=id;saveState();renderOpenGym();sfx.tap()}
+  function selectSparTarget(id){if(sparringSession)return;const target=sparringTargets().find(choice=>choice.id===id);if(!target)return;sparringSnapshot=structuredClone(target);state.sparringTarget=id;$('#sparFighterPicker').open=false;saveState();renderOpenGym();sfx.tap()}
   function selectSparSetting(setting,value){const allowed={pace:['slow','fast'],offense:['conservative','aggressive'],tactics:['stick','adapt']};if(sparringSession||!allowed[setting]?.includes(value))return;state.sparringPlan[setting]=value;saveState();renderOpenGym();sfx.tap()}
   function renderSparringProgress(){
     const session=sparringSession,active=!!session;
-    $('#sparSession').hidden=!active;$('#startSparBtn').disabled=active;$('#startSparBtn').textContent=active?'SPARRING IN PROGRESS…':'START ONE-ROUND SPAR';
+    $('#sparSession').hidden=!active;$('#startSparBtn').disabled=active||!sparringSnapshot;$('#startSparBtn').textContent=active?'SPARRING IN PROGRESS…':'START ONE-ROUND SPAR';
     $$('[data-spar-target], [data-spar-setting]').forEach(button=>button.disabled=active);
     if(!session)return;
     const percent=Math.min(100,Math.floor((performance.now()-session.startedAt)/10000*100));
@@ -1061,7 +1040,7 @@
   }
   function startSparringSession(){
     if(sparringSession||!state.nameLocked)return;
-    const target=sparringTargets().find(choice=>choice.id===state.sparringTarget)||sparringTargets()[0],career=state;
+    const target=sparringSnapshot,career=state;if(!target){toast('Choose a ranked fighter to scout.','#91b7a0');return}
     const report=createSparringReport(target);
     report.recognition=LOGIC.sparImprovement(state.lastSparringReport,report,state.sparringPlan);
     sparringSession={startedAt:performance.now(),phase:-1};renderSparringProgress();sfx.tap();
@@ -1532,7 +1511,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.148" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.149" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

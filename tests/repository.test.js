@@ -164,9 +164,35 @@ test('the five primary screens include the persistent Open Gym page',()=>{
 test('Open Gym runs reward-free scouting and persists the latest report',()=>{
   assert.match(html,/data-screen="gym"[\s\S]*?id="sparTargetChoices"[\s\S]*?id="sparReport"[\s\S]*?class="spar-action-dock"><button[^>]*id="startSparBtn"[\s\S]*?class="page-footer open-gym-footer"/);
   assert.match(html,/Test a matchup without spending Energy or affecting your record, rewards, ranking, or streaks/);
-  assert.match(game,/sparringTarget:'level',lastSparringReport:null/);
+  assert.match(game,/sparringTarget:'',lastSparringReport:null/);
   assert.match(game,/state\.lastSparringReport=report/);
-  assert.match(game,/playerIsChampion[\s\S]*?'contender'/);
+  assert.match(game,/currentRanking\(\).fighters.slice\(0,25\)/);
+  assert.match(game,/sparringSnapshot=structuredClone\(target\)/);
+  assert.match(game,/const target=sparringSnapshot,career=state/);
+});
+
+test('Open Gym lists only the top 25 ranked fighters, excludes self, and freezes selected clones',()=>{
+  const profiles=Array.from({length:30},(_,i)=>({id:'fighter-'+i,handle:'Fighter'+i,level:i+1}));
+  const source={network:true,sourceProfileId:'fighter-1',networkHandle:'Fighter1',name:'Fighter1',tier:2,tag:'GRAPPLER',tendency:'grappler',power:12,speed:9,chin:10,cardio:8};
+  const state={socialProfileId:'fighter-0',name:'Fighter0',roster:[source]};
+  const context={state,currentRanking:()=>({fighters:profiles}),networkOpponentFromProfile:p=>({...source,sourceProfileId:p.id,networkHandle:p.handle,tier:p.level}),structuredClone,$:()=>({open:true}),saveState:()=>{},renderOpenGym:()=>{},sfx:{tap:()=>{}}};
+  vm.createContext(context);
+  const targets=game.slice(game.indexOf('  function sparringTargets('),game.indexOf('  function sparPlanAdvice('));
+  const select=game.slice(game.indexOf('  function selectSparTarget('),game.indexOf('  function selectSparSetting('));
+  vm.runInContext('let sparringSession=null,sparringSnapshot=null;'+targets+select,context);
+  const choices=JSON.parse(vm.runInContext('JSON.stringify(sparringTargets())',context));
+  assert.equal(choices.length,24);
+  assert.equal(choices[0].id,'fighter-1');
+  assert.equal(choices[0].opponent.power,12);
+  assert.equal(choices[0].opponent.worldRank,2);
+  assert.equal(choices.at(-1).id,'fighter-24');
+  vm.runInContext('selectSparTarget("fighter-1")',context);
+  source.power=99;
+  assert.equal(vm.runInContext('sparringSnapshot.opponent.power',context),12);
+  vm.runInContext('sparringSession={};selectSparTarget("fighter-2")',context);
+  assert.equal(state.sparringTarget,'fighter-1');
+  profiles.length=0;
+  assert.equal(vm.runInContext('sparringTargets().length',context),0);
 });
 
 test('removed manual activity interfaces are absent',()=>{
