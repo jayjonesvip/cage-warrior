@@ -22,13 +22,23 @@
   const fmt = n => Math.floor(n).toLocaleString();
   const formatStat = value => Number.isFinite(Number(value))?String(Math.round(Number(value))):'0';
   const formatGain = value => String(Math.round(Number(value)||0));
+  const SUBMISSION_FINISHES=[
+    {id:'rear_naked_choke',name:'Rear-Naked Choke',call:'takes the back and sinks in the rear-naked choke'},
+    {id:'guillotine_choke',name:'Guillotine Choke',call:'snatches the neck and locks in the guillotine choke'},
+    {id:'armbar',name:'Armbar',call:'isolates the arm and extends the armbar'},
+    {id:'triangle_choke',name:'Triangle Choke',call:'traps the head and arm in a triangle choke'},
+    {id:'kimura',name:'Kimura',call:'pins the wrist and cranks the kimura'}
+  ];
+  function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
+  function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.129';
+  const ICON_ASSET_VERSION = '2.7.132';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
   const SAVE_BACKUP_KEY = 'cage-warrior-save-backup-v1';
   const GEAR_FILTER_KEY = 'cage-grind-gear-filter';
+  const REFERRAL_INVITER_KEY = 'cage-grind-referral-inviter';
   const STATE_VERSION = 31;
   const ENDORSEMENT_IDS = endorsementDefs.map(item=>item.id);
   let saveWarningShown = false;
@@ -107,6 +117,8 @@
   let retirementPending=false;
   let shareWinPending=false;
   let lastFightShareData=null;
+  let pendingReferralInviterId='';
+  let pendingReferralDrop=null;
   let pendingCeoPresentation=null;
   let pendingTitleLossPresentation=null;
   const HISTORY_KEY='cageGrind';
@@ -298,6 +310,15 @@
     const primary=readRaw(SAVE_KEY);careerSaveKnown=primary!==null;
     return LOGIC.selectStoredState({primary,backup:readRaw(SAVE_BACKUP_KEY),legacy:readRaw('fytr-save-v1')},normalizeState,defaultState);
   }
+  function normalizeReferralId(value){const id=String(value||'').trim();return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)?id:''}
+  function clearReferralInvite(){pendingReferralInviterId='';try{localStorage.removeItem(REFERRAL_INVITER_KEY)}catch{/* Referral storage is optional. */}}
+  function captureReferralInvite(){
+    let stored='';try{stored=localStorage.getItem(REFERRAL_INVITER_KEY)||''}catch{/* Referral storage is optional. */}
+    const url=new URL(window.location.href),incoming=normalizeReferralId(url.searchParams.get('invite'));
+    if(incoming){try{localStorage.setItem(REFERRAL_INVITER_KEY,incoming)}catch{/* The link still works for this session. */}url.searchParams.delete('invite');history.replaceState(history.state,'',`${url.pathname}${url.search}${url.hash}`)}
+    pendingReferralInviterId=incoming||normalizeReferralId(stored);
+    if(!LOGIC.isBlankCareer(state))clearReferralInvite();
+  }
   function recoveredStateFromProfile(profile){
     const avatar=fighterAvatars.find(item=>item.id===String(profile?.fighter_avatar||'')),name=normalizeIdentityName(profile?.handle),city=String(profile?.city||''),style=normalizeMajorArchetype(profile?.archetype);if(!profile?.id||!avatar||!name||!city||!style)return null;
     const stats=Object.assign({},avatar.stats),keys=['power','speed','chin','cardio'],baseTotal=keys.reduce((sum,key)=>sum+stats[key],0),targetTotal=Math.max(baseTotal,Math.floor(Number(profile.attribute_total))||baseTotal);for(let point=0;point<targetTotal-baseTotal;point++)stats[keys[point%keys.length]]++;
@@ -321,6 +342,7 @@
     cloudCareerSavePromise=SHARED_FEED.saveCareer(snapshot,expectedProfileId).then(()=>true).catch(error=>{if(error?.status===404||/save_cage_career|schema cache/i.test(String(error?.message||'')))cloudCareerEnabled=false;else cloudCareerSaveDirty=true;return false}).finally(()=>{cloudCareerSavePromise=null;if(cloudCareerSaveDirty)scheduleCloudCareerSave()});return cloudCareerSavePromise;
   }
   if(LOGIC.isBlankCareer(state))await restoreRemoteCareer();
+  captureReferralInvite();
   function saveState(){
     let current;try{current=localStorage.getItem(SAVE_KEY)}catch(e){current=undefined}
     if(!LOGIC.shouldPersistCareer(retirementPending,careerSaveKnown,current))return;
@@ -435,6 +457,12 @@
     for(let r=rank-1;!pool.length&&r>=minRank;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     for(let r=rank+1;!pool.length&&r<gearRarityOrder.length;r++){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
     if(!pool.length)return null;const item=chooseGear(pool,random);state.gear.push(item.id);state.gearCounts[item.id]=1;const autoEquipped=autoEquipNewDrop(item);ensureLoadout();return {item,rarity,count:1,isNew:true,autoEquipped,guaranteed:true,reason:'DAILY DROP'};
+  }
+  function awardReferralCollectible(referralId){
+    const random=seededRandom(hashSeed(`${state.gearSeed}|${referralId}|${state.level}|referral-drop-v1`));let rarity=rollGearRarity(state.level,random()),rank=gearRarityOrder.indexOf(rarity),pool=eligibleGearAtLevel(state.level,rarity);
+    for(let r=rank-1;!pool.length&&r>=0;r--){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
+    for(let r=rank+1;!pool.length&&r<gearRarityOrder.length;r++){rarity=gearRarityOrder[r];pool=eligibleGearAtLevel(state.level,rarity)}
+    if(!pool.length)return null;const item=chooseGear(pool,random);state.gear.push(item.id);state.gearCounts[item.id]=1;const autoEquipped=autoEquipNewDrop(item);ensureLoadout();return {item,rarity,count:1,isNew:true,autoEquipped,guaranteed:true,reason:'REFERRAL DROP'};
   }
   function victoryPackResultHtml({earned=false,eligible=false,steps=0,lowerLevel=false,repeatEligible=true,titleWon=false,firstCareerWin=false}={}){
     const progress=earned?4:clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),title=earned?'VICTORY PACK EARNED':eligible?`VICTORY PACK ${progress}/4`:'VICTORY PACK UNCHANGED';
@@ -644,7 +672,7 @@
     identityPending=true;renderCareer();
     try{
       const candidates=manualRequested?[requested]:identityClaimCandidates(requested),profile=await SHARED_FEED.claimIdentity(Object.assign(sharedProfilePayload(),{candidates}));if(!profile?.id||!normalizeIdentityName(profile.handle))throw new Error('Unique fighter name was not returned.');
-      state.name=normalizeIdentityName(profile.handle);state.nameLocked=true;state.rookieShowcasePending=true;state.firstContractPending=false;state.socialProfileId=profile.id;identitySuggestion='';identityManualMode=false;identityManualValue='';ensureRookieShowcaseOpponent();trackEvent('career_setup_step',{step:'name'});trackEvent('career_started',{archetype:state.fighterStyle,city:state.fighterCity,avatar:state.fighterAvatar});createSocialAccount();saveState();sfx.win();confettiBurst();toast(requested===state.name?`@${state.name} IS READY`:`@${requested} WAS TAKEN · @${state.name} IS YOURS`,'#76dcff');updateUI();offerRookieShowcase();connectSharedSocial(true);
+      state.name=normalizeIdentityName(profile.handle);state.nameLocked=true;state.rookieShowcasePending=true;state.firstContractPending=false;state.socialProfileId=profile.id;identitySuggestion='';identityManualMode=false;identityManualValue='';ensureRookieShowcaseOpponent();trackEvent('career_setup_step',{step:'name'});trackEvent('career_started',{archetype:state.fighterStyle,city:state.fighterCity,avatar:state.fighterAvatar});createSocialAccount();saveState();await registerPendingReferral();sfx.win();confettiBurst();toast(requested===state.name?`@${state.name} IS READY`:`@${requested} WAS TAKEN · @${state.name} IS YOURS`,'#76dcff');updateUI();offerRookieShowcase();connectSharedSocial(true);
     }catch(error){const unavailable=manualRequested&&/no unique cage grind name/i.test(String(error?.message||error));toast(unavailable?`@${requested} IS NOT AVAILABLE`:'NAME CHECK FAILED · TRY AGAIN WHEN CONNECTED','#ff766d');console.warn('Cage identity claim failed:',error)}finally{identityPending=false;renderCareer()}
   }
   function openRetirementDialog(){if(!state.nameLocked||retirementPending)return;$('#retireFighterName').textContent=`@${state.name}`;$('#retireCareerModal').classList.add('open');$('#retireCareerModal').setAttribute('aria-hidden','false');sfx.tap()}
@@ -682,6 +710,22 @@
   function fighterSessionMessage(error){const message=String(error?.message||error||'Cage Network unavailable.');if(/permanent fighter identity/i.test(message))return 'FIGHTER REGISTRATION MISSING · RECOVERY REQUIRED';if(/fighter (network )?session (missing|expired)/i.test(message))return 'FIGHTER NETWORK SESSION UNAVAILABLE · RECOVERY REQUIRED';if(/fighter (network )?(session disconnected|identity does not match)/i.test(message))return 'FIGHTER NETWORK IDENTITY DOES NOT MATCH THIS CAREER · RECOVERY REQUIRED';if(/No unique Cage Grind name was available/i.test(message))return 'FIGHTER NETWORK IDENTITY CONFLICT · RECOVERY REQUIRED';return message}
   function sharedProfileMatchesCareer(profile){return !!profile&&normalizeIdentityName(profile.handle)===state.name&&String(profile.city||'')===state.fighterCity&&normalizeMajorArchetype(profile.archetype)===state.fighterStyle&&String(profile.fighter_avatar||'')===state.fighterAvatar}
   async function syncSharedProfile(){const existing=await SHARED_FEED.loadOwnProfile(state.socialProfileId);if(existing){if(!sharedProfileMatchesCareer(existing))throw new Error('Fighter network identity does not match this saved career.');return SHARED_FEED.registerProfile(sharedProfilePayload())}if(!SHARED_FEED.claimIdentity)throw new Error('Create a permanent fighter identity before syncing');const profile=await SHARED_FEED.claimIdentity(Object.assign(sharedProfilePayload(),{candidates:[state.name]}));if(!sharedProfileMatchesCareer(profile))throw new Error('Fighter network identity does not match this saved career.');return profile}
+  function referralRpcUnavailable(error){return error?.status===404||/cage_fighter_referral|schema cache/i.test(String(error?.message||error||''))}
+  async function registerPendingReferral(){
+    if(!pendingReferralInviterId||!SHARED_FEED?.registerReferral)return false;
+    try{const registered=await SHARED_FEED.registerReferral(pendingReferralInviterId);trackEvent('fighter_referral_registered',{registered:registered===true});clearReferralInvite();return registered===true}
+    catch(error){if(!referralRpcUnavailable(error)){clearReferralInvite();console.warn('Cage referral registration failed:',error)}return false}
+  }
+  async function syncReferralRewards(){
+    if(!state.nameLocked||!SHARED_FEED?.qualifyReferral)return false;
+    try{
+      await registerPendingReferral();await SHARED_FEED.qualifyReferral();
+      if(pendingReferralDrop||pendingResultDrop||!SHARED_FEED.claimReferralReward||!eligibleGearAtLevel(state.level,'').length)return false;
+      const referral=await SHARED_FEED.claimReferralReward();if(!referral?.referralId)return false;
+      const drop=awardReferralCollectible(referral.referralId);if(!drop)return false;
+      pendingReferralDrop={drop,inviteeHandle:referral.inviteeHandle};saveState();updateUI();trackEvent('fighter_referral_reward_earned',{invitee_handle:referral.inviteeHandle,gear_id:drop.item.id});requestAnimationFrame(showPendingReferralDrop);return true;
+    }catch(error){if(!referralRpcUnavailable(error))console.warn('Cage referral reward sync failed:',error);return false}
+  }
   function scheduleSharedSocialRefresh(){clearTimeout(sharedSocialRefreshTimer);sharedSocialRefreshTimer=null;if(currentScreen==='feed'&&sharedSocialStatus==='ready')sharedSocialRefreshTimer=setTimeout(()=>connectSharedSocial(true),30000)}
   async function connectSharedSocial(force=false){
     if(!state.nameLocked||!SHARED_FEED?.configured?.())return false;
@@ -697,7 +741,7 @@
       if(postsLoaded&&state.socialAccountCreated&&!hasOwnRemotePost&&!state.socialRemoteInitialized){await SHARED_FEED.publishPost({kind:'player',body:'Hello, fight fans! Stay tuned—the climb starts now.'});posts=await SHARED_FEED.loadFeed(50)}
       state.socialRemoteInitialized=state.socialAccountCreated&&(hasOwnRemotePost||Array.isArray(posts)&&posts.some(post=>post.author_id===profile.id));
       sharedSocialProfiles=[profile,...rankedProfiles.filter(item=>item.id!==profile.id)];try{state.socialFollowingCount=await SHARED_FEED.loadProfileCount()}catch{state.socialFollowingCount=sharedSocialProfiles.length}sharedSocialInteractionsRemaining=Math.max(0,Math.min(5,Number(interactionsRemaining)||0));sharedSocialPosts=Array.isArray(posts)?posts.map(mapSharedPost):[];
-      sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderLanding();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();if(state.pendingChampionshipResult&&!championshipSettlementPromise)queueMicrotask(()=>settleChampionshipResult());requestAnimationFrame(showPendingTitleLoss);return true;
+      sharedSocialStatus='ready';sharedSocialError='';sharedSocialNoticeShown=false;saveState();renderSocial();renderLanding();renderCareer();renderOpponents();$('#cageStatus').textContent=cageStatus();scheduleSharedSocialRefresh();if(state.pendingChampionshipResult&&!championshipSettlementPromise)queueMicrotask(()=>settleChampionshipResult());queueMicrotask(syncReferralRewards);requestAnimationFrame(showPendingTitleLoss);return true;
     })().catch(error=>{
       sharedSocialStatus='error';sharedSocialError=fighterSessionMessage(error);sharedSocialPosts=[];sharedSocialProfiles=[];sharedSocialInteractionsRemaining=0;if(!landingFeature.status().championshipLoaded)landingFeature.setAvailability(null,true,true);renderSocial();renderLanding();renderOpponents();
       if(currentScreen==='feed'&&!sharedSocialNoticeShown){sharedSocialNoticeShown=true;toast('SHARED FEED SETUP PENDING · USING LOCAL FEED','#ffcf78')}
@@ -916,7 +960,7 @@
   function createFight(o){
     const P={name:state.name,power:effectiveStat('power'),speed:effectiveStat('speed'),chin:effectiveStat('chin'),cardio:effectiveStat('cardio')};
     const O={name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio};
-    return {o,player:P,opp:O,playerAura:Math.floor(effectiveAura()),opponentAura:opponentFightAura(o),playerCondition:LOGIC.startingFightCondition(state.health,state.maxHealth),oppCondition:100,healthLost:0,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',finishRound:FIGHT_ROUNDS,finishClock:'0:00',ended:false,mode:'planned',gamePlan:Object.assign({},state.fightPlanPreference),planAssessment:null,focus:80,plans:[],lastPlan:state.fighterStyle||'striker',openingApproach:null,tendencyRevealed:true,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[],rocked:{player:0,opp:0}};
+    return {o,player:P,opp:O,playerAura:Math.floor(effectiveAura()),opponentAura:opponentFightAura(o),playerCondition:LOGIC.startingFightCondition(state.health,state.maxHealth),oppCondition:100,healthLost:0,rounds:[],timeline:[],totals:{player:emptyFightStats(),opp:emptyFightStats()},winner:null,method:'DECISION',submissionMove:null,finishRound:FIGHT_ROUNDS,finishClock:'0:00',ended:false,mode:'planned',gamePlan:Object.assign({},state.fightPlanPreference),planAssessment:null,focus:80,plans:[],lastPlan:state.fighterStyle||'striker',openingApproach:null,tendencyRevealed:true,deepRead:false,crisisUsed:false,cornerTowel:false,haymakerMiss:false,finalDecisionPending:false,lastChanceResolved:false,pendingMoment:null,resolvedMoments:[],roundIntros:[],rocked:{player:0,opp:0}};
   }
 
   function planFamiliarity(styleId,planId){
@@ -994,7 +1038,7 @@
         sim.timeline.push({type:'action',round,clock,text,className,playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:kd,landed,side,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({landed,knockdown:kd}):0});
         if(landed&&type==='takedown'&&attackingStyle==='grappler'){
           const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,subChance=LOGIC.submissionFinishChance({speed:A.speed,opponentSpeed:D.speed,cardio:A.cardio,opponentCardio:D.cardio,targetCondition,signature:side==='player'&&state.fighterStyle==='grappler',rocked:defenderRocked});
-          if(Math.random()<subChance){sim.winner=side;sim.method='SUBMISSION';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'submission',round,clock,text:`TAP! ${A.name} locks in the submission and ${D.name} has nowhere to go!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({finish:'SUBMISSION'}):0})}
+          if(Math.random()<subChance){const submissionMove=selectSubmissionFinish();sim.winner=side;sim.method='SUBMISSION';sim.submissionMove=submissionMove;sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'submission',round,clock,text:`TAP! ${A.name} ${submissionMove.call}! ${D.name} has nowhere to go!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,big:true,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({finish:'SUBMISSION'}):0})}
         }
         if(!stopped){const targetCondition=side==='player'?sim.oppCondition:sim.playerCondition,koChance=landed?LOGIC.knockoutFinishChance({targetCondition,rocked:defenderRocked,knockdown:kd,damage,power:A.power,chin:D.chin}):0;if(koChance&&Math.random()<koChance){sim.winner=side;sim.method=targetCondition<=0?'KO':'TKO';sim.finishRound=round;sim.finishClock=clock;stopped=true;sim.timeline.push({type:'ko',round,clock,text:`IT'S OVER! ${A.name} gets the stoppage!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,healthDamage:side==='opp'?LOGIC.liveFightHealthDamage({finish:sim.method}):0})}}
         let newlyRocked='';
@@ -1204,7 +1248,7 @@
   function showFightEventToast(item){
     if(item.type==='rocked'){toast(`${String(item.fighterName||'FIGHTER').toUpperCase()} IS ROCKED!`,'#fff','','',1900,'fight-rocked-toast');return}
     if(!['ko','submission'].includes(item.type)||!fight?.winner)return;
-    const winner=fight.winner==='player'?fight.player:fight.opp,loser=fight.winner==='player'?fight.opp:fight.player,playerWon=fight.winner==='player',message=item.type==='submission'?`SUBMISSION · ${winner.name.toUpperCase()} FORCES ${loser.name.toUpperCase()} TO TAP`:`${fight.method} · ${winner.name.toUpperCase()} STOPS ${loser.name.toUpperCase()}`;
+    const winner=fight.winner==='player'?fight.player:fight.opp,loser=fight.winner==='player'?fight.opp:fight.player,playerWon=fight.winner==='player',message=item.type==='submission'?`${fightMethodLabel(fight).toUpperCase()} · ${winner.name.toUpperCase()} FORCES ${loser.name.toUpperCase()} TO TAP`:`${fight.method} · ${winner.name.toUpperCase()} STOPS ${loser.name.toUpperCase()}`;
     toast(message,'#fff','','',2400,`fight-finish-toast ${playerWon?'fight-finish-win':'fight-finish-loss'}`);
   }
 
@@ -1240,7 +1284,7 @@
   function toggleResultSection(sectionId){const section=$('#'+sectionId),expanded=section?.classList.contains('expanded')===true;setResultSectionExpanded(sectionId,!expanded);sfx.tap()}
 
   function buildResultDetails(f){
-    $('#resultMethod').textContent=`${f.method} · ROUND ${f.finishRound} · ${f.finishClock}`;
+    $('#resultMethod').textContent=`${fightMethodLabel(f)} · ROUND ${f.finishRound} · ${f.finishClock}`;
     const planAssessment=f.planAssessment||assessFightPlan(f);f.planAssessment=planAssessment;
     const planLabel=fightPlanLabel(f.gamePlan),gradeClass=planAssessment.grade.toLowerCase(),resultTape=$('#resultTape'),playerPortrait=currentAvatar()?.asset||$('#heroFighterArt').src,opponentPortrait=silhouetteForOpponent(f.o),playerTag=fighterCityCode(state.fighterCity),opponentTag=f.o.network?fighterCityCode(f.o.networkCity):opponentCountry(f.o.country).code;
     $('#resultStickyPlayer').textContent=f.player.name;$('#resultStickyOpponent').textContent=f.opp.name;const tapeSummary=$('#resultTapeSummary');tapeSummary.textContent=`${planLabel} — ${planAssessment.grade}`;tapeSummary.className=`result-section-summary ${gradeClass}`;
@@ -1310,10 +1354,10 @@
       o.losses=(o.losses||0)+1;o.lossesToPlayer=(o.lossesToPlayer||0)+1;o.rematchAccepted=false;state.wins++;state.winStreak++;state.bestStreak=Math.max(state.bestStreak,state.winStreak);attributePoint=LOGIC.awardVictoryAttributePoint(state,{won:true,forfeited:false,playerLevel:state.level,opponentLevel:o.min});if(lowerLevelWin&&!calloutFight){const penalty=LOGIC.lowerLevelFollowerPenalty(state.fans,{won:true,playerLevel:state.level,opponentLevel:o.min});fans=changeFollowers(-penalty)}else{fans=changeFollowers(LOGIC.fightFollowerReward({opponentBaseFollowers:o.fans,aura:effectiveAura(),upset,rivalry,randomMultiplier:rand(.9,1.2),won:true}))}state.aura=clamp(state.aura+auraBaseChange,0,100);auraAppliedChange=state.aura-auraBefore;sfx.win();confettiBurst();
       if(victoryPackEligible||titleWon||firstCareerWin)gearDrop=awardDeterministicGearDrop({opponent:o,titleWon,guaranteed:firstCareerWin,progressSteps:victoryPackProgressSteps});ceoAura=awardCeoPerformanceRecognition({upset,ko:fight.method.includes('KO'),titleWon});
       if(lowerLevelWin&&!calloutFight)lootNotes.push({kind:'penalty',text:`FAN BACKLASH · ${fmt(Math.abs(fans))} FOLLOWERS LOST (5%)`});const currentSponsor=endorsementDefs.find(item=>item.id===state.activeEndorsement?.id);if(currentSponsor)lootNotes.push({kind:'sponsor',text:`CURRENT SPONSOR · ${currentSponsor.brand}`});if(firstContractUnlocked)lootNotes.push({kind:'milestone',text:'FIRST CONTRACT UNLOCKED · DIEGORAMOSBR'});if(o.globalChampionship)lootNotes.push({kind:'milestone',text:'CONFIRMING TITLE RESULT'});if(ceoAura)lootNotes.push({kind:'milestone',text:`CEO NOTICED · +${ceoAura} AURA`});if(upset)lootNotes.push({kind:'milestone',text:'UPSET VICTORY'});if(rivalry)lootNotes.push({kind:'milestone',text:'RIVALRY WIN'});if(circuitOpponent)state.circuitLossStreak=0;
-      $('#resultTitle').textContent='YOU WIN';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps out. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
+      $('#resultTitle').textContent='YOU WIN';$('#resultTitle').className='win';$('#resultLine').textContent=fight.lastChanceLanded?`Ten seconds left, behind on the cards, and one haymaker changed everything.`:fight.method==='SUBMISSION'?`${o.name} taps to a ${(fight.submissionMove?.name||'submission').toLowerCase()}. Your grappling just made a statement.`:fight.method.includes('KO')?`${o.name} could not answer the damage. Your stock just jumped.`:`The scorecards are in. Your hand gets raised.`;
     }else{
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;if(circuitOpponent&&!fight.forfeited){o.lastDefeatedPlayerAt=Date.now();state.circuitLossStreak++}state.losses++;state.winStreak=0;if(!fight.forfeited)fans=changeFollowers(LOGIC.fightFollowerReward({opponentBaseFollowers:o.fans,won:false}));state.aura=clamp(state.aura+auraBaseChange,0,100);auraAppliedChange=state.aura-auraBefore;sfx.lose();
-      if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
+      if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap with a ${(fight.submissionMove?.name||'submission').toLowerCase()}. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
     const dailyStreakBefore=state.dailyCounters.qualifyingWinStreak||0,dailyBonusAwarded=updateDailyBonusStreak(win,o.min,state.level);
     pendingPostFightText=selectPostFightText({won:win,forfeited:!!fight.forfeited,lowerLevelWin,titleWon,titleFight:!!o.globalChampionship,winStreak:state.winStreak,opponent:o.name});
@@ -1323,9 +1367,11 @@
     const resultDamage=$('#resultDamage');resultDamage.hidden=!healthLoss;resultDamage.textContent=healthLoss?`♥ HEALTH −${healthLoss}`:'';
     $('#ceoResultSpotlight').hidden=true;
     if(consumeFeedChallenge(fight.feedChallengePostId,win?`@${state.name}`:`@${o.networkHandle||o.name}`))trackEvent('feed_challenge_completed',{opponent_id:o.sourceProfileId||'',result:win?'win':'loss',forfeited:!!fight.forfeited,aura_change:state.aura-auraBefore});
-    openSocialCycle('fight',{win,opponent:o.name,method:fight.method,winStreak:state.winStreak,title:'',lowerLevelWin:lowerLevelWin&&!calloutFight,followersLost:Math.abs(fans),fighterLevel:state.level,opponentLevel:o.min});
+    openSocialCycle('fight',{win,opponent:o.name,method:fightMethodLabel(fight),winStreak:state.winStreak,title:'',lowerLevelWin:lowerLevelWin&&!calloutFight,followersLost:Math.abs(fans),fighterLevel:state.level,opponentLevel:o.min});
     renderResultBonuses(lootNotes);renderDailyHeatResult({won:win,lowerLevelWin,forfeited:!!fight.forfeited,dailyStreakBefore,dailyBonusAwarded});
     const xpResultLabel=fight.forfeited?'FORFEIT · NO XP':xpTier.resultLabel,planAssessment=fight.planAssessment||assessFightPlan(fight),auraChange=state.aura-auraBefore;trackEvent('fight_completed',{result:win?'win':'loss',fight_mode:'planned',plan_pace:fight.gamePlan.pace,plan_offense:fight.gamePlan.offense,plan_tactics:fight.gamePlan.tactics,plan_grade:planAssessment.grade.toLowerCase(),plan_modifier:Number(planAssessment.modifier.toFixed(3)),health_lost:healthLoss,method:String(fight.method).toLowerCase().replace(/\s+/g,'_'),finish_round:fight.finishRound,rounds_fought:fight.rounds.length,player_archetype:state.fighterStyle,opponent_key:o.key,opponent_archetype:o.tendency,is_rematch:isRematch,is_title:!!o.globalChampionship,is_callout:calloutFight,rookie_showcase:!!o.rookieShowcase,first_contract:!!o.firstContract,title_won:titleWon,upset,rivalry,attribute_points_earned:attributePoint,followers_change:fans,aura_change:auraChange,xp_earned:xp,xp_category:xpResult.category,xp_repeat_tier:xpTier.tier,gear_rarity:gearDrop?.rarity?.toLowerCase()||'none'});if(o.globalChampionship&&fight.championshipBout)state.pendingChampionshipResult={challengeId:fight.championshipBout.challenge_id,challengerId:fight.championshipBout.challenger_id,challengerWon:fight.championshipBout.player_is_champion===true?!win:win,mode:o.titleMode||'challenge'};state.pendingFight=null;pendingResultDrop=gearDrop;resultDropRevealed=false;buildResultDetails(fight);renderChampionshipSettlement(o.globalChampionship?'pending':'',o.globalChampionship?'CONFIRMING TITLE RESULT':'');prepareRewardMetric('#rewardPrimary',win?attributePoint:auraChange,win||auraChange>0);$('#rewardPrimaryLabel').textContent=win?(attributePoint===1?'ATTRIBUTE POINT':'ATTRIBUTE POINTS'):'AURA';prepareRewardMetric('#rewardFans',fans,fans>=0);$('#rewardFansLabel').textContent=fans<0?'FOLLOWERS LOST':'FOLLOWERS';prepareRewardMetric('#rewardXp',xp,true);styleResultMetric('#rewardPrimary',win?attributePoint:auraChange);styleResultMetric('#rewardFans',fans);styleResultMetric('#rewardXp',xp);const rewardXpLabel=$('#rewardXpLabel');rewardXpLabel.textContent='XP';rewardXpLabel.title=xpResultLabel;rewardXpLabel.setAttribute('aria-label',`XP · ${xpResultLabel}`);lastFightShareData=win?{opponent:o.networkHandle||o.name,method:fight.method,round:fight.finishRound,record:`${state.wins}-${state.losses}`,winStreak:state.winStreak,titleWon}:null;$('#shareWinBtn').hidden=!win;renderPostFightTutorial(win);renderAttributeAssignment();armResultAction(fight.forfeited?'CONTINUE':'CLAIM REWARDS');showResultStage('outcome');const lootBox=$('#lootBox');lootBox.style.display='none';lootBox.className='loot';lootBox.innerHTML='';$('#resultDetails').classList.remove('open');const detailsToggle=$('#detailsToggle');detailsToggle.style.display='';detailsToggle.textContent='VIEW SCORECARD';const card=$('#resultModal .result-card');card.classList.remove('revealing','drop-celebration','fight-win','fight-loss');card.classList.add(win?'fight-win':'fight-loss');void card.offsetWidth;card.classList.add('revealing');card.scrollTop=0;writeHistory('result','replace');saveState();if(o.globalChampionship)settleChampionshipResult();scheduleFight(()=>{$('#resultModal').style.display='flex';requestAnimationFrame(()=>$('#resultContinueBtn').focus())},180);
+    queueMicrotask(()=>connectSharedSocial(true));
+    if(lastFightShareData)lastFightShareData.method=fightMethodLabel(fight);
     if(win){const victoryLoot=$('#lootBox');victoryLoot.style.display='block';victoryLoot.className='loot victory-pack-progress';victoryLoot.innerHTML=victoryPackResultHtml({earned:!!gearDrop,eligible:victoryPackEligible,steps:victoryPackProgressSteps,lowerLevel:o.min<state.level,repeatEligible:dropEligible,titleWon,firstCareerWin})}
   }
 
@@ -1340,8 +1386,17 @@
       else{await navigator.clipboard.writeText(text);button.textContent='RESULT COPIED'}
       trackEvent('fight_win_shared',{method:String(lastFightShareData.method).toLowerCase().replace(/\s+/g,'_'),title_win:lastFightShareData.titleWon===true});
     }catch(error){
-      if(error?.name==='AbortError'){button.textContent='SHARE WIN'}else{const modal=$('#shareFallbackModal'),field=$('#shareFallbackText');field.value=text;modal.classList.add('open');modal.setAttribute('aria-hidden','false');field.focus();field.select();button.textContent='SELECT RESULT TEXT'}
+      if(error?.name==='AbortError'){button.textContent='SHARE WIN'}else{openShareFallback({kicker:'SHARE YOUR RESULT',title:'COPY YOUR WIN',message:'Your device blocked automatic sharing. Select and copy this result.',text});button.textContent='SELECT RESULT TEXT'}
     }finally{shareWinPending=false;button.disabled=false;setTimeout(()=>{if(button.isConnected)button.textContent='SHARE WIN'},1800)}
+  }
+  function openShareFallback({kicker,title,message,text}){const modal=$('#shareFallbackModal'),field=$('#shareFallbackText');$('#shareFallbackKicker').textContent=kicker;$('#shareFallbackTitle').textContent=title;$('#shareFallbackMessage').textContent=message;field.value=text;modal.classList.add('open');modal.setAttribute('aria-hidden','false');field.focus();field.select()}
+  function fighterInviteUrl(){const url=new URL(window.location.href);url.search='';url.hash='';url.searchParams.set('invite',state.socialProfileId);return url.toString()}
+  async function shareFighterInvite(){
+    if(!state.nameLocked||!normalizeReferralId(state.socialProfileId)){toast('FIGHTER NETWORK CONNECTION REQUIRED','#ffcf78');connectSharedSocial(true);return}
+    const button=$('#inviteFighterBtn'),url=fighterInviteUrl(),message=`@${state.name} invited you to Cage Grind. Create your fighter and complete your first fight to earn them a guaranteed drop.`,text=`${message} ${url}`;button.disabled=true;button.textContent='SHARING…';
+    try{if(typeof navigator.share==='function'){await navigator.share({title:'Join Cage Grind',text:message,url});button.textContent='INVITE SENT'}else{await navigator.clipboard.writeText(text);button.textContent='INVITE COPIED'}trackEvent('fighter_invite_shared')}
+    catch(error){if(error?.name!=='AbortError'){openShareFallback({kicker:'BRING IN A FIGHTER',title:'COPY YOUR INVITE',message:'Share this invite. Your drop unlocks after their first completed fight.',text});button.textContent='SELECT INVITE'}else button.textContent='INVITE'}
+    finally{button.disabled=false;setTimeout(()=>{if(button.isConnected)button.textContent='INVITE'},1800)}
   }
   function closeShareFallback(){const modal=$('#shareFallbackModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
   function showPendingSponsor(){const sponsor=endorsementDefs.find(item=>item.id===state.sponsorAnnouncementPending);if(!sponsor)return false;$('#sponsorAnnouncementLogo').src=`assets/icons/${sponsor.id}.png?v=${ICON_ASSET_VERSION}`;$('#sponsorAnnouncementBrand').textContent=sponsor.brand;$('#sponsorAnnouncementMilestone').textContent=`${fmt(sponsor.followersRequired)} FOLLOWERS`;state.sponsorAnnouncementPending='';saveState();const modal=$('#sponsorAnnouncementModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.win();confettiBurst();requestAnimationFrame(()=>$('#sponsorAnnouncementClose').focus());return true}
@@ -1353,10 +1408,15 @@
     if(!pendingPostFightText)return false;const modal=$('#postFightMessageModal');if(modal.classList.contains('open'))return true;if(postFightMessageTimer){clearTimeout(postFightMessageTimer);postFightMessageTimer=null}const thread=pendingPostFightText,{contact,messages}=thread,avatar=$('#postFightMessageAvatar'),messageRow=message=>`<div class="post-fight-message-row in"><img src="${escapeHtml(contact.avatar)}" alt=""><div class="post-fight-message-bubble">${escapeHtml(message)}</div></div>`,typingRow=messages.length>1?`<div class="post-fight-message-row in post-fight-message-typing-row" role="status" aria-label="${escapeHtml(contact.name)} is typing"><img src="${escapeHtml(contact.avatar)}" alt=""><div class="post-fight-message-bubble post-fight-message-typing" aria-hidden="true"><i></i><i></i><i></i></div></div>`:'';avatar.src=contact.avatar;avatar.alt=contact.name;$('#postFightMessageName').textContent=contact.name;$('#postFightMessageStatus').textContent=`${contact.relationship} · JUST NOW`;$('#postFightMessageList').innerHTML=`<div class="post-fight-message-time">JUST NOW</div>${messageRow(messages[0])}${typingRow}`;$('#postFightMessageInput').value='';modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(messages.length>1)postFightMessageTimer=setTimeout(()=>{postFightMessageTimer=null;if(!modal.classList.contains('open')||pendingPostFightText!==thread)return;const typing=$('.post-fight-message-typing-row');if(!typing)return;typing.outerHTML=messages.slice(1).map(messageRow).join('');const list=$('#postFightMessageList');list.scrollTop=list.scrollHeight;sfx.tap()},1500);trackEvent('post_fight_text_received',{contact_id:contact.id});sfx.tap();requestAnimationFrame(()=>$('#postFightMessageClose').focus());return true;
   }
   function closePostFightText(){const modal=$('#postFightMessageModal');if(!modal.classList.contains('open'))return;if(postFightMessageTimer){clearTimeout(postFightMessageTimer);postFightMessageTimer=null}pendingPostFightText=null;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();requestAnimationFrame(showPostFightFollowup)}
-  function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
+  function showPendingReferralDrop(){
+    if(!pendingReferralDrop||pendingResultDrop||fight||document.querySelector('.modal-overlay.open'))return false;
+    const reward=pendingReferralDrop;pendingReferralDrop=null;const handle=normalizeIdentityName(reward.inviteeHandle),fighter=handle?`@${handle}`:'Your invited fighter';
+    return openDropClaim(reward.drop,{kind:'referral',eyebrow:'YOUR INVITE ENTERED THE CAGE',title:'REFERRAL DROP',message:`${fighter} completed their first fight. Your guaranteed collectible is ready.`});
+  }
+  function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.129" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.132" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1380,7 +1440,7 @@
     const victoryDrop=pendingResultDrop;if(!state.postFightTutorialSeen){state.postFightTutorialSeen=true;saveState()}stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=victoryDrop;resultDropRevealed=false;combatLocked=false;updateUI();navTo('fight','replace');if(victoryDrop)setTimeout(()=>openDropClaim(victoryDrop,{kind:'victory',eyebrow:'VICTORY PACK EARNED',title:'VICTORY PACK',message:'A surprise collectible pack landed after your win.'}),180);else requestAnimationFrame(showPostFightFollowup);
   }
   function closeDropClaim(){
-    const context=pendingDropContext||{};$('#dropClaimModal').classList.remove('open');$('#dropClaimModal').setAttribute('aria-hidden','true');pendingResultDrop=null;pendingDropContext=null;resultDropRevealed=false;stopConfetti();if(context.kind==='daily')queueMicrotask(maybeGrantInstallReward);if(context.kind==='victory')requestAnimationFrame(showPostFightFollowup);
+    const context=pendingDropContext||{};$('#dropClaimModal').classList.remove('open');$('#dropClaimModal').setAttribute('aria-hidden','true');pendingResultDrop=null;pendingDropContext=null;resultDropRevealed=false;stopConfetti();if(context.kind==='daily')queueMicrotask(maybeGrantInstallReward);if(context.kind==='victory'||context.kind==='referral')requestAnimationFrame(showPostFightFollowup);if(context.kind==='referral')queueMicrotask(syncReferralRewards);
   }
 
   function stopConfetti(){
@@ -1425,6 +1485,7 @@
   document.addEventListener('cagegrind:installchange',()=>updateUI());
   document.addEventListener('cagegrind:installed',()=>{const firstDetection=!state.installDetected;state.installDetected=true;if(firstDetection)trackEvent('game_installed');saveState();updateUI()});
   $('#installGameBtn').addEventListener('click',requestGameInstall);
+  $('#inviteFighterBtn').addEventListener('click',shareFighterInvite);
   $('#landingEnterBtn').addEventListener('click',enterGameFromLanding);
   $('#dailyBtn').addEventListener('click',claimDaily);$('#dropRevealBtn').addEventListener('click',revealDropClaim);$('#dropCloseBtn').addEventListener('click',closeDropClaim);$('#resultContinueBtn').addEventListener('click',()=>{sfx.tap();showResultStage('rewards')});$('#continueBtn').addEventListener('click',handleResultAction);$('#levelUpContinue').addEventListener('click',closeLevelUp);
   $('#tapeBackBtn').addEventListener('click',closeFightPreview);$('#tapeFightBtn').addEventListener('click',()=>commitFight());$('#fightPlanConfirm').addEventListener('click',confirmFightPlan);$('#tapeStatsToggle').addEventListener('click',openTapeStats);$('#tapeStatsClose').addEventListener('click',()=>closeTapeStats());$('#tapeStatsBackdrop').addEventListener('click',()=>closeTapeStats());$('#tapeStatsPanel').addEventListener('keydown',e=>{if(e.key==='Escape')closeTapeStats()});$('#tapeTermsToggle').addEventListener('click',openTapeBreakdown);$('#tapeBreakdownClose').addEventListener('click',()=>closeTapeBreakdown());$('#tapeBreakdownBackdrop').addEventListener('click',()=>closeTapeBreakdown());$('#tapeBreakdown').addEventListener('keydown',e=>{if(e.key==='Escape')closeTapeBreakdown()});

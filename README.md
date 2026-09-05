@@ -94,6 +94,8 @@ Collectibles are permanent, and every drop reveals an undiscovered, level-eligib
 
 The Gear page keeps the Daily Drop, its next-drop countdown, and the installation Drop together above the collection. When a Daily Drop is ready, the Gear navigation item receives a gold action indicator. The Daily Drop grants a guaranteed collectible; it does not grant currency or manually refill resources.
 
+Home also offers each registered fighter a shareable invite. An invite is attached when a new fighter creates their permanent identity and qualifies after that fighter completes their first bout. The inviter then receives one server-validated, guaranteed nonduplicate collectible, which auto-equips when its category has an open slot.
+
 ## Follower-based sponsors
 
 Sponsors are a sequential status track. Reaching the next follower milestone automatically advances the fighter, records the sponsor in career history, and shows a sponsor announcement. Sponsorships do not pay bonuses.

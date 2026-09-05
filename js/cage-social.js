@@ -119,8 +119,15 @@
     }
     async function publishCeoPost(eventKey){return database.insertCageCeoPost(eventKey)}
     async function publishSponsorPost(sponsorId){return database.insertCageSponsorPost(sponsorId)}
+    async function registerReferral(inviterId){return database.registerCageFighterReferral(inviterId)}
+    async function qualifyReferral(){return database.qualifyCageFighterReferral()}
+    async function claimReferralReward(){
+      const data=await database.claimCageFighterReferralReward();
+      const reward=Array.isArray(data)?data[0]||null:data;
+      return reward?{referralId:String(reward.referral_id||''),inviteeHandle:String(reward.invitee_handle||'')}:null;
+    }
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,sessionUserId:database.sessionUserId};
+    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,registerReferral,qualifyReferral,claimReferralReward,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

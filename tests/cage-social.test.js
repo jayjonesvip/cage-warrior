@@ -178,6 +178,9 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
       if (url.endsWith('/rest/v1/rpc/get_cage_interactions_remaining')) return jsonResponse(3);
       if (url.endsWith('/rest/v1/rpc/load_cage_career')) return jsonResponse({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true });
       if (url.endsWith('/rest/v1/rpc/save_cage_career')) return jsonResponse('2026-09-02T16:00:00Z');
+      if (url.endsWith('/rest/v1/rpc/register_cage_fighter_referral')) return jsonResponse(true);
+      if (url.endsWith('/rest/v1/rpc/qualify_cage_fighter_referral')) return jsonResponse(true);
+      if (url.endsWith('/rest/v1/rpc/claim_cage_fighter_referral_reward')) return jsonResponse([{ referral_id: '33333333-3333-4333-8333-333333333333', invitee_handle: 'NewFighterLAS' }]);
       if (url.endsWith('/rest/v1/rpc/publish_cage_post')) return jsonResponse({ id: 8 });
       if (url.endsWith('/rest/v1/rpc/publish_cage_ceo_post')) return jsonResponse({ id: 9, post_kind: 'ceo' });
       return jsonResponse({ message: 'unexpected request' }, 500);
@@ -195,6 +198,9 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const remaining = await client.loadInteractionAllowance();
   const career = await client.loadCareer();
   const careerSavedAt = await client.saveCareer({ version: 31, name: 'WhiteDrizzlePHX', nameLocked: true }, session.user.id);
+  const referralRegistered = await client.registerReferral(otherId);
+  const referralQualified = await client.qualifyReferral();
+  const referralReward = await client.claimReferralReward();
   await client.publishPost({ kind: 'callout', body: '@CHICounter_01, keep winning.', targetProfileId: otherId });
   await client.publishCeoPost('city_offer');
   const retired = await client.retireProfile();
@@ -214,6 +220,9 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.equal(remaining, 3);
   assert.equal(career.name, 'WhiteDrizzlePHX');
   assert.equal(careerSavedAt, '2026-09-02T16:00:00Z');
+  assert.equal(referralRegistered, true);
+  assert.equal(referralQualified, true);
+  assert.deepEqual(referralReward, { referralId: '33333333-3333-4333-8333-333333333333', inviteeHandle: 'NewFighterLAS' });
   const authenticated = requests.filter(request => request.url.includes('/rest/v1/'));
   assert.ok(authenticated.every(request => request.options.headers.Authorization === 'Bearer access-token'));
   const claimBody = JSON.parse(authenticated.find(request => request.url.endsWith('claim_cage_identity')).options.body);
@@ -233,6 +242,8 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   assert.deepEqual(seedRosterBody, {});
   const careerSaveBody = JSON.parse(authenticated.find(request => request.url.endsWith('save_cage_career')).options.body);
   assert.deepEqual(careerSaveBody, { p_state: { version: 31, name: 'WhiteDrizzlePHX', nameLocked: true } });
+  const referralBody = JSON.parse(authenticated.find(request => request.url.endsWith('register_cage_fighter_referral')).options.body);
+  assert.deepEqual(referralBody, { p_inviter_id: otherId });
   assert.ok(authenticated.some(request => request.url.includes(`id=eq.${session.user.id}`)));
 });
 

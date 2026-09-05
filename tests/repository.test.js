@@ -123,7 +123,7 @@ test('completed careers restore from private cloud saves before the landing scre
   assert.match(migration,/revoke all on table public\.cage_career_saves from public, anon, authenticated/);
   assert.match(migration,/create or replace function public\.load_cage_career\(\)/);
   assert.match(migration,/create or replace function public\.save_cage_career\(p_state jsonb\)/);
-  assert.match(game,/if\(LOGIC\.isBlankCareer\(state\)\)await restoreRemoteCareer\(\);\s*function saveState/);
+  assert.match(game,/if\(LOGIC\.isBlankCareer\(state\)\)await restoreRemoteCareer\(\);\s*captureReferralInvite\(\);\s*function saveState/);
   assert.match(game,/const remote=await SHARED_FEED\.loadCareer/);
   assert.match(game,/const profile=await SHARED_FEED\.loadOwnProfile/);
   assert.match(game,/scheduleCloudCareerSave\(\)/);
@@ -573,10 +573,21 @@ test('rocked fighters and every stoppage receive dedicated live-fight toasts',()
   assert.match(game,/fighterName:D\.name/);
   assert.match(game,/\$\{String\(item\.fighterName\|\|'FIGHTER'\)\.toUpperCase\(\)\} IS ROCKED!/);
   assert.match(game,/\['ko','submission'\]\.includes\(item\.type\)/);
-  assert.match(game,/SUBMISSION · \$\{winner\.name\.toUpperCase\(\)\} FORCES \$\{loser\.name\.toUpperCase\(\)\} TO TAP/);
+  assert.match(game,/\$\{fightMethodLabel\(fight\)\.toUpperCase\(\)\} · \$\{winner\.name\.toUpperCase\(\)\} FORCES \$\{loser\.name\.toUpperCase\(\)\} TO TAP/);
   assert.match(styles,/#toast\.fight-rocked-toast\{[^}]*border-color:#ff4c49/);
   assert.match(styles,/#toast\.fight-finish-win\{[^}]*border-color:#36df7c/);
   assert.match(styles,/#toast\.fight-finish-loss\{[^}]*border-color:#ff4c49/);
+});
+
+test('submission finishes name the technique throughout the fight and result flow',()=>{
+  for(const move of ['Rear-Naked Choke','Guillotine Choke','Armbar','Triangle Choke','Kimura'])assert.ok(game.includes(`name:'${move}'`),move);
+  assert.match(game,/function selectSubmissionFinish\(random=Math\.random\)/);
+  assert.match(game,/sim\.method='SUBMISSION';sim\.submissionMove=submissionMove/);
+  assert.match(game,/TAP! \$\{A\.name\} \$\{submissionMove\.call\}!/);
+  assert.match(game,/function fightMethodLabel\(result\).*SUBMISSION \(\$\{result\.submissionMove\.name\}\)/);
+  assert.match(game,/\$\('#resultMethod'\)\.textContent=`\$\{fightMethodLabel\(f\)\} · ROUND/);
+  assert.match(game,/method:fightMethodLabel\(fight\)/);
+  assert.match(game,/lastFightShareData\.method=fightMethodLabel\(fight\)/);
 });
 
 test('fight plan starts the bout directly and matchup portraits share one branded surface',()=>{
@@ -799,11 +810,28 @@ test('Victory Packs and Daily Drops only award undiscovered collectibles',()=>{
   assert.match(game,/function eligibleGearAtLevel\(level,rarity\)\{return LOGIC\.undiscoveredCollectibles\(gearItems,ownedGearIds\(\),level,rarity\)\}/);
   assert.match(game,/function autoEquipNewDrop\(item\)\{/);
   assert.match(game,/equippedForCategory\(item\.category\)\.length>=LOGIC\.loadoutCategoryLimit\(\)/);
-  assert.equal((game.match(/const autoEquipped=autoEquipNewDrop\(item\)/g)||[]).length,2);
+  assert.equal((game.match(/const autoEquipped=autoEquipNewDrop\(item\)/g)||[]).length,3);
   assert.doesNotMatch(game,/chooseGearWithDuplicateReroll/);
-  assert.equal((game.match(/state\.gearCounts\[item\.id\]=1/g)||[]).length,2);
+  assert.equal((game.match(/state\.gearCounts\[item\.id\]=1/g)||[]).length,3);
   assert.match(game,/ALL 32 COLLECTIBLES FOUND/);
   assert.match(game,/NEW COLLECTIBLES UNLOCK AS YOU LEVEL UP/);
+});
+
+test('Home invites award a server-validated nonduplicate referral drop after the invited fighter competes',()=>{
+  const home=html.slice(html.indexOf('data-screen="home"'),html.indexOf('data-screen="fight"'));
+  assert.match(home,/home-invite-heading"><b>FIGHTER REFERRALS<\/b><span>INVITE REWARDS<\/span>[\s\S]*id="inviteFighterBtn"[^>]*>INVITE<[\s\S]*RETIRE THIS FIGHTER/);
+  assert.match(home,/guaranteed drop when they create a fighter and complete their first fight/i);
+  assert.match(game,/url\.searchParams\.set\('invite',state\.socialProfileId\)/);
+  assert.match(game,/await SHARED_FEED\.qualifyReferral\(\)/);
+  assert.match(game,/awardReferralCollectible\(referral\.referralId\)/);
+  assert.match(game,/eligibleGearAtLevel\(state\.level,rarity\)/);
+  assert.match(game,/reason:'REFERRAL DROP'/);
+  const migration=read('supabase/migrations/20260905010000_fighter_referral_drops.sql');
+  assert.match(migration,/create table if not exists public\.cage_fighter_referrals/i);
+  assert.match(migration,/invitee_id uuid not null unique/i);
+  assert.match(migration,/profile\.wins\+profile\.losses>0/i);
+  assert.match(migration,/for update of referral skip locked/i);
+  assert.match(migration,/grant execute on function public\.claim_cage_fighter_referral_reward\(\) to authenticated/i);
 });
 
 test('Aura can create a visible but bounded final-round crowd comeback edge',()=>{
