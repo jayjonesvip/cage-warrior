@@ -45,6 +45,17 @@ test('Fight Skins appear only in Compare Stats and render the saved cosmetic tie
   assert.equal(container.style['--fight-skin-accent'],'#ffdc78');
 });
 
+test('Open Gym reuses checked Fight Plan controls with a scoped green palette',()=>{
+  const gym=html.slice(html.indexOf('data-screen="gym"'),html.indexOf('data-screen="gym"')+6000);
+  assert.match(gym,/class="spar-target-grid fight-plan-toggle"/);
+  assert.equal((gym.match(/class="fight-plan-toggle" role="group" aria-label="Sparring/g)||[]).length,3);
+  assert.equal((gym.match(/data-spar-setting=/g)||[]).length,6);
+  assert.match(game,/button.setAttribute\('aria-pressed',String\(active\)\)/);
+  assert.match(styles,/\.open-gym-card \.fight-plan-toggle button\[aria-pressed="true"\]:after\{background:#dbe9df;color:#315840/);
+  assert.match(styles,/\.open-gym-card \.spar-session-track i\{background:linear-gradient\(90deg,#4e775b,#98baa3\)/);
+  assert.doesNotMatch(styles,/\.spar-plan-row button\.active\{/);
+});
+
 test('all seven sponsors have five distinct brand reaction messages',()=>{
   const context={};vm.runInNewContext(strings,context);
   const pools=context.CAGE_STRINGS.sponsorHighlights;
