@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.152';
+  const ICON_ASSET_VERSION = '2.7.153';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -66,6 +66,8 @@
   let recoveryReport = null;
   let landingFeature = null;
   let audioCtx = null;
+  const walkoutMusic=globalThis.CAGE_MUSIC.create();
+  let walkoutPending=false;
   let currentScreen = 'home';
   let sparringSession = null;
   let sparringSnapshot = null;
@@ -972,7 +974,7 @@
   function emptyFightStats(){return {attempted:0,landed:0,sig:0,takedowns:0,control:0,damage:0,kd:0}}
   function addFightStats(total,part){for(const k of Object.keys(total))total[k]+=part[k]||0}
   function scheduleFight(fn,delay){const id=setTimeout(fn,Math.max(40,delay));fightTimers.push(id);return id}
-  function clearFightTimers(){fightTimers.forEach(clearTimeout);fightTimers=[]}
+  function clearFightTimers(){fightTimers.forEach(clearTimeout);fightTimers=[];walkoutPending=false;walkoutMusic.stop()}
   function fightClock(exchange,total){const seconds=Math.max(12,300-Math.round((exchange/Math.max(1,total))*288));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`}
 
   function commentaryFor(type,attacker,defender,landed,big=false){
@@ -1193,12 +1195,26 @@
     const matchup=edge>4?'YOU HAVE THE STATISTICAL EDGE':edge<-4?'OPPONENT HAS THE STATISTICAL EDGE':'ATTRIBUTES ARE EVENLY MATCHED',titleAction=f.o.titleMode==='defense'?'DEFEND THE TITLE':f.o.titleMode==='rematch'?'RECLAIM THE TITLE':'FIGHT FOR THE TITLE';$('#walkoutText').textContent=rookieShowcase?ROOKIE_SHOWCASE.headline:firstContract?FIRST_CONTRACT.headline:matchup;$('#tapeFightBtn').textContent=titleBout?titleAction:rookieShowcase?ROOKIE_SHOWCASE.actionLabel:firstContract?FIRST_CONTRACT.actionLabel:'SET FIGHT PLAN';$('#fightPlanConfirm').textContent=titleBout?titleAction:firstContract?FIRST_CONTRACT.actionLabel:'LOCK IN FIGHT PLAN';renderTapeBreakdown();
   }
 
-  function showFightStage(stage){['tapeStage','planStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage))}
+  function showFightStage(stage){['tapeStage','planStage','liveStage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==stage));walkoutMusic.setScene(stage==='planStage'?'locker':'off',effectiveAura());if(stage==='planStage'){walkoutPending=false;$('#fightPlanConfirm').disabled=false;$$('[data-plan-setting]').forEach(button=>button.disabled=false);renderLockerMusic()}}
   const fightPlanFeature=globalThis.CAGE_FIGHT_PLAN.createFightPlanFeature({$,$$,getFight:()=>fight,getState:()=>state,isCombatLocked:()=>combatLocked,currentStyle,escapeHtml,showFightStage,saveState,trackEvent,tap:()=>sfx.tap(),beginFight:beginPlannedFight});
   function fightPlanLabel(plan=fight?.gamePlan){return fightPlanFeature.label(plan)}
   function beginFightPlan(){fightPlanFeature.begin()}
-  function selectFightPlanSetting(setting,value){fightPlanFeature.select(setting,value)}
-  function confirmFightPlan(){fightPlanFeature.confirm()}
+  function selectFightPlanSetting(setting,value){if(!walkoutPending)fightPlanFeature.select(setting,value)}
+  function renderLockerMusic(){
+    const toggle=$('#lockerMusicToggle');toggle.disabled=!walkoutMusic.supported;toggle.textContent=walkoutMusic.enabled?'MUSIC ON':'MUSIC OFF';toggle.setAttribute('aria-pressed',String(walkoutMusic.enabled));
+    $('#lockerMusicVolume').value=Math.round(walkoutMusic.volume*100);$('#lockerMusicVolume').disabled=!walkoutMusic.supported;
+    $('#lockerMusicStatus').textContent=!walkoutMusic.supported?'Music is unavailable in this browser.':walkoutPending?'MAKE YOUR ENTRANCE…':'Your entrance theme evolves with your fighter.';
+  }
+  $('#lockerMusicToggle').addEventListener('click',()=>{walkoutMusic.setEnabled(!walkoutMusic.enabled);renderLockerMusic()});
+  $('#lockerMusicVolume').addEventListener('input',event=>walkoutMusic.setVolume(Number(event.target.value)/100));
+  function confirmFightPlan(){
+    if(!fight||walkoutPending)return;
+    if(!walkoutMusic.enabled||!walkoutMusic.supported){fightPlanFeature.confirm();return}
+    walkoutPending=true;$('#fightPlanConfirm').disabled=true;$$('[data-plan-setting]').forEach(button=>button.disabled=true);renderLockerMusic();
+    walkoutMusic.setScene('walkout',effectiveAura());
+    scheduleFight(()=>walkoutMusic.stop(),2500);
+    scheduleFight(()=>{walkoutPending=false;fightPlanFeature.confirm()},3000);
+  }
   function offerRookieShowcase(){
     if(!state.nameLocked||!state.rookieShowcasePending||state.pendingFight)return false;
     const opponent=ensureRookieShowcaseOpponent();if(!opponent||!opponentAvailable(opponent))return false;
@@ -1520,7 +1536,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.152" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.153" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

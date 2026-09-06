@@ -4,6 +4,8 @@ Cage Grind is a mobile-first MMA career game built with static HTML, CSS, and va
 
 ## Core loop
 
+Locker-room music is opt-in through the fight-plan music toggle, with volume and preference saved locally. A synthesized 92 BPM theme gains layers at effective Aura thresholds 40, 60, 80, and 99. Enabled music builds into a three-second walkout on plan confirmation and fades before live action. It stops on fight cleanup and pauses while the page is hidden; unavailable Web Audio never prevents a fight. The soundtrack has no effect on combat or rewards.
+
 The career is intentionally centered on one repeatable loop:
 
 1. Choose an opponent and fight.
