@@ -126,6 +126,14 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 .profile-header-record{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;text-align:right;white-space:nowrap}
 .profile-header-record>b{font-variant-numeric:tabular-nums;color:#f0f6fc}
 .profile-header-record>small{color:#8b949e;letter-spacing:.6px}
+.hero-sponsor{border:0;border-radius:0;background:transparent;box-shadow:none}
+.hero-sponsor-copy{text-shadow:0 2px 4px #000,0 0 8px #000b}
+#lockerMusicToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+#lockerMusicToggle .ti{font-size:16px}
+.ti-music,.ti-music-off{display:inline-block;width:1em;height:1em;flex-shrink:0;background:currentColor;-webkit-mask:var(--music-icon) center/contain no-repeat;mask:var(--music-icon) center/contain no-repeat}
+.ti-music{--music-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13M9 9l12-2'/%3E%3Cellipse cx='6' cy='18' rx='3' ry='3'/%3E%3Cellipse cx='18' cy='16' rx='3' ry='3'/%3E%3C/svg%3E")}
+.ti-music-off{--music-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 9v9M9 5l12-2v13M13 8l8-1M3 3l18 18'/%3E%3Cellipse cx='6' cy='18' rx='3' ry='3'/%3E%3Cpath d='M15 16a3 3 0 0 0 5 2'/%3E%3C/svg%3E")}
+#lockerMusicVolume:disabled{opacity:.4;cursor:not-allowed}
 /* Rewards, supporting context, then progress: keep each zone distinct. */
 #resultModal .result-rewards-title{color:#ffe29a;text-shadow:0 0 12px #e4ba4633}
 #resultModal #rewardFans{font-size:clamp(21px,6vw,27px)!important;text-shadow:0 0 10px #4be47726}
