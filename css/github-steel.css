@@ -52,6 +52,31 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px so
 button:disabled { border-color:#30363d!important; background:#161b22!important; color:#6e7681!important; box-shadow:none!important }
 .retire-career-btn, .retire-confirm { border-color:#f85149!important; background:#b62324!important; color:#fff!important; box-shadow:0 1px 0 #010409!important; text-shadow:none!important }
 
+/* Shared primary actions: standard, compact footer, and modal text scale. */
+:root{--action-height:44px;--action-font:11px;--action-weight:700;--action-radius:8px;--action-padding:10px 12px}
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run){
+  box-sizing:border-box;min-height:var(--action-height);padding:var(--action-padding);border:1px solid var(--button-primary-border);border-radius:var(--action-radius);
+  background:var(--button-primary);color:var(--cta-text);box-shadow:var(--button-primary-shadow);text-shadow:none;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:var(--action-weight);line-height:20px;letter-spacing:.35px;text-align:center;cursor:pointer;
+}
+#app .screen :is(.spar-start-btn,.spar-fighter-picker),#app .screen .feed-action-grid button,#app .screen .feed-action-grid button b{
+  font-size:var(--action-font)!important;font-weight:var(--action-weight);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:20px;letter-spacing:.35px;
+}
+.feed-action-grid button{--action-height:32px;--action-padding:5px 12px}
+.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run{font-size:13px!important}
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):focus-visible{
+  outline:2px solid var(--blue);outline-offset:2px;
+}
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):active:not(:disabled){
+  transform:translateY(1px);box-shadow:var(--button-primary-shadow);
+}
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):disabled{
+  opacity:.45;filter:none;cursor:not-allowed;box-shadow:none;
+}
+@media(hover:hover){
+  :is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):hover:not(:disabled){filter:brightness(1.08)}
+}
+
 @media (hover:hover) and (pointer:fine) {
   .choice, .opponent, .gear, .social-action { transition:border-color .12s ease,background-color .12s ease,transform .12s ease }
   .choice:hover, .opponent:hover, .gear:hover, .social-action:hover { transform:translateY(-1px); border-color:#58a6ff }

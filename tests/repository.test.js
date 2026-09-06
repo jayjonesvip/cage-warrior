@@ -63,6 +63,22 @@ test('Open Gym reuses checked Fight Plan controls and the shared system palette'
   assert.doesNotMatch(styles,/\.spar-plan-row button\.active\{/);
 });
 
+test('primary actions share sizing and compact Feed labels avoid footer typography',()=>{
+  assert.match(steel,/--action-height:44px;--action-font:11px;--action-weight:700;--action-radius:8px;--action-padding:10px 12px/);
+  assert.match(steel,/\.feed-action-grid button\{--action-height:32px;--action-padding:5px 12px\}/);
+  assert.match(steel,/#app \.screen \.feed-action-grid button b\{\s*font-size:var\(--action-font\)!important/);
+  assert.match(steel,/\.fight-plan-card \.fight-plan-confirm,\.modal-overlay \.modal-run\{font-size:13px!important\}/);
+});
+
+test('Cage Feed audience sits inside its two-line card header',()=>{
+  const start=html.indexOf('class="card-title feed-card-header"'),end=html.indexOf('id="socialTimeline"',start);
+  const header=html.slice(start,end);
+  assert.ok(start>0);assert.match(header,/page-title-copy/);
+  assert.match(header,/feed-network-summary/);
+  assert.match(header,/<\/section><\/div><div class="page-scroll feed-list"/);
+  assert.match(styles,/\.feed-card-header \.feed-network-summary>div\{padding:0;gap:5px\}/);
+});
+
 test('Home progression heading is concise and content cannot widen its scroll area',()=>{
   assert.match(html,/career-progression-heading"><b>CAREER PROGRESSION<\/b><\/div>/);
   assert.match(styles,/\.home-career-scroll\{[^}]*min-width:0;max-width:100%;overflow-x:hidden/);

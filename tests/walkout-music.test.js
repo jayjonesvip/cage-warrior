@@ -45,6 +45,9 @@ test('locker music is wired before the game and walkout ends before combat',()=>
   const html=read('index.html'),game=read('js/game.js');
   assert.ok(html.indexOf('src="js/walkout-music.js')<html.indexOf('src="js/game.js'));
   assert.match(read('service-worker.js'),/walkout-music.js/);
+  assert.match(html,/id="homeMusicMeter" role="progressbar"/);
+  assert.match(html,/aria-label="Play entrance music">▶ PLAY/);
+  assert.match(game,/clearInterval\(homeMusicMeterTimer\)/);
   assert.match(html,/<details class="entrance-music">\s*<summary>/);
   assert.match(html,/ENTRANCE MUSIC<small>Evolves with you\.<\/small>/);
   assert.match(game,/\$\('#entranceMusicState'\)\.textContent=/);

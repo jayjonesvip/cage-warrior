@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.157';
+  const ICON_ASSET_VERSION = '2.7.158';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -70,10 +70,17 @@
   let audioCtx = null;
   const walkoutMusic=globalThis.CAGE_MUSIC.create();
   let homeMusicPreviewTimer=null;
+  let homeMusicMeterTimer=null;
+  function updateHomeMusicMeter(seconds=0){
+    const elapsed=clamp(seconds,0,12);
+    $('#homeMusicMeterFill').style.width=`${elapsed/12*100}%`;
+    $('#homeMusicMeter').setAttribute('aria-valuenow',String(Math.floor(elapsed)));
+    $('#homeMusicTime').textContent=`0:${String(Math.floor(elapsed)).padStart(2,'0')} / 0:12`;
+  }
   function stopHomeMusicPreview(){
     if(homeMusicPreviewTimer===null)return;
-    clearTimeout(homeMusicPreviewTimer);homeMusicPreviewTimer=null;walkoutMusic.stop();
-    $('#homeMusicPreview').textContent='PREVIEW ENTRANCE MUSIC';$('#homeMusicPreview').setAttribute('aria-pressed','false');
+    clearTimeout(homeMusicPreviewTimer);homeMusicPreviewTimer=null;clearInterval(homeMusicMeterTimer);homeMusicMeterTimer=null;walkoutMusic.stop();updateHomeMusicMeter();
+    $('#homeMusicPreview').textContent='▶ PLAY';$('#homeMusicPreview').setAttribute('aria-pressed','false');$('#homeMusicPreview').setAttribute('aria-label','Play entrance music');
   }
   let walkoutPending=false;
   let currentScreen = 'home';
@@ -1255,7 +1262,9 @@
   $('#homeMusicPreview').addEventListener('click',()=>{
     if(homeMusicPreviewTimer!==null){stopHomeMusicPreview();return}
     walkoutMusic.preview(effectiveAura());
-    $('#homeMusicPreview').textContent='STOP MUSIC PREVIEW';$('#homeMusicPreview').setAttribute('aria-pressed','true');
+    $('#homeMusicPreview').textContent='■ STOP';$('#homeMusicPreview').setAttribute('aria-pressed','true');$('#homeMusicPreview').setAttribute('aria-label','Stop entrance music');
+    const started=performance.now();updateHomeMusicMeter();
+    homeMusicMeterTimer=setInterval(()=>updateHomeMusicMeter((performance.now()-started)/1000),100);
     homeMusicPreviewTimer=setTimeout(stopHomeMusicPreview,12000);
   });
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stopHomeMusicPreview()});
@@ -1601,7 +1610,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.157" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.158" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
