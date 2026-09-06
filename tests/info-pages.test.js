@@ -5,6 +5,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+test('all landing and information pages link to the official Facebook page',()=>{
+  for(const file of ['index.html','origins.html','how-to-play.html','privacy.html']){
+    assert.match(read(file),/href="https:\/\/facebook.com\/CageGrind" target="_blank" rel="noopener noreferrer"/);
+  }
+});
 test('landing information pages are linked, discoverable, and cached',()=>{
   for(const file of ['how-to-play.html','privacy.html']){
     const page=read(file);
