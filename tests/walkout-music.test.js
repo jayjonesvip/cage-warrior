@@ -39,6 +39,9 @@ test('locker music is wired before the game and walkout ends before combat',()=>
   const html=read('index.html'),game=read('js/game.js');
   assert.ok(html.indexOf('src="js/walkout-music.js')<html.indexOf('src="js/game.js'));
   assert.match(read('service-worker.js'),/walkout-music.js/);
+  assert.match(html,/<details class="entrance-music">\s*<summary>/);
+  assert.match(html,/ENTRANCE MUSIC<small>Evolves with you\.<\/small>/);
+  assert.match(game,/\$\('#entranceMusicState'\)\.textContent=/);
   assert.match(game,/scheduleFight\(\(\)=>walkoutMusic.stop\(\),2500\)/);
   assert.match(game,/scheduleFight\(\(\)=>\{walkoutPending=false;fightPlanFeature.confirm\(\)\},3000\)/);
   assert.match(game,/if\(!fight\|\|walkoutPending\)return/);
