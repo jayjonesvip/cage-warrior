@@ -45,7 +45,11 @@ test('Fight Skins appear only in Compare Stats and render the saved cosmetic tie
   assert.equal(container.style['--fight-skin-accent'],'#ffdc78');
 });
 
-test('Open Gym reuses checked Fight Plan controls with a scoped green palette',()=>{
+test('Open Gym reuses checked Fight Plan controls and the shared system palette',()=>{
+  assert.match(html,/class="gig-modal fighter-post-dialog spar-scout-dialog"/);
+  assert.match(html,/aria-describedby="sparScoutDescription"/);
+  assert.match(html,/<p id="sparScoutDescription">/);
+  assert.doesNotMatch(styles,/\.spar-scout-dialog\{display:flex|\.spar-scout-dialog \.fighter-post-result small/);
   const gym=html.slice(html.indexOf('data-screen="gym"'),html.indexOf('data-screen="gym"')+6000);
   assert.match(html,/class="fighter-post-results" id="sparTargetChoices"/);
   assert.match(html,/id="sparScoutSearch" type="search"/);
@@ -53,9 +57,16 @@ test('Open Gym reuses checked Fight Plan controls with a scoped green palette',(
   assert.equal((gym.match(/class="fight-plan-toggle" role="group" aria-label="Sparring/g)||[]).length,3);
   assert.equal((gym.match(/data-spar-setting=/g)||[]).length,6);
   assert.match(game,/button.setAttribute\('aria-pressed',String\(active\)\)/);
-  assert.match(styles,/\.open-gym-card \.fight-plan-toggle button\[aria-pressed="true"\]:after\{background:#dbe9df;color:#315840/);
-  assert.match(styles,/\.open-gym-card \.spar-session-track i\{background:linear-gradient\(90deg,#4e775b,#98baa3\)/);
+  assert.doesNotMatch(styles,/--gym-accent|--gym-border|--gym-muted|#91b7a0|#344e3e/);
+  assert.doesNotMatch(styles,/\.navbtn\[data-nav="gym"\]\.active/);
+  assert.match(styles,/\.spar-fighter-picker\{[^}]*background:var\(--button-primary\)/);
   assert.doesNotMatch(styles,/\.spar-plan-row button\.active\{/);
+});
+
+test('Home progression heading is concise and content cannot widen its scroll area',()=>{
+  assert.match(html,/career-progression-heading"><b>CAREER PROGRESSION<\/b><\/div>/);
+  assert.match(styles,/\.home-career-scroll\{[^}]*min-width:0;max-width:100%;overflow-x:hidden/);
+  assert.match(styles,/\.home-career-scroll \.home-profile-section-heading\{[^}]*flex-wrap:wrap;white-space:normal/);
 });
 
 test('game pages use four typography tokens without targeting landing pages or modals',()=>{
@@ -619,7 +630,7 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(html,/id="homeFightSkin"><div class="page-subhead home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
   assert.match(styles,/\.page-subhead,\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
   assert.match(styles,/#app:not\(\.career-setup\) \.screen\[data-screen="home"\] #careerGameContent\{display:flex!important;gap:0\}/);
-  assert.match(styles,/\.home-career-scroll\{display:flex;flex-direction:column\}/);
+  assert.match(styles,/\.home-career-scroll\{display:flex;flex-direction:column[;}]/);
   assert.match(styles,/\.page-scroll\{min-height:0;flex:1 1 auto;overflow-y:auto/);
   assert.match(styles,/\.home-career-scroll>\.career-after-setup\{flex:0 0 auto\}/);
   assert.match(styles,/\.home-career-scroll>\.hero\{order:1;width:100%;margin:0;border-width:0 0 1px;border-radius:0/);
