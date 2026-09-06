@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.158';
+  const ICON_ASSET_VERSION = '2.7.159';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -1327,6 +1327,7 @@
   function haymakerChance(sim){return clamp(.15+(sim.player.power-sim.opp.chin)*.018+(sim.player.speed-sim.opp.speed)*.01+sim.playerCondition*.0015+(100-sim.oppCondition)*.002+(state.fighterStyle==='striker'?.04:0)+fightFocusModifier(sim),.15,.68)}
   function resetBloodSportBurst(){const layer=$('#bloodSportBurst');if(!layer)return;clearTimeout(layer._clearTimer);layer.classList.remove('active');layer.replaceChildren()}
   function prepareLiveFight(){
+    $('#livePlayerStyle').textContent=String(currentStyle()?.name||state.fighterStyle||'UNKNOWN STYLE').toUpperCase();
     const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.playerCondition),liveCard=$('#liveStage .live-card');liveCard.style.setProperty('--player-accent',currentAuraFightSkin().accent);liveCard.style.setProperty('--opponent-accent',fight.o.network?fighterAccent(fight.o.networkCity):fight.o.color||DEFAULT_FIGHTER_ACCENT);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');resetBloodSportBurst();showFightStage('liveStage');setFightDecisionFocus(false);$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#liveOppStyle').textContent=fight.o.tag||'UNKNOWN STYLE';$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';
   }
   function beginPlannedFight(){
@@ -1610,7 +1611,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.158" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.159" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

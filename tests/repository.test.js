@@ -70,6 +70,19 @@ test('primary actions share sizing and compact Feed labels avoid footer typograp
   assert.match(steel,/\.fight-plan-card \.fight-plan-confirm,\.modal-overlay \.modal-run\{font-size:13px!important\}/);
 });
 
+test('live fight identities have matching name, style, and condition rows',()=>{
+  for(const side of ['Player','Opp']){
+    assert.match(html,new RegExp('id="live'+side+'Name"[^<]*<[^>]+>[^<]*<span class="live-opp-style" id="live'+side+'Style"'));
+  }
+  assert.match(game,/\$\('#livePlayerStyle'\)\.textContent=/);
+  assert.match(styles,/\.live-score\{grid-template-columns:minmax\(0,1fr\) 50px minmax\(0,1fr\);align-items:start\}/);
+});
+
+test('fight allowance uses plain header status styling instead of a badge',()=>{
+  assert.match(html,/class="open-gym-impact fight-limit-status" id="fightLimitText"/);
+  assert.doesNotMatch(html,/class="limit-pill" id="fightLimitText"/);
+});
+
 test('Cage Feed audience sits inside its two-line card header',()=>{
   const start=html.indexOf('class="card-title feed-card-header"'),end=html.indexOf('id="socialTimeline"',start);
   const header=html.slice(start,end);
@@ -638,7 +651,9 @@ test('Home presents Career Progression in XP, Aura, Sponsor, Victory Pack, and D
 
 test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card page-card" id="careerGameContent"/);
-  assert.match(html,/class="card-title career-after-setup">Fighter Profile/);
+  assert.match(html,/class="card-title career-after-setup"><span class="page-title-copy"><b>Fighter Profile<\/b>/);
+  assert.match(html,/class="home-profile-meta"><span id="cageStatus">/);
+  assert.doesNotMatch(html,/<div class="rank-chip">/);
   assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
   assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerWorldRank"/);
   assert.match(game,/\$\('#careerWorldRank'\)\.textContent=careerRanking\.position\?`#\$\{careerRanking\.position\}`:'UNRANKED'/);
@@ -857,8 +872,8 @@ test('Daily Drop lives at the top of Gear while the install CTA stays on Home',(
 });
 
 test('Daily Drop offer uses a dramatic gold pack treatment and shares the Fight reset timer',()=>{
-  assert.match(styles,/\.daily-drop-card\{[^}]*min-height:198px[^}]*border:2px solid #c7962e[^}]*radial-gradient\(circle at 21% 48%,#ffc8324d/);
-  assert.match(styles,/\.daily-drop-pack\{[^}]*height:165px[^}]*animation:dailyDropHover/);
+  assert.match(styles,/\.daily-drop-card\{[^}]*grid-template-rows:auto auto[^}]*min-height:138px[^}]*border:2px solid #c7962e[^}]*radial-gradient\(circle at 21% 48%,#ffc8324d/);
+  assert.match(styles,/\.daily-drop-pack\{[^}]*height:110px[^}]*animation:dailyDropHover/);
   assert.match(styles,/\.daily\{[^}]*linear-gradient\(#ffe47a[^}]*font-family:"Oswald"/);
   assert.match(styles,/@keyframes dailyDropShine/);
   assert.match(html,/id="fightResetClock"[^>]*>[\s\S]*class="daily-reset-clock career-after-setup" id="dailyDropResetClock"/);
