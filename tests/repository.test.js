@@ -586,7 +586,21 @@ test('reward context groups known stats without dropping other messages',()=>{
   assert.equal((summary.innerHTML.match(/class="result-context-item/g)||[]).length,3);
   for(const text of ['Surge &lt;Core&gt;','-2','+20%','FAN BACKLASH · 199 FOLLOWERS LOST (5%)','UPSET VICTORY'])assert.ok(summary.innerHTML.includes(text));
   assert.match(summary.innerHTML,/result-context-item non-positive/);
+  context.renderResultBonuses([{kind:'penalty',text:'AURA · -7'},{kind:'milestone',text:'RANKED FIGHT BONUS +20%'}],{auraInRewards:true});
+  assert.doesNotMatch(summary.innerHTML,/AURA|-7/);assert.match(summary.innerHTML,/\+20%/);
+  context.renderResultBonuses([{kind:'milestone',text:'AURA · +2'}]);assert.match(summary.innerHTML,/AURA/);
   context.renderResultBonuses([]);assert.equal(summary.hidden,true);assert.equal(summary.innerHTML,'');
+});
+
+test('live condition begins at the pre-simulation value rather than final damage',()=>{
+  const nodes=new Map(),$=key=>{if(!nodes.has(key))nodes.set(key,{style:{setProperty(){}},classList:{remove(){}},setAttribute(){}});return nodes.get(key)};
+  const context={$,fight:{startingPlayerCondition:88,playerCondition:23,player:{name:'Player'},opp:{name:'Opponent'},o:{tag:'STRIKER'},timeline:[{playerCondition:88}]},state:{fighterStyle:'striker'},currentStyle:()=>({name:'Striker'}),currentAuraFightSkin:()=>({accent:'#fff'}),DEFAULT_FIGHTER_ACCENT:'#fff',resetBloodSportBurst(){},showFightStage(){},setFightDecisionFocus(){}};
+  vm.createContext(context);
+  vm.runInContext(game.slice(game.indexOf('  function prepareLiveFight()'),game.indexOf('  function beginPlannedFight()')),context);
+  context.prepareLiveFight();assert.equal($('#livePlayerCondition').style.width,'88%');assert.equal($('#livePlayerConditionText').textContent,'88% CONDITION');
+  assert.equal(context.fight.playerCondition,23);
+  const begin=game.slice(game.indexOf('  function beginPlannedFight()'),game.indexOf('  function setFightDecisionFocus('));
+  assert.ok(begin.indexOf('fight.startingPlayerCondition=fight.playerCondition')<begin.indexOf('simulateRound('));
 });
 
 test('zero and negative result metrics use the red non-positive treatment',()=>{

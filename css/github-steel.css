@@ -123,4 +123,25 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal #continueBtn{min-height:46px;background:#35cf7c!important;border:1px solid #66e69f!important;color:#052014!important;box-shadow:0 2px 10px #1ba85e26!important;font-weight:800}
 #resultModal #continueBtn:hover:not(:disabled){background:#4bdd8d!important}
 #resultModal #continueBtn:disabled{opacity:.5}
+/* Match the roomier supplied rewards reference without changing other modals. */
+#resultModal .result-card.showing-rewards{padding:22px 18px 18px;border-radius:18px}
+#resultRewardsStage,#resultRewardsStage button,#resultRewardsStage b,#resultRewardsStage small,#resultRewardsStage strong,#resultRewardsStage footer{font-family:"Segoe UI",system-ui,sans-serif}
+#resultModal .result-rewards-title{font-family:"Segoe UI",system-ui,sans-serif;font-size:21px!important;font-weight:800;letter-spacing:1px;margin:0 0 18px}
+#resultRewardsStage .rewards{border-radius:12px;margin-bottom:18px;background:#ffffff05}
+#resultRewardsStage .rewardbox{padding:14px 6px}
+#resultRewardsStage .rewardbox>b{font-size:20px}
+#resultRewardsStage .rewardbox small{white-space:normal;margin-top:4px;font-weight:600}
+#resultRewardsStage .result-context-strip{display:flex;background:#ffffff04;padding:10px 4px;border-color:#ffffff12;border-radius:10px}
+#resultRewardsStage .result-context-item{flex:1;padding:2px 5px}
+#resultRewardsStage .result-context-item b{font-size:13px!important;font-weight:700;margin:3px 0}
+#resultRewardsStage .result-context-item small{font-size:10px!important;font-weight:500;color:#93a0b4}
+.result-context-icon{display:block;font-size:14px;line-height:1.3}
+#resultRewardsStage .daily-heat-result,#resultRewardsStage .victory-pack-progress{padding:14px;border-radius:12px;margin-top:20px}
+#resultRewardsStage .daily-heat-result b{white-space:normal;font-size:15px!important;font-weight:800}
+#resultRewardsStage .daily-heat-result footer,#resultRewardsStage .victory-pack-progress small{font-size:11px!important;line-height:1.45;font-weight:500}
+#resultRewardsStage .daily-heat-result header strong{font-size:20px!important}
+#resultRewardsStage .victory-pack-result-head{gap:10px;font-size:15px!important}
+#resultRewardsStage .victory-pack-result-head b{font-size:20px!important}
+#resultRewardsStage .result-actions{margin-top:22px}
+#resultModal #continueBtn{font-family:"Segoe UI",system-ui,sans-serif;min-height:48px;border-radius:12px;font-size:16px!important}
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}
