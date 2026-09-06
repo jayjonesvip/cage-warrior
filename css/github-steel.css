@@ -86,19 +86,19 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
   *, *::before, *::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; animation-iteration-count:1!important }
 }
 
-/* Post-fight poster shares the promo's cage backdrop and centered billing. */
-#resultModal .result-card:not(.showing-rewards){padding:0;border-color:#365a70;background:#07111b}
-.result-poster-tools{padding:10px;border-bottom:1px solid #344653}
-#resultModal .result-poster-tools .result-secondary-actions{display:flex;gap:8px}
-#resultModal .result-poster-tools .details-toggle{flex:1;min-height:44px;padding:10px 8px;border:1px solid #415565!important;border-radius:8px!important;background:#152330!important;text-decoration:none}
-#resultModal .result-outcome-stage{display:block;padding:0 0 12px}
-.winner-poster{--player-accent:#57c8ea;--opponent-accent:#57c8ea;position:relative;isolation:isolate;overflow:hidden;height:clamp(240px,46dvh,400px);background:#071522}
-.winner-portrait{position:absolute;z-index:1;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.winner-poster-caption{position:absolute;z-index:2;inset:auto 0 0;padding:45px 12px 16px;background:linear-gradient(transparent,#02070cf0);text-align:center}
-#resultModal .winner-poster #resultTitle{margin:0;color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:clamp(58px,16vw,88px)!important;line-height:1;letter-spacing:3px;text-shadow:0 3px 8px #000}
-#resultModal #resultVerdict{margin:3px 0 0;font-size:13px!important;font-weight:800;letter-spacing:2px;color:#a1ddf1}
-#resultModal .fight-loss #resultVerdict{color:#e2a0a0}
-#resultModal .result-outcome-stage #resultLine{display:none}
-#resultModal .result-outcome-stage .result-method{margin:10px 12px;color:#b5c4ce}
-#resultModal .result-stage-continue{width:calc(100% - 24px);margin:10px 12px 0;min-height:44px}
-#resultModal .result-card:not(.showing-rewards) .result-details.open{padding:12px}
+/* Winner is a fight stage, reusing the promo card, tools, actions and billing. */
+#winnerStage{overflow:hidden}
+#winnerStage .result-outcome-stage{display:block;padding:11px 8px 14px;--player-accent:#57c8ea;--opponent-accent:#57c8ea;text-align:center}
+.winner-art-frame{position:relative;z-index:2;width:100%;height:clamp(180px,38dvh,360px);margin:0 auto;overflow:hidden}
+#resultWinnerArt{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;-webkit-mask-image:linear-gradient(180deg,#000 75%,transparent);mask-image:linear-gradient(180deg,#000 75%,transparent)}
+#winnerStage #resultTitle{margin:0;color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:clamp(48px,14vw,80px);line-height:1;letter-spacing:3px;text-shadow:0 3px 8px #000}
+#winnerStage #resultVerdict{font-size:13px;font-weight:800;letter-spacing:2px;color:#a1ddf1}
+#winnerStage .matchup-poster-title{margin-top:-10px}
+#winnerStage .matchup-poster-billing{margin:12px 0 4px}
+#winnerStage #resultMethod{border:0;border-radius:0;background:none;padding:0;box-shadow:none;white-space:normal;line-height:1.5}
+#winnerStage .tape-actions{grid-template-columns:1fr}
+#winnerStage .matchup-tool[hidden],#resultModal [hidden]{display:none!important}
+#winnerStage .result-damage,#winnerStage .personal-best-stamps{position:relative;z-index:3}
+#resultModal .result-card{overflow-x:hidden}
+#resultScorecardClose{width:100%;margin-bottom:12px}
+@media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}

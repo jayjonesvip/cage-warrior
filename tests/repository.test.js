@@ -536,11 +536,40 @@ test('fight result uses focused outcome and rewards stages',()=>{
   assert.match(game,/textContent=won\?'YOU WIN':'YOU LOSE'/);
   assert.match(html,/id="resultOutcomeStage"[\s\S]*id="resultContinueBtn"[\s\S]*id="resultRewardsStage"/);
   assert.match(html,/id="resultRewardsStage"[^>]*hidden/);
-  assert.match(html,/class="result-secondary-actions"[\s\S]*id="shareWinBtn"[\s\S]*id="detailsToggle"/);
+  assert.match(html,/class="matchup-tools"[^>]*aria-label="Fight result actions"[\s\S]*id="shareWinBtn"[\s\S]*id="detailsToggle"/);
+  assert.ok(html.indexOf('id="winnerStage"')<html.indexOf('id="tapeStage"'));
+  assert.ok(html.indexOf('id="resultContinueBtn"')<html.indexOf('id="resultModal"'));
+  assert.match(html,/class="tape-action fight" id="resultContinueBtn"/);
+  assert.match(game,/style.display=rewards\?'flex':'none'/);
   assert.match(game,/function showResultStage\(stage='outcome'\)/);
   assert.match(game,/showResultStage\('outcome'\)/);
   assert.match(game,/resultContinueBtn.*showResultStage\('rewards'\)/);
   assert.match(styles,/\.result-stage\[hidden\]\{display:none\}/);
+});
+
+test('winner page selects either portrait and keeps the rewards modal separate',()=>{
+  const nodes=new Map(),stages=[];
+  const $=selector=>{
+    if(!nodes.has(selector))nodes.set(selector,{style:{},classList:{toggle(){},remove(){}},setAttribute(){}});
+    return nodes.get(selector);
+  };
+  $('#heroFighterArt').src='player.png';
+  const context={$,fight:{winner:'player',o:{name:'Opponent'}},silhouetteForOpponent:()=> 'opponent.png',showFightStage:stage=>stages.push(stage),resetRewardAnimations(){},setRewardClaimReady(){},requestAnimationFrame:fn=>fn(),animateRewardMetrics(){}};
+  const source=game.slice(game.indexOf("  function showResultStage("),game.indexOf("  function formatRewardMetric("));
+  vm.createContext(context);vm.runInContext(source,context);
+  context.showResultStage('outcome');
+  assert.equal($('#resultWinnerArt').src,'player.png');
+  assert.equal($('#resultVerdict').textContent,'YOU WIN');
+  assert.equal($('#resultModal').style.display,'none');
+  assert.equal($('#resultRewardsStage').hidden,true);
+  context.showResultStage('rewards');
+  assert.equal($('#resultModal').style.display,'flex');
+  assert.equal($('#resultRewardsStage').hidden,false);
+  context.fight.winner='opponent';context.showResultStage('outcome');
+  assert.equal($('#resultWinnerArt').src,'opponent.png');
+  assert.equal($('#resultVerdict').textContent,'YOU LOSE');
+  assert.equal($('#resultModal').style.display,'none');
+  assert.ok(stages.every(stage=>stage==='winnerStage'));
 });
 
 test('zero and negative result metrics use the red non-positive treatment',()=>{
@@ -781,7 +810,7 @@ test('fight plan starts the bout directly and matchup portraits share one brande
   assert.doesNotMatch(html,/focusStage|liveFocusText|fight-focus/);
   assert.doesNotMatch(game,/fightFocusFeature|resolveFocusChoice|continueAfterFocus/);
   assert.match(fightPlan,/beginFight\(\)/);
-  assert.match(game,/showFightStage\(stage\)\{\['tapeStage','planStage','liveStage'\]/);
+  assert.match(game,/showFightStage\(stage\)\{\['tapeStage','planStage','liveStage','winnerStage'\]/);
   assert.match(html,/class="matchup-poster-backdrop" aria-hidden="true"/);
   assert.match(game,/poster\.style\.setProperty\('--player-accent',playerAccent\)/);
   assert.match(game,/poster\.style\.setProperty\('--opponent-accent',opponentAccent\)/);
