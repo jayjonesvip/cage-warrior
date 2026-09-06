@@ -34,7 +34,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.162';
+  const ICON_ASSET_VERSION = '2.7.163';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -1508,6 +1508,16 @@
   }
 
   function showResultStage(stage='outcome'){
+    if(stage==='outcome'&&fight){
+      const won=fight.winner==='player',portrait=$('#resultWinnerArt');
+      portrait.src=won?$('#heroFighterArt').src:silhouetteForOpponent(fight.o);
+      portrait.alt=won?'Your fighter — winner':`${fight.o.networkHandle||fight.o.name} — winner`;
+      $('#resultTitle').textContent='WINNER';
+      $('#resultTitle').className='winner-title';
+      $('#resultVerdict').textContent=won?'YOU WIN':'YOU LOSE';
+      $('#resultContinueBtn').textContent='COLLECT REWARDS';
+      $('#detailsToggle').setAttribute('aria-expanded','false');
+    }
     const rewards=stage==='rewards',outcomeStage=$('#resultOutcomeStage'),rewardsStage=$('#resultRewardsStage'),card=$('#resultModal .result-card');
     outcomeStage.hidden=rewards;rewardsStage.hidden=!rewards;card.classList.toggle('showing-rewards',rewards);card.scrollTop=0;
     if(rewards){setRewardClaimReady(false);requestAnimationFrame(animateRewardMetrics)}else resetRewardAnimations();
@@ -1626,7 +1636,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.162" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.163" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1700,6 +1710,11 @@
   $('#inviteFighterBtn').addEventListener('click',shareFighterInvite);
   $('#startSparBtn').addEventListener('click',startSparringSession);
   $('#sparRematchBtn').addEventListener('click',prepareSparRematch);
+  $('#detailsToggle').addEventListener('click',()=>requestAnimationFrame(()=>{
+    const details=$('#resultDetails'),open=details.classList.contains('open');
+    $('#detailsToggle').setAttribute('aria-expanded',String(open));
+    if(open)details.scrollIntoView({block:'start',behavior:'smooth'});
+  }));
   $('#landingEnterBtn').addEventListener('click',enterGameFromLanding);
   $('#dailyBtn').addEventListener('click',claimDaily);$('#dropRevealBtn').addEventListener('click',revealDropClaim);$('#dropCloseBtn').addEventListener('click',closeDropClaim);$('#resultContinueBtn').addEventListener('click',()=>{sfx.tap();showResultStage('rewards')});$('#continueBtn').addEventListener('click',handleResultAction);$('#levelUpContinue').addEventListener('click',closeLevelUp);
   $('#tapeBackBtn').addEventListener('click',closeFightPreview);$('#tapeFightBtn').addEventListener('click',()=>commitFight());$('#fightPlanConfirm').addEventListener('click',confirmFightPlan);$('#tapeStatsToggle').addEventListener('click',openTapeStats);$('#tapeStatsClose').addEventListener('click',()=>closeTapeStats());$('#tapeStatsBackdrop').addEventListener('click',()=>closeTapeStats());$('#tapeStatsPanel').addEventListener('keydown',e=>{if(e.key==='Escape')closeTapeStats()});$('#tapeTermsToggle').addEventListener('click',openTapeBreakdown);$('#tapeBreakdownClose').addEventListener('click',()=>closeTapeBreakdown());$('#tapeBreakdownBackdrop').addEventListener('click',()=>closeTapeBreakdown());$('#tapeBreakdown').addEventListener('keydown',e=>{if(e.key==='Escape')closeTapeBreakdown()});

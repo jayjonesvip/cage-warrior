@@ -528,6 +528,12 @@ test('victory reward prioritizes Attribute Point, followers, and XP',()=>{
 });
 
 test('fight result uses focused outcome and rewards stages',()=>{
+  assert.ok(html.indexOf('id="shareWinBtn"')<html.indexOf('id="resultOutcomeStage"'));
+  assert.match(html,/id="resultWinnerArt"/);
+  assert.match(html,/id="resultVerdict">YOU WIN/);
+  assert.match(html,/id="resultContinueBtn"[^>]*>COLLECT REWARDS/);
+  assert.match(game,/portrait.src=won\?\$\('#heroFighterArt'\).src:silhouetteForOpponent\(fight.o\)/);
+  assert.match(game,/textContent=won\?'YOU WIN':'YOU LOSE'/);
   assert.match(html,/id="resultOutcomeStage"[\s\S]*id="resultContinueBtn"[\s\S]*id="resultRewardsStage"/);
   assert.match(html,/id="resultRewardsStage"[^>]*hidden/);
   assert.match(html,/class="result-secondary-actions"[\s\S]*id="shareWinBtn"[\s\S]*id="detailsToggle"/);
