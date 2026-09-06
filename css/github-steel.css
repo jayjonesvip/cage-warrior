@@ -102,4 +102,25 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #winnerStage .result-damage,#winnerStage .personal-best-stamps{position:relative;z-index:3}
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
+/* Rewards, supporting context, then progress: keep each zone distinct. */
+#resultModal .result-rewards-title{color:#ffe29a;text-shadow:0 0 12px #e4ba4633}
+#resultModal #rewardFans{font-size:clamp(21px,6vw,27px)!important;text-shadow:0 0 10px #4be47726}
+#resultModal .rewardbox.non-positive #rewardFans{text-shadow:none}
+#resultModal .result-bonuses{margin:14px 0 0}
+.result-context-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #344451;border-radius:9px;background:#0b1520;overflow:hidden;text-transform:none}
+.result-context-item{min-width:0;padding:10px 6px;text-align:center}
+.result-context-item+.result-context-item{border-left:1px solid #344451}
+.result-context-item small,.result-context-item b{display:block;overflow-wrap:anywhere;line-height:1.35}
+.result-context-item small{color:#9eafbd;letter-spacing:.3px}
+.result-context-item b{margin-top:4px;color:#e4edf4}
+.result-context-item.non-positive b{color:#ff737b}
+#resultModal .result-bonus-row{padding:5px 3px}
+#resultModal .daily-heat-result{margin-top:18px;position:relative}
+#resultModal .daily-heat-result:before{content:"";position:absolute;top:-10px;left:0;right:0;border-top:1px solid #62768933}
+#resultModal .daily-heat-result-pips i{height:9px;border-radius:5px}
+#resultModal .victory-pack-result-track{height:10px}
+#resultModal .result-actions{margin-top:18px}
+#resultModal #continueBtn{min-height:46px;background:#35cf7c!important;border:1px solid #66e69f!important;color:#052014!important;box-shadow:0 2px 10px #1ba85e26!important;font-weight:800}
+#resultModal #continueBtn:hover:not(:disabled){background:#4bdd8d!important}
+#resultModal #continueBtn:disabled{opacity:.5}
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}

@@ -10,6 +10,12 @@ const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const html=read('index.html');
 const game=read('js/game.js');
+
+test('Origins describes current systems rather than retired activities',()=>{
+  const current=read('origins.html').split('CURRENT CAGE GRIND SYSTEMS')[1].split('</article>')[0];
+  for(const feature of ['Open Gym','Daily Heat','Daily Drops','Victory Packs','Fight Skins','entrance music','Cage Feed','fight history'])assert.ok(current.includes(feature),feature);
+  assert.doesNotMatch(current,/Focus|Hustles|relationships/);
+});
 const logic=read('js/game-logic.js');
 const rules=read('fight-rules.json');
 const definitions=read('js/definitions.js');
@@ -487,7 +493,7 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   assert.match(game,/const notable=titleWon\|\|titleFight\|\|\(won&&winStreak>0&&winStreak%5===0\)/);
   assert.match(game,/pendingPostFightText=selectPostFightText\(\{won:win,forfeited:!!fight\.forfeited,lowerLevelWin,titleWon,titleFight:!!o\.globalChampionship/);
   assert.match(game,/if\(forfeited\|\|lowerLevelWin\|\|!contacts\.length\)return null/);
-  assert.match(game,/function showPostFightFollowup\(\)\{if\(showPendingPostFightText\(\)\)return true/);
+  assert.match(game,/function showPostFightFollowup\(\)\{if\(postFightPresentationBusy\(\)\)return false;if\(showPendingPostFightText\(\)\)return true/);
   assert.match(html,/id="postFightMessageInput"[^>]*placeholder="Replies unavailable"[^>]*disabled/);
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
   assert.doesNotMatch(game,/sendPostFightTextReply|post_fight_text_replied/);
@@ -570,6 +576,17 @@ test('winner page selects either portrait and keeps the rewards modal separate',
   assert.equal($('#resultVerdict').textContent,'YOU LOSE');
   assert.equal($('#resultModal').style.display,'none');
   assert.ok(stages.every(stage=>stage==='winnerStage'));
+});
+
+test('reward context groups known stats without dropping other messages',()=>{
+  const summary={},context={$:()=>summary,escapeHtml:value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')};
+  vm.createContext(context);
+  vm.runInContext(game.slice(game.indexOf('  function renderResultBonuses('),game.indexOf('  function renderDailyHeatResult(')),context);
+  context.renderResultBonuses([{kind:'sponsor',text:'CURRENT SPONSOR · Surge <Core>'},{kind:'penalty',text:'AURA · -2'},{kind:'milestone',text:'RANKED FIGHT BONUS +20%'},{kind:'penalty',text:'FAN BACKLASH · 199 FOLLOWERS LOST (5%)'},{kind:'milestone',text:'UPSET VICTORY'}]);
+  assert.equal((summary.innerHTML.match(/class="result-context-item/g)||[]).length,3);
+  for(const text of ['Surge &lt;Core&gt;','-2','+20%','FAN BACKLASH · 199 FOLLOWERS LOST (5%)','UPSET VICTORY'])assert.ok(summary.innerHTML.includes(text));
+  assert.match(summary.innerHTML,/result-context-item non-positive/);
+  context.renderResultBonuses([]);assert.equal(summary.hidden,true);assert.equal(summary.innerHTML,'');
 });
 
 test('zero and negative result metrics use the red non-positive treatment',()=>{

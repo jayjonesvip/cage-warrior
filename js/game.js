@@ -34,7 +34,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.165';
+  const ICON_ASSET_VERSION = '2.7.166';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -497,7 +497,7 @@
     if(!pool.length)return null;const item=chooseGear(pool,random);state.gear.push(item.id);state.gearCounts[item.id]=1;const autoEquipped=autoEquipNewDrop(item);ensureLoadout();return {item,rarity,count:1,isNew:true,autoEquipped,guaranteed:true,reason:'REFERRAL DROP'};
   }
   function victoryPackResultHtml({earned=false,eligible=false,steps=0,lowerLevel=false,repeatEligible=true,titleWon=false,firstCareerWin=false}={}){
-    const progress=earned?4:clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),title=earned?'VICTORY PACK EARNED':eligible?`VICTORY PACK ${progress}/4`:'VICTORY PACK UNCHANGED';
+    const progress=earned?4:clamp(Math.floor(Number(state.gearWinsSinceDrop))||0,0,4),title=earned?'VICTORY PACK EARNED':eligible?'VICTORY PACK':'VICTORY PACK UNCHANGED';
     let detail=progress>=3?'NEXT ELIGIBLE WIN GUARANTEES A PACK':'WIN AT YOUR LEVEL OR ABOVE YOUR RANK TO ADVANCE';
     if(earned)detail=titleWon?'TITLE WIN · RARE+ PACK GUARANTEED':firstCareerWin?'FIRST WIN PACK GUARANTEED':'METER COMPLETE · PACK READY';
     else if(!eligibleGearAtLevel(state.level,'').length)detail=ownedGearIds().length>=gearItems.length?'ALL 32 COLLECTIBLES FOUND':'ALL UNLOCKED COLLECTIBLES FOUND · LEVEL UP FOR MORE';
@@ -598,6 +598,7 @@
     renderRecoveryClocks();
   }
   function updatePassiveRecovery(showFollowerAway=false){
+    if(state.sponsorAnnouncementPending&&!fight)requestAnimationFrame(showPostFightFollowup);
     const now=Date.now(),recovered=LOGIC.passiveRecovery(state,now,OFFLINE_RECOVERY_CAP,{energy:energyRecoveryInterval(),health:healthRecoveryInterval()}),followerGrowth=LOGIC.passiveFollowerGrowth(state,now,FOLLOWER_OFFLINE_CAP,effectiveAura());
     if(recovered.energy>0)flashRecoveryResources({energy:recovered.energy,health:0});
     if(followerGrowth.followers){syncSponsorProgress();trackEvent('passive_followers_awarded',{followers:followerGrowth.followers,hours:followerGrowth.hours,aura_rate:followerGrowth.aura,followers_per_hour:followerGrowth.rate});saveState();if(state.nameLocked){renderResourceHud();if(currentScreen==='home')renderCareer();else if(currentScreen==='feed')renderSocial()}if(showFollowerAway)toast(`WHILE YOU WERE AWAY · +${fmt(followerGrowth.followers)} FOLLOWERS`,'#78dfff')}
@@ -1490,7 +1491,14 @@
   }
 
   function renderResultBonuses(notes=[]){
-    const summary=$('#resultBonuses');if(!summary)return;summary.hidden=!notes.length;summary.innerHTML=notes.map(note=>`<div class="result-bonus-row${note.kind==='penalty'?' non-positive':''}">${escapeHtml(note.text)}</div>`).join('');
+    const summary=$('#resultBonuses');if(!summary)return;summary.hidden=!notes.length;
+    const context=[],messages=[];
+    notes.forEach(note=>{
+      const text=String(note.text),split=text.match(/^(CURRENT SPONSOR|AURA) · (.+)$/),ranked=text.match(/^(RANKED FIGHT BONUS) (.+)$/),parts=split||ranked;
+      if(parts)context.push(`<div class="result-context-item${note.kind==='penalty'?' non-positive':''}"><small>${escapeHtml(parts[1])}</small><b>${escapeHtml(parts[2])}</b></div>`);
+      else messages.push(`<div class="result-bonus-row${note.kind==='penalty'?' non-positive':''}">${escapeHtml(text)}</div>`);
+    });
+    summary.innerHTML=(context.length?`<div class="result-context-strip">${context.join('')}</div>`:'')+messages.join('');
   }
 
   function renderDailyHeatResult({won=false,lowerLevelWin=false,rankRepeatExhausted=false,forfeited=false,dailyStreakBefore=0,dailyBonusAwarded=false}={}){
@@ -1625,8 +1633,8 @@
     finally{button.disabled=false;setTimeout(()=>{if(button.isConnected)button.textContent='INVITE'},1800)}
   }
   function closeShareFallback(){const modal=$('#shareFallbackModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
-  function showPendingSponsor(){const sponsor=endorsementDefs.find(item=>item.id===state.sponsorAnnouncementPending);if(!sponsor)return false;$('#sponsorAnnouncementLogo').src=sponsorLogo(sponsor);$('#sponsorAnnouncementBrand').textContent=sponsor.brand;$('#sponsorAnnouncementMilestone').textContent=`${fmt(sponsor.followersRequired)} FOLLOWERS`;state.sponsorAnnouncementPending='';saveState();const modal=$('#sponsorAnnouncementModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.win();confettiBurst();requestAnimationFrame(()=>$('#sponsorAnnouncementClose').focus());return true}
-  function closeSponsorAnnouncement(){const modal=$('#sponsorAnnouncementModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');stopConfetti();updateUI();requestAnimationFrame(showPostFightFollowup)}
+  function showPendingSponsor(){if(postFightPresentationBusy())return false;const sponsor=endorsementDefs.find(item=>item.id===state.sponsorAnnouncementPending);if(!sponsor)return false;$('#sponsorAnnouncementLogo').src=sponsorLogo(sponsor);$('#sponsorAnnouncementBrand').textContent=sponsor.brand;$('#sponsorAnnouncementMilestone').textContent=`${fmt(sponsor.followersRequired)} FOLLOWERS`;const modal=$('#sponsorAnnouncementModal');modal.dataset.sponsorId=sponsor.id;modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.win();confettiBurst();requestAnimationFrame(()=>$('#sponsorAnnouncementClose').focus());return true}
+  function closeSponsorAnnouncement(){const modal=$('#sponsorAnnouncementModal');if(!modal.classList.contains('open'))return;if(state.sponsorAnnouncementPending===modal.dataset.sponsorId){state.sponsorAnnouncementPending='';saveState()}delete modal.dataset.sponsorId;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');stopConfetti();updateUI();requestAnimationFrame(showPostFightFollowup)}
   function selectPostFightText({won=false,forfeited=false,lowerLevelWin=false,titleWon=false,titleFight=false,winStreak=0,opponent=''}={}){
     const config=STRINGS.postFightTexts,contacts=Array.isArray(config?.contacts)?config.contacts:[];if(forfeited||lowerLevelWin||!contacts.length)return null;const notable=titleWon||titleFight||(won&&winStreak>0&&winStreak%5===0);if(!notable&&Math.random()>clamp(Number(config.chance)||.32,0,1))return null;let eligible=contacts.filter(contact=>contact.id!==lastPostFightTextContactId);if(!eligible.length)eligible=contacts;const contact=eligible[rint(0,eligible.length-1)],threadKey=titleWon?'titleWin':won?'win':'loss',threads=contact[threadKey]||contact[won?'win':'loss']||[],thread=threads[rint(0,Math.max(0,threads.length-1))]||[];if(!thread.length)return null;lastPostFightTextContactId=contact.id;return {contact,messages:thread.map(message=>copyText(message,{name:state.name,opponent,winStreak}))};
   }
@@ -1634,15 +1642,18 @@
     if(!pendingPostFightText)return false;const modal=$('#postFightMessageModal');if(modal.classList.contains('open'))return true;if(postFightMessageTimer){clearTimeout(postFightMessageTimer);postFightMessageTimer=null}const thread=pendingPostFightText,{contact,messages}=thread,avatar=$('#postFightMessageAvatar'),messageRow=message=>`<div class="post-fight-message-row in"><img src="${escapeHtml(contact.avatar)}" alt=""><div class="post-fight-message-bubble">${escapeHtml(message)}</div></div>`,typingRow=messages.length>1?`<div class="post-fight-message-row in post-fight-message-typing-row" role="status" aria-label="${escapeHtml(contact.name)} is typing"><img src="${escapeHtml(contact.avatar)}" alt=""><div class="post-fight-message-bubble post-fight-message-typing" aria-hidden="true"><i></i><i></i><i></i></div></div>`:'';avatar.src=contact.avatar;avatar.alt=contact.name;$('#postFightMessageName').textContent=contact.name;$('#postFightMessageStatus').textContent=`${contact.relationship} · JUST NOW`;$('#postFightMessageList').innerHTML=`<div class="post-fight-message-time">JUST NOW</div>${messageRow(messages[0])}${typingRow}`;$('#postFightMessageInput').value='';modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(messages.length>1)postFightMessageTimer=setTimeout(()=>{postFightMessageTimer=null;if(!modal.classList.contains('open')||pendingPostFightText!==thread)return;const typing=$('.post-fight-message-typing-row');if(!typing)return;typing.outerHTML=messages.slice(1).map(messageRow).join('');const list=$('#postFightMessageList');list.scrollTop=list.scrollHeight;sfx.tap()},1500);trackEvent('post_fight_text_received',{contact_id:contact.id});sfx.tap();requestAnimationFrame(()=>$('#postFightMessageClose').focus());return true;
   }
   function closePostFightText(){const modal=$('#postFightMessageModal');if(!modal.classList.contains('open'))return;if(postFightMessageTimer){clearTimeout(postFightMessageTimer);postFightMessageTimer=null}pendingPostFightText=null;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();requestAnimationFrame(showPostFightFollowup)}
+  function postFightPresentationBusy(){
+    return !!(fight||combatLocked||pendingResultDrop||$('#resultModal').style.display==='flex'||$('#levelUpModal').classList.contains('active')||document.querySelector('.modal-overlay.open'));
+  }
   function showPendingReferralDrop(){
     if(!pendingReferralDrop||pendingResultDrop||fight||document.querySelector('.modal-overlay.open'))return false;
     const reward=pendingReferralDrop;pendingReferralDrop=null;const handle=normalizeIdentityName(reward.inviteeHandle),fighter=handle?`@${handle}`:'Your invited fighter';
     return openDropClaim(reward.drop,{kind:'referral',eyebrow:'YOUR INVITE ENTERED THE CAGE',title:'REFERRAL DROP',message:`${fighter} completed their first fight. Your guaranteed collectible is ready.`});
   }
-  function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
+  function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.165" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.166" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
