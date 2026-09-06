@@ -16,5 +16,18 @@
       round:fight.finishRound,clock:fight.finishClock,playerStyle,title:!!fight.o?.globalChampionship
     }]);
   }
-  const api={normalize,append,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
+  function breakdown(entries){
+    const counts={ko:0,sub:0,dec:0,other:0};
+    for(const entry of normalize(entries)){
+      if(!entry.won)continue;
+      const method=entry.method.toUpperCase();
+      if(/\b(?:KO|TKO)\b/.test(method))counts.ko++;
+      else if(method.startsWith('SUBMISSION'))counts.sub++;
+      else if(method.includes('DECISION'))counts.dec++;
+      else counts.other++;
+    }
+    return counts;
+  }
+  function recentResults(entries){return normalize(entries).slice(-5).reverse().map(entry=>entry.won?'W':'L')}
+  const api={normalize,append,breakdown,recentResults,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
 })(globalThis);

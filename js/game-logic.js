@@ -138,8 +138,8 @@
   }
 
   function dailyCountersFor(counters,today){
-    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,qualifyingWinStreak:0,bonusFightAwarded:false};
-    return {date:today,fight:clamp(nonNegativeWhole(counters.fight),0,50),qualifyingWinStreak:clamp(nonNegativeWhole(counters.qualifyingWinStreak),0,50),bonusFightAwarded:counters.bonusFightAwarded===true};
+    if(!counters||typeof counters!=='object'||counters.date!==today)return {date:today,fight:0,qualifyingWinStreak:0,bonusFightAwarded:false,heatAuraAwarded:false};
+    return {date:today,fight:clamp(nonNegativeWhole(counters.fight),0,50),qualifyingWinStreak:clamp(nonNegativeWhole(counters.qualifyingWinStreak),0,50),bonusFightAwarded:counters.bonusFightAwarded===true,heatAuraAwarded:counters.heatAuraAwarded===true};
   }
 
   function applyDailyFightStreak(counters,{won=false,playerLevel=1,opponentLevel=1,requiredStreak=5,...ranks}={}){
@@ -150,6 +150,11 @@
     return {qualifies,awarded,streak:counters.qualifyingWinStreak};
   }
 
+  function claimDailyHeatAura(state){
+    const counters=state.dailyCounters;
+    if(!counters||counters.heatAuraAwarded===true||nonNegativeWhole(counters.qualifyingWinStreak)<10)return false;
+    counters.heatAuraAwarded=true;state.aura=clamp(finite(state.aura)+5,0,100);return true;
+  }
   function spendEnergy(state,cost,now=Date.now()){
     const amount=Math.max(0,finite(cost));
     const available=clamp(finite(state.energy),0,finite(state.maxEnergy,100));
@@ -653,5 +658,5 @@
     };
   }
 
-  return {higherRankedOpponent,rewardMatchup,careerHighlights,sparImprovement,clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankingFightEntry,rankingComponents,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,applyDailyFightStreak,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraGrowthMultiplier,scaledAuraGain,lowerLevelAuraPenalty,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,loadoutCategoryLimit,fightScore,playerTrailing,auraComebackEdge,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,undiscoveredCollectibles,normalizeGearDrop};
+return {claimDailyHeatAura,higherRankedOpponent,rewardMatchup,careerHighlights,sparImprovement,clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,rankingFightEntry,rankingComponents,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,applyDailyFightStreak,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraGrowthMultiplier,scaledAuraGain,lowerLevelAuraPenalty,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,loadoutCategoryLimit,fightScore,playerTrailing,auraComebackEdge,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,undiscoveredCollectibles,normalizeGearDrop};
 });

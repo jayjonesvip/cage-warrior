@@ -149,8 +149,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.155',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.155',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.156',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.156',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -166,6 +166,16 @@ opponentNames: {
     ],
     contractSigning:{profile:'media',text:'SIGNED: @{name} has put pen to paper on a Cage Grind contract. The new {archetype} out of {city} is officially on the roster.'},
     ceo: {
+      dailyHeat:["Ten straight today, @{name}. That is not luck. That is a fighter making the whole roster uncomfortable. Keep the lights on for this one.",
+        "I asked for someone to own the day. @{name} answered with ten straight qualifying wins. Message received.",
+        "@{name} just hit ten straight today. Matchmakers, put the coffee down and pay attention. We have business to discuss.",
+        "There are busy fighters, and there are dangerous fighters. Ten straight today puts @{name} firmly in the second group.",
+        "My phone has not stopped buzzing about @{name}. Ten straight qualifying wins in one day will do that. You earned this spotlight.",
+        "Ten fights. Ten straight wins on the Daily Heat run. @{name} did not come here to blend into the rankings.",
+        "@{name}, I saw all ten. No soft touches on this run. That is the kind of work that gets the boss out of his chair.",
+        "The locker room has a new problem today: @{name}. Ten straight qualifying wins. Someone better have an answer.",
+        "I do not hand out attention for showing up. @{name} earned it with ten straight today. Take your bow. Then get back to work.",
+        "Tonight's memo is short: remember @{name}. Ten straight on the Daily Heat run. That name belongs under brighter lights."],
       debut:{profile:'ceo',text:'Welcome to Cage Grind, @{name}. Build a record worth putting under the bright lights.'},
       performanceBonus:{profile:'ceo',text:'I noticed that performance, @{name}. A bonus is already on the way.'}
     },

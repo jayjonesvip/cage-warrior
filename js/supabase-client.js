@@ -165,7 +165,7 @@
     async function selectCageSeedFighterRoster(){return rpc('get_cage_seed_fighter_roster',{})}
     async function getCageInteractionsRemaining(){return rpc('get_cage_interactions_remaining',{})}
     async function insertCagePost(values){return rpc('publish_cage_post',values)}
-    async function insertCageCeoPost(eventKey){return rpc('publish_cage_ceo_post',{p_event_key:eventKey})}
+    async function insertCageCeoPost(eventKey){return rpc(eventKey.startsWith('daily_heat_')?'publish_cage_daily_heat_post':'publish_cage_ceo_post',{p_event_key:eventKey})}
     async function insertCageSponsorPost(sponsorId){return rpc('publish_cage_sponsor_post',{p_sponsor_id:sponsorId})}
     async function registerCageFighterReferral(inviterId){return rpc('register_cage_fighter_referral',{p_inviter_id:inviterId})}
     async function qualifyCageFighterReferral(){return rpc('qualify_cage_fighter_referral',{})}

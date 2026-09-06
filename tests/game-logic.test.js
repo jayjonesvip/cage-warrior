@@ -383,8 +383,8 @@ test('zero Energy cannot start a fight',()=>{
 });
 
 test('daily counters retain fight count and same-day bonus progress',()=>{
-  assert.deepEqual(logic.dailyCountersFor({date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true,train:3,hustle:2},'2026-08-28'),{date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true});
-  assert.deepEqual(logic.dailyCountersFor({},'2026-08-28'),{date:'2026-08-28',fight:0,qualifyingWinStreak:0,bonusFightAwarded:false});
+  assert.deepEqual(logic.dailyCountersFor({date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true,train:3,hustle:2},'2026-08-28'),{date:'2026-08-28',fight:13,qualifyingWinStreak:5,bonusFightAwarded:true ,heatAuraAwarded:false});
+  assert.deepEqual(logic.dailyCountersFor({},'2026-08-28'),{date:'2026-08-28',fight:0,qualifyingWinStreak:0,bonusFightAwarded:false ,heatAuraAwarded:false});
 });
 
 test('five consecutive on-level or higher wins award one daily fight bonus',()=>{

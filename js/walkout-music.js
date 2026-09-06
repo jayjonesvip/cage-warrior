@@ -4,7 +4,7 @@
   const tierFor=aura=>[40,60,80,99].filter(limit=>Number(aura)>=limit).length;
   function create(options={}){
     const Context=options.AudioContext||root.AudioContext||root.webkitAudioContext;
-    let enabled=false,volume=.35,ctx,master,noise,timer=null,scene='off',tier=0,step=0,next=0,generation=0;
+    let preview=false,enabled=false,volume=.35,ctx,master,noise,timer=null,scene='off',tier=0,step=0,next=0,generation=0;
     const voices=new Set();
     try{const saved=JSON.parse(root.localStorage.getItem(KEY));enabled=saved?.enabled===true;volume=Math.max(0,Math.min(1,Number(saved?.volume??.35)))}catch{}
     if(!Number.isFinite(volume))volume=.35;
@@ -45,7 +45,7 @@
     }
     async function play(){
       halt();const token=generation;
-      if(!enabled||scene==='off'||!Context||root.document?.hidden)return;
+      if((!enabled&&!preview)||scene==='off'||!Context||root.document?.hidden)return;
       try{
         if(!ctx){
           ctx=new Context();master=ctx.createGain();master.gain.value=0;
@@ -54,17 +54,17 @@
           const data=noise.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
         }
         await ctx.resume();
-        if(token!==generation||!enabled||scene==='off'||root.document?.hidden)return;
+        if(token!==generation||(!enabled&&!preview)||scene==='off'||root.document?.hidden)return;
         master.gain.setTargetAtTime(volume*(scene==='walkout'?.65:.3),ctx.currentTime,.12);
         next=ctx.currentTime+.1;step=0;tick();timer=setInterval(tick,25);
       }catch{halt()}
     }
-    function setScene(value,aura=0){scene=['locker','walkout'].includes(value)?value:'off';tier=tierFor(aura);void play()}
+    function setScene(value,aura=0){preview=false;scene=['locker','walkout'].includes(value)?value:'off';tier=tierFor(aura);void play()}
     function setEnabled(value){enabled=!!value;save();void play()}
-    function setVolume(value){const number=Number(value);if(!Number.isFinite(number))return;volume=Math.max(0,Math.min(1,number));save();if(master)master.gain.setTargetAtTime(enabled&&scene!=='off'&&!root.document?.hidden?volume*(scene==='walkout'?.65:.3):0,ctx.currentTime,.05)}
+    function setVolume(value){const number=Number(value);if(!Number.isFinite(number))return;volume=Math.max(0,Math.min(1,number));save();if(master)master.gain.setTargetAtTime((enabled||preview)&&scene!=='off'&&!root.document?.hidden?volume*(scene==='walkout'?.65:.3):0,ctx.currentTime,.05)}
     root.document?.addEventListener('visibilitychange',()=>{if(root.document.hidden)halt();else void play()});
     root.addEventListener?.('pagehide',()=>{scene='off';halt()});
-    return {setScene,setEnabled,setVolume,stop:()=>setScene('off'),get enabled(){return enabled},get volume(){return volume},get supported(){return !!Context}};
+    return {preview:(aura=0)=>{preview=true;scene='walkout';tier=tierFor(aura);void play()},setScene,setEnabled,setVolume,stop:()=>setScene('off'),get enabled(){return enabled},get volume(){return volume},get supported(){return !!Context}};
   }
   const api={create,tierFor};root.CAGE_MUSIC=api;if(typeof module==='object')module.exports=api;
 })(globalThis);

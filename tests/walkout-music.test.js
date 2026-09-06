@@ -34,6 +34,12 @@ test('saved preference and volume survive, unavailable audio is nonfatal',async(
   music.setVolume(5);assert.equal(music.volume,1);
   h.box.AudioContext=null;const unsupported=h.api.create();assert.equal(unsupported.supported,false);unsupported.setScene('locker');await Promise.resolve();
 });
+test('Home preview plays while music is off without changing the saved toggle',async()=>{
+  const h=harness(),music=h.api.create();
+  music.preview(99);await flush();assert.equal(h.jobs.size,1);assert.equal(music.enabled,false);
+  music.stop();assert.equal(h.jobs.size,0);
+  music.setScene('locker',99);await flush();assert.equal(h.jobs.size,0);
+});
 test('locker music is wired before the game and walkout ends before combat',()=>{
   const read=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8');
   const html=read('index.html'),game=read('js/game.js');
