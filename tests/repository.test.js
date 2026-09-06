@@ -505,8 +505,8 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   assert.match(styles,/\.post-fight-message-typing i\{[^}]*animation:postFightTyping 1s ease-in-out infinite/);
   assert.match(styles,/@keyframes postFightTyping/);
   const copyContext={};vm.runInNewContext(strings,copyContext);const contacts=copyContext.CAGE_STRINGS.postFightTexts.contacts;
-  assert.equal(contacts.length,5);
-  contacts.forEach(contact=>{assert.equal(contact.win.length,10,`${contact.name} needs ten win texts`);assert.equal(contact.loss.length,10,`${contact.name} needs ten loss texts`);assert.ok(contact.titleWin.length>=3,`${contact.name} needs varied title texts`)});
+  assert.equal(contacts.length,6);
+  contacts.filter(contact=>contact.id!=='unknown-number').forEach(contact=>{assert.equal(contact.win.length,10,`${contact.name} needs ten win texts`);assert.equal(contact.loss.length,10,`${contact.name} needs ten loss texts`);assert.ok(contact.titleWin.length>=3,`${contact.name} needs varied title texts`)});
 });
 
 test('legacy Diego presentation assets remain available while contract eligibility is controlled by core logic',()=>{
