@@ -32,7 +32,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.154';
+  const ICON_ASSET_VERSION = '2.7.155';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -45,6 +45,7 @@
   let careerSaveKnown = false;
 
   const defaultState = {
+    fightHistory:[],
     personalBests:{fastestFinish:0,biggestUpset:0,bestStreak:0},sponsorHighlightHistory:{},
     version:STATE_VERSION,name:'ROOKIE',nameLocked:false,rookieShowcasePending:false,firstContractPending:false,postFightTutorialSeen:false,fans:0,level:1,xp:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,rankingHistory:[],
     energy:100,maxEnergy:100,health:100,maxHealth:100,aura:0,followersUpdatedAt:Date.now(),followersAccrualAura:0,
@@ -299,6 +300,7 @@
       s.gearSeed=(Number(s.gearSeed)>>>0)||Math.floor(Math.random()*0xffffffff);s.gearWinsSinceDrop=clamp(Math.floor(Number(s.gearWinsSinceDrop))||0,0,4);
       const currentDate=LOGIC.localDateKey();s.dailyCounters=LOGIC.dailyCountersFor(s.dailyCounters,currentDate);const savedOpponentWins=source.dailyOpponentWins&&typeof source.dailyOpponentWins==='object'&&!Array.isArray(source.dailyOpponentWins)?source.dailyOpponentWins:null,winEntries=savedOpponentWins?.date===currentDate&&savedOpponentWins.wins&&typeof savedOpponentWins.wins==='object'&&!Array.isArray(savedOpponentWins.wins)?Object.entries(savedOpponentWins.wins):[];s.dailyOpponentWins={date:currentDate,wins:Object.fromEntries(winEntries.filter(([key])=>typeof key==='string'&&key.length<=100).map(([key,value])=>[key,clamp(Math.floor(Number(value))||0,0,2)]))};
       s.rankingHistory=(Array.isArray(source.rankingHistory)?source.rankingHistory:[]).filter(entry=>entry&&typeof entry==='object'&&typeof entry.won==='boolean').map(entry=>{const quality=Number(entry.quality);return {won:entry.won,quality:clamp(Math.round(Number.isFinite(quality)?quality:50),0,100)}}).slice(-30);
+      s.fightHistory=globalThis.CAGE_FIGHT_HISTORY.normalize(source.fightHistory);
       const legacySponsorId=ENDORSEMENT_IDS.includes(source.activeEndorsement?.id)?source.activeEndorsement.id:'',legacySponsorHistory=Array.isArray(source.endorsementHistory)?source.endorsementHistory:[],sponsor=LOGIC.sponsorProgress(endorsementDefs,s.fans,[...legacySponsorHistory,legacySponsorId].filter(Boolean)),pendingSponsorId=ENDORSEMENT_IDS.includes(source.sponsorAnnouncementPending)?source.sponsorAnnouncementPending:'';s.activeEndorsement=sponsor.active?{id:sponsor.active.id}:null;s.endorsementHistory=sponsor.history;s.sponsorAnnouncementPending=pendingSponsorId===s.activeEndorsement?.id?pendingSponsorId:'';
       delete s.fightInjury;
       s.installDetected=source.installDetected===true;s.installRewardClaimed=source.installRewardClaimed===true;if(s.installRewardClaimed)s.installDetected=true;
@@ -597,7 +599,18 @@
   function closeLevelUp(){const modal=$('#levelUpModal');clearTimeout(modal._burstTimer);modal._burstTimer=null;stopConfetti();modal.classList.remove('active');modal.setAttribute('aria-hidden','true');levelUpSummary=null;sfx.tap();updateUI();requestAnimationFrame(showPostFightFollowup)}
   function spendEnergy(n){const energySpent=LOGIC.spendEnergy(state,n);if(!energySpent){toast('ENERGY IS EMPTY · CHARGING AUTOMATICALLY','#ff766d');return 0}return energySpent}
 
+  let renderedFightHistory='';
+  function renderFightHistory(){
+    const entries=globalThis.CAGE_FIGHT_HISTORY.normalize(state.fightHistory),key=JSON.stringify(entries);
+    if(key===renderedFightHistory)return;renderedFightHistory=key;
+    $('#fightHistoryCount').textContent=entries.length+' SAVED FIGHT'+(entries.length===1?'':'S');
+    $('#fightHistoryList').innerHTML=entries.length?[...entries].reverse().map(entry=>{
+      const date=new Date(entry.date),method=entry.method==='SUBMISSION'&&entry.submission?'SUBMISSION · '+entry.submission:entry.method;
+      return `<details class="fight-history-entry"><summary><strong class="${entry.won?'history-win':'history-loss'}">${entry.won?'WIN':'LOSS'}</strong><b>${escapeHtml(entry.opponent)}</b><time datetime="${date.toISOString()}">${escapeHtml(date.toLocaleDateString())}</time></summary><dl><div><dt>Date</dt><dd>${escapeHtml(date.toLocaleString())}</dd></div><div><dt>Result</dt><dd>${entry.won?'Won':'Lost'} · ${escapeHtml(method)}</dd></div><div><dt>Opponent style</dt><dd>${escapeHtml(entry.style)}</dd></div><div><dt>Your style</dt><dd>${escapeHtml(entry.playerStyle||'Unknown')}</dd></div><div><dt>Finish</dt><dd>${entry.round?'Round '+entry.round:'Not recorded'}${entry.clock?' · '+escapeHtml(entry.clock)+' remaining':''}</dd></div>${entry.title?'<div><dt>Bout</dt><dd>World title fight</dd></div>':''}</dl></details>`;
+    }).join(''):'<p class="fight-history-note">No saved fights yet. Your next completed fight will appear here.</p>';
+  }
   function updateUI(){
+    renderFightHistory();
     ensureDailyCounters();
     const careerRank=rankName(),rankText=$('#rankText');$('#fightNightDay').textContent=localFightNightDay();$('#fighterName').textContent=state.name;$('#levelText').textContent=`LVL ${state.level}`;rankText.textContent=careerRank;rankText.classList.toggle('world-champion',careerRank==='WORLD CHAMPION');
     const headerRanking=currentRanking(),progressText=$('#progressText');progressText.textContent=state.attributePoints?`${state.attributePoints} POINT${state.attributePoints===1?'':'S'}`:(headerRanking?.position?`RANK #${headerRanking.position}`:'UNRANKED');progressText.classList.toggle('rank-status',!state.attributePoints&&!!headerRanking?.position);$('#recordText').textContent=`${state.wins}-${state.losses}`;$('#cageStatus').textContent=cageStatus();$('#heroLevel').textContent=`LVL ${state.level}`;
@@ -1476,6 +1489,7 @@
       o.wins=(o.wins||0)+1;o.winsVsPlayer=(o.winsVsPlayer||0)+1;o.rematchAccepted=true;if(circuitOpponent&&!fight.forfeited){o.lastDefeatedPlayerAt=Date.now();state.circuitLossStreak++}state.losses++;state.winStreak=0;if(!fight.forfeited)fans=changeFollowers(LOGIC.fightFollowerReward({opponentBaseFollowers:o.fans,won:false}));state.aura=clamp(state.aura+auraBaseChange,0,100);auraAppliedChange=state.aura-auraBefore;sfx.lose();
       if(fight.forfeited){$('#resultTitle').textContent='FIGHT FORFEITED';$('#resultLine').textContent=`You left the cage. ${o.name} receives the win, and the loss is official.`}else{$('#resultTitle').textContent='YOU LOST';$('#resultLine').textContent=fight.cornerTowel?`Your corner protected you. ${o.name} gets the TKO win.`:fight.haymakerMiss?'The last-chance haymaker missed, and the counter ended the fight.':fight.method==='SUBMISSION'?`${o.name} forced the tap with a ${(fight.submissionMove?.name||'submission').toLowerCase()}. Rebuild your defense and come back sharper.`:fight.method.includes('KO')?'The referee saves you from more damage. Back to the gym.':'Close the scorecard, remember the lesson, and come back better.'}$('#resultTitle').className='loss';
     }
+    state.fightHistory=globalThis.CAGE_FIGHT_HISTORY.append(state.fightHistory,fight,Date.now(),state.fighterStyle);
     const clock=String(fight.finishClock||'0:00').split(':').map(Number),finishSeconds=(fight.finishRound-1)*300+300-(clock[0]*60+clock[1]);
     const highlights=LOGIC.careerHighlights(state.personalBests,{won:win,forfeited:fight.forfeited,lowerLevel:lowerLevelWin,finish:fight.method.includes('KO')||fight.method==='SUBMISSION',finishSeconds,ratingGap:oppRating-playerRating,streak:state.winStreak});state.personalBests=highlights.records;
     const stampBox=$('#personalBestStamps');stampBox.hidden=!highlights.stamps.length;stampBox.innerHTML=highlights.stamps.map(label=>`<span>${escapeHtml(label)}</span>`).join('');
@@ -1537,7 +1551,7 @@
   function showPostFightFollowup(){if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.154" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.155" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
