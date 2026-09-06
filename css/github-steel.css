@@ -25,6 +25,13 @@
 }
 
 html, body { background:#010409; color:var(--text) }
+#healthHud{--health-tier-color:#5cc978;--health-tier-start:#3fae5c}
+#healthHud[data-health-tier="bruised"]{--health-tier-color:#e7d45b;--health-tier-start:#c2ab38}
+#healthHud[data-health-tier="battered"]{--health-tier-color:#f0b44e;--health-tier-start:#cf902c}
+#healthHud[data-health-tier="banged-up"]{--health-tier-color:#ee8846;--health-tier-start:#cf632f}
+#healthHud[data-health-tier="not-cleared"]{--health-tier-color:#f16b70;--health-tier-start:#cf424d}
+#healthHud #hudHealthLabel,#healthHud #hudHealthText{color:var(--health-tier-color)}
+#healthHud #hudHealthBar{background:linear-gradient(90deg,var(--health-tier-start),var(--health-tier-color));box-shadow:none}
 button, input, select, textarea { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif }
 button { transition:background-color .12s ease,border-color .12s ease,color .12s ease,transform .12s ease }
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px solid #58a6ff; outline-offset:2px }
@@ -102,6 +109,23 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #winnerStage .result-damage,#winnerStage .personal-best-stamps{position:relative;z-index:3}
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
+#walkoutModal{z-index:105;background:#01070cdd}
+.walkout-dialog{text-align:center;border-color:#4384a4;background:radial-gradient(ellipse at top,#204c66,#09131e 75%)}
+.walkout-dialog>small{color:#8edfff;letter-spacing:1px}
+#walkoutMessage{min-height:65px;display:grid;align-items:center;line-height:1.5;color:#dce9f2}
+#walkoutProgress{height:10px;overflow:hidden;border:1px solid #37566c;border-radius:999px;background:#040b11}
+#walkoutProgress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#258fd2,#8fe5ff)}
+#walkoutModal.open #walkoutProgress i{animation:walkoutFill 9s linear forwards}
+@keyframes walkoutFill{to{width:100%}}
+@media(prefers-reduced-motion:reduce){#walkoutModal.open #walkoutProgress i{animation:none!important;width:100%}}
+.home-fight-skin .entrance-music{margin:12px;border:1px solid #365269;border-radius:10px;background:linear-gradient(145deg,#0d2232,#08121c);overflow:hidden}
+.home-fight-skin .entrance-music>summary{padding:12px;min-height:52px}
+.home-fight-skin .entrance-music[open]>summary{border-bottom:1px solid #304555;background:#112432}
+.home-fight-skin .entrance-music .locker-music-controls{padding:12px;margin:0;border:0}
+.home-fight-skin .entrance-music .home-music-preview{margin:0 12px 12px;padding:12px 0 0;border-top:1px solid #304555}
+.profile-header-record{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;text-align:right;white-space:nowrap}
+.profile-header-record>b{font-variant-numeric:tabular-nums;color:#f0f6fc}
+.profile-header-record>small{color:#8b949e;letter-spacing:.6px}
 /* Rewards, supporting context, then progress: keep each zone distinct. */
 #resultModal .result-rewards-title{color:#ffe29a;text-shadow:0 0 12px #e4ba4633}
 #resultModal #rewardFans{font-size:clamp(21px,6vw,27px)!important;text-shadow:0 0 10px #4be47726}

@@ -2,11 +2,12 @@
   'use strict';
   const KEY='cage-grind-music-v1';
   const tierFor=aura=>[40,60,80,99].filter(limit=>Number(aura)>=limit).length;
+  const trackNameFor=aura=>['The Quiet Before','Word Gets Around','Bad Intentions','No Introduction','Heavy Is the Crown'][tierFor(aura)];
   function create(options={}){
     const Context=options.AudioContext||root.AudioContext||root.webkitAudioContext;
-    let preview=false,enabled=false,volume=.35,ctx,master,noise,timer=null,scene='off',tier=0,step=0,next=0,generation=0;
+    let preview=false,enabled=true,volume=.35,ctx,master,noise,timer=null,scene='off',tier=0,step=0,next=0,generation=0;
     const voices=new Set();
-    try{const saved=JSON.parse(root.localStorage.getItem(KEY));enabled=saved?.enabled===true;volume=Math.max(0,Math.min(1,Number(saved?.volume??.35)))}catch{}
+    try{const saved=JSON.parse(root.localStorage.getItem(KEY));enabled=saved?.enabled!==false;volume=Math.max(0,Math.min(1,Number(saved?.volume??.35)))}catch{}
     if(!Number.isFinite(volume))volume=.35;
     function save(){try{root.localStorage.setItem(KEY,JSON.stringify({enabled,volume}))}catch{}}
     function halt(){
@@ -66,5 +67,5 @@
     root.addEventListener?.('pagehide',()=>{scene='off';halt()});
     return {preview:(aura=0)=>{preview=true;scene='walkout';tier=tierFor(aura);void play()},setScene,setEnabled,setVolume,stop:()=>setScene('off'),get enabled(){return enabled},get volume(){return volume},get supported(){return !!Context}};
   }
-  const api={create,tierFor};root.CAGE_MUSIC=api;if(typeof module==='object')module.exports=api;
+  const api={create,tierFor,trackNameFor};root.CAGE_MUSIC=api;if(typeof module==='object')module.exports=api;
 })(globalThis);
