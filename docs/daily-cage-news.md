@@ -1,11 +1,15 @@
 # The Daily Cage
 
 Run `supabase/migrations/20260907120000_daily_cage_news.sql` before deploying.
+Then run `supabase/migrations/20260907160000_daily_cage_news_title_roundup.sql`
+to count all defenses per champion rather than returning the latest three events.
 
 Home shows one dismissible, manually swiped edition per local calendar day,
 starting the day after the fighter profile was created. It covers the previous
 local calendar day. Viewing marks the edition seen for that career on this browser;
-closing, switching tabs, and reloading do not show it again. There is no autoplay.
+closing, switching tabs, and reloading do not show it again. Headlines advance every
+six seconds. Hover, focus, touch, or manual navigation pauses rotation; a play/pause
+control resumes it. Reduced-motion preferences start with rotation paused.
 An empty or failed query does not display filler or mark an edition seen.
 
 Headlines use active profile creation dates, championship transfer/defense history,

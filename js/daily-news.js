@@ -14,35 +14,45 @@
   }
   function stories(data){
     const items=[];const count=Math.max(0,Number(data?.newFighters)||0),fights=Math.max(0,Number(data?.fights)||0);
-    for(const title of data?.titles||[])items.push(title.action==='transfer'
+    const titles=new Map();
+    for(const title of data?.titles||[]){const key=`${title.action}:${title.handle}`,entry=titles.get(key);if(entry)entry.count+=Math.max(1,Number(title.count)||1);else titles.set(key,{...title,count:Math.max(1,Number(title.count)||1)})}
+    for(const title of titles.values())items.push(title.action==='transfer'
       ?{tag:'AND NEW',title:'A new king of the cage.',body:`@${title.handle} took the world title. The chase starts all over again.`}
-      :{tag:'AND STILL',title:'The crown stays put.',body:`@${title.handle} defended the world title. Another challenger sent back to the drawing board.`});
+      :{tag:'AND STILL',title:'The crown stays put.',body:title.count>1?`@${title.handle} defended the crown ${title.count} times yesterday. Every challenger sent back to the drawing board.`:`@${title.handle} defended the world title. Another challenger sent back to the drawing board.`});
     if(count)items.push({tag:'FRESH BLOOD',title:`${count} new fighter${count===1?'':'s'}. Zero fear.`,body:`The roster got a little hungrier. ${count===1?'A new career began':`${count} new careers began`} yesterday.`});
     if(data?.upset)items.push({tag:'UPSET WATCH',title:'The rankings didn’t see it coming.',body:`@${data.upset.winner} beat higher-ranked @${data.upset.opponent}. The climb just got interesting.`});
     if(fights)items.push({tag:'AROUND THE CAGE',title:`${fights} fight${fights===1?'':'s'}. One wild day.`,body:'Recorded yesterday across Cage Grind. Every result left somebody with something to prove.'});
     return items;
   }
-  function create({element,client,storage,now=()=>new Date()}){
+  function create({element,client,storage,now=()=>new Date(),schedule=setTimeout,cancel=clearTimeout}){
     let profile=null,home=false,loading=false,attempt='',slides=[],index=0,visible=false,editionKey='';
     const read=(key,fallback)=>{try{return JSON.parse(storage.getItem(key))??fallback}catch{return fallback}};
     const write=(key,value)=>{try{storage.setItem(key,JSON.stringify(value));return true}catch{return false}};
     const key=()=>`cage-daily-news:${profile.id}:${profile.created_at}`;
-    const hide=()=>{visible=false;element.hidden=true};
+    let timer=null,paused=false;
+    const pauseButton=element.querySelector('[data-news-pause]');
+    const stop=()=>{if(timer!==null)cancel(timer);timer=null};
+    function setPaused(value){paused=value;stop();pauseButton.textContent=paused?'▶':'Ⅱ';pauseButton.setAttribute('aria-label',paused?'Resume automatic headlines':'Pause automatic headlines');if(!paused)start()}
+    function start(){stop();if(!visible||!home||paused||slides.length<2)return;timer=schedule(()=>{timer=null;if(globalThis.document?.hidden){setPaused(true);return}move(1);start()},6000);timer?.unref?.()}
+    const hide=()=>{stop();visible=false;element.hidden=true};
+    pauseButton.onclick=()=>setPaused(!paused);
+    element.addEventListener('pointerenter',()=>setPaused(true));
+    element.addEventListener('focusin',event=>{if(event.target!==pauseButton)setPaused(true)});
     function draw(){
       const story=slides[index];if(!story)return;
       element.querySelector('[data-news-tag]').textContent=story.tag;
       element.querySelector('[data-news-title]').textContent=story.title;
       element.querySelector('[data-news-body]').textContent=story.body;
       const dots=element.querySelector('[data-news-dots]');dots.replaceChildren();
-      slides.forEach((_,i)=>{const button=document.createElement('button');button.type='button';button.className='daily-news-dot';button.setAttribute('aria-label',`Headline ${i+1} of ${slides.length}`);button.setAttribute('aria-current',String(i===index));button.onclick=()=>{index=i;draw()};dots.append(button)});
+      slides.forEach((_,i)=>{const button=document.createElement('button');button.type='button';button.className='daily-news-dot';button.setAttribute('aria-label',`Headline ${i+1} of ${slides.length}`);button.setAttribute('aria-current',String(i===index));button.onclick=()=>{setPaused(true);index=i;draw()};dots.append(button)});
       element.querySelector('[data-news-controls]').hidden=slides.length<2;
     }
     function move(delta){if(slides.length){index=(index+delta+slides.length)%slides.length;draw()}}
     element.querySelector('[data-news-close]').onclick=hide;
-    element.querySelector('[data-news-prev]').onclick=()=>move(-1);
-    element.querySelector('[data-news-next]').onclick=()=>move(1);
+    element.querySelector('[data-news-prev]').onclick=()=>{setPaused(true);move(-1)};
+    element.querySelector('[data-news-next]').onclick=()=>{setPaused(true);move(1)};
     let touchX=0;const body=element.querySelector('[data-news-story]');
-    body.addEventListener('touchstart',event=>{touchX=event.changedTouches[0].clientX},{passive:true});
+    body.addEventListener('touchstart',event=>{setPaused(true);touchX=event.changedTouches[0].clientX},{passive:true});
     body.addEventListener('touchend',event=>{const delta=event.changedTouches[0].clientX-touchX;if(Math.abs(delta)>40)move(delta<0?1:-1)},{passive:true});
     async function load(){
       if(!home||!profile||loading)return;
@@ -60,6 +70,7 @@
         write(owner,current.key);editionKey=current.key;index=0;draw();
         element.querySelector('[data-news-date]').textContent=`${current.label.toUpperCase()} · YESTERDAY’S ROUNDUP`;
         visible=true;element.hidden=false;
+        setPaused(!!globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
       }catch{attempt='';/* Missing migration/network: don't block Home or mark seen. */}
       finally{loading=false}
     }
@@ -74,7 +85,7 @@
       }}catch{/* Retry after the next successful career sync. */}finally{flushing=false}
     }
     return {
-      profile(value){if(!value?.id||!value.created_at)return;if(profile&&(profile.id!==value.id||profile.created_at!==value.created_at)){hide();attempt=''}profile=value;void flush();void load()},
+      async profile(value){if(!value?.id||!value.created_at)return;if(profile&&(profile.id!==value.id||profile.created_at!==value.created_at)){hide();attempt=''}profile=value;await flush();void load()},
       visit(isHome){home=isHome;if(!home){hide();return}void load()},
       record(result){if(!profile)return;const outbox=key()+':results',queue=read(outbox,[]);if(!queue.some(item=>item.bout===result.bout))write(outbox,[...queue,{...result,career:profile.created_at}].slice(-100))}
     };

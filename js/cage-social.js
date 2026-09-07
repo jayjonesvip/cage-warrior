@@ -24,6 +24,8 @@
         p_fighter_avatar:profile.fighterAvatar
       });
       const base=Array.isArray(data)?data[0]||null:data;
+      if(database.saveDefendingPlan&&profile.defendingPlan)try{await database.saveDefendingPlan(profile.defendingPlan)}catch{/* Retry on the next career sync. */}
+      if(database.saveCombatStats&&profile.combatStats)try{await database.saveCombatStats(profile.combatStats)}catch{/* Retry on the next career sync. */}
       if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
       const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
@@ -40,6 +42,7 @@
         p_losses:profile.losses
       });
       const base=Array.isArray(data)?data[0]||null:data;
+      if(database.saveCombatStats&&profile.combatStats)try{await database.saveCombatStats(profile.combatStats)}catch{/* Retry on the next career sync. */}
       if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
       const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
@@ -58,10 +61,17 @@
     async function loadProfiles(limit=100){
       const count=Math.max(1,Math.min(1000,Math.floor(Number(limit))||100));
       const rows=await database.selectCageProfiles(count);
+      if(database.loadDefendingPlans&&Array.isArray(rows))try{const plans=await database.loadDefendingPlans(rows.map(row=>row.id));rows.forEach(row=>{row.defending_plan=plans?.[row.id]})}catch{/* Balanced default while offline or awaiting migration. */}
       const active=await database.ensureSession();
+      await attachCombatStats(rows);
       return Array.isArray(rows)?rows.filter(row=>row.id!==active.user.id).map(normalizeRankingProfile):[];
     }
 
+    async function attachCombatStats(rows){
+      if(!Array.isArray(rows))return;
+      try{const snapshots=await database.loadCombatStats(rows.map(row=>row.id));rows.forEach(row=>{row.combat_stats=snapshots?.[row.id]?.stats||null;row.combat_stats_updated_at=snapshots?.[row.id]?.updatedAt||null})}
+      catch{rows.forEach(row=>{row.combat_stats=null;row.combat_stats_updated_at=null})}
+    }
     function normalizeRankingProfile(row){
       if(!row||typeof row!=='object')return row;
       return {...row,attributeTotal:Number(row.attribute_total??row.attributeTotal),rankingHistory:Array.isArray(row.ranking_history)?row.ranking_history:Array.isArray(row.rankingHistory)?row.rankingHistory:[]};
@@ -88,6 +98,7 @@
       const tier=Math.max(1,Math.min(99,Math.floor(Number(level))||1));
       const count=Math.max(1,Math.min(20,Math.floor(Number(limit))||12));
       const rows=await database.selectCageOpponentCandidates(tier,count);
+      await attachCombatStats(rows);
       return Array.isArray(rows)?rows:[];
     }
 
@@ -129,7 +140,7 @@
       return reward?{referralId:String(reward.referral_id||''),inviteeHandle:String(reward.invitee_handle||'')}:null;
     }
 
-return {loadDailyNews:values=>database.loadDailyNews(values),recordNewsResult:result=>database.recordNewsResult(result),configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,registerReferral,qualifyReferral,claimReferralReward,sessionUserId:database.sessionUserId};
+return {saveDefendingPlan:plan=>database.saveDefendingPlan(plan),saveCombatStats:stats=>database.saveCombatStats(stats),loadDailyNews:values=>database.loadDailyNews(values),recordNewsResult:result=>database.recordNewsResult(result),configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,registerReferral,qualifyReferral,claimReferralReward,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

@@ -177,7 +177,7 @@ test('seeded circuit migration supplies two read-only opponents per level from 2
   assert.match(read('js/supabase-client.js'),/get_cage_seed_fighter_roster/);
   assert.match(read('js/cage-social.js'),/loadSeedFighterRoster/);
   assert.match(game,/SHARED_FEED\.loadSeedFighterRoster\(\)/);
-  assert.match(game,/profile\.seeded===true&&\['power','speed','chin','cardio'\]/);
+  assert.match(game,/LOGIC\.validCombatStats\(profile\.seeded===true\?profile:profile\.combat_stats\)/);
   assert.match(migration,/where seed\.active and lower\(seed\.handle\)=lower\(v_candidate\)/);
   assert.doesNotMatch(migration,/insert into auth\.users/i);
 });
@@ -236,7 +236,7 @@ test('Open Gym lists only the top 25 ranked fighters, excludes self, and freezes
   const profiles=Array.from({length:30},(_,i)=>({id:'fighter-'+i,handle:'Fighter'+i,level:i+1}));
   const source={network:true,sourceProfileId:'fighter-1',networkHandle:'Fighter1',name:'Fighter1',tier:2,tag:'GRAPPLER',tendency:'grappler',power:12,speed:9,chin:10,cardio:8};
   const state={socialProfileId:'fighter-0',name:'Fighter0',roster:[source]};
-  const context={closeSparScout:()=>{},state,currentRanking:()=>({fighters:profiles}),networkOpponentFromProfile:p=>({...source,sourceProfileId:p.id,networkHandle:p.handle,tier:p.level}),structuredClone,$:()=>({open:true}),saveState:()=>{},renderOpenGym:()=>{},sfx:{tap:()=>{}}};
+  const context={combatStatsPending:()=>false,closeSparScout:()=>{},state,currentRanking:()=>({fighters:profiles}),networkOpponentFromProfile:p=>({...source,sourceProfileId:p.id,networkHandle:p.handle,tier:p.level}),structuredClone,$:()=>({open:true}),saveState:()=>{},renderOpenGym:()=>{},sfx:{tap:()=>{}}};
   vm.createContext(context);
   const targets=game.slice(game.indexOf('  function sparringTargets('),game.indexOf('  function sparPlanAdvice('));
   const select=game.slice(game.indexOf('  function selectSparTarget('),game.indexOf('  function selectSparSetting('));
