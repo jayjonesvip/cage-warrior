@@ -24,7 +24,7 @@
     if(fights)items.push({tag:'AROUND THE CAGE',title:`${fights} fight${fights===1?'':'s'}. One wild day.`,body:'Recorded yesterday across Cage Grind. Every result left somebody with something to prove.'});
     return items;
   }
-  function create({element,client,storage,now=()=>new Date(),schedule=setTimeout,cancel=clearTimeout}){
+  function create({element,client,storage,now=()=>new Date(),schedule=setTimeout,cancel=clearTimeout,onSyncError=()=>{}}){
     let profile=null,home=false,loading=false,attempt='',slides=[],index=0,visible=false,editionKey='';
     const read=(key,fallback)=>{try{return JSON.parse(storage.getItem(key))??fallback}catch{return fallback}};
     const write=(key,value)=>{try{storage.setItem(key,JSON.stringify(value));return true}catch{return false}};
@@ -74,20 +74,23 @@
       }catch{attempt='';/* Missing migration/network: don't block Home or mark seen. */}
       finally{loading=false}
     }
-    let flushing=false;
+    let flushing=false,syncWarningShown=false;
+    const resultKey=result=>result.resultId||`${result.at}|${result.opponent}|${result.won}`;
     async function flush(){
       if(!profile||flushing)return;flushing=true;const owner=key(),outbox=owner+':results';
       try{for(const result of read(outbox,[])){
         if(owner!==key())break;
-        if(now().getTime()-Date.parse(result.at)>7*86400000){write(outbox,read(outbox,[]).filter(item=>item.bout!==result.bout));continue}
-        await client.recordNewsResult(result);
-        write(outbox,read(outbox,[]).filter(item=>item.bout!==result.bout));
-      }}catch{/* Retry after the next successful career sync. */}finally{flushing=false}
+        if(now().getTime()-Date.parse(result.at)>7*86400000){if(!syncWarningShown){syncWarningShown=true;onSyncError(new Error('Result needs manual recovery'))}continue}
+        try{
+          await client.recordNewsResult(result);
+          write(outbox,read(outbox,[]).filter(item=>resultKey(item)!==resultKey(result)));
+        }catch(error){if(!syncWarningShown){syncWarningShown=true;onSyncError(error)}}
+      }if(!read(outbox,[]).length)syncWarningShown=false;}catch(error){if(!syncWarningShown){syncWarningShown=true;onSyncError(error)}}finally{flushing=false}
     }
     return {
       async profile(value){if(!value?.id||!value.created_at)return;if(profile&&(profile.id!==value.id||profile.created_at!==value.created_at)){hide();attempt=''}profile=value;await flush();void load()},
       visit(isHome){home=isHome;if(!home){hide();return}void load()},
-      record(result){if(!profile)return;const outbox=key()+':results',queue=read(outbox,[]);if(!queue.some(item=>item.bout===result.bout))write(outbox,[...queue,{...result,career:profile.created_at}].slice(-100))}
+      record(result){if(!profile){onSyncError(new Error('Fighter profile has not synced'));return}const outbox=key()+':results',queue=read(outbox,[]);if(!queue.some(item=>resultKey(item)===resultKey(result)))write(outbox,[...queue,{...result,career:profile.created_at}])}
     };
   }
   return {dayKey,edition,eligible,stories,create};

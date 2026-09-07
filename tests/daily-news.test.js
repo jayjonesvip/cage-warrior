@@ -31,6 +31,16 @@ function harness(client,options={}){
 }
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 const profile={id:'player',created_at:new Date(2026,8,5).toISOString()};
+test('same fight count does not merge separate results; conflicts stay queued without blocking others',async()=>{
+  const saved=[],warnings=[];const h=harness({loadDailyNews:async()=>({}),recordNewsResult:async result=>{if(result.resultId==='first')throw Error('Conflicting fight result ID');saved.push(result.resultId)}},{onSyncError:error=>warnings.push(error.message)});
+  await h.controller.profile(profile);
+  const common={bout:15,at:new Date(2026,8,7,10).toISOString(),opponent:'Seed',won:false};
+  h.controller.record({...common,resultId:'first'});h.controller.record({...common,resultId:'second'});h.controller.record({...common,resultId:'second'});
+  await h.controller.profile(profile);
+  assert.deepEqual(saved,['second']);assert.deepEqual(warnings,['Conflicting fight result ID']);
+  const queue=JSON.parse([...h.entries].find(([key])=>key.endsWith(':results'))[1]);
+  assert.equal(queue.length,1);assert.equal(queue[0].resultId,'first');
+});
 test('repeated defenses collapse and aggregated counts remain accurate',()=>{
   const duplicate={action:'defense',handle:'Champ'};
   assert.equal(news.stories({titles:[duplicate,duplicate,duplicate]}).length,1);
