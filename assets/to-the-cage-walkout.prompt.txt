@@ -1,0 +1,9 @@
+Generated with the built-in image-generation tool.
+
+Use case: stylized-concept
+Asset type: cinematic background artwork for Cage Grind's 'To the Cage' walkout game screen.
+Primary request: A hooded MMA fighter seen entirely from behind, walking down the arena aisle toward an illuminated octagonal fighting cage. The crowd is present but barely visible, suggested by soft indistinct silhouettes deep in the shadows on either side.
+Style: premium realistic sports game key art, believable anatomy and fabric, cinematic photography quality.
+Composition: landscape 3:2 image, centered rear-view fighter from hood to upper legs in foreground, cage clearly recognizable ahead in middle distance. Strong perspective down the aisle. Fighter wearing a plain dark hooded walkout robe, face completely unseen. Keep important subjects within center area so image also crops well for mobile. Cage and athlete should read clearly at small sizes.
+Lighting: moody near-black and midnight blue arena, restrained cyan rim light around hood and shoulders, cool white spotlights illuminate cage through subtle atmospheric haze. Crowd stays dark, not detailed or distracting.
+Constraints: no lettering, no logos, no watermark, no UI, no visible fighter face, no extra foreground people.
