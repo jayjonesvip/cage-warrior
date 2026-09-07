@@ -26,3 +26,12 @@ test('rankings defer refresh during a matchup and resume after it closes',()=>{
 test('pending refresh does not fetch after navigation away',()=>{
  const h=harness('fight');h.ctx.scheduleSharedSocialRefresh();h.ctx.currentScreen='home';h.tick();assert.equal(h.calls.length,0);assert.equal(h.jobs.size,0);
 });
+
+test('fight rankings hide unsynced fighters and restore them after sync without changing rank',()=>{
+ const nodes=new Map(),shown=[],$=id=>{if(!nodes.has(id))nodes.set(id,{});return nodes.get(id)};
+ const waiting={key:'waiting',network:true,statsReady:false,worldRank:2},ready={key:'ready',network:true,statsReady:true,worldRank:5};
+ const ctx={$,opponents:[waiting,ready],centerFightRankingPending:false,visibleFightRankingCount:30,DAILY_FIGHT_LIMIT:12,refreshOpponents(){},sessionsLeft:()=>12,currentRanking:()=>({fighters:[waiting,ready],profile:null,position:0}),combatStatsPending:o=>!o.statsReady,setLimitBadge(){},renderFightLadderRow:o=>{shown.push(o.worldRank);return `<button>${o.key}</button>`}};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function renderOpponents('),source.indexOf('  function centerPlayerInRankings(')),ctx);
+ ctx.renderOpponents();assert.deepEqual(shown,[5]);assert.doesNotMatch($('#opponentList').innerHTML,/>waiting</);assert.match($('#rosterSummary').textContent,/1 RANKED/);
+ waiting.statsReady=true;shown.length=0;ctx.renderOpponents();assert.deepEqual(shown,[2,5]);assert.match($('#opponentList').innerHTML,/>waiting</);assert.match($('#rosterSummary').textContent,/2 RANKED/);
+});
