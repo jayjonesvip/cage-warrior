@@ -35,7 +35,7 @@
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.173';
+  const ICON_ASSET_VERSION = '2.7.174';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -276,6 +276,7 @@
   }
   function fighterLevelOrder(a,b){return b.tier-a.tier||Number(b.network)-Number(a.network)||String(a.name).localeCompare(String(b.name))}
   function rankedTitleContext(opponent,worldRank){
+    if(opponent.seeded)return nonTitleOpponent({...opponent,worldRank});
     const playerIsChampion=sharedChampionship?.is_champion===true,opponentIsChampion=opponent.sourceProfileId===sharedChampionship?.champion_id,fightMode=LOGIC.rankedFightTitleMode({playerIsChampion,defenseUsedToday:sharedChampionship?.defense_used_today===true,opponentIsChampion});
     if(fightMode==='ranked')return Object.assign({},opponent,{worldRank,titleDefenseComplete:playerIsChampion});
     const rematch=!playerIsChampion&&sharedChampionship?.former_champion_rematch===true,titleCooldown=playerIsChampion?sharedChampionship?.defense_used_today===true:sharedChampionship?.daily_bout_used===true;
@@ -1346,6 +1347,7 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
     closeTapeStats(false);closeTapeBreakdown(false);clearFightTimers();fight=createFight(o);if(fromFeed&&/^shared-\d+$/.test(String(options.feedChallengePostId||'')))fight.feedChallengePostId=String(options.feedChallengePostId);combatLocked=false;fightTimelineIndex=0;trackEvent('fight_matchup_viewed',{opponent_key:o.key,opponent_archetype:o.tendency,is_rematch:(o.meetings||0)>0,is_title:!!o.globalChampionship,rookie_showcase:!!o.rookieShowcase,first_contract:!!o.firstContract});$('#tapeBackBtn').textContent=fromFeed?'BACK TO FEED':'GO BACK';$('#fightOverlay').classList.add('active');showFightStage('tapeStage');$('#tapeStage').scrollTop=0;fillTape(fight);writeHistory('preview','push');sfx.tap();
   }
   function closeFightPreview(){const fromHistory=arguments[0]===true;if(combatLocked)return;if(!fromHistory&&history.state?.[HISTORY_KEY]&&history.state.layer==='preview'){history.back();return}closeTapeStats(false);closeTapeBreakdown(false);clearFightTimers();$('#fightOverlay').classList.remove('active');$('#tapeBackBtn').textContent='GO BACK';fight=null;sfx.tap()}
+  function nonTitleOpponent(opponent){return {...opponent,globalChampionship:false,championDefense:false,titleMode:'ranked',titleName:'',titleCooldown:false,formerChampionRematch:false,challengeEligible:false,defenses:0}}
   async function commitFight(o=fight?.o){
     if(!o)return;
     if(combatLocked||state.pendingFight)return;
@@ -1353,7 +1355,7 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
     if(sessionsLeft('fight',DAILY_FIGHT_LIMIT)<1){toast('Daily fight limit reached. New fights unlock at local midnight.','#ff766d');fillTape(fight);return}
     if(state.health<MINIMUM_FIGHT_HEALTH){toast(`You need at least ${MINIMUM_FIGHT_HEALTH} health to be cleared.`,'#ff766d');return}
     if(!hasActionEnergy()){toast('You cannot fight at 0 Energy. Charging automatically.','#ff766d');return}
-    let championshipBout=null;if(o.globalChampionship){$('#tapeFightBtn').disabled=true;$('#tapeFightBtn').textContent='BOOKING TITLE FIGHT…';try{if(!await connectSharedSocial(true))throw new Error(sharedSocialError||'Cage Network connection required.');championshipBout=await SHARED_FEED.beginChampionshipBout(o.sourceProfileId);if(!championshipBout?.challenge_id)throw new Error('The title fight could not be booked.')}catch(error){toast(fighterSessionMessage(error),'#ff766d');fillTape(fight);return}}
+let championshipBout=null;if(o.globalChampionship){$('#tapeFightBtn').disabled=true;$('#tapeFightBtn').textContent='BOOKING TITLE FIGHT…';try{if(!await connectSharedSocial(true))throw new Error(sharedSocialError||'Cage Network connection required.');championshipBout=await SHARED_FEED.beginChampionshipBout(o.sourceProfileId);if(!championshipBout?.challenge_id)throw new Error('The title fight could not be booked.')}catch(error){if(o.championDefense&&String(error?.message||error).includes('That ranked fighter is not available for a title defense')){o=nonTitleOpponent(o);championshipBout=null;fight.o=o;fillTape(fight);toast('NON-TITLE RANKED FIGHT · YOUR BELT IS NOT ON THE LINE','#78dfff')}else{toast(fighterSessionMessage(error),'#ff766d');fillTape(fight);return}}}
     const booking=LOGIC.bookFight(state,o.key,FIGHT_ENERGY_COST,Date.now(),MINIMUM_ACTION_ENERGY_EXCLUSIVE);if(!booking.ok){if(booking.reason==='energy')toast('You cannot fight at 0 Energy. Charging automatically.','#ff766d');return}
     if(o.rookieShowcase)state.rookieShowcasePending=false;if(o.firstContract)state.firstContractPending=false;
     if(championshipBout)Object.assign(state.pendingFight,{challengeId:championshipBout.challenge_id,challengerId:championshipBout.challenger_id,playerIsChampion:championshipBout.player_is_champion===true});
@@ -1696,7 +1698,7 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
   function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.173" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.174" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
