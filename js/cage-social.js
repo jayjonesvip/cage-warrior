@@ -129,7 +129,7 @@
       return reward?{referralId:String(reward.referral_id||''),inviteeHandle:String(reward.invitee_handle||'')}:null;
     }
 
-    return {configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,registerReferral,qualifyReferral,claimReferralReward,sessionUserId:database.sessionUserId};
+return {loadDailyNews:values=>database.loadDailyNews(values),recordNewsResult:result=>database.recordNewsResult(result),configured:database.configured,ensureSession:database.ensureSession,registerProfile,claimIdentity,retireProfile,loadChampionship,beginChampionshipBout,settleChampionshipBout,loadFeed,loadProfiles,loadOwnProfile,loadCareer,saveCareer,loadProfileCount,loadOpponentCandidates,loadSeedFighterRoster,loadInteractionAllowance,publishPost,publishCeoPost,publishSponsorPost,registerReferral,qualifyReferral,claimReferralReward,sessionUserId:database.sessionUserId};
   }
 
   return {createClient};

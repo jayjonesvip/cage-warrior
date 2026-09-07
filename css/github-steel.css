@@ -25,6 +25,9 @@
 }
 
 html, body { background:#010409; color:var(--text) }
+.fight-rank-avatar{position:relative}
+.fight-rank-avatar .fight-country-badge{position:absolute;right:2px;bottom:2px;z-index:2;padding:2px;border-radius:3px;background:#07111be6;pointer-events:none}
+.fight-rank-avatar .fight-country-badge img{width:16px;height:11px;object-fit:contain;border-radius:0}
 #healthHud{--health-tier-color:#5cc978;--health-tier-start:#3fae5c}
 #healthHud[data-health-tier="bruised"]{--health-tier-color:#e7d45b;--health-tier-start:#c2ab38}
 #healthHud[data-health-tier="battered"]{--health-tier-color:#f0b44e;--health-tier-start:#cf902c}
@@ -112,10 +115,11 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #walkoutModal{z-index:105;background:#01070cdd}
 .walkout-dialog{text-align:center;border-color:#4384a4;background:radial-gradient(ellipse at top,#204c66,#09131e 75%)}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
-#walkoutMessage{min-height:65px;display:grid;align-items:center;line-height:1.5;color:#dce9f2}
+#walkoutModal #walkoutTitle{font-family:"Segoe UI",system-ui,sans-serif;font-size:27px!important;font-weight:800;line-height:1.12;letter-spacing:.6px;min-height:64px;display:grid;align-content:center;margin:15px 0 0}
+#walkoutModal #walkoutMessage{font-size:13px!important;min-height:64px;display:grid;align-items:center;line-height:1.5;color:#b5c9d7;margin:10px 0 20px}
 #walkoutProgress{height:10px;overflow:hidden;border:1px solid #37566c;border-radius:999px;background:#040b11}
 #walkoutProgress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#258fd2,#8fe5ff)}
-#walkoutModal.open #walkoutProgress i{animation:walkoutFill 9s linear forwards}
+#walkoutModal.open #walkoutProgress i{animation:walkoutFill 7s linear forwards}
 @keyframes walkoutFill{to{width:100%}}
 @media(prefers-reduced-motion:reduce){#walkoutModal.open #walkoutProgress i{animation:none!important;width:100%}}
 .home-fight-history,.home-fight-skin .entrance-music{margin:12px;border:1px solid #365269;border-radius:10px;background:linear-gradient(145deg,#0d2232,#08121c);overflow:hidden}
@@ -181,3 +185,20 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultRewardsStage .result-actions{margin-top:22px}
 #resultModal #continueBtn{font-family:"Segoe UI",system-ui,sans-serif;min-height:48px;border-radius:12px;font-size:16px!important}
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}
+#dailyCageNews{flex:none;min-width:0;margin:0 0 10px;border:1px solid #446d87;border-radius:12px;overflow:hidden;background:linear-gradient(125deg,#123149,#09131e);color:#e1eaf0}
+#dailyCageNews[hidden],#dailyCageNews [hidden]{display:none!important}
+#dailyCageNews header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid #345369}
+#dailyCageNews header b{font-size:11px;color:#88d9f7;letter-spacing:1px}
+#dailyCageNews header small{display:block;font-size:9px;color:#a6bbc9;margin-top:3px}
+#dailyCageNews button{background:transparent;border:0;box-shadow:none;color:#91dff7;min-width:36px;min-height:36px;padding:0;border-radius:5px}
+#dailyCageNews [data-news-close],#dailyCageNews [data-news-prev],#dailyCageNews [data-news-next]{font-size:23px}
+#dailyCageNews .daily-news-story{padding:12px 16px 4px;min-height:96px;touch-action:pan-y}
+#dailyCageNews [data-news-tag]{font-size:9px;font-weight:800;color:#e9c76f;letter-spacing:1px}
+#dailyCageNews h2{font-family:inherit;font-size:13px!important;font-weight:800;line-height:1.2;margin:7px 0;color:#f3f5f7;overflow-wrap:anywhere}
+#dailyCageNews p{font-size:10px!important;color:#b7c9d5;line-height:1.5;text-align:left;margin:0;overflow-wrap:anywhere}
+#dailyCageNews .daily-news-controls{display:flex;align-items:center;justify-content:space-between;padding:0 8px 4px}
+#dailyCageNews [data-news-dots]{display:flex;flex-wrap:wrap;justify-content:center}
+#dailyCageNews .daily-news-dot{display:grid;place-items:center;min-width:28px}
+#dailyCageNews .daily-news-dot:after{content:'';width:6px;height:6px;background:#496073;border-radius:100%}
+#dailyCageNews .daily-news-dot[aria-current=true]:after{background:#84e0ff;width:16px;border-radius:5px}
+@media(pointer:coarse){#dailyCageNews button{min-height:44px;min-width:44px}}

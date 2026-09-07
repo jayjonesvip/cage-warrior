@@ -171,7 +171,7 @@
     async function qualifyCageFighterReferral(){return rpc('qualify_cage_fighter_referral',{})}
     async function claimCageFighterReferralReward(){return rpc('claim_cage_fighter_referral_reward',{})}
 
-    return {configured,ensureSession,registerCageProfile,syncCageFightSkin,syncCageRanking,claimCageIdentity,retireCageProfile,getCageChampionship,beginCageChampionshipChallenge,settleCageChampionshipChallenge,selectCageFeed,selectCageProfiles,selectOwnCageProfile,loadCageCareer,saveCageCareer,countCageProfiles,selectCageOpponentCandidates,selectCageSeedFighterRoster,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,insertCageSponsorPost,registerCageFighterReferral,qualifyCageFighterReferral,claimCageFighterReferralReward,sessionUserId:()=>session?.user?.id||''};
+return {loadDailyNews:values=>rpc('get_daily_cage_news',values),recordNewsResult:result=>rpc('record_cage_news_result',{p_result:result}),configured,ensureSession,registerCageProfile,syncCageFightSkin,syncCageRanking,claimCageIdentity,retireCageProfile,getCageChampionship,beginCageChampionshipChallenge,settleCageChampionshipChallenge,selectCageFeed,selectCageProfiles,selectOwnCageProfile,loadCageCareer,saveCageCareer,countCageProfiles,selectCageOpponentCandidates,selectCageSeedFighterRoster,getCageInteractionsRemaining,insertCagePost,insertCageCeoPost,insertCageSponsorPost,registerCageFighterReferral,qualifyCageFighterReferral,claimCageFighterReferralReward,sessionUserId:()=>session?.user?.id||''};
   }
 
   return {SESSION_KEY,createClient,normalizeSession};
