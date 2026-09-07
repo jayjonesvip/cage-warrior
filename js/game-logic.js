@@ -268,16 +268,16 @@
   }
 
   function matchupAdvice({playerLevel=1,opponentLevel=1,playerRating=0,opponentRating=0,titleBout=false,playerIsChampion=false,rookieShowcase=false}={}){
-    const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),ratingEdge=finite(playerRating)-finite(opponentRating),points=victoryAttributePointReward(playerLevel,opponentLevel);
-    if(rookieShowcase)return {tone:'favorable',headline:'LET US SEE WHAT YOU HAVE',message:'A clean opening test. Stay composed and make the first contract count.'};
-    if(titleBout&&playerIsChampion)return {tone:'title',headline:'PROTECT THE BELT',message:'Every ranked challenger can take what you earned. Do not overlook this defense.'};
-    if(titleBout)return {tone:levelDifference>0||ratingEdge<=-4?'danger':'title',headline:'YOUR TITLE SHOT',message:levelDifference>0||ratingEdge<=-4?'You are the underdog on paper, but one win changes everything.':'This is the moment you climbed for. Fight smart and take the belt.'};
-    if(levelDifference<0){const auraCost=Math.abs(auraFightChange({won:true,playerLevel,opponentLevel}));return {tone:'avoid',headline:'FAN BACKLASH',message:`A win pays no XP or Attribute Points, costs ${fightRule('experienceRewards.lowerLevelOpponentFollowerLossPercent',5)}% of your followers, and loses ${auraCost} Aura.`}}
-    if(levelDifference>=2||ratingEdge<=-8)return {tone:'danger',headline:'HIGH-RISK FIGHT',message:`You are out of your league on paper. A win still earns ${points} Attribute Points.`};
-    if(levelDifference>0)return {tone:'step-up',headline:'STEP-UP FIGHT',message:`A real test of your skills. The risk comes with ${points} Attribute Points.`};
-    if(ratingEdge>=4)return {tone:'favorable',headline:'GOOD TEST OF SKILLS',message:'You have the edge, but this opponent is at your level. Go earn the point.'};
-    if(ratingEdge<=-4)return {tone:'danger',headline:'TOUGH MATCHUP',message:'A hard fight at your level. Bring a real plan and earn the point.'};
-    return {tone:'even',headline:'RIGHT-SIZED FIGHT',message:'A good test of your skills. This is the matchup your career needs.'};
+    const levelDifference=whole(opponentLevel,1)-whole(playerLevel,1),ratingEdge=finite(playerRating)-finite(opponentRating);
+    if(rookieShowcase)return {tone:'favorable',headline:'LET US SEE WHAT YOU HAVE',message:'Stay composed and make your opening test count.'};
+    if(titleBout&&playerIsChampion)return {tone:'title',headline:'PROTECT THE BELT',message:'Respect the challenger and protect your belt.'};
+    if(titleBout)return {tone:levelDifference>0||ratingEdge<=-4?'danger':'title',headline:'YOUR TITLE SHOT',message:levelDifference>0||ratingEdge<=-4?'You are the underdog on paper, but one win changes everything.':'Fight smart and take the belt.'};
+    if(levelDifference<0)return {tone:'avoid',headline:'FAN BACKLASH',message:'Fans expect tougher competition; check the rewards before committing.'};
+    if(levelDifference>=2||ratingEdge<=-8)return {tone:'danger',headline:'HIGH-RISK FIGHT',message:'You are the underdog on paper; bring your best plan.'};
+    if(levelDifference>0)return {tone:'step-up',headline:'STEP-UP FIGHT',message:'A step up in competition that will test your skills.'};
+    if(ratingEdge>=4)return {tone:'favorable',headline:'GOOD TEST OF SKILLS',message:'You have the edge, but stay disciplined.'};
+    if(ratingEdge<=-4)return {tone:'danger',headline:'TOUGH MATCHUP',message:'Bring a solid plan for this tough matchup.'};
+    return {tone:'even',headline:'RIGHT-SIZED FIGHT',message:'An evenly matched test to build your career.'};
   }
 
   function assignAttributePoint(state,attribute){
