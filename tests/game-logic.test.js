@@ -26,7 +26,21 @@ test('higher-ranked opponents bridge level rewards without bypassing repeat limi
   assert.equal(repeat.qualifyingWinStreak,0);
 });
 
-test('unranked, tied and lower-ranked opponents retain level-based rewards',()=>{
+test('lower-ranked higher-level wins give one point without reducing XP',()=>{
+  const ranks={playerRank:3,opponentRank:10};
+  assert.equal(logic.victoryAttributePointReward(8,14,ranks),1);
+  assert.equal(logic.victoryAttributePointReward(8,8,ranks),1);
+  assert.equal(logic.victoryAttributePointReward(8,7,ranks),0);
+  assert.equal(logic.victoryAttributePointReward(8,14,{playerRank:3,opponentRank:2}),2);
+  const fighter={level:8,attributePoints:0};
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,opponentLevel:14,...ranks}),1);
+  assert.equal(fighter.attributePoints,1);
+  const match={playerLevel:8,opponentLevel:14,won:true,ranked:true};
+  assert.equal(logic.fightXp({...match,...ranks}).xp,logic.fightXp(match).xp);
+  assert.equal(logic.victoryAttributePointReward(8,14,{...ranks,opponentWinsToday:2}),1);
+});
+
+test('unranked, tied and lower-ranked lower-level opponents retain penalties',()=>{
   for(const ranks of [{playerRank:0,opponentRank:1},{playerRank:26,opponentRank:0},{playerRank:26,opponentRank:26},{playerRank:1,opponentRank:2}]){
     const match={...ranks,playerLevel:8,opponentLevel:3,won:true};
     assert.equal(logic.higherRankedOpponent(ranks),false);

@@ -118,9 +118,13 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #walkoutModal.open #walkoutProgress i{animation:walkoutFill 9s linear forwards}
 @keyframes walkoutFill{to{width:100%}}
 @media(prefers-reduced-motion:reduce){#walkoutModal.open #walkoutProgress i{animation:none!important;width:100%}}
-.home-fight-skin .entrance-music{margin:12px;border:1px solid #365269;border-radius:10px;background:linear-gradient(145deg,#0d2232,#08121c);overflow:hidden}
-.home-fight-skin .entrance-music>summary{padding:12px;min-height:52px}
-.home-fight-skin .entrance-music[open]>summary{border-bottom:1px solid #304555;background:#112432}
+.home-fight-history,.home-fight-skin .entrance-music{margin:12px;border:1px solid #365269;border-radius:10px;background:linear-gradient(145deg,#0d2232,#08121c);overflow:hidden}
+.home-fight-history>summary,.home-fight-skin .entrance-music>summary{padding:12px;min-height:52px;border:0;background:transparent}
+.home-fight-history[open]>summary,.home-fight-skin .entrance-music[open]>summary{border-bottom:1px solid #304555;background:#112432}
+.home-fight-history>summary{display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:#b6ddeb}
+.home-fight-history>summary>b{flex:1}
+.home-fight-history>summary:focus-visible{outline:2px solid #80d6f5;outline-offset:-3px}
+.home-fight-history .fight-history-entry:last-child{border-bottom:0}
 .home-fight-skin .entrance-music .locker-music-controls{padding:12px;margin:0;border:0}
 .home-fight-skin .entrance-music .home-music-preview{margin:0 12px 12px;padding:12px 0 0;border-top:1px solid #304555}
 .profile-header-record{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;text-align:right;white-space:nowrap}

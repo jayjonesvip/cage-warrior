@@ -1291,7 +1291,7 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.match(game,/#opponentList'\)\.addEventListener\('scroll',maybeLoadMoreFightRankings,\{passive:true\}\)/);
   assert.match(game,/scroller\.scrollTop\+scroller\.clientHeight<scroller\.scrollHeight-240/);
   assert.match(styles,/\.page-scroll\{[^}]*overflow-y:auto/);
-  assert.match(html,/fight-ladder-footer[^>]*>Tap a fighter for the Tale of the Tape/);
+  assert.match(html,/fight-ladder-footer[^>]*>Higher-ranked wins earn 2 Attribute Points/);
   assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
   assert.doesNotMatch(html,/data-opponent-filter/);
   assert.match(game,/onChampionshipChange:renderOpponents/);
@@ -1347,7 +1347,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
   assert.match(game,/if\(win\)\{[\s\S]*?state\.wins\+\+;state\.winStreak\+\+/);
   assert.match(game,/\}else\{[\s\S]*?state\.losses\+\+;state\.winStreak=0/);
-  assert.match(html,/Tap a fighter for the Tale of the Tape; on-level wins earn 1 Attribute Point/);
+  assert.match(html,/on-level Circuit wins earn 1/);
   assert.match(game,/CAGE CIRCUIT REMATCH/);
   assert.match(game,/circuitRematches\.length>1/);
   assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
@@ -1367,7 +1367,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
   for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
   assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
-  assert.match(html,/on-level wins earn 1 Attribute Point; higher-level or higher-ranked wins earn 2/);
+  assert.match(html,/Higher-ranked wins earn 2 Attribute Points/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 

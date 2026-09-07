@@ -222,6 +222,8 @@
     if(higherRankedOpponent(ranks)&&nonNegativeWhole(ranks.opponentWinsToday)<2)return 2;
     const player=Math.max(1,whole(playerLevel,1)),opponent=Math.max(1,whole(opponentLevel,1));
     if(opponent<player)return fightRule('attributePointRewards.victoryAgainstLowerLevelOpponent',0);
+    // Ranked wins down the ladder develop the fighter without the climbing bonus.
+    if(whole(ranks.playerRank)>0&&whole(ranks.opponentRank)>=whole(ranks.playerRank))return fightRule('attributePointRewards.victoryAgainstSameLevelOpponent',1);
     if(opponent>player)return fightRule('attributePointRewards.victoryAgainstHigherLevelOpponent',2);
     return fightRule('attributePointRewards.victoryAgainstSameLevelOpponent',1);
   }
