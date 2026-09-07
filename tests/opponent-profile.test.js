@@ -47,3 +47,12 @@ test('shared sponsor component clears badge and wallpaper for an unsponsored fig
  context.renderProfileSponsor({badge,wallpaper,surface},{id:'volt',brand:'Surge Core'});assert.equal(badge.hidden,false);assert.match(badge.innerHTML,/Surge Core/);assert.match(wallpaper.style.backgroundImage,/volt.png/);
  context.renderProfileSponsor({badge,wallpaper,surface},null);assert.equal(badge.hidden,true);assert.equal(badge.innerHTML,'');assert.equal(wallpaper.hidden,true);assert.equal(wallpaper.style.backgroundImage,'');
 });
+
+test('unavailable opponents remain inspectable but cannot be booked',async()=>{
+ const h=harness();h.ctx.opponentAvailable=()=>false;h.ctx.openTaleOfTape({key:'cooldown',name:'Champion',titleCooldown:true});
+ assert.equal(h.stages.at(-1),'opponentProfileModal');await h.ctx.commitFight();assert.equal(h.ctx.state.energy,100);assert.equal(h.ctx.state.pendingFight,undefined);
+});
+test('fighters awaiting stat sync remain inspectable but cannot be booked',async()=>{
+ const h=harness();h.ctx.combatStatsPending=()=>true;h.ctx.openTaleOfTape({key:'pending',name:'Pending fighter'});
+ assert.equal(h.stages.at(-1),'opponentProfileModal');await h.ctx.commitFight();assert.equal(h.ctx.state.energy,100);assert.equal(h.ctx.state.pendingFight,undefined);
+});

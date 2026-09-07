@@ -29,6 +29,6 @@ const calls=[],client=createClient({url:'https://test.supabase.co',key:'sb_publi
 test('payload and simulation share effective stats; missing stats block feed challenges as well',()=>{
   assert.match(game,/combatStats:Object\.fromEntries\(\['power','speed','chin','cardio'\]\.map\(key=>\[key,effectiveStat\(key\)\]\)\)/);
   assert.match(game,/const O=\{name:o.name,power:o.power,speed:o.speed,chin:o.chin,cardio:o.cardio\}/);
-  assert.match(game,/function openTaleOfTape\(o,options=\{\}\)\{\s+if\(combatStatsPending\(o\)\)/);
+  assert.match(game,/async function commitFight\(o=fight\?\.o\)\{\s+if\(!o\)return;\s+if\(combatStatsPending\(o\)\)/);
   assert.match(game,/if\(!opponent\|\|combatStatsPending\(opponent\)\)return \[\]/);
 });

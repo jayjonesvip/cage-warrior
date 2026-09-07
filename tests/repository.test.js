@@ -697,7 +697,7 @@ test('Home presents Career Progression in XP, Aura, Sponsor, Victory Pack, and D
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
   const packIndex=html.indexOf('id="victoryPackMeter"');
   const heatIndex=html.indexOf('id="dailyFightBonusMeter"');
-  const heroIndex=html.indexOf('<div class="hero career-after-setup fighter-profile-visual">');
+  const heroIndex=html.indexOf('<div class="hero career-after-setup fighter-profile-visual fighter-profile-with-chart">');
   assert.ok(heroIndex>=0&&xpIndex>=0&&auraIndex>xpIndex&&sponsorIndex>auraIndex&&packIndex>sponsorIndex&&heatIndex>packIndex);
   assert.match(html,/class="page-subhead home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
   assert.match(html,/id="careerAuraTrack"[^>]*role="progressbar"/);
@@ -1319,11 +1319,11 @@ test('CageReporter calls out lower-level wins and their follower backlash',()=>{
   assert.match(game,/lowerLevelWin:lowerLevelWin&&!calloutFight/);
 });
 
-test('Fight ladder keeps the current fighter visible but not selectable',()=>{
+test('Fight ladder opens the current fighter profile without offering a self fight',()=>{
   assert.match(game,/function renderPlayerRankingRow\(profile,position\)/);
-  assert.match(game,/class="fight-ranking-row player\$\{champion\?' champion':''\}" role="listitem"/);
+  assert.match(game,/class="fight-ranking-row player\$\{champion\?' champion':''\}" type="button" data-own-fighter-profile/);
   assert.match(game,/YOUR FIGHTER<\/span>/);
-  assert.match(game,/NOT SELECTABLE/);
+  assert.match(game,/VIEW PROFILE/);
   assert.match(game,/rankedEntries\.push\(\{rank:ranking\.position,html:renderPlayerRankingRow/);
   assert.match(styles,/\.fight-ranking-row\.player\{/);
 });
