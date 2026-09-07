@@ -1387,14 +1387,14 @@ test('desktop Fight layout uses a single-column navigation rail and centered det
   assert.match(styles,/\.tape-breakdown-sheet\{width:min\(720px,calc\(100% - 48px\)\)/);
 });
 
-test('Tale of the Tape includes dynamic agent matchup advice',()=>{
+test('opponent profile includes dynamic agent matchup advice',()=>{
   for(const id of ['tapeAgentRead','tapeAgentHeadline','tapeAgentMessage'])assert.ok(html.includes(`id="${id}"`),id);
   assert.equal((html.match(/id="tapeAgentRead"/g)||[]).length,1);
   assert.match(html,/class="tape-agent-avatar" src="assets\/contact-agent-carl.png\?v=[^"]+" alt="Agent Carl"/);
   assert.ok(fs.existsSync(path.join(root,'assets/contact-agent-carl.png')));
   assert.match(styles,/\.tape-agent-avatar\{[^}]*width:44px;height:44px/);
-  assert.ok(html.indexOf('id="tapeAgentRead"')>html.indexOf('id="tapeStatsPanel"'));
-  assert.ok(html.indexOf('id="tapeAgentRead"')<html.indexOf('class="tape-stats-bios"'));
+  assert.ok(html.indexOf('id="tapeAgentRead"')>html.indexOf('id="opponentProfileModal"'));
+  assert.ok(html.indexOf('id="tapeAgentRead"')<html.indexOf('id="tapeStage"'));
   assert.ok(html.indexOf('id="tapeAgentRead"')<html.indexOf('id="tapeBreakdown"'));
   assert.match(game,/LOGIC\.matchupAdvice/);
   assert.match(styles,/\.tape-agent-read/);
@@ -1424,7 +1424,7 @@ test('Tale of the Tape and Fight Details are top-level matchup sub-items',()=>{
   assert.ok(html.indexOf('id="tapeStatsToggle"')<html.indexOf('class="matchup-poster"'));
   assert.ok(html.indexOf('id="tapeTermsToggle"')<html.indexOf('class="matchup-poster"'));
   assert.match(game,/tapeStatsToggle'\)\.addEventListener\('click',openTapeStats\)/);
-  assert.match(styles,/\.matchup-promo-card \.tape-actions\{grid-template-columns:\.8fr 1\.45fr/);
+  assert.match(styles,/\.matchup-promo-card \.tape-actions\{grid-template-columns:1fr/);
   assert.match(styles,/\.matchup-promo-card \.tape-actions\{[^}]*width:100%;max-width:none/);
 });
 
