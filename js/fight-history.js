@@ -29,5 +29,15 @@
     return counts;
   }
   function recentResults(entries){return normalize(entries).slice(-5).reverse().map(entry=>entry.won?'W':'L')}
-  const api={normalize,append,breakdown,recentResults,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
+  function charts(entries){
+    const saved=normalize(entries),total=saved.length,wins=saved.filter(entry=>entry.won).length,finishes=breakdown(saved);
+    function donut(title,value,caption,segments){
+      const sum=segments.reduce((n,item)=>n+item[1],0);let start=0;
+      const stops=segments.filter(item=>item[1]).map(([label,count,color])=>{const end=start+count/sum*100,stop=`${color} ${start}% ${end}%`;start=end;return stop});
+      const legend=segments.map(([label,count,color])=>`<span><i style="background:${color}"></i>${count} ${label}</span>`).join('');
+      return `<section class="history-chart"><h3>${title}</h3><div class="history-donut" role="img" aria-label="${title}: ${segments.map(([label,count])=>count+' '+label).join(', ')}" style="background:${sum?'conic-gradient('+stops.join(',')+')':'#253644'}"><div><b>${value}</b><small>${caption}</small></div></div><div class="history-chart-legend">${legend}</div></section>`;
+    }
+    return donut('WIN / LOSS',total?Math.round(wins/total*100)+'%':'—','WIN RATE',[['W',wins,'#70bf99'],['L',total-wins,'#bb6878']])+donut('WIN METHODS',wins,'WINS',[['KO',finishes.ko,'#62cbea'],['SUB',finishes.sub,'#ad93d2'],['DEC',finishes.dec,'#c5a25c'],...(finishes.other?[['OTHER',finishes.other,'#a5b2bf']]:[])]);
+  }
+  const api={normalize,append,breakdown,recentResults,charts,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
 })(globalThis);

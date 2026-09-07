@@ -1,6 +1,16 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),history=require('../js/fight-history.js');
 const fight={winner:'player',o:{name:'Test Opponent',tendency:'grappler'},method:'SUBMISSION',submissionMove:{name:'Rear-Naked Choke'},finishRound:2,finishClock:'1:23'};
+test('charts use saved results and handle empty, all loss, and unknown finishes',()=>{
+  assert.doesNotMatch(history.charts([]),/NaN|Infinity|conic-gradient/);
+  const loss=history.append([],{...fight,winner:'opp'},123456);
+  assert.match(history.charts(loss),/>0%<\/b>/);
+  assert.match(history.charts(loss),/WIN METHODS: 0 KO, 0 SUB, 0 DEC/);
+  const mixed=history.append(loss,{...fight,method:'FORFEIT'},123457);
+  assert.match(history.charts(mixed),/>50%<\/b>/);
+  assert.match(history.charts(mixed),/1 OTHER/);
+  assert.match(history.charts(history.append([],fight,123456)),/>100%<\/b>/);
+});
 test('finish breakdown counts only saved wins and groups TKO with KO',()=>{
   let entries=[];
   for(const method of ['KO','TKO','SUBMISSION','UNANIMOUS DECISION','SPLIT DECISION','FORFEIT'])entries=history.append(entries,{...fight,method},123456);
