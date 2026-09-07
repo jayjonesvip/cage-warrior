@@ -35,7 +35,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),c
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.177';
+  const ICON_ASSET_VERSION = '2.7.178';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -862,11 +862,12 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
   function ceoCopyKey(eventKey){return eventKey.startsWith('performance_bonus_')?'performanceBonus':eventKey==='debut'?'debut':''}
   function ceoRemoteEventKey(eventKey){return eventKey.startsWith('performance_bonus_')?'performance_bonus':eventKey}
   function publishCeoEvent(eventKey,{sync=true}={}){
+    if(eventKey==='debut')return false;
     const copy=STRINGS.social.ceo[ceoCopyKey(eventKey)];if(!copy||state.ceoEvents.includes(eventKey))return false;
     state.ceoEvents.push(eventKey);state.ceoEvents=state.ceoEvents.slice(-40);state.socialCycle=Math.max(1,state.socialCycle+1);addSocialPosts(copyPosts([copy],{name:state.name}));
     if(sync&&state.socialAccountCreated)queueSharedPosts([{kind:'ceo',eventKey:ceoRemoteEventKey(eventKey)}]);saveState();return true;
   }
-  function syncCeoCareerEvents(){if(!state.nameLocked)return;if(publishCeoEvent('debut',{sync:false})&&state.socialAccountCreated)queueSharedPosts([{kind:'ceo',eventKey:'debut'}])}
+  function syncCeoCareerEvents(){/* CEO posts are reserved for earned milestones, not signups. */}
   function queueTitleLossPresentation(champ){
     const historyId=Math.max(0,Math.floor(Number(champ?.last_title_loss_id))||0);if(!historyId||historyId<=state.lastTitleLossSeenId)return false;
     pendingTitleLossPresentation={id:historyId,opponent:String(champ.last_title_loss_opponent_handle||champ.champion_handle||'THE NEW CHAMPION').replace(/^@/,''),lostAt:champ.last_title_loss_at||'',rematch:champ.former_champion_rematch===true,cooldown:champ.cooldown_until||''};return true;
@@ -883,7 +884,7 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
   function createSocialAccount(){
     if(ensureSocialFeed())return;
     const firstAccount=!state.socialAccountCreated;state.socialAccountCreated=true;state.socialCycle=Math.max(1,state.socialCycle);state.socialPostedCycle=state.socialCycle;
-    const previousCeoEvents=[...state.ceoEvents],newCareer=firstAccount&&state.wins+state.losses===0,accountPosts=newCareer?copyPosts([STRINGS.social.account[0]],{name:state.name}):[],contractPosts=newCareer?copyPosts([STRINGS.social.contractSigning],{name:state.name,archetype:currentStyle()?.name||'fighter',city:currentCity()?.name||'the regional circuit'}):[];addSocialPosts(accountPosts);if(newCareer)publishCeoEvent('debut');if(contractPosts.length){addSocialPosts(contractPosts);queueSharedPosts(contractPosts.map(post=>({kind:'reporter',body:post.text})))}if(firstAccount&&previousCeoEvents.length)queueSharedPosts(previousCeoEvents.map(eventKey=>({kind:'ceo',eventKey:ceoRemoteEventKey(eventKey)})));
+    const previousCeoEvents=state.ceoEvents.filter(eventKey=>eventKey!=='debut'),newCareer=firstAccount&&state.wins+state.losses===0,contractPosts=newCareer?copyPosts([STRINGS.social.contractSigning],{name:state.name,archetype:currentStyle()?.name||'fighter',city:currentCity()?.name||'the regional circuit'}):[];if(contractPosts.length){addSocialPosts(contractPosts);queueSharedPosts(contractPosts.map(post=>({kind:'reporter',body:post.text})))}if(firstAccount&&previousCeoEvents.length)queueSharedPosts(previousCeoEvents.map(eventKey=>({kind:'ceo',eventKey:ceoRemoteEventKey(eventKey)})));
     const firstFollowers=firstAccount?changeFollowers(5):0;if(firstAccount)trackEvent('social_account_created',{followers_awarded:firstFollowers});toast(firstFollowers?`CAGE FEED ACCOUNT CREATED · +${firstFollowers} FOLLOWERS`:'CAGE FEED ACCOUNT CONNECTED','#6ed7ff');sfx.win();saveState();
   }
   function drawSocialHeadline(key,entries){
@@ -1385,12 +1386,38 @@ let championshipBout=null;if(o.globalChampionship){$('#tapeFightBtn').disabled=t
     $('#livePlayerStyle').textContent=String(currentStyle()?.name||state.fighterStyle||'UNKNOWN STYLE').toUpperCase();
     const intro=$('#roundInterstitial'),playerCondition=Math.round(fight.startingPlayerCondition??fight.timeline.find(item=>item.playerCondition!=null)?.playerCondition??fight.playerCondition),liveCard=$('#liveStage .live-card');liveCard.style.setProperty('--player-accent',currentAuraFightSkin().accent);liveCard.style.setProperty('--opponent-accent',fight.o.network?fighterAccent(fight.o.networkCity):fight.o.color||DEFAULT_FIGHTER_ACCENT);intro.classList.remove('active','leaving');intro.setAttribute('aria-hidden','true');resetBloodSportBurst();showFightStage('liveStage');setFightDecisionFocus(false);$('#livePlayerName').textContent=fight.player.name;$('#liveOppName').textContent=fight.opp.name;$('#liveOppStyle').textContent=fight.o.tag||'UNKNOWN STYLE';$('#livePlayerCondition').style.width=`${playerCondition}%`;$('#liveOppCondition').style.width='100%';$('#livePlayerConditionText').textContent=`${playerCondition}% CONDITION`;$('#liveOppConditionText').textContent='100% CONDITION';
   }
+  function isTutorialShowcase(sim,career){
+    return sim.o.rookieShowcase===true&&sim.o.key===ROOKIE_SHOWCASE.key&&!sim.o.network&&(sim.o.meetings||0)===0&&career.wins+career.losses===0;
+  }
+  function simulateProtectedShowcase(sim){
+    // Select a complete winning simulation before playback, never relabel a loss.
+    // Bound retries so even a pathological random source cannot stall onboarding.
+    for(let attempt=0;attempt<24;attempt++){
+      const candidate=structuredClone(sim);
+      for(let round=1;round<=FIGHT_ROUNDS&&!candidate.winner;round++)simulateRound(candidate,round,plannedStyleForRound(candidate,round));
+      if(!candidate.winner)settleFightDecision(candidate);
+      if(candidate.winner==='player'){Object.assign(sim,candidate);return}
+    }
+    simulateTutorialShowcase(sim);
+  }
+  function simulateTutorialShowcase(sim){
+    // Script only the first-career showcase; keep its timeline and scorecard consistent.
+    const style=state.fighterStyle||'striker',player=emptyFightStats(),opp=emptyFightStats();
+    sim.planAssessment=LOGIC.combatPlanRound({fighter:sim.player,opponent:sim.opp,plan:sim.gamePlan,style,opponentStyle:'striker',round:1}).assessment;
+    sim.plans.push(style);sim.lastPlan=style;sim.timeline.push({type:'roundStart',round:1,clock:'5:00'});
+    const lines=[`${sim.player.name} takes the center and establishes the range.`,`${sim.opp.name} reaches with a jab. ${sim.player.name} slips outside.`,style==='grappler'?`${sim.player.name} takes Vaso down and settles into top position.`:`${sim.player.name} backs Vaso toward the fence with a sharp combination.`,`${sim.player.name} keeps the pressure controlled and lands clean shots.`,`${sim.opp.name} shells up under the unanswered punches.`];
+    lines.forEach((text,index)=>{const landed=index!==1,damage=landed?18:0;const stats=landed?player:opp;stats.attempted++;if(landed){stats.landed++;stats.damage+=damage;sim.oppCondition=Math.max(0,sim.oppCondition-damage)}if(style==='grappler'&&index===2){player.takedowns++;player.control+=20}sim.timeline.push({type:'action',round:1,clock:['4:42','4:18','3:51','3:25','3:02'][index],text,className:landed?'player':'opp',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,landed,side:landed?'player':'opp',healthDamage:0})});
+    sim.rounds.push({round:1,plan:style,player,opp,scoreP:10,scoreO:9});addFightStats(sim.totals.player,player);addFightStats(sim.totals.opp,opp);
+    sim.winner='player';sim.method='TKO';sim.finishRound=1;sim.finishClock='2:58';sim.finalDecisionPending=false;
+    sim.timeline.push({type:'ko',round:1,clock:'2:58',text:`THE REFEREE STEPS IN! ${sim.player.name} wins the opening showcase!`,className:'ko',playerCondition:sim.playerCondition,oppCondition:sim.oppCondition,healthDamage:0});
+  }
   function beginPlannedFight(){
     if(!fight||fight.rounds.length)return;fight.openingApproach=fightPlanLabel(fight.gamePlan).toLowerCase();fight.tendencyRevealed=true;
     const defendingPlan=LOGIC.normalizeFightPlan(fight.gamePlan);
     Promise.resolve().then(()=>SHARED_FEED.saveDefendingPlan(defendingPlan)).catch(()=>{});
     fight.startingPlayerCondition=fight.playerCondition;
-    for(let round=1;round<=FIGHT_ROUNDS&&!fight.winner;round++)simulateRound(fight,round,plannedStyleForRound(fight,round));
+    if(isTutorialShowcase(fight,state))simulateProtectedShowcase(fight);
+    else for(let round=1;round<=FIGHT_ROUNDS&&!fight.winner;round++)simulateRound(fight,round,plannedStyleForRound(fight,round));
     fight.finalDecisionPending=false;if(!fight.winner&&fight.rounds.length>=FIGHT_ROUNDS)settleFightDecision(fight);fight.timeline=fight.timeline.filter(item=>item.type!=='fightMoment'&&item.type!=='lastChance');prepareLiveFight();trackEvent('fight_planned_sim_started',{player_archetype:state.fighterStyle,pace:fight.gamePlan.pace,offense:fight.gamePlan.offense,tactics:fight.gamePlan.tactics,rounds_simulated:fight.rounds.length});fightTimelineIndex=0;playFightTimeline(0);
   }
   function setFightDecisionFocus(active){const card=$('#liveStage .live-card');if(card)card.classList.toggle('decision-active',!!active)}
@@ -1699,7 +1726,7 @@ let championshipBout=null;if(o.globalChampionship){$('#tapeFightBtn').disabled=t
   function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.177" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.178" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
