@@ -144,11 +144,11 @@
     }
 
     async function selectCageProfiles(limit){
-      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,fight_skin_aura,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
+      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,draws,fight_skin_aura,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
     }
 
     async function selectOwnCageProfile(expectedUserId=''){
-      const active=await ensureSession(expectedUserId),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,fight_skin_aura,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`,{},expectedUserId);
+      const active=await ensureSession(expectedUserId),rows=await authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,draws,fight_skin_aura,updated_at&id=eq.${encodeURIComponent(active.user.id)}&retired_at=is.null&limit=1`,{},expectedUserId);
       return Array.isArray(rows)?rows[0]||null:null;
     }
 

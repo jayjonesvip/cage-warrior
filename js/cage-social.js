@@ -27,7 +27,7 @@
       if(database.saveDefendingPlan&&profile.defendingPlan)try{await database.saveDefendingPlan(profile.defendingPlan)}catch{/* Retry on the next career sync. */}
       if(database.saveCombatStats&&profile.combatStats)try{await database.saveCombatStats(profile.combatStats)}catch{/* Retry on the next career sync. */}
       if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
-      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
+      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory,p_draws:profile.draws||0});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
 
@@ -44,7 +44,7 @@
       const base=Array.isArray(data)?data[0]||null:data;
       if(database.saveCombatStats&&profile.combatStats)try{await database.saveCombatStats(profile.combatStats)}catch{/* Retry on the next career sync. */}
       if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
-      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory});
+      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory,p_draws:profile.draws||0});
       return Array.isArray(ranked)?ranked[0]||base:ranked||base;
     }
 

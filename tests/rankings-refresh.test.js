@@ -1,12 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync(require('node:path').join(__dirname,'../js/game.js'),'utf8');
-test('opening rankings centers your fighter once without moving later refreshes',()=>{
- const scroller={scrollTop:0,clientHeight:400,getBoundingClientRect:()=>({top:100}),querySelector:()=>({getBoundingClientRect:()=>({top:900,height:80})})};
- const ctx={centerFightRankingPending:true,currentScreen:'fight',fight:null,sharedSocialStatus:'ready',$:()=>scroller};
- vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function centerPlayerInRankings('),source.indexOf('  function maybeLoadMoreFightRankings(')),ctx);
- ctx.centerPlayerInRankings();assert.equal(scroller.scrollTop,640);assert.equal(ctx.centerFightRankingPending,false);
- scroller.scrollTop=250;ctx.centerPlayerInRankings();assert.equal(scroller.scrollTop,250);
- ctx.centerFightRankingPending=true;ctx.fight={};ctx.centerPlayerInRankings();assert.equal(scroller.scrollTop,250);assert.equal(ctx.centerFightRankingPending,true);
+test('opening the fight list starts at the top without moving later refreshes',()=>{
+ const scroller={scrollTop:640};
+ const ctx={resetFightListPending:true,currentScreen:'fight',fight:null,$:()=>scroller};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function resetFightListScroll('),source.indexOf('  function maybeLoadMoreFightRankings(')),ctx);
+ ctx.resetFightListScroll();assert.equal(scroller.scrollTop,0);assert.equal(ctx.resetFightListPending,false);
+ scroller.scrollTop=250;ctx.resetFightListScroll();assert.equal(scroller.scrollTop,250);
+ ctx.resetFightListPending=true;ctx.fight={};ctx.resetFightListScroll();assert.equal(scroller.scrollTop,250);assert.equal(ctx.resetFightListPending,true);
 });
 function harness(screen){
  const jobs=new Map(),calls=[];let serial=0;
@@ -30,8 +30,8 @@ test('pending refresh does not fetch after navigation away',()=>{
 test('fight rankings hide unsynced fighters and restore them after sync without changing rank',()=>{
  const nodes=new Map(),shown=[],$=id=>{if(!nodes.has(id))nodes.set(id,{});return nodes.get(id)};
  const waiting={key:'waiting',network:true,statsReady:false,worldRank:2},ready={key:'ready',network:true,statsReady:true,worldRank:5};
- const ctx={$,opponents:[waiting,ready],centerFightRankingPending:false,visibleFightRankingCount:30,DAILY_FIGHT_LIMIT:12,refreshOpponents(){},sessionsLeft:()=>12,currentRanking:()=>({fighters:[waiting,ready],profile:null,position:0}),combatStatsPending:o=>!o.statsReady,setLimitBadge(){},renderFightLadderRow:o=>{shown.push(o.worldRank);return `<button>${o.key}</button>`}};
- vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function renderOpponents('),source.indexOf('  function centerPlayerInRankings(')),ctx);
+ const ctx={$,opponents:[waiting,ready],resetFightListPending:false,visibleFightRankingCount:30,DAILY_FIGHT_LIMIT:12,refreshOpponents(){},sessionsLeft:()=>12,currentRanking:()=>({fighters:[waiting,ready],profile:null,position:0}),combatStatsPending:o=>!o.statsReady,setLimitBadge(){},renderFightLadderRow:o=>{shown.push(o.worldRank);return `<button>${o.key}</button>`}};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function renderOpponents('),source.indexOf('  function resetFightListScroll(')),ctx);
  ctx.renderOpponents();assert.deepEqual(shown,[5]);assert.doesNotMatch($('#opponentList').innerHTML,/>waiting</);assert.match($('#rosterSummary').textContent,/1 RANKED/);
  waiting.statsReady=true;shown.length=0;ctx.renderOpponents();assert.deepEqual(shown,[2,5]);assert.match($('#opponentList').innerHTML,/>waiting</);assert.match($('#rosterSummary').textContent,/2 RANKED/);
 });

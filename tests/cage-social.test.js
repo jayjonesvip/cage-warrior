@@ -230,7 +230,7 @@ test('identity claiming, profile sync, retirement, feed reads, roster filtering,
   const syncBody = JSON.parse(authenticated.find(request => request.url.endsWith('sync_cage_profile')).options.body);
   assert.deepEqual(syncBody, { p_level: 4, p_wins: 7, p_losses: 2, p_fighter_avatar: 'fighter-07' });
   const rankBodies = authenticated.filter(request => request.url.endsWith('sync_cage_ranking')).map(request=>JSON.parse(request.options.body));
-  assert.deepEqual(rankBodies,[{p_attribute_total:20,p_ranking_history:[]},{p_attribute_total:24,p_ranking_history:[{won:true,quality:65}]}]);
+  assert.deepEqual(rankBodies,[{p_attribute_total:20,p_ranking_history:[],p_draws:0},{p_attribute_total:24,p_ranking_history:[{won:true,quality:65}],p_draws:0}]);
   const postBody = JSON.parse(authenticated.find(request => request.url.endsWith('publish_cage_post')).options.body);
   assert.equal(postBody.p_target_profile_id, otherId);
   assert.equal(postBody.p_post_kind, 'callout');

@@ -481,7 +481,7 @@ test('balanced XP curve slows late-career leveling while preserving early progre
 });
 
 test('hybrid rankings keep the champion first and score the remaining field',()=>{
-  const profiles=[{id:'a',handle:'Alpha',level:9,wins:10,losses:0},{id:'b',handle:'Bravo',level:8,wins:2,losses:8},{id:'c',handle:'Champ',level:4,wins:1,losses:2}];
+  const profiles=[{id:'a',handle:'Alpha',level:9,wins:10,losses:0},{id:'b',handle:'Bravo',level:8,wins:2,losses:8},{id:'c',handle:'Champ',level:4,wins:1,losses:2,combat_stats:{power:5,speed:5,chin:5,cardio:5}}];
   const ranked=logic.rankFighters(profiles,{champion_id:'c'},25);
   assert.deepEqual(ranked.map(row=>row.id),['c','a','b']);
   assert.ok(ranked.every(row=>Number.isFinite(row.rankScore)));
@@ -517,9 +517,9 @@ test('hybrid ranking requires a proven record before rewarding an undefeated per
 });
 
 test('ranking fight history grades opponent difficulty deterministically',()=>{
-  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}),{won:true,quality:20});
-  assert.deepEqual(logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true,opponentRank:5}),{won:false,quality:94});
-  assert.deepEqual(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:12,championship:true,opponentRank:1}),{won:true,quality:99});
+ const entry=logic.rankingFightEntry({won:false,playerLevel:10,opponentLevel:12,ranked:true,opponentRank:5});
+ assert.equal(entry.opponent_rank_at_booking,5);assert.equal(entry.opponent_level_at_booking,12);assert.ok(Math.abs(entry.quality_points-(30+65*Math.exp(-4/40)+4))<.000001);
+ assert.equal(logic.rankingFightEntry({won:true,playerLevel:10,opponentLevel:10}).quality,20);
 });
 
 test('rank snapshots drive quality and title defenses do not inflate weak opposition',()=>{
@@ -610,4 +610,10 @@ test('collectible drops exclude owned and level-locked items',()=>{
 test('countdown formatting supports Energy and Health timers',()=>{
   assert.equal(logic.formatCountdown(444000),'00:07:24');
   assert.equal(logic.formatCountdown(0),'00:00:00');
+});
+
+test('World Rank uses base attributes even when a perk-inclusive combat snapshot exists',()=>{
+ const base={wins:20,losses:8,attributeTotal:40};
+ assert.equal(logic.rankingComponents({...base,combat_stats:{power:30,speed:30,chin:30,cardio:30},aura:100,fans:1000000}).score,logic.rankingComponents(base).score);
+ assert.equal(logic.rankingComponents({...base,baseStats:{power:15,speed:15,chin:15,cardio:15}}).attributeTotal,60);
 });

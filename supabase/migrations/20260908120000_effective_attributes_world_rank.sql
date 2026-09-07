@@ -1,0 +1,2 @@
+-- Superseded before application: live rankings must use base attributes only.
+-- The ranking-scorer migration prepares a separate perk-inclusive shadow score.

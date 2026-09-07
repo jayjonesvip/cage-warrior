@@ -322,23 +322,23 @@ test('fighter-name shuffle is a compact action beside the proposed name',()=>{
   assert.match(styles,/\.fighter-name-shuffle\{[^}]*min-height:74px/);
 });
 
-test('World Rank uses fight quality, recent form, and permanent attributes without gear',()=>{
+test('World Rank keeps permanent recovery stats separate from effective ranking stats',()=>{
   assert.match(game,/attributeTotal:Object\.values\(state\.stats\)/);
   assert.match(game,/rankingHistory:state\.rankingHistory/);
-  assert.match(game,/LOGIC\.rankingFightEntry\(\{won:win/);
+  assert.match(game,/LOGIC\.appendRankingResult\(state\.rankingHistory,fight\.rankingSnapshot/);
   assert.doesNotMatch(game,/attributeTotal:[^;\n]*(effectiveStat|equippedGear)/);
-  assert.match(read('README.md'),/30% résumé, 45% quality of defeated opposition, 20% recent form, and 5% permanent base attributes/);
+  assert.match(read('README.md'),/25% career record, 45% quality of wins, 25% recent form, and 5% base attributes/);
   const migration=read('supabase/migrations/20260902120000_hybrid_world_rank.sql');
   assert.match(migration,/add column if not exists attribute_total integer not null default 20/);
   assert.match(migration,/add column if not exists ranking_history jsonb not null default '\[\]'::jsonb/);
   assert.match(migration,/create or replace function public\.sync_cage_ranking/);
   assert.match(migration,/create or replace function public\.cage_world_rank_score/);
-  assert.match(read('js/cage-social.js'),/database\.syncCageRanking\(\{p_attribute_total:profile\.attributeTotal,p_ranking_history:profile\.rankingHistory\}\)/);
+  assert.match(read('js/cage-social.js'),/database\.syncCageRanking\(\{p_attribute_total:profile\.attributeTotal,p_ranking_history:profile\.rankingHistory,p_draws:profile\.draws\|\|0\}\)/);
   assert.match(read('js/supabase-client.js'),/attribute_total,ranking_history/);
   const confidenceMigration=read('supabase/migrations/20260903160000_rebalance_world_rank_confidence.sql');
   assert.match(confidenceMigration,/\(wins\+2\)\/\(wins\+losses\+4\)/);
   assert.match(confidenceMigration,/proven_win_rate\*75/);
-  assert.match(logic,/provenWinPercentage=fights\?\(wins\+2\)\/\(fights\+4\):0/);
+  assert.match(logic,/provenWinPercentage=\(wins\+draws\*\.5\+2\)\/\(fights\+4\)/);
 });
 
 test('migration does not erase followers when a legacy social flag is false',()=>{

@@ -18,7 +18,7 @@ test('seed progression changes records and quality history, not level or stats',
 });
 test('only seeded completed fights queue seed outcomes and flush precedes roster refresh',()=>{
   const game=read('js/game.js');
-  assert.match(game,/seedId:o.seeded\?o.sourceProfileId:null,playerLevel:playerLevelBefore/);
+  assert.match(game,/seedId:o.seeded\?o.sourceProfileId:null,playerLevel:fight.playerLevelAtBooking/);
   const sync=game.slice(game.indexOf('  async function connectSharedSocial('));
   assert(sync.indexOf('await dailyNews.profile(profile)')<sync.indexOf('SHARED_FEED.loadSeedFighterRoster()'));
   assert.match(read('js/daily-news.js'),/await flush\(\);void load\(\)/);

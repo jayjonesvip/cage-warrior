@@ -4,14 +4,14 @@
   const text=value=>typeof value==='string'?value.slice(0,120):'';
   function normalize(entries){
     return (Array.isArray(entries)?entries:[]).filter(entry=>entry&&typeof entry.won==='boolean'&&Number.isFinite(entry.date)&&entry.date>0&&entry.date<=8640000000000000).slice(-LIMIT).map(entry=>({
-      ...(typeof entry.resultId==='string'&&/^[0-9a-f-]{36}$/i.test(entry.resultId)?{resultId:entry.resultId}:{}),date:entry.date,won:entry.won,opponent:text(entry.opponent)||'Unknown opponent',style:text(entry.style)||'Unknown',
+      ...(typeof entry.resultId==='string'&&/^[0-9a-f-]{36}$/i.test(entry.resultId)?{resultId:entry.resultId}:{}),...(Number.isFinite(entry.quality_points)?{quality_points:entry.quality_points,opponent_rank_at_booking:entry.opponent_rank_at_booking??null,opponent_level_at_booking:entry.opponent_level_at_booking??null}:{}),date:entry.date,won:entry.won,opponent:text(entry.opponent)||'Unknown opponent',style:text(entry.style)||'Unknown',
       method:text(entry.method)||'Unknown',submission:text(entry.submission),round:Math.max(0,Math.min(3,Math.floor(Number(entry.round)||0))),
       clock:/^\d{1,2}:\d{2}$/.test(entry.clock)?entry.clock:'',playerStyle:text(entry.playerStyle),title:entry.title===true
     }));
   }
   function append(entries,fight,date=Date.now(),playerStyle=''){
     return normalize([...normalize(entries),{
-      resultId:fight.resultId,date,won:fight.winner==='player',opponent:fight.o?.networkHandle||fight.o?.name,
+      ...fight.rankingSnapshot,resultId:fight.resultId,date,won:fight.winner==='player',opponent:fight.o?.networkHandle||fight.o?.name,
       style:fight.o?.tendency||fight.o?.tag,method:fight.method,submission:fight.method==='SUBMISSION'?fight.submissionMove?.name:'',
       round:fight.finishRound,clock:fight.finishClock,playerStyle,title:!!fight.o?.globalChampionship
     }]);
