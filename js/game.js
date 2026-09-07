@@ -35,7 +35,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),c
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.181';
+  const ICON_ASSET_VERSION = '2.7.182';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -692,7 +692,7 @@ $,logic:LOGIC,getState:()=>state,getRank:()=>rankName(),getChampionship:()=>shar
     const sponsorProgress=syncSponsorProgress(false),sponsor=sponsorProgress.active,nextSponsor=sponsorProgress.next,sponsorBadge=$('#heroSponsor'),hero=$('.hero'),sponsorWallpaper=$('#heroSponsorWallpaper'),sponsorTrack=$('#careerSponsorProgressTrack'),sponsorFill=$('#careerSponsorProgressFill');
     if(nextSponsor){const currentFloor=sponsor?.followersRequired||0,goal=nextSponsor.followersRequired,needed=Math.max(0,goal-state.fans),stageProgress=clamp((state.fans-currentFloor)/Math.max(1,goal-currentFloor)*100,0,100);$('#careerSponsorLabel').textContent='NEXT SPONSOR';$('#careerSponsorText').textContent=nextSponsor.brand;$('#careerSponsorProgress').textContent=`${fmt(needed)} FOLLOWERS NEEDED`;$('#careerSponsorProgressMeta').textContent=`${fmt(state.fans)} / ${fmt(goal)} FOLLOWERS`;sponsorTrack.hidden=false;sponsorTrack.setAttribute('aria-valuemin',String(currentFloor));sponsorTrack.setAttribute('aria-valuemax',String(goal));sponsorTrack.setAttribute('aria-valuenow',String(state.fans));sponsorFill.style.width=`${stageProgress}%`}
     else{$('#careerSponsorLabel').textContent='SPONSOR STATUS';$('#careerSponsorText').textContent='TOP-TIER SPONSOR';$('#careerSponsorProgress').textContent=sponsor?.brand||'SPONSOR LADDER COMPLETE';$('#careerSponsorProgressMeta').textContent='';sponsorTrack.hidden=true;sponsorFill.style.width='100%'}
-    sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${sponsor.pilot?`<img class="pilot-sponsor-logo" src="${escapeHtml(sponsorLogo(sponsor))}" alt="">`:gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${escapeHtml(sponsor.brand)}</b></span>`:'';hero.classList.toggle('sponsored',!!sponsor);sponsorWallpaper.hidden=!sponsor;sponsorWallpaper.style.backgroundImage=sponsor?`url("${sponsorLogo(sponsor)}")`:'';
+    renderProfileSponsor({badge:sponsorBadge,wallpaper:sponsorWallpaper,surface:hero},sponsor);
     $('#cityChoices').innerHTML=city?'':fighterCities.map(c=>`<button class="city-choice" data-city="${c.id}" style="${fighterThemeStyle(c.id)}"><i aria-hidden="true"></i>${c.name}<small>${c.region}</small></button>`).join('');
     if(city&&!avatar)renderFighterBuilder();
     if(avatar)$('#heroFighterArt').src=avatar.asset;
@@ -1294,6 +1294,7 @@ refreshOpponents();const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),rank
   function renderStatsFightSkin(selector,aura,{compact=false}={}){
     const tier=LOGIC.auraTitle(Number(aura)||0),skin=auraFightSkins.find(item=>item.key===tier.key)||auraFightSkins[0],container=$(selector);
     container.style.setProperty('--fight-skin-accent',skin.accent);
+    if(compact){container.innerHTML=`<div class="home-fight-skin-display"><img src="${skin.glovesAsset}?v=${ICON_ASSET_VERSION}" alt="${skin.colorName} gloves"><div><div class="home-fight-skin-accessories"><img src="${skin.wrapsAsset}?v=${ICON_ASSET_VERSION}" alt="${skin.colorName} hand wraps"><img src="${skin.mouthguardAsset}?v=${ICON_ASSET_VERSION}" alt="${skin.colorName} mouthguard"></div><b>${skin.label}</b></div><img src="${skin.shortsAsset}?v=${ICON_ASSET_VERSION}" alt="${skin.colorName} shorts"></div>`;return}
     container.innerHTML=`${compact?'':`<small class="tape-stats-kit-owner">${selector==='#tapeStatsPlayerSkin'?'YOUR KIT':'OPPONENT KIT'}</small>`}<div class="tape-stats-kit-items">${[['gloves','gloves'],['wraps','hand wraps'],['mouthguard','mouthguard'],['shorts','shorts']].map(([key,label])=>`<img src="${skin[key+'Asset']}?v=${ICON_ASSET_VERSION}" alt="${skin.colorName} ${label}">`).join('')}</div><b>${skin.label}</b>${compact?'':'<small>FIGHT SKIN · COSMETIC</small>'}`;
   }
   function fillTape(f){
@@ -1309,12 +1310,25 @@ refreshOpponents();const fightsLeft=sessionsLeft('fight',DAILY_FIGHT_LIMIT),rank
     const matchup=edge>4?'YOU HAVE THE STATISTICAL EDGE':edge<-4?'OPPONENT HAS THE STATISTICAL EDGE':'ATTRIBUTES ARE EVENLY MATCHED',titleAction=f.o.titleMode==='defense'?'DEFEND THE TITLE':f.o.titleMode==='rematch'?'RECLAIM THE TITLE':'FIGHT FOR THE TITLE';$('#walkoutText').textContent=rookieShowcase?ROOKIE_SHOWCASE.headline:firstContract?FIRST_CONTRACT.headline:matchup;$('#tapeFightBtn').textContent='SET FIGHT PLAN';$('#opponentProfileFight').textContent=titleBout?titleAction:'START FIGHT';$('#fightPlanConfirm').textContent=titleBout?titleAction:firstContract?FIRST_CONTRACT.actionLabel:'LOCK IN FIGHT PLAN';renderTapeBreakdown();renderOpponentProfile(f);
   }
 
+  function renderProfileSponsor({badge,wallpaper,surface},sponsor){
+    const sponsorBadge=badge,sponsorWallpaper=wallpaper,hero=surface;
+    sponsorBadge.hidden=!sponsor;sponsorBadge.innerHTML=sponsor?`${sponsor.pilot?`<img class="pilot-sponsor-logo" src="${escapeHtml(sponsorLogo(sponsor))}" alt="">`:gameIcon(sponsor.id,sponsor.icon)}<span class="hero-sponsor-copy"><small>SPONSORED BY</small><b>${escapeHtml(sponsor.brand)}</b></span>`:'';hero.classList.toggle('sponsored',!!sponsor);sponsorWallpaper.hidden=!sponsor;sponsorWallpaper.style.backgroundImage=sponsor?`url("${sponsorLogo(sponsor)}")`:'';
+  }
+  function renderProfileAttributes({chart,totalLabel,legend},stats){
+    const attributes=[['power','#ff8a70'],['speed','#69caff'],['chin','#e5bb62'],['cardio','#7bd6af']].map(([key,color])=>({key,color,value:Math.max(0,Number(stats[key])||0)})),total=attributes.reduce((sum,attribute)=>sum+attribute.value,0);let offset=0;
+    const segments=attributes.map(({color,value})=>{const start=offset;offset+=total?value/total*100:0;return `${color} ${start}% ${offset}%`});
+    chart.style.background=total?`conic-gradient(${segments.join(',')})`:'#30475c';totalLabel.textContent=formatStat(total);
+    chart.setAttribute('aria-label',`Total attributes ${formatStat(total)}: ${attributes.map(({key,value})=>`${key} ${formatStat(value)}`).join(', ')}`);
+    legend.innerHTML=attributes.map(({key,color,value})=>`<div style="--attribute-color:${color}"><small>${key.toUpperCase()}</small><b>${formatStat(value)}</b></div>`).join('');
+  }
   function renderOpponentProfile(f){
     $('#opponentProfileAvatar').src=silhouetteForOpponent(f.o);$('#opponentProfileAvatar').alt=`${f.o.name} portrait`;
     $('#opponentProfileName').textContent=f.o.networkHandle?`@${f.o.networkHandle}`:f.o.name;
-    $('#opponentProfileMeta').textContent=`LEVEL ${f.o.tier} · PRO ${f.o.wins}-${f.o.losses} · ${f.o.tag||'UNKNOWN STYLE'}`;
+    $('#opponentProfileMeta').textContent=`LEVEL ${f.o.tier}`;$('#opponentProfileRecord').textContent=`PRO ${f.o.wins}-${f.o.losses}`;$('#opponentProfileStyle').textContent=f.o.tag||'UNKNOWN STYLE';
     const location=networkOpponentLocation(f.o)?.name||(f.o.country?opponentCountry(f.o.country).name:'Cage Circuit');$('#opponentProfileCity').textContent=location;
-    $('#opponentProfileStats').innerHTML=['power','speed','chin','cardio'].map(key=>`<div><small>${key.toUpperCase()}</small><b>${formatStat(f.opp[key])}</b></div>`).join('');
+    renderProfileAttributes({chart:$('#opponentAttributeDonut'),totalLabel:$('#opponentAttributeTotal'),legend:$('#opponentProfileStats')},f.opp);
+    const sponsorPost=f.o.sourceProfileId&&sharedSocialPosts.find(post=>post.targetProfileId===f.o.sourceProfileId&&post.sponsorId),sponsor=sponsorPost&&sponsorPost.kind!=='sponsor-drop'?endorsementDefs.find(item=>item.id===sponsorPost.sponsorId):null;
+    renderProfileSponsor({badge:$('#opponentProfileSponsor'),wallpaper:$('#opponentProfileSponsorWallpaper'),surface:$('#opponentProfileVisual')},sponsor);
     renderStatsFightSkin('#opponentProfileSkin',f.o.fightSkinAura||0,{compact:true});
     $('#opponentProfileRewards').textContent=$('#tapeXpStatus').textContent;$('#opponentProfileClearance').textContent=$('#tapeClearance').textContent.replace('FIGHT USES UP TO','UP TO')+' · NO BACKING OUT';
   }
@@ -1763,7 +1777,7 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
   function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.181" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.182" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

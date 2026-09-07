@@ -32,3 +32,18 @@ test('profile is a dialog and poster has only its fight-plan action',()=>{
  assert.match(modal,/role="dialog" aria-modal="true"/);for(const id of ['opponentProfileAvatar','opponentProfileSkin','opponentProfileStats','tapeAgentRead','opponentProfileBack','opponentProfileFight'])assert.ok(modal.includes(`id="${id}"`));
  const poster=html.slice(html.indexOf('id="tapeStage"'),html.indexOf('id="tapeStatsPanel"'));assert.doesNotMatch(poster,/tapeBackBtn|tapeAgentRead/);assert.match(poster,/class="tape-actions"><button class="tape-action fight" id="tapeFightBtn" type="button">SET FIGHT PLAN<\/button><\/div>/);
 });
+
+test('shared attribute chart reports exact totals and resets cleanly for empty stats',()=>{
+ const context={formatStat:String};vm.createContext(context);vm.runInContext(source.slice(source.indexOf('  function renderProfileAttributes('),source.indexOf('  function renderOpponentProfile(')),context);
+ const chart={style:{},setAttribute(key,value){this[key]=value}},totalLabel={},legend={};
+ context.renderProfileAttributes({chart,totalLabel,legend},{power:25,speed:20,chin:10,cardio:7});
+ assert.equal(totalLabel.textContent,'62');assert.match(chart.style.background,/conic-gradient/);assert.match(chart['aria-label'],/power 25, speed 20, chin 10, cardio 7/);assert.equal((legend.innerHTML.match(/--attribute-color/g)||[]).length,4);
+ context.renderProfileAttributes({chart,totalLabel,legend},{});assert.equal(totalLabel.textContent,'0');assert.equal(chart.style.background,'#30475c');assert.doesNotMatch(legend.innerHTML,/NaN/);
+});
+
+test('shared sponsor component clears badge and wallpaper for an unsponsored fighter',()=>{
+ const context={escapeHtml:String,sponsorLogo:s=>s.id+'.png',gameIcon:()=>'<img>'};vm.createContext(context);vm.runInContext(source.slice(source.indexOf('  function renderProfileSponsor('),source.indexOf('  function renderProfileAttributes(')),context);
+ const badge={},wallpaper={style:{}},surface={classList:{toggle(key,value){this[key]=value}}};
+ context.renderProfileSponsor({badge,wallpaper,surface},{id:'volt',brand:'Surge Core'});assert.equal(badge.hidden,false);assert.match(badge.innerHTML,/Surge Core/);assert.match(wallpaper.style.backgroundImage,/volt.png/);
+ context.renderProfileSponsor({badge,wallpaper,surface},null);assert.equal(badge.hidden,true);assert.equal(badge.innerHTML,'');assert.equal(wallpaper.hidden,true);assert.equal(wallpaper.style.backgroundImage,'');
+});

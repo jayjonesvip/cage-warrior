@@ -697,7 +697,7 @@ test('Home presents Career Progression in XP, Aura, Sponsor, Victory Pack, and D
   const sponsorIndex=html.indexOf('id="careerSponsorLabel"');
   const packIndex=html.indexOf('id="victoryPackMeter"');
   const heatIndex=html.indexOf('id="dailyFightBonusMeter"');
-  const heroIndex=html.indexOf('<div class="hero career-after-setup">');
+  const heroIndex=html.indexOf('<div class="hero career-after-setup fighter-profile-visual">');
   assert.ok(heroIndex>=0&&xpIndex>=0&&auraIndex>xpIndex&&sponsorIndex>auraIndex&&packIndex>sponsorIndex&&heatIndex>packIndex);
   assert.match(html,/class="page-subhead home-profile-section-heading career-progression-heading"><b>CAREER PROGRESSION<\/b>/);
   assert.match(html,/id="careerAuraTrack"[^>]*role="progressbar"/);
