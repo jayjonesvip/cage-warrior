@@ -150,15 +150,19 @@ test('all first-party JavaScript parses without a build step',()=>{
   }
 });
 
-test('fighter creation offers all fifty portrait avatars',()=>{
-  assert.equal((definitions.match(/id:'fighter-\d{2}'/g)||[]).length,50);
-  for(let number=45;number<=50;number+=1){
+test('fighter creation offers all sixty-five portrait avatars with twenty starting points',()=>{
+  const avatars=vm.runInNewContext(definitions.slice(definitions.indexOf('const fighterAvatars = ['),definitions.indexOf('const auraFightSkins'))+';fighterAvatars');
+  assert.equal(avatars.length,65);
+  for(let number=1;number<=65;number+=1){
     const suffix=String(number).padStart(2,'0');
     const asset=`assets/avatars/fighter-avatar-${suffix}.png`;
     assert.match(definitions,new RegExp(`id:'fighter-${suffix}'[^\\n]+asset:'${asset.replaceAll('/','\\/')}'`));
     const bytes=fs.readFileSync(path.join(root,asset));
     assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],asset);
     assert.ok([4,6].includes(bytes[25]),`${asset} has an alpha channel`);
+    const avatar=avatars[number-1];assert.equal(avatar.id,`fighter-${suffix}`);
+    assert.equal(Object.values(avatar.stats).reduce((sum,value)=>sum+value,0),20);
+    assert.ok(Object.values(avatar.stats).every(value=>Number.isInteger(value)&&value>=2&&value<=8));
   }
 });
 

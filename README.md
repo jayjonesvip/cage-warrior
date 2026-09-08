@@ -38,6 +38,8 @@ Eligible victories can earn gold personal-best stamps for fastest finish, bigges
 
 A new career permanently locks the fighter avatar, twenty-point starting attribute allocation, archetype, hometown, and unique Cage Feed handle.
 
+Fighter creation offers 65 portraits, including avatars 51–65. Each uses the same twenty-point starting attribute budget. Apply `supabase/migrations/20260908150000_expand_fighter_avatars_to_65.sql` before publishing this avatar update so the new portraits can be claimed and synced.
+
 Level and XP still come from fights. The balanced XP curve keeps Levels 1–5 approachable, then adds a quadratic late-career requirement so higher levels take progressively more victories. Level 15 requires 1,280 XP instead of 680. Attributes always display as whole numbers.
 
 Eligible victories award whole Attribute Points based on opponent level: zero below the fighter's level, one at the same level, and two above it. Losses and forfeitures never award points. Unspent points are persisted immediately and assigned from the glowing **Improve Your Fighter** panel at the top of the Fight page. On mobile, its four attributes use a readable two-by-two layout; desktop retains one row. Assignment is permanent, saved immediately, and guarded against repeated clicks.
