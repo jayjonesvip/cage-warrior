@@ -121,7 +121,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
 #walkoutModal{z-index:105;background:#01070cdd}
-.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.190") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
+.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.191") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
 .walkout-dialog:before,.walkout-dialog:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;opacity:0;background:#eaf8ff;box-shadow:0 0 5px 2px #c7eaff99,0 0 12px 4px #9fd6ff33}
 #walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft 7s linear both}
@@ -197,8 +197,8 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultRewardsStage .result-actions{margin-top:22px}
 
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}
-/* Daily CEO note: one dismissible summary, without carousel controls. */
-#app #dailyCageNews{flex:none;min-width:0;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);color:var(--text)}
+/* Daily CEO modal: summary, tip, and shared single-action footer. */
+#app #dailyCageNews .daily-news-dialog{width:100%;max-width:420px;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);max-height:calc(100dvh - 28px);overflow-y:auto}
 #app #dailyCageNews[hidden]{display:none!important}
 #app #dailyCageNews header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--line)}
 #app #dailyCageNews header>div{min-width:0;flex:1}
