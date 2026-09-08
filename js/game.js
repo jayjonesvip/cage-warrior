@@ -35,7 +35,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),c
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.186';
+  const ICON_ASSET_VERSION = '2.7.187';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -928,10 +928,21 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
   function renderCeoBioDetails(){$('#fighterBioInteractions').innerHTML='<div class="fighter-bio-limit ceo-bio-official">VERIFIED OFFICIAL ACCOUNT · MESSAGES CLOSED</div>'}
   function renderReporterBioDetails(){$('#fighterBioInteractions').innerHTML='<div class="fighter-bio-limit reporter-bio-official">VERIFIED OFFICIAL ACCOUNT · READ ONLY</div>'}
   function renderSponsorBioDetails(){const id=activeBioProfileId.replace('official-sponsor:',''),profile=sponsorFeedProfile(id),box=$('#fighterBioInteractions');box.replaceChildren();const label=document.createElement('div');label.className='fighter-bio-limit ceo-bio-official';label.textContent=profile?.pilot?'PILOT SPONSOR · BRAND PARTNERSHIP':'VERIFIED SPONSOR · READ ONLY';box.append(label);if(profile?.website){const link=document.createElement('a');link.className='pilot-sponsor-link';link.href=profile.website;link.target='_blank';link.rel='noopener noreferrer sponsored';link.textContent='VISIT '+profile.author.toUpperCase();link.setAttribute('aria-label','Visit '+profile.author+' website (opens in a new tab)');box.append(link)}}
-  function openCeoBio(){const profile=STRINGS.social.profiles.ceo;activeBioProfileId='official-ceo';$('#fighterBioModal').style.removeProperty('--fighter-accent');$('#fighterBioModal').classList.remove('reporter-profile');$('#fighterBioModal').classList.add('ceo-profile');$('#fighterBioKicker').textContent='VERIFIED OFFICIAL ACCOUNT';$('#fighterBioAvatar').innerHTML=`<img src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(profile.author)}">`;$('#fighterBioHandle').textContent=profile.handle;$('#fighterBioTitle').textContent=profile.author;$('#fighterBioText').textContent=profile.bio;renderCeoBioDetails();$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
-  function openReporterBio(){const profile=STRINGS.social.profiles.media;activeBioProfileId='official-reporter';$('#fighterBioModal').style.removeProperty('--fighter-accent');$('#fighterBioModal').classList.remove('ceo-profile');$('#fighterBioModal').classList.add('reporter-profile');$('#fighterBioKicker').textContent='CAGE GRIND NEWSROOM · VERIFIED';$('#fighterBioAvatar').innerHTML=`<img src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(profile.author)}">`;$('#fighterBioHandle').textContent=profile.handle;$('#fighterBioTitle').textContent=profile.author;$('#fighterBioText').textContent=profile.bio;renderReporterBioDetails();$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
-  function openSponsorBio(sponsorId){const profile=sponsorFeedProfile(sponsorId);if(!profile)return;activeBioProfileId=`official-sponsor:${profile.id}`;$('#fighterBioModal').style.removeProperty('--fighter-accent');$('#fighterBioModal').classList.remove('ceo-profile','reporter-profile');$('#fighterBioModal').classList.add('sponsor-profile');$('#fighterBioKicker').textContent='CAGE GRIND SPONSOR · VERIFIED';$('#fighterBioAvatar').innerHTML=`<img src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(profile.author)}">`;$('#fighterBioHandle').textContent=profile.handle;$('#fighterBioTitle').textContent=profile.author;$('#fighterBioText').textContent=profile.bio;renderSponsorBioDetails();$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
-  function openFighterBio(profile){if(!profile)return;activeBioProfileId=profile.id;$('#fighterBioModal').style.setProperty('--fighter-accent',fighterAccent(profile.city));applyPortraitStyle($('#fighterBioModal'),profile.handle);$('#fighterBioModal').classList.remove('ceo-profile','reporter-profile');$('#fighterBioKicker').textContent=`REAL CAGE GRIND FIGHTER · ${fighterCityCode(profile.city)}`;const avatar=fighterAvatars.find(item=>item.id===profile.fighter_avatar);$('#fighterBioAvatar').innerHTML=avatar?`<img src="${escapeHtml(avatar.asset)}" alt="${escapeHtml(profile.handle)}">`:'<span>CG</span>';$('#fighterBioHandle').textContent=`@${profile.handle}`;$('#fighterBioTitle').textContent=profile.handle;$('#fighterBioText').textContent=fighterBioSentence(profile);renderFighterBioInteractions(profile);$('#fighterBioModal').classList.add('open');$('#fighterBioModal').setAttribute('aria-hidden','false');sfx.tap()}
+  function openProfileBio({id,theme='',kicker,avatar,name,handle,bio,accent='',portrait='',details}){
+    const modal=$('#fighterBioModal');activeBioProfileId=id;
+    modal.classList.remove('ceo-profile','reporter-profile','sponsor-profile');if(theme)modal.classList.add(theme);
+    if(accent)modal.style.setProperty('--fighter-accent',accent);else modal.style.removeProperty('--fighter-accent');
+    for(const key of ['brightness','contrast','saturation','offset'])modal.style.removeProperty('--portrait-'+key);
+    if(portrait)applyPortraitStyle(modal,portrait);
+    $('#fighterBioKicker').textContent=kicker;
+    $('#fighterBioAvatar').innerHTML=avatar?`<img src="${escapeHtml(avatar)}" alt="${escapeHtml(name)}">`:'<span>CG</span>';
+    $('#fighterBioHandle').textContent=handle;$('#fighterBioTitle').textContent=name;$('#fighterBioText').textContent=bio;
+    details();modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.tap();
+  }
+  function openCeoBio(){const profile=STRINGS.social.profiles.ceo;openProfileBio({id:'official-ceo',theme:'ceo-profile',kicker:'VERIFIED OFFICIAL ACCOUNT',avatar:profile.avatar,name:profile.author,handle:profile.handle,bio:profile.bio,details:renderCeoBioDetails})}
+  function openReporterBio(){const profile=STRINGS.social.profiles.media;openProfileBio({id:'official-reporter',theme:'reporter-profile',kicker:'CAGE GRIND NEWSROOM · VERIFIED',avatar:profile.avatar,name:profile.author,handle:profile.handle,bio:profile.bio,details:renderReporterBioDetails})}
+  function openSponsorBio(sponsorId){const profile=sponsorFeedProfile(sponsorId);if(!profile)return;openProfileBio({id:`official-sponsor:${profile.id}`,theme:'sponsor-profile',kicker:'CAGE GRIND SPONSOR · VERIFIED',avatar:profile.avatar,name:profile.author,handle:profile.handle,bio:profile.bio,details:renderSponsorBioDetails})}
+  function openFighterBio(profile){if(!profile)return;openProfileBio({id:profile.id,kicker:`REAL CAGE GRIND FIGHTER · ${fighterCityCode(profile.city)}`,avatar:fighterAvatars.find(item=>item.id===profile.fighter_avatar)?.asset,name:profile.handle,handle:`@${profile.handle}`,bio:fighterBioSentence(profile),accent:fighterAccent(profile.city),portrait:profile.handle,details:()=>renderFighterBioInteractions(profile)})}
   function closeFighterBio(){activeBioProfileId='';$('#fighterBioModal').classList.remove('open','ceo-profile','reporter-profile','sponsor-profile');$('#fighterBioModal').setAttribute('aria-hidden','true')}
   function rankingProfiles(){
     const player={combat_stats:Object.fromEntries(['power','speed','chin','cardio'].map(key=>[key,effectiveStat(key)])),id:state.socialProfileId||'local-player',handle:state.name,city:state.fighterCity,archetype:state.fighterStyle,fighter_avatar:state.fighterAvatar,level:state.level,wins:state.wins,losses:state.losses,draws:state.draws||0,attributeTotal:Object.values(state.stats).reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0),rankingHistory:state.rankingHistory};
@@ -1739,24 +1750,38 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
     const button=$('#continueBtn');button.disabled=false;button.textContent=label;
   }
 
-  async function shareFightWin(){
-    if(shareWinPending||!lastFightShareData)return;shareWinPending=true;const button=$('#shareWinBtn'),text=LOGIC.fightWinShareText(lastFightShareData);button.disabled=true;
+  async function shareContent({button,data,text=data.text,labels,fallback,onShared}){
+    if(button.disabled)return;
+    clearTimeout(button._shareResetTimer);button.disabled=true;if(labels.pending)button.textContent=labels.pending;
     try{
-      if(typeof navigator.share==='function'){await navigator.share({title:'Cage Grind Victory',text});button.textContent='WIN SHARED'}
-      else{await navigator.clipboard.writeText(text);button.textContent='RESULT COPIED'}
-      trackEvent('fight_win_shared',{method:String(lastFightShareData.method).toLowerCase().replace(/\s+/g,'_'),title_win:lastFightShareData.titleWon===true});
+      if(typeof navigator.share==='function'){await navigator.share(data);button.textContent=labels.shared}
+      else{await navigator.clipboard.writeText(text);button.textContent=labels.copied}
+      onShared();
     }catch(error){
-      if(error?.name==='AbortError'){button.textContent='SHARE WIN'}else{openShareFallback({kicker:'SHARE YOUR RESULT',title:'COPY YOUR WIN',message:'Your device blocked automatic sharing. Select and copy this result.',text});button.textContent='SELECT RESULT TEXT'}
-    }finally{shareWinPending=false;button.disabled=false;setTimeout(()=>{if(button.isConnected)button.textContent='SHARE WIN'},1800)}
+      if(error?.name==='AbortError')button.textContent=labels.idle;
+      else{openShareFallback({...fallback,text});button.textContent=labels.fallback}
+    }finally{
+      button.disabled=false;button._shareResetTimer=setTimeout(()=>{if(button.isConnected)button.textContent=labels.idle},1800);
+    }
+  }
+  async function shareFightWin(){
+    if(shareWinPending||!lastFightShareData)return;shareWinPending=true;const result=lastFightShareData;
+    try{await shareContent({button:$('#shareWinBtn'),data:{title:'Cage Grind Victory',text:LOGIC.fightWinShareText(result)},
+      labels:{idle:'SHARE WIN',shared:'WIN SHARED',copied:'RESULT COPIED',fallback:'SELECT RESULT TEXT'},
+      fallback:{kicker:'SHARE YOUR RESULT',title:'COPY YOUR WIN',message:'Your device blocked automatic sharing. Select and copy this result.'},
+      onShared:()=>trackEvent('fight_win_shared',{method:String(result.method).toLowerCase().replace(/\s+/g,'_'),title_win:result.titleWon===true})
+    })}finally{shareWinPending=false}
   }
   function openShareFallback({kicker,title,message,text}){const modal=$('#shareFallbackModal'),field=$('#shareFallbackText');$('#shareFallbackKicker').textContent=kicker;$('#shareFallbackTitle').textContent=title;$('#shareFallbackMessage').textContent=message;field.value=text;modal.classList.add('open');modal.setAttribute('aria-hidden','false');field.focus();field.select()}
   function fighterInviteUrl(){const url=new URL(window.location.href);url.search='';url.hash='';url.searchParams.set('invite',state.socialProfileId);return url.toString()}
   async function shareFighterInvite(){
     if(!state.nameLocked||!normalizeReferralId(state.socialProfileId)){toast('FIGHTER NETWORK CONNECTION REQUIRED','#ffcf78');connectSharedSocial(true);return}
-    const button=$('#inviteFighterBtn'),url=fighterInviteUrl(),message="I just started Cage Grind and it's brutal in the best way. Come build your fighter and throw down —",text=`${message} ${url}`;button.disabled=true;button.textContent='SHARING…';
-    try{if(typeof navigator.share==='function'){await navigator.share({title:'Join Cage Grind',text:message,url});button.textContent='INVITE SENT'}else{await navigator.clipboard.writeText(text);button.textContent='INVITE COPIED'}trackEvent('fighter_invite_shared')}
-    catch(error){if(error?.name!=='AbortError'){openShareFallback({kicker:'BRING IN A FIGHTER',title:'COPY YOUR INVITE',message:'Share this invite. Your drop unlocks after their first completed fight.',text});button.textContent='SELECT INVITE'}else button.textContent='INVITE'}
-    finally{button.disabled=false;setTimeout(()=>{if(button.isConnected)button.textContent='INVITE'},1800)}
+    const url=fighterInviteUrl(),message="I just started Cage Grind and it's brutal in the best way. Come build your fighter and throw down —";
+    await shareContent({button:$('#inviteFighterBtn'),data:{title:'Join Cage Grind',text:message,url},text:`${message} ${url}`,
+      labels:{idle:'INVITE',pending:'SHARING…',shared:'INVITE SENT',copied:'INVITE COPIED',fallback:'SELECT INVITE'},
+      fallback:{kicker:'BRING IN A FIGHTER',title:'COPY YOUR INVITE',message:'Share this invite. Your drop unlocks after their first completed fight.'},
+      onShared:()=>trackEvent('fighter_invite_shared')
+    });
   }
   function closeShareFallback(){const modal=$('#shareFallbackModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
   function showPendingSponsor(){if(postFightPresentationBusy())return false;const sponsor=endorsementDefs.find(item=>item.id===state.sponsorAnnouncementPending);if(!sponsor)return false;$('#sponsorAnnouncementLogo').src=sponsorLogo(sponsor);$('#sponsorAnnouncementBrand').textContent=sponsor.brand;$('#sponsorAnnouncementMilestone').textContent=`${fmt(sponsor.followersRequired)} FOLLOWERS`;const modal=$('#sponsorAnnouncementModal');modal.dataset.sponsorId=sponsor.id;modal.classList.add('open');modal.setAttribute('aria-hidden','false');sfx.win();confettiBurst();requestAnimationFrame(()=>$('#sponsorAnnouncementClose').focus());return true}
@@ -1791,7 +1816,7 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
   function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(showPendingRankUpdate())return true;if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.186" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.187" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

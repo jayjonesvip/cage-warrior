@@ -73,7 +73,7 @@ test('primary actions share sizing and compact Feed labels avoid footer typograp
   assert.match(steel,/--action-height:44px;--action-font:11px;--action-weight:700;--action-radius:8px;--action-padding:10px 12px/);
   assert.match(steel,/\.feed-action-grid button\{--action-height:32px;--action-padding:5px 12px\}/);
   assert.match(steel,/#app \.screen \.feed-action-grid button b\{\s*font-size:var\(--action-font\)!important/);
-  assert.match(steel,/\.fight-plan-card \.fight-plan-confirm,\.modal-overlay \.modal-run\{font-size:13px!important\}/);
+  assert.match(steel,/\.level-up-continue\{font-size:13px!important\}/);
 });
 
 test('live fight identities have matching name, style, and condition rows',()=>{
@@ -364,7 +364,7 @@ test('persistent HUD swaps inline values for compact live recovery countdowns',(
   assert.match(game,/`full in \$\{formatHudRecoveryCountdown/);
   assert.match(game,/Math\.floor\(totalSeconds\/60\)/);
   assert.match(game,/padStart\(2,'0'\)/);
-  assert.match(styles,/#hudEnergyText\.recovering\{color:#4a9bf0\}#hudHealthText\.recovering\{color:#5cc978\}/);
+  assert.match(styles,/#hudEnergyText\.recovering\{color:#4a9bf0\}#hudHealthText\.recovering\{color:var\(--attribute-cardio\)\}/);
   assert.match(game,/setInterval\(updatePassiveRecovery,1000\)/);
   assert.match(game,/visibilitychange/);
   assert.match(game,/pageshow/);
@@ -461,10 +461,10 @@ test('Attribute Point assignment has one source of truth above Fight rankings',(
   assert.match(styles,/\.attribute-assignment-stat button\{appearance:none/);
   assert.match(styles,/\.attribute-point-badge\{[^}]*background:#22c55e;[^}]*color:#052e13/);
   assert.match(styles,/\.attribute-assignment-stat button\{[^}]*border-radius:50%;background:#22c55e;color:#052e13/);
-  assert.match(styles,/\.attribute-assignment-stat:nth-child\(1\) b\{color:#e2685f\}/);
-  assert.match(styles,/\.attribute-assignment-stat:nth-child\(2\) b\{color:#e0b84a\}/);
-  assert.match(styles,/\.attribute-assignment-stat:nth-child\(3\) b\{color:#a888e8\}/);
-  assert.match(styles,/\.attribute-assignment-stat:nth-child\(4\) b\{color:#5cc978\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(1\) b\{color:var\(--attribute-power\)\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(2\) b\{color:var\(--attribute-speed\)\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(3\) b\{color:var\(--attribute-chin\)\}/);
+  assert.match(styles,/\.attribute-assignment-stat:nth-child\(4\) b\{color:var\(--attribute-cardio\)\}/);
   assert.match(game,/attributeAssignmentExpanded = false/);
   assert.match(game,/toggleAttributeAssignment/);
   assert.match(game,/subtitle\.textContent=attributeAssignmentExpanded\?'Choose one permanent upgrade'/);
@@ -873,7 +873,7 @@ test('sponsor announcement and next-milestone progress are wired',()=>{
   assert.match(html,/id="careerSponsorProgress"/);
   assert.match(game,/sponsorAnnouncementPending/);
   assert.match(game,/TOP-TIER SPONSOR/);
-  assert.match(styles,/\.sponsor-announcement-dialog \.modal-actions\.single-action\{grid-template-columns:minmax\(0,1fr\)\}/);
+  assert.match(styles,/\.modal-actions\.single-action\{grid-template-columns:minmax\(0,1fr\)\}/);
   assert.match(styles,/\.sponsor-announcement-dialog \.modal-run\{width:100%\}/);
 });
 
@@ -1484,7 +1484,7 @@ test('career breakthrough modal uses flat materials and emphasizes the actionabl
   assert.match(styles,/\.level-up-number\{[^}]*border:3px solid #2f9cf4[^}]*background:#071a2d[^}]*box-shadow:none/);
   assert.match(styles,/\.level-up-reward\.unlock\{[^}]*border-color:#22c55e[^}]*background:#22c55e14/);
   assert.match(styles,/\.level-up-rewards\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(styles,/\.level-up-continue\{[^}]*background:#2376e5[^}]*box-shadow:none/);
+  assert.match(styles,/\.level-up-continue\{width:100%\}/);
   assert.doesNotMatch(styles,/\.level-up-card:before\{[^}]*repeating-conic-gradient/);
 });
 

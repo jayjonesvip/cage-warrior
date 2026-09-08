@@ -22,13 +22,21 @@
   --button-secondary-border: #484f58;
   --button-secondary-shadow: 0 1px 0 #010409;
   --fighter-accent: #58a6ff;
+  --dialog-border: var(--line);
+  --dialog-surface: var(--panel);
+  --button-danger: #b62324;
+  --button-danger-border: #f85149;
+  --button-reward: #35cf7c;
+  --button-reward-hover: #4bdd8d;
+  --button-reward-border: #66e69f;
+  --button-reward-text: #052014;
 }
 
 html, body { background:#010409; color:var(--text) }
 .fight-rank-avatar{position:relative}
 .fight-rank-avatar .fight-country-badge{position:absolute;right:2px;bottom:2px;z-index:2;padding:2px;border-radius:3px;background:#07111be6;pointer-events:none}
 .fight-rank-avatar .fight-country-badge img{width:16px;height:11px;object-fit:contain;border-radius:0}
-#healthHud{--health-tier-color:#5cc978;--health-tier-start:#3fae5c}
+#healthHud{--health-tier-color:var(--attribute-cardio);--health-tier-start:#3fae5c}
 #healthHud[data-health-tier="bruised"]{--health-tier-color:#e7d45b;--health-tier-start:#c2ab38}
 #healthHud[data-health-tier="battered"]{--health-tier-color:#f0b44e;--health-tier-start:#cf902c}
 #healthHud[data-health-tier="banged-up"]{--health-tier-color:#ee8846;--health-tier-start:#cf632f}
@@ -60,11 +68,11 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px so
 .install-offer button:not(:disabled), .fight-btn:not(:disabled), .tape-action.fight:not(:disabled), .continue-btn, .modal-run:not(:disabled), .fighter-message-send:not(:disabled), .attribute-assign-btn:not(:disabled) { border-color:var(--button-primary-border)!important; background:var(--button-primary)!important; color:#fff!important; box-shadow:var(--button-primary-shadow)!important; text-shadow:none!important }
 .details-toggle, .modal-cancel, .gear-footer button, .share-win-btn { border-color:var(--button-secondary-border)!important; background:var(--button-secondary)!important; color:#f0f6fc!important; box-shadow:var(--button-secondary-shadow)!important; text-shadow:none!important }
 button:disabled { border-color:#30363d!important; background:#161b22!important; color:#6e7681!important; box-shadow:none!important }
-.retire-career-btn, .retire-confirm { border-color:#f85149!important; background:#b62324!important; color:#fff!important; box-shadow:0 1px 0 #010409!important; text-shadow:none!important }
+.retire-career-btn, .retire-confirm { border-color:var(--button-danger-border)!important; background:var(--button-danger)!important; color:#fff!important; box-shadow:0 1px 0 #010409!important; text-shadow:none!important }
 
-/* Shared primary actions: standard, compact footer, and modal text scale. */
+/* Shared actions: geometry and interaction states; secondary/destructive materials above. */
 :root{--action-height:44px;--action-font:11px;--action-weight:700;--action-radius:8px;--action-padding:10px 12px}
-:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run){
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run,.modal-overlay .modal-cancel,.modal-overlay .retire-confirm,.level-up-continue){
   box-sizing:border-box;min-height:var(--action-height);padding:var(--action-padding);border:1px solid var(--button-primary-border);border-radius:var(--action-radius);
   background:var(--button-primary);color:var(--cta-text);box-shadow:var(--button-primary-shadow);text-shadow:none;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:var(--action-weight);line-height:20px;letter-spacing:.35px;text-align:center;cursor:pointer;
@@ -73,18 +81,18 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
   font-size:var(--action-font)!important;font-weight:var(--action-weight);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:20px;letter-spacing:.35px;
 }
 .feed-action-grid button{--action-height:32px;--action-padding:5px 12px}
-.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run{font-size:13px!important}
-:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):focus-visible{
+.fight-plan-card .fight-plan-confirm,.modal-overlay :is(.modal-run,.modal-cancel,.retire-confirm),.level-up-continue{font-size:13px!important}
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run,.modal-overlay .modal-cancel,.modal-overlay .retire-confirm,.level-up-continue):focus-visible{
   outline:2px solid var(--blue);outline-offset:2px;
 }
-:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):active:not(:disabled){
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run,.modal-overlay .modal-cancel,.modal-overlay .retire-confirm,.level-up-continue):active:not(:disabled){
   transform:translateY(1px);box-shadow:var(--button-primary-shadow);
 }
-:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):disabled{
+:is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run,.modal-overlay .modal-cancel,.modal-overlay .retire-confirm,.level-up-continue):disabled{
   opacity:.45;filter:none;cursor:not-allowed;box-shadow:none;
 }
 @media(hover:hover){
-  :is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run):hover:not(:disabled){filter:brightness(1.08)}
+  :is(.feed-action-grid button,.spar-action-dock .spar-start-btn,.spar-scout-selection .spar-fighter-picker,.fight-plan-card .fight-plan-confirm,.modal-overlay .modal-run,.modal-overlay .modal-cancel,.modal-overlay .retire-confirm,.level-up-continue):hover:not(:disabled){filter:brightness(1.08)}
 }
 
 @media (hover:hover) and (pointer:fine) {
@@ -113,7 +121,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
 #walkoutModal{z-index:105;background:#01070cdd}
-.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.186") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
+.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.187") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
 .walkout-dialog:before,.walkout-dialog:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;opacity:0;background:#eaf8ff;box-shadow:0 0 5px 2px #c7eaff99,0 0 12px 4px #9fd6ff33}
 #walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft 7s linear both}
@@ -166,9 +174,9 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .daily-heat-result-pips i{height:9px;border-radius:5px}
 #resultModal .victory-pack-result-track{height:10px}
 #resultModal .result-actions{margin-top:18px}
-#resultModal #continueBtn{min-height:46px;background:#35cf7c!important;border:1px solid #66e69f!important;color:#052014!important;box-shadow:0 2px 10px #1ba85e26!important;font-weight:800}
-#resultModal #continueBtn:hover:not(:disabled){background:#4bdd8d!important}
-#resultModal #continueBtn:disabled{opacity:.5}
+#resultModal #continueBtn{font-family:"Segoe UI",system-ui,sans-serif;min-height:48px;border-radius:12px;font-size:16px!important;background:var(--button-reward)!important;border:1px solid var(--button-reward-border)!important;color:var(--button-reward-text)!important;box-shadow:0 2px 10px #1ba85e26!important;font-weight:800}
+#resultModal #continueBtn:hover:not(:disabled){background:var(--button-reward-hover)!important}
+#resultModal #continueBtn:disabled{opacity:.5;background:var(--panel)!important;border-color:var(--line)!important;color:var(--muted)!important;box-shadow:none!important;cursor:not-allowed}
 /* Match the roomier supplied rewards reference without changing other modals. */
 #resultModal .result-card.showing-rewards{padding:22px 18px 18px;border-radius:18px}
 #resultRewardsStage,#resultRewardsStage button,#resultRewardsStage b,#resultRewardsStage small,#resultRewardsStage strong,#resultRewardsStage footer{font-family:"Segoe UI",system-ui,sans-serif}
@@ -189,7 +197,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultRewardsStage .victory-pack-result-head{gap:10px;font-size:15px!important}
 #resultRewardsStage .victory-pack-result-head b{font-size:20px!important}
 #resultRewardsStage .result-actions{margin-top:22px}
-#resultModal #continueBtn{font-family:"Segoe UI",system-ui,sans-serif;min-height:48px;border-radius:12px;font-size:16px!important}
+
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}
 #dailyCageNews{flex:none;min-width:0;margin:0 0 10px;border:1px solid #446d87;border-radius:12px;overflow:hidden;background:linear-gradient(125deg,#123149,#09131e);color:#e1eaf0}
 #dailyCageNews[hidden],#dailyCageNews [hidden]{display:none!important}
