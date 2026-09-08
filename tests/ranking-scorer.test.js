@@ -67,3 +67,51 @@ test('ranking snapshot normalization never rerates legacy rows or replaces an ex
  const snapshot=logic.rankingFightSnapshot({opponentRank:5,ranked:true}),first=logic.appendRankingResult([],snapshot,'event','win');
  assert.deepEqual(logic.appendRankingResult(first,{...snapshot,quality_points:20},'event','loss'),first);
 });
+
+test('a lower-ranked win preserves an upset gain, including legacy saves',()=>{
+ const before=fighter('player',3,0,[row(30),row(30),row(30)]);
+ const upset={...before,wins:4,rankingHistory:[...before.rankingHistory,row(10)]};
+ const followup={...upset,wins:5,rankingHistory:[...upset.rankingHistory,row(40)]};
+ const peak=logic.rankingComponents(upset).score,after=logic.rankingComponents(followup);
+ assert.ok(peak>logic.rankingComponents(before).score);
+ assert.ok(after.score>=peak);
+ assert.ok(after.debug.winProtection>0);
+ const rivals=Array.from({length:40},(_,i)=>fighter('rival-'+i,5,0,Array.from({length:5},()=>row(10+i*3))));
+ const position=p=>logic.rankFighters([...rivals,p],null,100).findIndex(f=>f.id==='player');
+ assert.ok(position(followup)<=position(upset));
+});
+
+test('wins never reduce earned score across decay boundaries, window rollover, and reloads',()=>{
+ for(const initialLength of [1,4,5,8,10,18,29,30]){
+  let profile=fighter('player',initialLength,2,Array.from({length:initialLength},()=>row(10)));
+  for(let i=0;i<40;i++){
+   const before=logic.rankingComponents(profile).score,snapshot=row(i%2?0:140,true,{opponentLevel:1+i%20});
+   const history=logic.appendRankingResult(profile.rankingHistory,snapshot,'win-'+i,'win',profile);
+   assert.deepEqual(logic.appendRankingResult(history,row(0,false),'win-'+i,'loss',profile),history);
+   profile={...profile,wins:profile.wins+1,rankingHistory:logic.normalizeRankingHistory(JSON.parse(JSON.stringify(history)))};
+   assert.ok(logic.rankingComponents(profile).score>=before,`length ${initialLength}, win ${i}`);
+   assert.ok(profile.rankingHistory.length<=30);
+  }
+ }
+});
+
+test('losses and draws end win protection; another fighter can still overtake',()=>{
+ const strong=fighter('player',3,0,[row(10),row(10),row(10)]);
+ const history=logic.appendRankingResult(strong.rankingHistory,row(100),'soft-win','win',strong);
+ const protectedFighter={...strong,wins:4,rankingHistory:history},peak=logic.rankingComponents(protectedFighter).score;
+ for(const outcome of ['loss','draw']){
+  const after={...protectedFighter,losses:outcome==='loss'?1:0,draws:outcome==='draw'?1:0,rankingHistory:logic.appendRankingResult(history,row(100),'next-'+outcome,outcome,protectedFighter)};
+  assert.ok(logic.rankingComponents(after).score<peak);
+  assert.equal(logic.rankingComponents(after).debug.winProtection,0);
+ }
+ const rival=fighter('rival',30,0,Array.from({length:30},()=>row(1)),{attributeTotal:150});
+ assert.equal(logic.rankFighters([protectedFighter,rival])[0].id,'rival');
+});
+
+test('performance protection is bounded, excludes perks, and ignores floors on losses',()=>{
+ const history=logic.normalizeRankingHistory([{...row(10),win_score_floor:999},{...row(10,false),win_score_floor:999}]);
+ assert.equal(history[0].win_score_floor,95);assert.equal(history[1].win_score_floor,undefined);
+ const before=fighter('player',5,0,Array.from({length:5},()=>row(10)));
+ const changed={...before,attributeTotal:150,combat_stats:{power:99,speed:99,chin:99,cardio:99}};
+ assert.deepEqual(logic.appendRankingResult(before.rankingHistory,row(100),'win','win',before),logic.appendRankingResult(changed.rankingHistory,row(100),'win','win',changed));
+});

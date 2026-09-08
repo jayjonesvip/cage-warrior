@@ -642,13 +642,18 @@
       const resultId=typeof row.resultId==='string'?row.resultId:'';if(resultId&&seen.has(resultId))continue;if(resultId)seen.add(resultId);
       const quality=clamp(finite(row.quality_points,finite(row.quality,20)),0,100);
       normalized.push({...(resultId?{resultId}:{}),outcome,won:outcome==='win',quality,quality_points:quality,
+        ...(outcome==='win'&&Number.isFinite(row.win_score_floor)?{win_score_floor:clamp(row.win_score_floor,0,95)}:{}),
         opponent_rank_at_booking:Number.isFinite(row.opponent_rank_at_booking)?Math.max(0,whole(row.opponent_rank_at_booking)):null,
         opponent_level_at_booking:Number.isFinite(row.opponent_level_at_booking)?Math.max(1,whole(row.opponent_level_at_booking)):null});
     }
     return normalized.slice(-30);
   }
-  function appendRankingResult(history,snapshot,resultId,outcome){
-    return normalizeRankingHistory([...(Array.isArray(history)?history:[]),{...snapshot,resultId,outcome}]);
+  function appendRankingResult(history,snapshot,resultId,outcome,profileBefore=null){
+    const previous=normalizeRankingHistory(history);
+    if(resultId&&previous.some(entry=>entry.resultId===resultId))return previous;
+    // Carry the earned performance score before the oldest bout leaves the window.
+    const floor=outcome==='win'&&profileBefore?Math.ceil(rankingComponents({...profileBefore,rankingHistory:previous}).performanceScore*1e6)/1e6:null;
+    return normalizeRankingHistory([...previous,{...snapshot,resultId,outcome,...(floor!==null?{win_score_floor:floor}:{})}]);
   }
   function rankingFightSnapshot({playerLevel=1,opponentLevel=1,ranked=false,championship=false,opponentRank=0}={}){
     const rank=Math.max(0,whole(opponentRank)),level=Math.max(1,whole(opponentLevel,1)),circuit=!rank&&!ranked&&!championship;
@@ -659,7 +664,7 @@
   function rankingFightEntry({won=false,...booking}={}){
     const snapshot=rankingFightSnapshot(booking);return {...snapshot,won:won===true,outcome:won?'win':'loss',quality:snapshot.quality_points};
   }
-  function rankingComponents(profile){
+  function rawRankingComponents(profile){
     // Counters are adjudicated W/L/D only; NC, vacates and DQs never enter them.
     const wins=nonNegativeWhole(profile?.wins),losses=nonNegativeWhole(profile?.losses),draws=nonNegativeWhole(profile?.draws),fights=wins+losses+draws,winPercentage=fights?wins/fights:0,provenWinPercentage=(wins+draws*.5+2)/(fights+4);
     const history=normalizeRankingHistory(profile?.rankingHistory??profile?.ranking_history),recent=history.slice(-10);
@@ -671,6 +676,21 @@
     const base=validCombatStats(profile?.baseStats),attributeTotal=base?Object.values(base).reduce((sum,value)=>sum+value,0):Math.max(0,finite(profile?.attributeTotal,finite(profile?.attribute_total,20+Math.max(0,whole(profile?.level,1)-1))));
     const resumeScore=clamp(85*provenWinPercentage+15*Math.min(wins,50)/50,0,100),skillScore=clamp(attributeTotal/150*100,0,100),score=Number((qualityScore*.45+resumeScore*.25+recentScore*.25+skillScore*.05).toFixed(6));
     return {score,resumeScore,qualityScore,recentScore,skillScore,attributeTotal,winPercentage,provenWinPercentage,fights,debug:{bestDecayedWins:bestWins,lastTenForm:formLine,smoothedRecord:{wins,losses,draws,fights,rate:provenWinPercentage},attributeTotal,pillars:{quality:qualityScore,career:resumeScore,recent:recentScore,attributes:skillScore},score}};
+  }
+  function rankingComponents(profile){
+    const result=rawRankingComponents(profile),history=normalizeRankingHistory(profile?.rankingHistory??profile?.ranking_history);
+    const performance=value=>value.qualityScore*.45+value.resumeScore*.25+value.recentScore*.25;
+    let performanceScore=performance(result),remainingWins=nonNegativeWhole(profile?.wins);
+    // Replay only the current winning streak. This also repairs legacy averages
+    // without inventing opponent ranks or changing recorded quality.
+    for(let end=history.length;end>0&&remainingWins>0&&history[end-1].outcome==='win';end--){
+      performanceScore=Math.max(performanceScore,history[end-1].win_score_floor||0);
+      remainingWins--;
+      const earlier=rawRankingComponents({...profile,wins:remainingWins,rankingHistory:history.slice(0,end-1)});
+      performanceScore=Math.max(performanceScore,performance(earlier));
+    }
+    const rawScore=result.score,score=Number((performanceScore+result.skillScore*.05).toFixed(6));
+    return {...result,score,performanceScore,debug:{...result.debug,rawScore,winProtection:Number((score-rawScore).toFixed(6)),score}};
   }
   function rankingDebug(profile,logger=console.log){const dump={fighterId:profile?.id,...rankingComponents(profile).debug};logger(dump);return dump}
   function rankFighters(profiles,championship=null,limit=25){

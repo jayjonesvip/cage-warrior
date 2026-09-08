@@ -12,6 +12,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  insert into cage_profiles(id,wins,losses,ranking_history,combat_stats) values(auth.uid(),3,1,'[{"won":true,"quality":88}]','{"power":30,"speed":30,"chin":30,"cardio":30}');`);
  const migration=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260908130000_ranking_scorer_v2.sql'),'utf8');
  await db.exec(migration);await db.exec(migration);
+ const protectionMigration=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260908140000_protect_ranking_score_on_wins.sql'),'utf8');
+ await db.exec(protectionMigration);await db.exec(protectionMigration);
  const snapshot=logic.rankingFightSnapshot({opponentRank:5,opponentLevel:12,playerLevel:10,ranked:true});
  const rows=logic.appendRankingResult([],snapshot,'event-id','win');
  await db.query('select public.sync_cage_ranking($1,$2::jsonb,$3)',[40,JSON.stringify(rows),2]);
@@ -25,6 +27,17 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  assert.ok(Math.abs(js.score-sql.score)<.000002,JSON.stringify({count,draws,js:js.score,sql:sql.score}));
  for(const [key,value] of Object.entries(js.debug.pillars))assert.ok(Math.abs(value-sql.pillars[key])<1e-8,key);cases++;
  }
+ // Sparse legacy histories, long winning streaks, reloads and 30-bout rollover.
+ let winningProfile={wins:3,losses:0,draws:0,attributeTotal:40,rankingHistory:Array.from({length:3},()=>logic.rankingFightEntry({won:true,ranked:true,opponentRank:10}))};
+ for(let i=0;i<65;i++){
+  const priorScore=logic.rankingComponents(winningProfile).score;
+  const history=logic.appendRankingResult(winningProfile.rankingHistory,logic.rankingFightSnapshot({ranked:true,opponentRank:140}),`protected-${i}`,'win',winningProfile);
+  winningProfile={...winningProfile,wins:winningProfile.wins+1,rankingHistory:history};
+  const js=logic.rankingComponents(winningProfile),sql=(await db.query('select public.cage_ranking_breakdown($1,0,0,40,$2::jsonb) value',[winningProfile.wins,JSON.stringify(history)])).rows[0].value;
+  assert.ok(js.score>=priorScore);assert.ok(Math.abs(js.score-sql.score)<.000002);cases++;
+ }
+ await db.query('select public.sync_cage_ranking(40,$1::jsonb,2)',[JSON.stringify(winningProfile.rankingHistory)]);
+ assert.deepEqual((await db.query('select ranking_history from cage_profiles')).rows[0].ranking_history,winningProfile.rankingHistory);
  // The live server selection must use base attributes; a larger shadow cannot win a tie.
  await db.exec(`insert into cage_profiles(id,handle,wins,losses,draws,ranking_history,combat_stats) select '22222222-2222-4222-8222-222222222222','AAA',wins,losses,draws,ranking_history,'{"power":90,"speed":90,"chin":90,"cardio":90}' from cage_profiles limit 1;`);
  const selected=(await db.query("select public.select_cage_championship_defense_challenger('99999999-9999-4999-8999-999999999999',current_date) id")).rows[0].id;
@@ -37,5 +50,17 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  await db.query('select public.record_cage_news_result($1::jsonb)',[JSON.stringify(event)]);await db.query('select public.record_cage_news_result($1::jsonb)',[JSON.stringify(event)]);
  const seed=(await db.query('select losses,ranking_history from cage_seed_fighters')).rows[0];assert.equal(seed.losses,1);assert.equal(seed.ranking_history[0].quality_points,seedSnapshot.quality_points);assert.equal(seed.ranking_history[0].opponent_level_at_booking,12);
  const durable=(await db.query('select quality_points,opponent_level_at_booking from cage_news_results')).rows[0];assert.equal(Number(durable.quality_points),snapshot.quality_points);assert.equal(durable.opponent_level_at_booking,12);
+ // Seed settlement must retain protection even when durable-history rebuilds
+ // omit previously carried floors, and retrying the result must not add credit.
+ let seedScore=0;
+ for(let i=0;i<36;i++){
+  const seedEvent={...event,resultId:`55555555-5555-4555-8555-${String(i).padStart(12,'0')}`,bout:5+i,at:new Date(Date.parse(event.at)+i+1).toISOString(),won:false,seedRankingSnapshot:logic.rankingFightSnapshot({ranked:true,opponentRank:i?140:1})};
+  await db.query('select public.record_cage_news_result($1::jsonb)',[JSON.stringify(seedEvent)]);
+  await db.query('select public.record_cage_news_result($1::jsonb)',[JSON.stringify(seedEvent)]);
+  const next=(await db.query('select wins,losses,ranking_history from cage_seed_fighters')).rows[0];
+  assert.equal(next.wins,i+1);
+  const js=logic.rankingComponents({...next,attributeTotal:40}),sql=(await db.query('select public.cage_ranking_breakdown($1,$2,0,40,$3::jsonb) value',[next.wins,next.losses,JSON.stringify(next.ranking_history)])).rows[0].value;
+  assert.ok(js.score>=seedScore);assert.ok(Math.abs(js.score-sql.score)<.000002);assert.ok(Number.isFinite(next.ranking_history.at(-1).win_score_floor));seedScore=js.score;cases++;
+ }
  console.log(`Migration applied twice; snapshot sync, shadow isolation, and ${cases} JavaScript/PostgreSQL parity cases passed.`);await db.close();
 })().catch(error=>{console.error(error);process.exit(1)});
