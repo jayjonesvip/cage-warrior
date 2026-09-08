@@ -38,7 +38,7 @@ Eligible victories can earn gold personal-best stamps for fastest finish, bigges
 
 A new career permanently locks the fighter avatar, twenty-point starting attribute allocation, archetype, hometown, and unique Cage Feed handle.
 
-Fighter creation offers 65 portraits, including avatars 51–65. Each uses the same twenty-point starting attribute budget. Apply `supabase/migrations/20260908150000_expand_fighter_avatars_to_65.sql` before publishing this avatar update so the new portraits can be claimed and synced.
+Fighter creation offers 70 portraits, including avatars 66–70. Each uses the same twenty-point starting attribute budget. Apply `supabase/migrations/20260908170000_expand_fighter_avatars_to_70.sql` before publishing this avatar update so the new portraits can be claimed and synced.
 
 Level and XP still come from fights. The balanced XP curve keeps Levels 1–5 approachable, then adds a quadratic late-career requirement so higher levels take progressively more victories. Level 15 requires 1,280 XP instead of 680. Attributes always display as whole numbers.
 

@@ -70,7 +70,12 @@ const fighterAvatars = [
   {id:'fighter-62',asset:'assets/avatars/fighter-avatar-62.png',stats:{power:3,speed:7,chin:4,cardio:6}},
   {id:'fighter-63',asset:'assets/avatars/fighter-avatar-63.png',stats:{power:5,speed:3,chin:7,cardio:5}},
   {id:'fighter-64',asset:'assets/avatars/fighter-avatar-64.png',stats:{power:5,speed:4,chin:3,cardio:8}},
-  {id:'fighter-65',asset:'assets/avatars/fighter-avatar-65.png',stats:{power:4,speed:6,chin:6,cardio:4}}
+  {id:'fighter-65',asset:'assets/avatars/fighter-avatar-65.png',stats:{power:4,speed:6,chin:6,cardio:4}},
+  {id:'fighter-66',asset:'assets/avatars/fighter-avatar-66.png',stats:{power:8,speed:4,chin:3,cardio:5}},
+  {id:'fighter-67',asset:'assets/avatars/fighter-avatar-67.png',stats:{power:4,speed:8,chin:5,cardio:3}},
+  {id:'fighter-68',asset:'assets/avatars/fighter-avatar-68.png',stats:{power:5,speed:3,chin:8,cardio:4}},
+  {id:'fighter-69',asset:'assets/avatars/fighter-avatar-69.png',stats:{power:3,speed:5,chin:4,cardio:8}},
+  {id:'fighter-70',asset:'assets/avatars/fighter-avatar-70.png',stats:{power:6,speed:4,chin:5,cardio:5}}
 ];
 
 const auraFightSkins = [
@@ -106,7 +111,7 @@ const gearItems = [
   {id:'energy-drink',category:'Lifestyle',name:'Energy Drink',icon:'⚡',assetExt:'png',rarity:'COMMON',minLevel:1,desc:'Quick recovery fuel between sessions.'},
   {id:'tinned-sardines',category:'Lifestyle',name:'Tinned Sardines',icon:'🐟',rarity:'COMMON',minLevel:1,desc:'Old-school protein for a hard camp.'},
   {id:'dill-pickle',category:'Lifestyle',name:'Dill Pickle',icon:'🥒',rarity:'COMMON',minLevel:1,desc:'Electrolytes for the long recovery window.'},
-  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Clean protein for the next session.',sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.194'},
+  {id:'fight-fuel-protein',category:'Lifestyle',name:'ALLMAX ISOFLEX',icon:'🥤',rarity:'COMMON',minLevel:2,desc:'Clean protein for the next session.',sponsored:true,brand:'ALLMAX ISOFLEX',sponsorDescription:'Chocolate whey isolate with 27g protein, 0g sugar and 75 servings. Gluten free, soy free and low lactose.',sponsorDisclosure:'AFFILIATE QR · Cage Grind may earn from qualifying purchases.',qrAsset:'assets/icons/fight-fuel-protein-qr.png?v=2.7.195'},
   {id:'meal-plan',category:'Lifestyle',name:'Fight Camp Meal Plan',icon:'🥩',rarity:'RARE',minLevel:4,desc:'Every recovery meal handled.'},
   {id:'hot-tub',category:'Lifestyle',name:'Backyard Hot Tub',icon:'🛁',rarity:'RARE',minLevel:6,desc:'Heat, rest, and another round tomorrow.'},
   {id:'home-gym',category:'Lifestyle',name:'Private Home Gym',icon:'🏋️',rarity:'EPIC',minLevel:8,desc:'Recovery resources without leaving home.'},

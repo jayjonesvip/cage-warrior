@@ -150,10 +150,10 @@ test('all first-party JavaScript parses without a build step',()=>{
   }
 });
 
-test('fighter creation offers all sixty-five portrait avatars with twenty starting points',()=>{
+test('fighter creation offers all seventy portrait avatars with twenty starting points',()=>{
   const avatars=vm.runInNewContext(definitions.slice(definitions.indexOf('const fighterAvatars = ['),definitions.indexOf('const auraFightSkins'))+';fighterAvatars');
-  assert.equal(avatars.length,65);
-  for(let number=1;number<=65;number+=1){
+  assert.equal(avatars.length,70);
+  for(let number=1;number<=70;number+=1){
     const suffix=String(number).padStart(2,'0');
     const asset=`assets/avatars/fighter-avatar-${suffix}.png`;
     assert.match(definitions,new RegExp(`id:'fighter-${suffix}'[^\\n]+asset:'${asset.replaceAll('/','\\/')}'`));
