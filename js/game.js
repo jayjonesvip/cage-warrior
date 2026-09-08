@@ -35,7 +35,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),c
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.185';
+  const ICON_ASSET_VERSION = '2.7.186';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -108,6 +108,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),c
   let confettiFrameId = null;
   let confettiRun = 0;
   let levelUpSummary = null;
+  let pendingRankUpdate = null;
   let combatLocked = false;
   let fightBooking = false;
   let fightTimelineIndex = 0;
@@ -1690,6 +1691,7 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
   }
 
   function finishFightSimulation(){
+    if(fight&&!fight.ended)pendingRankUpdate={before:fight.rewardRanks.playerRank};
     if(fight&&!fight.resultId)fight.resultId=crypto.randomUUID();
     if(!fight||fight.ended)return;fight.ended=true;clearFightTimers();combatLocked=true;ensureDailyCounters();state.dailyCounters.fight++;
     const o=fight.o,playerLevelBefore=state.level,ranks=fight.rewardRanks,win=fight.winner==='player',lowerLevelWin=win&&o.min<state.level&&!LOGIC.higherRankedOpponent(ranks),calloutFight=Boolean(fight.feedChallengePostId),circuitOpponent=!o.network&&!o.rookieShowcase&&!o.firstContract&&!o.globalChampionship,firstCareerWin=win&&state.wins===0,firstContractUnlocked=LOGIC.firstContractUnlockEligible({won:win,rookieShowcase:o.rookieShowcase===true}),winsToday=opponentWinsToday(o),xpTier=fightRewardTier(o),dropEligible=LOGIC.fightDropEligible(winsToday),isRematch=(o.meetings||0)>0,rivalry=(o.meetings||0)>=2,ordinaryRival=!o.network&&!o.globalChampionship&&(o.lossesToPlayer||0)>0,playerRating=fight.player.power+fight.player.speed+fight.player.chin+fight.player.cardio,oppRating=fight.opp.power+fight.opp.chin+fight.opp.speed+fight.opp.cardio,upset=win&&oppRating>=playerRating+4,healthLoss=finalizePersistentFightDamage(fight),titleWon=!!(win&&o.globalChampionship&&!fight.championshipBout?.player_is_champion),titleDefense=!!(win&&o.globalChampionship&&fight.championshipBout?.player_is_champion),xpResult=LOGIC.fightXp({...ranks,playerLevel:state.level,opponentLevel:o.min,won:win,forfeited:!!fight.forfeited,upset,ranked:!!o.network&&!o.globalChampionship,championship:!!o.globalChampionship,titleWon,rival:ordinaryRival,opponentWinsToday:winsToday}),auraBefore=state.aura,auraTitleBefore=LOGIC.auraTitle(state.aura),auraBaseChange=LOGIC.auraFightChange({...ranks,won:win,forfeited:!!fight.forfeited,callout:calloutFight,playerLevel:state.level,opponentLevel:o.min,upset,titleWon,titleDefense,exhausted:xpTier.tier==='exhausted',currentAura:state.aura});let fans=0,xp=xpResult.xp,auraAppliedChange=0,ceoAura=0,gearDrop=null,attributePoint=0;const lootNotes=[];o.meetings=(o.meetings||0)+1;
@@ -1774,10 +1776,22 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
     const reward=pendingReferralDrop;pendingReferralDrop=null;const handle=normalizeIdentityName(reward.inviteeHandle),fighter=handle?`@${handle}`:'Your invited fighter';
     return openDropClaim(reward.drop,{kind:'referral',eyebrow:'YOUR INVITE ENTERED THE CAGE',title:'REFERRAL DROP',message:`${fighter} completed their first fight. Your guaranteed collectible is ready.`});
   }
-  function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
+  function showPendingRankUpdate(){
+    if(!pendingRankUpdate)return false;
+    const before=pendingRankUpdate.before,after=currentRanking().position;
+    const delta=before>0&&after>0?before-after:0;
+    $('#rankUpdateNumber').textContent=after>0?`#${after}`:'UNRANKED';
+    const change=$('#rankUpdateChange');
+    change.className=`rank-update-change ${delta>0?'up':delta<0?'down':'unchanged'}`;
+    change.textContent=after<=0?'NOT CURRENTLY RANKED':before<=0?'NEW TO THE RANKINGS':delta===0?'NO CHANGE':`${delta>0?'▲ UP':'▼ DOWN'} ${Math.abs(delta)} ${Math.abs(delta)===1?'PLACE':'PLACES'} · FROM #${before}`;
+    const modal=$('#rankUpdateModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+    requestAnimationFrame(()=>$('#rankUpdateContinue').focus());return true;
+  }
+  function closeRankUpdate(){pendingRankUpdate=null;const modal=$('#rankUpdateModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');sfx.tap();requestAnimationFrame(showPostFightFollowup)}
+  function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(showPendingRankUpdate())return true;if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.185" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.186" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;
@@ -1796,6 +1810,9 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
   function handleResultAction(){
     closeResult()
   }
+
+  $('#rankUpdateContinue').addEventListener('click',closeRankUpdate);
+  $('#rankUpdateModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeRankUpdate()}else if(event.key==='Tab'){event.preventDefault();$('#rankUpdateContinue').focus()}});
 
   function closeResult(){
     const victoryDrop=pendingResultDrop;if(!state.postFightTutorialSeen){state.postFightTutorialSeen=true;saveState()}stopConfetti();clearFightTimers();$('#resultModal').style.display='none';$('#fightOverlay').classList.remove('active');fight=null;pendingResultDrop=victoryDrop;resultDropRevealed=false;combatLocked=false;updateUI();navTo('fight','replace');if(victoryDrop)setTimeout(()=>openDropClaim(victoryDrop,{kind:'victory',eyebrow:'VICTORY PACK EARNED',title:'VICTORY PACK',message:'A surprise collectible pack landed after your win.'}),180);else requestAnimationFrame(showPostFightFollowup);
