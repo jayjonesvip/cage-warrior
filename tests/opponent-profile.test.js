@@ -41,11 +41,11 @@ test('shared attribute chart reports exact totals and resets cleanly for empty s
  context.renderProfileAttributes({chart,totalLabel,legend},{});assert.equal(totalLabel.textContent,'0');assert.equal(chart.style.background,'#30475c');assert.doesNotMatch(legend.innerHTML,/NaN/);
 });
 
-test('shared sponsor component clears badge and wallpaper for an unsponsored fighter',()=>{
- const context={escapeHtml:String,sponsorLogo:s=>s.id+'.png',gameIcon:()=>'<img>'};vm.createContext(context);vm.runInContext(source.slice(source.indexOf('  function renderProfileSponsor('),source.indexOf('  function renderProfileAttributes(')),context);
- const badge={},wallpaper={style:{}},surface={classList:{toggle(key,value){this[key]=value}}};
- context.renderProfileSponsor({badge,wallpaper,surface},{id:'volt',brand:'Surge Core'});assert.equal(badge.hidden,false);assert.match(badge.innerHTML,/Surge Core/);assert.match(wallpaper.style.backgroundImage,/volt.png/);
- context.renderProfileSponsor({badge,wallpaper,surface},null);assert.equal(badge.hidden,true);assert.equal(badge.innerHTML,'');assert.equal(wallpaper.hidden,true);assert.equal(wallpaper.style.backgroundImage,'');
+test('shared sponsor component keeps only wallpaper and clears it for an unsponsored fighter',()=>{
+ const context={sponsorLogo:s=>s.id+'.png'};vm.createContext(context);vm.runInContext(source.slice(source.indexOf('  function renderProfileSponsor('),source.indexOf('  function renderProfileAttributes(')),context);
+ const wallpaper={style:{}},surface={classList:{toggle(key,value){this[key]=value}}};
+ context.renderProfileSponsor({wallpaper,surface},{id:'volt',brand:'Surge Core'});assert.equal(wallpaper.hidden,false);assert.equal(surface.classList.sponsored,true);assert.match(wallpaper.style.backgroundImage,/volt.png/);
+ context.renderProfileSponsor({wallpaper,surface},null);assert.equal(wallpaper.hidden,true);assert.equal(surface.classList.sponsored,false);assert.equal(wallpaper.style.backgroundImage,'');
 });
 
 test('unavailable opponents remain inspectable but cannot be booked',async()=>{

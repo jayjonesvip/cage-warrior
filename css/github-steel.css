@@ -121,7 +121,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
 #walkoutModal{z-index:105;background:#01070cdd}
-.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.187") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
+.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.188") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
 .walkout-dialog:before,.walkout-dialog:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;opacity:0;background:#eaf8ff;box-shadow:0 0 5px 2px #c7eaff99,0 0 12px 4px #9fd6ff33}
 #walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft 7s linear both}
@@ -148,8 +148,6 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 .profile-header-record{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;text-align:right;white-space:nowrap}
 .profile-header-record>b{font-variant-numeric:tabular-nums;color:#f0f6fc}
 .profile-header-record>small{color:#8b949e;letter-spacing:.6px}
-.hero-sponsor{border:0;border-radius:0;background:transparent;box-shadow:none}
-.hero-sponsor-copy{text-shadow:0 2px 4px #000,0 0 8px #000b}
 #lockerMusicToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 #lockerMusicToggle .ti{font-size:16px}
 .ti-music,.ti-music-off{display:inline-block;width:1em;height:1em;flex-shrink:0;background:currentColor;-webkit-mask:var(--music-icon) center/contain no-repeat;mask:var(--music-icon) center/contain no-repeat}
