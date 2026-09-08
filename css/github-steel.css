@@ -121,7 +121,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
 #walkoutModal{z-index:105;background:#01070cdd}
-.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.188") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
+.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.190") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
 .walkout-dialog:before,.walkout-dialog:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;opacity:0;background:#eaf8ff;box-shadow:0 0 5px 2px #c7eaff99,0 0 12px 4px #9fd6ff33}
 #walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft 7s linear both}
@@ -197,20 +197,18 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultRewardsStage .result-actions{margin-top:22px}
 
 @media(max-height:600px){.winner-art-frame{height:clamp(100px,25dvh,160px)}#winnerStage #resultTitle{font-size:42px}}
-#dailyCageNews{flex:none;min-width:0;margin:0 0 10px;border:1px solid #446d87;border-radius:12px;overflow:hidden;background:linear-gradient(125deg,#123149,#09131e);color:#e1eaf0}
-#dailyCageNews[hidden],#dailyCageNews [hidden]{display:none!important}
-#dailyCageNews header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid #345369}
-#dailyCageNews header b{font-size:11px;color:#88d9f7;letter-spacing:1px}
-#dailyCageNews header small{display:block;font-size:9px;color:#a6bbc9;margin-top:3px}
-#dailyCageNews button{background:transparent;border:0;box-shadow:none;color:#91dff7;min-width:36px;min-height:36px;padding:0;border-radius:5px}
-#dailyCageNews [data-news-close],#dailyCageNews [data-news-prev],#dailyCageNews [data-news-next]{font-size:23px}
-#dailyCageNews .daily-news-story{padding:12px 16px 4px;min-height:96px;touch-action:pan-y}
-#dailyCageNews [data-news-tag]{font-size:9px;font-weight:800;color:#e9c76f;letter-spacing:1px}
-#dailyCageNews h2{font-family:inherit;font-size:13px!important;font-weight:800;line-height:1.2;margin:7px 0;color:#f3f5f7;overflow-wrap:anywhere}
-#dailyCageNews p{font-size:10px!important;color:#b7c9d5;line-height:1.5;text-align:left;margin:0;overflow-wrap:anywhere}
-#dailyCageNews .daily-news-controls{display:flex;align-items:center;justify-content:space-between;padding:0 8px 4px}
-#dailyCageNews [data-news-dots]{display:flex;flex-wrap:wrap;justify-content:center}
-#dailyCageNews .daily-news-dot{display:grid;place-items:center;min-width:28px}
-#dailyCageNews .daily-news-dot:after{content:'';width:6px;height:6px;background:#496073;border-radius:100%}
-#dailyCageNews .daily-news-dot[aria-current=true]:after{background:#84e0ff;width:16px;border-radius:5px}
-@media(pointer:coarse){#dailyCageNews button{min-height:44px;min-width:44px}}
+/* Daily CEO note: one dismissible summary, without carousel controls. */
+#app #dailyCageNews{flex:none;min-width:0;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);color:var(--text)}
+#app #dailyCageNews[hidden]{display:none!important}
+#app #dailyCageNews header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--line)}
+#app #dailyCageNews header>div{min-width:0;flex:1}
+#app #dailyCageNews .daily-news-ceo{width:56px;height:56px;flex:none;border:1px solid #8a713b;border-radius:50%;object-fit:cover;object-position:50% 28%}
+#app #dailyCageNews h2{margin:0 0 3px;font:700 15px/1.3 system-ui,sans-serif!important;text-transform:none;overflow-wrap:anywhere;color:var(--text)}
+#app #dailyCageNews header small{display:block;color:var(--muted);font-size:10px!important;letter-spacing:.5px}
+#app #dailyCageNews [data-news-close]{flex:none;align-self:flex-start;min-width:44px;min-height:44px;padding:0;border:0;border-radius:8px;background:transparent;box-shadow:none;color:var(--muted);font-size:24px!important;cursor:pointer}
+#app #dailyCageNews [data-news-close]:hover{background:var(--panel2);color:var(--text)}
+#app #dailyCageNews .daily-news-body{padding:16px}
+#app #dailyCageNews p{margin:0;color:var(--text);font:400 14px/1.6 system-ui,sans-serif!important;text-align:left;overflow-wrap:anywhere}
+#app #dailyCageNews .daily-news-tip{margin-top:18px;padding:12px;border-left:3px solid var(--blue);border-radius:0 6px 6px 0;background:var(--bg)}
+#app #dailyCageNews .daily-news-tip b{color:var(--blue);font-size:10px!important;letter-spacing:1px}
+#app #dailyCageNews .daily-news-tip p{margin-top:5px;font-size:13px!important}

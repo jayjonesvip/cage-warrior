@@ -1,29 +1,30 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const news=require('../js/daily-news.js');
-test('Daily Cage skips day one and seen editions; tomorrow is eligible',()=>{
-  const now=new Date(2026,8,7,12);
-  assert.equal(news.eligible(new Date(2026,8,7,0),null,now),false);
-  assert.equal(news.eligible(new Date(2026,8,6,23),null,now),true);
-  assert.equal(news.eligible(new Date(2026,8,6),'2026-09-07',now),false);
-  assert.equal(news.eligible(new Date(2026,8,6),'2026-09-06',now),true);
-  assert.equal(news.eligible('invalid',null,now),false);
+test('Daily Cage hides for exactly 24 hours after dismissal, across midnight',()=>{
+  const now=new Date(2026,8,7,12),career=new Date(2026,8,5);
+  assert.equal(news.eligible(career,now.getTime()-86400000+1,now),false);
+  assert.equal(news.eligible(career,now.getTime()-86400000,now),true);
+  assert.equal(news.eligible(career,0,now),true);
+  assert.equal(news.eligible(new Date(2026,8,7),0,now),false);
+  assert.equal(news.eligible('invalid',0,now),false);
 });
-test('edition uses previous local calendar day, not rolling 24 hours',()=>{
-  const result=news.edition(new Date(2026,8,7,19));
-  assert.equal(result.key,'2026-09-07');
-  assert.equal(new Date(result.start).getDate(),6);
-  assert.equal(new Date(result.end).getHours(),0);
+test('edition queries a rolling 24 hours including today',()=>{
+  for(const now of [new Date(2026,8,7,19),new Date('2026-11-01T07:30:00Z')]){
+    const result=news.edition(now);
+    assert.equal(result.end,now.toISOString());assert.equal(Date.parse(result.end)-Date.parse(result.start),86400000);
+  }
 });
-test('only real events produce stories, with distinct title outcomes',()=>{
-  assert.deepEqual(news.stories({}),[]);
-  const items=news.stories({newFighters:3,fights:47,titles:[{action:'transfer',handle:'Winner'},{action:'defense',handle:'Champion'}],upset:{winner:'Underdog',opponent:'Favorite'}});
-  assert.equal(items.length,5);assert.equal(items[0].tag,'AND NEW');assert.equal(items[1].tag,'AND STILL');
-  assert.match(items[2].title,/3 new fighters/);assert.match(items[3].body,/@Underdog/);
+test('CEO paragraph includes all title groups, upsets, and counts with a quiet fallback',()=>{
+  assert.match(news.roundup({}),/No newsworthy events/);
+  const copy=news.roundup({newFighters:3,fights:47,titles:[{action:'transfer',handle:'Winner'},{action:'defense',handle:'Champion',count:2}],upsets:[{winner:'Underdog',opponent:'Favorite'},{winner:'Other',opponent:'Second',count:3}]});
+  for(const expected of ['3 new fighters','47 fights','@Winner took the world title','@Champion defended the world title 2 times','@Underdog beat higher-ranked @Favorite','@Other beat higher-ranked @Second 3 times'])assert.ok(copy.includes(expected),expected);
+  assert.equal(copy.includes('\n'),false);assert.doesNotMatch(copy,/yesterday/i);
+  assert.match(news.roundup({upset:{winner:'Legacy',opponent:'Opponent'}}),/@Legacy/);
 });
 function harness(client,options={}){
   const nodes=new Map();const node=()=>({hidden:true,children:[],textContent:'',setAttribute(k,v){this[k]=v},replaceChildren(){this.children=[]},append(x){this.children.push(x)},addEventListener(){}});
   const element={...node(),querySelector(key){if(!nodes.has(key))nodes.set(key,node());return nodes.get(key)}};
-  const entries=new Map(),storage={getItem:k=>entries.get(k),setItem:(k,v)=>entries.set(k,v)};
+  const entries=options.entries||new Map(),storage={getItem:k=>entries.get(k),setItem:(k,v)=>entries.set(k,v)};
   global.document={createElement:node};
   const controller=news.create({element,client,storage,now:()=>new Date(2026,8,7,12),...options});
   controller.visit(true);
@@ -41,27 +42,28 @@ test('same fight count does not merge separate results; conflicts stay queued wi
   const queue=JSON.parse([...h.entries].find(([key])=>key.endsWith(':results'))[1]);
   assert.equal(queue.length,1);assert.equal(queue[0].resultId,'first');
 });
-test('repeated defenses collapse and aggregated counts remain accurate',()=>{
-  const duplicate={action:'defense',handle:'Champ'};
-  assert.equal(news.stories({titles:[duplicate,duplicate,duplicate]}).length,1);
-  assert.match(news.stories({titles:[duplicate,duplicate,duplicate]})[0].body,/3 times/);
-  assert.match(news.stories({titles:[{...duplicate,count:7}]})[0].body,/7 times/);
+test('repeated defenses collapse without dropping counts',()=>{
+ const duplicate={action:'defense',handle:'Champ'};
+ assert.match(news.roundup({titles:[duplicate,duplicate,duplicate]}),/defended the world title 3 times/);
 });
-test('rotation advances at six seconds, pauses on interaction, resumes, and stops on close',async()=>{
-  const timers=new Map();let serial=0;
-  const h=harness({loadDailyNews:async()=>({newFighters:3,fights:12}),recordNewsResult:async()=>{}},{schedule(fn,ms){assert.equal(ms,6000);timers.set(++serial,fn);return serial},cancel(id){timers.delete(id)}});
-  h.controller.profile(profile);await tick();assert.equal(timers.size,1);
-  const [id,callback]=[...timers][0];timers.delete(id);callback();assert.match(h.element.querySelector('[data-news-title]').textContent,/12 fights/);
-  h.element.querySelector('[data-news-next]').onclick();assert.equal(timers.size,0);
-  h.element.querySelector('[data-news-pause]').onclick();assert.equal(timers.size,1);
-  h.element.querySelector('[data-news-close]').onclick();assert.equal(timers.size,0);
+test('dismissal survives reload and a new note is fetched exactly 24 hours later',async()=>{
+ let clock=new Date(2026,8,7,23),calls=0,randoms=0;
+ const timers=new Map();let serial=0;
+ const client={loadDailyNews:async()=>{calls++;return {fights:12}},recordNewsResult:async()=>{}};
+ const options={now:()=>clock,tips:['First tip','Second tip'],random:()=>{randoms++;return .9},schedule(fn,ms){timers.set(++serial,{fn,ms});return serial},cancel(id){timers.delete(id)}};
+ const h=harness(client,options);await h.controller.profile(profile);await tick();
+ assert.equal(h.element.hidden,false);assert.equal(h.element.querySelector('[data-news-tip]').textContent,'Second tip');assert.equal(randoms,1);
+ h.controller.visit(false);h.controller.visit(true);await tick();assert.equal(calls,1);assert.equal(randoms,1);
+ h.element.querySelector('[data-news-close]').onclick();assert.equal(h.element.hidden,true);assert.equal([...timers.values()][0].ms,86400000);
+ h.controller.visit(false);assert.equal(timers.size,0);
+ clock=new Date(2026,8,8,0);
+ const reloaded=harness(client,{...options,entries:h.entries});await reloaded.controller.profile(profile);await tick();assert.equal(reloaded.element.hidden,true);assert.equal(calls,1);
+ clock=new Date(2026,8,8,22,59,59,999);reloaded.controller.visit(true);await tick();assert.equal(reloaded.element.hidden,true);assert.equal(calls,1);
+ clock=new Date(2026,8,8,23);const timer=[...timers.values()][0];timers.clear();timer.fn();await tick();assert.equal(reloaded.element.hidden,false);assert.equal(calls,2);assert.equal(randoms,2);
 });
-test('display once, carousel changes, dismissal and Home return do not repeat',async()=>{
-  let calls=0;const h=harness({loadDailyNews:async()=>{calls++;return {newFighters:3,fights:12}},recordNewsResult:async()=>{}});
-  h.controller.profile(profile);await tick();assert.equal(h.element.hidden,false);assert.equal(calls,1);
-  h.element.querySelector('[data-news-next]').onclick();assert.match(h.element.querySelector('[data-news-title]').textContent,/12 fights/);
-  h.element.querySelector('[data-news-close]').onclick();assert.equal(h.element.hidden,true);
-  h.controller.visit(false);h.controller.visit(true);await tick();assert.equal(h.element.hidden,true);assert.equal(calls,1);
+test('quiet day still presents a CEO note and a tip',async()=>{
+ const h=harness({loadDailyNews:async()=>({}),recordNewsResult:async()=>{}},{tips:['Rest and plan.'],random:()=>0});
+ await h.controller.profile(profile);await tick();assert.equal(h.element.hidden,false);assert.match(h.element.querySelector('[data-news-body]').textContent,/quiet 24 hours/);assert.equal(h.element.querySelector('[data-news-tip]').textContent,'Rest and plan.');
 });
 test('failed request does not consume edition; returning can retry',async()=>{
   let fail=true;const h=harness({loadDailyNews:async()=>{if(fail)throw Error('offline');return {fights:2}},recordNewsResult:async()=>{}});

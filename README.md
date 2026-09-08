@@ -24,7 +24,7 @@ Open Gym's Scout a Fighter picker lists the top 25 World Ranked fighters, exclud
 
 The five-item navigation is Home, Fight, Gym, Gear, and Feed. The five primary pages are:
 
-- **Home** — the fighter profile and portrait first, followed by identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and the rotating career ticker.
+- **Home** — the fighter profile and portrait first, followed by identity, record, world rank, XP progress, Victory Pack progress, sponsor progress, and a dismissible CEO note summarizing the past 24 hours with a pro tip. Dismissal hides the note for 24 hours across reloads; its next appearance fetches a fresh roundup.
 - **Fight** — available Attribute Points, a world-ranked fighter ladder with exact win rewards, rematches, and championship activity.
 - **Gym** — a one-round scout spar against a same-level, next-level, or champion-caliber test. The player sets Pace, Offense, and Tactics, then receives a persistent grade with attribute and plan advice. Reigning champions instead choose between a same-level test and the top contender. Sessions cost nothing and never affect official career state.
 - **Gear** — Daily and installation Drops, Victory Packs, and collectible cards that equip Fight Gear or career perks directly.
