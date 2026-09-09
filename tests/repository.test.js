@@ -1329,7 +1329,7 @@ test('Fight ladder opens the current fighter profile without offering a self fig
   assert.match(game,/class="fight-ranking-row player\$\{champion\?' champion':''\}" type="button" data-own-fighter-profile/);
   assert.match(game,/YOUR FIGHTER<\/span>/);
   assert.match(game,/VIEW PROFILE/);
-  assert.match(game,/entries\.push\(\{id:ranking\.profile\.id,[\s\S]*?html:renderPlayerRankingRow/);
+  assert.match(game,/entries\.push\(\{id:ranking\.profile\.id,[\s\S]*?render:levelPosition=>renderPlayerRankingRow/);
   assert.match(styles,/\.fight-ranking-row\.player\{/);
 });
 
@@ -1346,7 +1346,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/ensureRoster\(\);state\.dailyOpponentWins/);
   assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.contract,\.\.\.circuit,\.\.\.ranked\]/);
   assert.match(game,/\$\{showcaseRows\}\$\{contractRows\}\$\{circuitRows\}\$\{rankedRows\}/);
-  assert.match(game,/levelBadge=opponent\.network\?`L\$\{opponent\.tier\}`:'N\/A'/);
+  assert.match(game,/levelBadge=opponent\.network\?\(levelPosition\?`\$\{opponent\.tier\}\.\$\{levelPosition\}`:`L\$\{opponent\.tier\}`\):'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
   assert.match(game,/FRESH MATCHUPS · FULL XP · PRO RECORD/);
   assert.match(game,/f\.o\.network\?'ROSTER BOUT':'UNRANKED PRO BOUT'/);
