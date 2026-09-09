@@ -35,7 +35,7 @@ const dailyNews=globalThis.CAGE_DAILY_NEWS.create({element:$('#dailyCageNews'),t
   function selectSubmissionFinish(random=Math.random){return SUBMISSION_FINISHES[Math.min(SUBMISSION_FINISHES.length-1,Math.floor(random()*SUBMISSION_FINISHES.length))]}
   function fightMethodLabel(result){return result?.method==='SUBMISSION'&&result.submissionMove?`SUBMISSION (${result.submissionMove.name})`:result?.method||'DECISION'}
   const ICON_ASSET_PATH = 'assets/icons/';
-  const ICON_ASSET_VERSION = '2.7.198';
+  const ICON_ASSET_VERSION = '2.7.199';
   function gameIcon(name,fallback,extension='png'){return `<span class="game-icon" data-game-icon="${name}" aria-hidden="true"><span class="icon-fallback">${fallback}</span><img class="icon-asset" src="${ICON_ASSET_PATH}${name}.${extension}?v=${ICON_ASSET_VERSION}" alt="" onload="this.parentElement.classList.add('asset-ready')" onerror="this.remove()"></span>`}
   function hydrateStaticIcons(){document.querySelectorAll('[data-icon-name]').forEach(el=>{if(el.dataset.iconHydrated)return;const fallback=el.dataset.iconFallback||el.textContent;el.innerHTML=gameIcon(el.dataset.iconName,fallback);el.dataset.iconHydrated='true'})}
   const SAVE_KEY = 'cage-warrior-save-v1';
@@ -1072,9 +1072,10 @@ function sharedProfilePayload(){return {combatStats:Object.fromEntries(['power',
     if(playerEntry&&!visibleEntries.includes(playerEntry))visibleEntries.push(playerEntry);
     visibleEntries.sort(byLevel);
     const championRows=championEntries.length?`<div class="page-subhead fight-ranking-group champion-group"><b>WORLD CHAMPION</b><span>REIGNING CHAMPION</span></div>${championEntries.map(entry=>entry.html).join('')}`:'',hasMore=visibleFightRankingCount<levelEntries.length,loadMore=hasMore?`<div class="fight-ranking-load-more" id="fightRankingsLoadMore" role="status">SHOWING ${Math.min(visibleFightRankingCount,levelEntries.length)} OF ${levelEntries.length} · SCROLL FOR MORE</div>`:'';
-    let lastLevel=null;
-    const rankedRows=visibleEntries.map(entry=>{const heading=entry.level!==lastLevel?`<div class="page-subhead fight-ranking-group ranked-group"><b>LEVEL ${entry.level}</b><span>WIN % · WINS · H2H</span></div>`:'';lastLevel=entry.level;return heading+entry.html}).join('')+loadMore;
-    $('#opponentList').innerHTML=opponents.length||ranking.profile?`<div class="fight-ranking-list">${championRows}${showcaseRows}${contractRows}${circuitRows}${rankedRows}</div>`:`<div class="gear-empty"><b>BUILDING THE FIGHT CARD</b><span>New opponents will appear shortly.</span></div>`;
+    const wrapGroup=html=>html?`<div class="fight-ranking-section">${html}</div>`:'',levelGroups=[];
+    for(const entry of visibleEntries){let group=levelGroups.at(-1);if(!group||group.level!==entry.level){group={level:entry.level,rows:[]};levelGroups.push(group)}group.rows.push(entry.html)}
+    const rankedRows=levelGroups.map(group=>wrapGroup(`<div class="page-subhead fight-ranking-group ranked-group"><b>LEVEL ${group.level}</b><span>WIN % · WINS · H2H</span></div>${group.rows.join('')}`)).join('')+loadMore;
+    $('#opponentList').innerHTML=opponents.length||ranking.profile?`<div class="fight-ranking-list">${wrapGroup(championRows)}${showcaseRows}${wrapGroup(contractRows)}${wrapGroup(circuitRows)}${rankedRows}</div>`:`<div class="gear-empty"><b>BUILDING THE FIGHT CARD</b><span>New opponents will appear shortly.</span></div>`;
     if(resetFightListPending)resetFightListScroll();
   }
 
@@ -1812,7 +1813,7 @@ let championshipBout=null;if(o.globalChampionship){$('#opponentProfileFight').te
   function showPostFightFollowup(){if(postFightPresentationBusy())return false;if(showPendingPostFightText())return true;if(showPendingSponsor())return true;if(levelUpSummary){showLevelUp(levelUpSummary);return true}if(offerFirstContractOpponent())return true;if(showPendingReferralDrop())return true;return showPendingTitleLoss()||showPendingCeoOffice()}
 
   function openDropClaim(drop,context={}){
-    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.198" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
+    if(!drop)return false;pendingResultDrop=drop;pendingDropContext=context;resultDropRevealed=false;const modal=$('#dropClaimModal');$('#dropClaimEyebrow').textContent=context.eyebrow||'SEALED CAGE GRIND PACK';$('#dropClaimTitle').textContent=context.title||'VICTORY PACK';$('#dropClaimMessage').textContent=context.message||'You earned a sealed Victory Pack.';const rewards=$('#dropClaimRewards'),rewardItems=Array.isArray(context.rewards)?context.rewards:[];rewards.hidden=!rewardItems.length;rewards.innerHTML=rewardItems.map(reward=>`<span>${escapeHtml(reward)}</span>`).join('');$('#dropClaimStage').innerHTML='<img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.199" alt="Sealed Cage Grind collectible pack">';$('#dropRevealBtn').hidden=false;$('#dropRevealBtn').disabled=false;$('#dropCloseBtn').hidden=true;modal.classList.add('open');modal.setAttribute('aria-hidden','false');requestAnimationFrame(()=>$('#dropRevealBtn').focus());sfx.win();return true
   }
   function revealDropClaim(){
     if(!pendingResultDrop||resultDropRevealed)return false;

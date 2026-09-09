@@ -725,7 +725,7 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(html,/class="card-title career-after-setup"><span class="page-title-copy"><b>Fighter Profile<\/b>/);
   assert.match(html,/class="home-profile-meta"><span id="cageStatus">/);
   assert.doesNotMatch(html,/<div class="rank-chip">/);
-  assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
+  assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead-section">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
   assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerAttributeTotal"/);
   assert.match(game,/\$\('#careerAttributeTotal'\)\.textContent=.*effectiveStat\(key\)/);
   assert.match(styles,/#careerIdentityCard \.career-identity-grid \.career-token:last-child\{grid-column:auto\}/);
@@ -1345,7 +1345,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/o\.lossesToPlayer=\(o\.lossesToPlayer\|\|0\)\+1/);
   assert.match(game,/ensureRoster\(\);state\.dailyOpponentWins/);
   assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.contract,\.\.\.circuit,\.\.\.ranked\]/);
-  assert.match(game,/\$\{showcaseRows\}\$\{contractRows\}\$\{circuitRows\}\$\{rankedRows\}/);
+  assert.match(game,/\$\{showcaseRows\}\$\{wrapGroup\(contractRows\)\}\$\{wrapGroup\(circuitRows\)\}\$\{rankedRows\}/);
   assert.match(game,/levelBadge=opponent\.network\?\(levelPosition\?`\$\{opponent\.tier\}\.\$\{levelPosition\}`:`L\$\{opponent\.tier\}`\):'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
   assert.match(game,/FRESH MATCHUPS · FULL XP · PRO RECORD/);
