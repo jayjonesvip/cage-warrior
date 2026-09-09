@@ -385,7 +385,8 @@ test('top bar stays compact and leaves XP progression on the Home card',()=>{
   assert.match(topbar,/class="ti ti-flame"[^>]*aria-hidden="true"/);
   assert.match(styles,/\.top-progress \.ti-flame\{[^}]*background:#f39a3f/);
   assert.doesNotMatch(topbar,/rankMovement/);
-  assert.match(game,/'NO POINTS'/);
+  assert.match(topbar,/<b id="progressText">PRO 0-0<\/b>/);
+  assert.match(game,/progressText\.textContent=`PRO \$\{state\.wins\}-\$\{state\.losses\}`/);
 });
 
 test('fight results increase persistent Health damage and enforce loss floors',()=>{
