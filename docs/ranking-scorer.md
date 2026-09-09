@@ -1,3 +1,5 @@
+> Historical reference: replaced in 2.7.197 by descending level and record tie-breakers. These scoring functions remain only for legacy compatibility; see README.md for current behavior.
+
 # World Rank scorer v2 with win protection
 
 Live weights: quality wins 45%, career 25%, recent form 25%, base attributes 5%. Every pillar is bounded to 0–100; the composite is rounded to six decimals in both JavaScript and PostgreSQL. Aura, followers, finish method and non-combat perks add nothing.

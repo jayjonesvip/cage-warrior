@@ -23,7 +23,7 @@
     if(transfers)lines.push(`The world title changed hands ${transfers===1?'once':transfers+' times'}.`);
     const upsets=total(Array.isArray(data.upsets)?data.upsets:data.upset?[data.upset]:[]),results=[];
     if(defenses)results.push(`${defenses} successful title defense${defenses===1?'':'s'}`);
-    if(upsets)results.push(`${upsets} upset${upsets===1?'':'s'} across the rankings`);
+    if(upsets)results.push(`${upsets} upset${upsets===1?'':'s'} across the roster`);
     if(results.length)lines.push(`There ${defenses+upsets===1?'was':'were'} ${results.join(' and ')}.`);
     return lines.length?`Fighters, here’s the past 24 hours. ${lines.join(' ')} Make your next fight count.`:'Fighters, it’s been a quiet 24 hours. Scout your next opponent and make the next card count.';
   }

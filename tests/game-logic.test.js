@@ -5,39 +5,39 @@ const assert=require('node:assert/strict');
 global.CAGE_FIGHT_RULES=require('../js/fight-rules.js');
 const logic=require('../js/game-logic.js');
 
-test('higher-ranked opponents bridge level rewards without bypassing repeat limits',()=>{
+test('legacy rank metadata cannot grant lower-level rewards',()=>{
   const ranks={playerRank:26,opponentRank:10},match={...ranks,playerLevel:8,opponentLevel:3,won:true,ranked:true};
-  assert.equal(logic.fightXp(match).xp,logic.fightXp({...match,opponentLevel:8}).xp);
+  assert.equal(logic.fightXp(match).xp,0);
   assert.equal(logic.fightXp({...match,opponentWinsToday:1}).xp,Math.round(logic.fightXp(match).xp*.5));
   assert.equal(logic.fightXp({...match,opponentWinsToday:2}).xp,0);
   assert.equal(logic.fightXp({...match,forfeited:true}).xp,0);
-  assert.equal(logic.victoryAttributePointReward(8,3,ranks),2);
-  assert.equal(logic.victoryAttributePointReward(8,8,ranks),2);
+  assert.equal(logic.victoryAttributePointReward(8,3,ranks),0);
+  assert.equal(logic.victoryAttributePointReward(8,8,ranks),1);
   assert.equal(logic.victoryAttributePointReward(8,9,ranks),2);
   assert.equal(logic.victoryAttributePointReward(8,3,{...ranks,opponentWinsToday:2}),0);
-  assert.equal(logic.lowerLevelFollowerPenalty(1000,match),0);
-  assert.ok(logic.auraFightChange(match)>0);
-  assert.equal(logic.victoryPackWinEligible(match),true);
+  assert.equal(logic.lowerLevelFollowerPenalty(1000,match),50);
+  assert.ok(logic.auraFightChange(match)<0);
+  assert.equal(logic.victoryPackWinEligible(match),false);
   assert.equal(logic.victoryPackWinEligible({...match,repeatEligible:false}),false);
   const counters={qualifyingWinStreak:4};
-  assert.equal(logic.applyDailyFightStreak(counters,match).awarded,true);
+  assert.equal(logic.applyDailyFightStreak(counters,match).awarded,false);
   const repeat={qualifyingWinStreak:4};
   assert.equal(logic.applyDailyFightStreak(repeat,{...match,opponentWinsToday:2}).awarded,false);
   assert.equal(repeat.qualifyingWinStreak,0);
 });
 
-test('lower-ranked higher-level wins give one point without reducing XP',()=>{
+test('higher-level wins give two points regardless of legacy ranks',()=>{
   const ranks={playerRank:3,opponentRank:10};
-  assert.equal(logic.victoryAttributePointReward(8,14,ranks),1);
+  assert.equal(logic.victoryAttributePointReward(8,14,ranks),2);
   assert.equal(logic.victoryAttributePointReward(8,8,ranks),1);
   assert.equal(logic.victoryAttributePointReward(8,7,ranks),0);
   assert.equal(logic.victoryAttributePointReward(8,14,{playerRank:3,opponentRank:2}),2);
   const fighter={level:8,attributePoints:0};
-  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,opponentLevel:14,...ranks}),1);
-  assert.equal(fighter.attributePoints,1);
+  assert.equal(logic.awardVictoryAttributePoint(fighter,{won:true,opponentLevel:14,...ranks}),2);
+  assert.equal(fighter.attributePoints,2);
   const match={playerLevel:8,opponentLevel:14,won:true,ranked:true};
   assert.equal(logic.fightXp({...match,...ranks}).xp,logic.fightXp(match).xp);
-  assert.equal(logic.victoryAttributePointReward(8,14,{...ranks,opponentWinsToday:2}),1);
+  assert.equal(logic.victoryAttributePointReward(8,14,{...ranks,opponentWinsToday:2}),2);
 });
 
 test('unranked, tied and lower-ranked lower-level opponents retain penalties',()=>{

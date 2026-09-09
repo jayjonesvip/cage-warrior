@@ -228,29 +228,29 @@ test('Open Gym runs reward-free scouting and persists the latest report',()=>{
   assert.match(game,/sparFighterPicker'\).addEventListener\('click',openSparScout\)/);
   assert.match(game,/e.key==='Escape'.*closeSparScout\(\)/);
   assert.match(html,/data-screen="gym"[\s\S]*?id="sparFighterPicker"[\s\S]*?id="sparReport"[\s\S]*?class="spar-action-dock"><button[^>]*id="startSparBtn"[\s\S]*?class="page-footer open-gym-footer"/);
-  assert.match(html,/Test a matchup without spending Energy or affecting your record, rewards, ranking, or streaks/);
+  assert.match(html,/Test a matchup without spending Energy or affecting your record, rewards, or streaks/);
   assert.match(game,/sparringTarget:'',lastSparringReport:null/);
   assert.match(game,/state\.lastSparringReport=report/);
-  assert.match(game,/currentRanking\(\).fighters.slice\(0,25\)/);
+  assert.match(game,/currentFighterList\(\).fighters/);
   assert.match(game,/sparringSnapshot=structuredClone\(target\)/);
   assert.match(game,/const target=sparringSnapshot,career=state/);
 });
 
-test('Open Gym lists only the top 25 ranked fighters, excludes self, and freezes selected clones',()=>{
+test('Open Gym lists the level-ordered roster, excludes self, and freezes selected clones',()=>{
   const profiles=Array.from({length:30},(_,i)=>({id:'fighter-'+i,handle:'Fighter'+i,level:i+1}));
   const source={network:true,sourceProfileId:'fighter-1',networkHandle:'Fighter1',name:'Fighter1',tier:2,tag:'GRAPPLER',tendency:'grappler',power:12,speed:9,chin:10,cardio:8};
   const state={socialProfileId:'fighter-0',name:'Fighter0',roster:[source]};
-  const context={combatStatsPending:()=>false,closeSparScout:()=>{},state,currentRanking:()=>({fighters:profiles}),networkOpponentFromProfile:p=>({...source,sourceProfileId:p.id,networkHandle:p.handle,tier:p.level}),structuredClone,$:()=>({open:true}),saveState:()=>{},renderOpenGym:()=>{},sfx:{tap:()=>{}}};
+  const context={combatStatsPending:()=>false,closeSparScout:()=>{},state,currentFighterList:()=>({fighters:profiles}),networkOpponentFromProfile:p=>({...source,sourceProfileId:p.id,networkHandle:p.handle,tier:p.level}),structuredClone,$:()=>({open:true}),saveState:()=>{},renderOpenGym:()=>{},sfx:{tap:()=>{}}};
   vm.createContext(context);
   const targets=game.slice(game.indexOf('  function sparringTargets('),game.indexOf('  function sparPlanAdvice('));
   const select=game.slice(game.indexOf('  function selectSparTarget('),game.indexOf('  function selectSparSetting('));
   vm.runInContext('let sparringSession=null,sparringSnapshot=null;'+targets+select,context);
   const choices=JSON.parse(vm.runInContext('JSON.stringify(sparringTargets())',context));
-  assert.equal(choices.length,24);
+  assert.equal(choices.length,29);
   assert.equal(choices[0].id,'fighter-1');
   assert.equal(choices[0].opponent.power,12);
   assert.equal(choices[0].opponent.worldRank,2);
-  assert.equal(choices.at(-1).id,'fighter-24');
+  assert.equal(choices.at(-1).id,'fighter-29');
   vm.runInContext('selectSparTarget("fighter-1")',context);
   source.power=99;
   assert.equal(vm.runInContext('sparringSnapshot.opponent.power',context),12);
@@ -326,12 +326,12 @@ test('fighter-name shuffle is a compact action beside the proposed name',()=>{
   assert.match(styles,/\.fighter-name-shuffle\{[^}]*min-height:74px/);
 });
 
-test('World Rank keeps permanent recovery stats separate from effective ranking stats',()=>{
+test('Fighter ordering keeps permanent recovery stats separate from effective combat stats',()=>{
   assert.match(game,/attributeTotal:Object\.values\(state\.stats\)/);
   assert.match(game,/rankingHistory:state\.rankingHistory/);
   assert.match(game,/LOGIC\.appendRankingResult\(state\.rankingHistory,fight\.rankingSnapshot/);
   assert.doesNotMatch(game,/attributeTotal:[^;\n]*(effectiveStat|equippedGear)/);
-  assert.match(read('README.md'),/25% career record, 45% quality of wins, 25% recent form, and 5% base attributes/);
+  assert.match(read('README.md'),/Equal levels sort by exact win percentage/);
   const migration=read('supabase/migrations/20260902120000_hybrid_world_rank.sql');
   assert.match(migration,/add column if not exists attribute_total integer not null default 20/);
   assert.match(migration,/add column if not exists ranking_history jsonb not null default '\[\]'::jsonb/);
@@ -384,7 +384,8 @@ test('top bar stays compact and leaves XP progression on the Home card',()=>{
   assert.match(styles,/\.career-progress-summary> b\.rank-status\{color:#7ddcff\}/);
   assert.match(topbar,/class="ti ti-flame"[^>]*aria-hidden="true"/);
   assert.match(styles,/\.top-progress \.ti-flame\{[^}]*background:#f39a3f/);
-  assert.match(game,/progressText\.classList\.toggle\('rank-status',!state\.attributePoints&&!!headerRanking\?\.position\)/);
+  assert.doesNotMatch(topbar,/rankMovement/);
+  assert.match(game,/'NO POINTS'/);
 });
 
 test('fight results increase persistent Health damage and enforce loss floors',()=>{
@@ -586,11 +587,11 @@ test('reward context groups known stats without dropping other messages',()=>{
   const summary={},context={$:()=>summary,escapeHtml:value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')};
   vm.createContext(context);
   vm.runInContext(game.slice(game.indexOf('  function renderResultBonuses('),game.indexOf('  function renderDailyHeatResult(')),context);
-  context.renderResultBonuses([{kind:'sponsor',text:'CURRENT SPONSOR · Surge <Core>'},{kind:'penalty',text:'AURA · -2'},{kind:'milestone',text:'RANKED FIGHT BONUS +20%'},{kind:'penalty',text:'FAN BACKLASH · 199 FOLLOWERS LOST (5%)'},{kind:'milestone',text:'UPSET VICTORY'}]);
+  context.renderResultBonuses([{kind:'sponsor',text:'CURRENT SPONSOR · Surge <Core>'},{kind:'penalty',text:'AURA · -2'},{kind:'milestone',text:'ROSTER FIGHT BONUS +20%'},{kind:'penalty',text:'FAN BACKLASH · 199 FOLLOWERS LOST (5%)'},{kind:'milestone',text:'UPSET VICTORY'}]);
   assert.equal((summary.innerHTML.match(/class="result-context-item/g)||[]).length,3);
   for(const text of ['Surge &lt;Core&gt;','-2','+20%','FAN BACKLASH · 199 FOLLOWERS LOST (5%)','UPSET VICTORY'])assert.ok(summary.innerHTML.includes(text));
   assert.match(summary.innerHTML,/result-context-item non-positive/);
-  context.renderResultBonuses([{kind:'penalty',text:'AURA · -7'},{kind:'milestone',text:'RANKED FIGHT BONUS +20%'}],{auraInRewards:true});
+  context.renderResultBonuses([{kind:'penalty',text:'AURA · -7'},{kind:'milestone',text:'ROSTER FIGHT BONUS +20%'}],{auraInRewards:true});
   assert.doesNotMatch(summary.innerHTML,/AURA|-7/);assert.match(summary.innerHTML,/\+20%/);
   context.renderResultBonuses([{kind:'milestone',text:'AURA · +2'}]);assert.match(summary.innerHTML,/AURA/);
   context.renderResultBonuses([]);assert.equal(summary.hidden,true);assert.equal(summary.innerHTML,'');
@@ -725,8 +726,8 @@ test('Home uses one fixed Fighter Profile card with section headers, internal sc
   assert.match(html,/class="home-profile-meta"><span id="cageStatus">/);
   assert.doesNotMatch(html,/<div class="rank-chip">/);
   assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
-  assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerWorldRank"/);
-  assert.match(game,/\$\('#careerWorldRank'\)\.textContent=careerRanking\.position\?`#\$\{careerRanking\.position\}`:'UNRANKED'/);
+  assert.match(html,/class="career-strip career-identity-grid"[\s\S]*id="careerFollowersText"[\s\S]*id="careerAttributeTotal"/);
+  assert.match(game,/\$\('#careerAttributeTotal'\)\.textContent=.*effectiveStat\(key\)/);
   assert.match(styles,/#careerIdentityCard \.career-identity-grid \.career-token:last-child\{grid-column:auto\}/);
   assert.match(html,/id="homeFightSkin"><div class="page-subhead home-profile-section-heading"><b>FIGHT SKIN<\/b><span>AURA · AUTOMATIC<\/span><\/div>/);
   assert.match(styles,/\.page-subhead,\.home-profile-section-heading\{[^}]*display:flex[^}]*white-space:nowrap/);
@@ -966,7 +967,7 @@ test('fight, championship, opponents, gear, packs, and Feed remain present',()=>
   for(const token of ['id="opponentList"','id="gearShop"','id="victoryPackMeter"','id="socialTimeline"'])assert.ok(html.includes(token),token);
   assert.doesNotMatch(html,/id="openRankingsBtn"|World Standings|TOP 25 RANKINGS/);
   assert.doesNotMatch(html,/id="worldTitleCard"/);
-  assert.match(game,/rankFighters/);
+  assert.match(game,/orderFighters/);
   assert.match(game,/settleChampionshipResult/);
   assert.match(game,/victoryPack/);
 });
@@ -1120,7 +1121,7 @@ test('daily fights use a twelve-bout limit with one three-fight qualifying strea
   assert.match(rules,/"dailyBonusFights": 3/);
   assert.match(game,/function updateDailyBonusStreak\(won,opponentLevel,playerLevel,ranks=\{\}\)/);
   assert.match(game,/LOGIC\.applyDailyFightStreak\(state\.dailyCounters,\{won,opponentLevel,playerLevel,...ranks,requiredStreak:DAILY_BONUS_WIN_STREAK\}\)\.awarded/);
-  assert.match(logic,/const qualifies=won===true&&\(whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
+  assert.match(logic,/const qualifies=won===true&&whole\(opponentLevel,1\)>=whole\(playerLevel,1\)/);
   assert.match(logic,/counters\.bonusFightAwarded!==true&&counters\.qualifyingWinStreak>=target/);
   assert.match(html,/id="dailyHeatResult"/);
   assert.match(html,/id="dailyHeatResultPips"/);
@@ -1285,18 +1286,18 @@ test('Aura fight skins appear on Home and stay outside perks and drops',()=>{
 });
 
 test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>{
-  assert.match(html,/fight-ladder-heading[\s\S]*World Fight Rankings[\s\S]*id="rosterSummary"/);
+  assert.match(html,/fight-ladder-heading[\s\S]*Find a Fighter[\s\S]*id="rosterSummary"/);
   assert.match(styles,/\.fight-ladder-heading\{[\s\S]*display:grid/);
-  for(const token of ['fight-ladder-columns','RANK · FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
+  for(const token of ['fight-ladder-columns','FIGHTER','WIN REWARDS'])assert.ok(html.includes(token),token);
   for(const token of ['fight-ranking-list','fight-ranking-row','fightWinRewardPreview','victoryAttributePointReward','data-fight-key'])assert.match(game,new RegExp(token));
   assert.match(game,/const FIGHT_RANKING_BATCH_SIZE=50/);
-  assert.match(game,/rankedEntries\.slice\(0,visibleFightRankingCount\)/);
+  assert.match(game,/levelEntries\.slice\(0,visibleFightRankingCount\)/);
   assert.match(game,/visibleFightRankingCount\+=FIGHT_RANKING_BATCH_SIZE/);
   assert.match(game,/#opponentList'\)\.addEventListener\('scroll',maybeLoadMoreFightRankings,\{passive:true\}\)/);
   assert.match(game,/scroller\.scrollTop\+scroller\.clientHeight<scroller\.scrollHeight-240/);
   assert.match(styles,/\.page-scroll\{[^}]*overflow-y:auto/);
-  assert.match(html,/fight-ladder-footer[^>]*>Higher-ranked wins earn 2 Attribute Points/);
-  assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\} · \$\{winPercentage\}% WIN/);
+  assert.match(html,/fight-ladder-footer[^>]*>Win at your level for 1 Attribute Point or above your level for 2/);
+  assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\}[\s\S]*?\$\{attributeTotal\} ATTR/);
   assert.doesNotMatch(html,/data-opponent-filter/);
   assert.match(game,/onChampionshipChange:renderOpponents/);
   assert.doesNotMatch(game,/renderFightChampionship|function filteredOpponents|function toggleOpponentCard|data-card-flip/);
@@ -1328,7 +1329,7 @@ test('Fight ladder opens the current fighter profile without offering a self fig
   assert.match(game,/class="fight-ranking-row player\$\{champion\?' champion':''\}" type="button" data-own-fighter-profile/);
   assert.match(game,/YOUR FIGHTER<\/span>/);
   assert.match(game,/VIEW PROFILE/);
-  assert.match(game,/rankedEntries\.push\(\{rank:ranking\.position,html:renderPlayerRankingRow/);
+  assert.match(game,/entries\.push\(\{id:ranking\.profile\.id,[\s\S]*?html:renderPlayerRankingRow/);
   assert.match(styles,/\.fight-ranking-row\.player\{/);
 });
 
@@ -1345,13 +1346,13 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/ensureRoster\(\);state\.dailyOpponentWins/);
   assert.match(game,/opponents=\[\.\.\.showcase,\.\.\.contract,\.\.\.circuit,\.\.\.ranked\]/);
   assert.match(game,/\$\{showcaseRows\}\$\{contractRows\}\$\{circuitRows\}\$\{rankedRows\}/);
-  assert.match(game,/rank=opponent\.network\?`#\$\{opponent\.worldRank\|\|'—'\}`:'N\/A'/);
+  assert.match(game,/levelBadge=opponent\.network\?`L\$\{opponent\.tier\}`:'N\/A'/);
   assert.match(game,/ON-LEVEL CAGE CIRCUIT/);
   assert.match(game,/FRESH MATCHUPS · FULL XP · PRO RECORD/);
-  assert.match(game,/f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
+  assert.match(game,/f\.o\.network\?'ROSTER BOUT':'UNRANKED PRO BOUT'/);
   assert.match(game,/if\(win\)\{[\s\S]*?state\.wins\+\+;state\.winStreak\+\+/);
   assert.match(game,/\}else\{[\s\S]*?state\.losses\+\+;state\.winStreak=0/);
-  assert.match(html,/on-level Circuit wins earn 1/);
+  assert.match(html,/Win at your level for 1/);
   assert.match(game,/CAGE CIRCUIT REMATCH/);
   assert.match(game,/circuitRematches\.length>1/);
   assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
@@ -1371,7 +1372,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
   for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
   assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
-  assert.match(html,/Higher-ranked wins earn 2 Attribute Points/);
+  assert.match(html,/above your level for 2/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 
@@ -1501,7 +1502,7 @@ test('fighter bios use full locations without city badges',()=>{
 
 test('promo poster uses a bundled condensed font and three-part card billing',()=>{
   assert.match(html,/id="tapeBoutClass">UNRANKED PRO BOUT<\/span>[\s\S]*id="tapeBoutRounds">3 ROUNDS<\/b>[\s\S]*id="tapeCardPlacement">MAIN CARD<\/strong>/);
-  assert.match(game,/tapeBoutClass'\)\.textContent=titleBout\?'WORLD TITLE':f\.o\.network\?'RANKED BOUT':'UNRANKED PRO BOUT'/);
+  assert.match(game,/tapeBoutClass'\)\.textContent=titleBout\?'WORLD TITLE':f\.o\.network\?'ROSTER BOUT':'UNRANKED PRO BOUT'/);
   assert.match(styles,/@font-face\{font-family:"Bebas Neue";src:url\("\.\.\/assets\/fonts\/BebasNeue-Regular\.ttf\?v=/);
   assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-Regular.ttf')));
   assert.ok(fs.existsSync(path.join(root,'assets/fonts/BebasNeue-OFL.txt')));

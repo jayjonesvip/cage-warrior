@@ -52,6 +52,16 @@ test('invalid shared-feed session data recovers through one anonymous sign-in', 
   assert.equal(normalizeSession(JSON.parse(storage.value(SESSION_KEY))).access_token, 'access-token');
 });
 
+test('head-to-head results load through the authenticated shared client',async()=>{
+ const ids=[session.user.id,'22222222-2222-4222-8222-222222222222'],rows=[{fighter_id:ids[0],opponent_id:ids[1],wins:2,losses:1}],requests=[];
+ const client=createClient({url:'https://test.supabase.co',key:'sb_publishable_test-key',storage:memoryStorage({[SESSION_KEY]:JSON.stringify(session)}),now:()=>1_000_000,fetchImpl:async(url,options)=>{requests.push({url,options});return jsonResponse(rows)}});
+ assert.deepEqual(await client.loadHeadToHead(ids),rows);
+ assert.equal(requests.length,1);
+ assert.ok(requests[0].url.endsWith('/rpc/get_cage_head_to_head'));
+ assert.deepEqual(JSON.parse(requests[0].options.body),{p_ids:ids});
+ assert.equal(requests[0].options.headers.Authorization,'Bearer access-token');
+});
+
 test('expired anonymous sessions refresh without creating a second player identity', async () => {
   const oldSession = { ...session, access_token: 'expired', expires_at: 10 };
   const refreshed = { ...session, access_token: 'refreshed', expires_at: 9000 };

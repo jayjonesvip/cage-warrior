@@ -17,10 +17,10 @@ test('edition queries a rolling 24 hours including today',()=>{
 test('CEO paragraph covers event categories without names or a long fight list',()=>{
   assert.match(news.roundup({}),/quiet 24 hours/);
   const copy=news.roundup({newFighters:3,fights:47,titles:[{action:'transfer',handle:'Winner'},{action:'defense',handle:'Champion',count:2}],upsets:[{winner:'Underdog',opponent:'Favorite'},{winner:'Other',opponent:'Second',count:3}]});
-  for(const expected of ['3 new fighters joined the roster','47 fights took place','world title changed hands once','2 successful title defenses','4 upsets across the rankings'])assert.ok(copy.includes(expected),expected);
+  for(const expected of ['3 new fighters joined the roster','47 fights took place','world title changed hands once','2 successful title defenses','4 upsets across the roster'])assert.ok(copy.includes(expected),expected);
   assert.equal(copy.includes('\n'),false);assert.doesNotMatch(copy,/yesterday/i);
   assert.doesNotMatch(copy,/@|Winner|Champion|Underdog beat/);assert.ok(copy.split(/\s+/).length<70);
-  assert.match(news.roundup({upset:{winner:'Legacy',opponent:'Opponent'}}),/1 upset across the rankings/);
+  assert.match(news.roundup({upset:{winner:'Legacy',opponent:'Opponent'}}),/1 upset across the roster/);
 });
 function harness(client,options={}){
   const nodes=new Map();const node=()=>({hidden:true,children:[],textContent:'',setAttribute(k,v){this[k]=v},replaceChildren(){this.children=[]},append(x){this.children.push(x)},addEventListener(){}});

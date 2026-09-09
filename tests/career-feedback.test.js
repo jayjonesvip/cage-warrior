@@ -1,10 +1,10 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),feedback=require('../js/career-feedback.js');
-test('spotlights persist until details and ranks require successful remote data',()=>{
+test('spotlights persist until details and retired rank notifications stay removed',()=>{
   const fs=require('node:fs'),path=require('node:path'),read=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8'),game=read('js/game.js');
   assert.match(game,/if\(item&&!state.unseenGear.includes\(item.id\)\)state.unseenGear.push\(item.id\)/);
   assert.match(game,/if\(flipped&&item\)\{state.unseenGear=state.unseenGear.filter/);
-  assert.match(game,/if\(profilesLoaded&&seedsLoaded&&championshipResult.status==='fulfilled'\)/);
+  assert.doesNotMatch(game,/renderRankMovement|showPendingRankUpdate/);
   assert.match(read('index.html'),/js\/career-feedback.js/);
   assert.match(read('service-worker.js'),/js\/career-feedback.js/);
 });

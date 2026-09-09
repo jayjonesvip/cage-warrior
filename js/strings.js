@@ -149,8 +149,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.196',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.196',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.197',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.197',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -171,7 +171,7 @@ opponentNames: {
         "@{name} just hit ten straight today. Matchmakers, put the coffee down and pay attention. We have business to discuss.",
         "There are busy fighters, and there are dangerous fighters. Ten straight today puts @{name} firmly in the second group.",
         "My phone has not stopped buzzing about @{name}. Ten straight qualifying wins in one day will do that. You earned this spotlight.",
-        "Ten fights. Ten straight wins on the Daily Heat run. @{name} did not come here to blend into the rankings.",
+        "Ten fights. Ten straight wins on the Daily Heat run. @{name} did not come here to blend into the roster.",
         "@{name}, I saw all ten. No soft touches on this run. That is the kind of work that gets the boss out of his chair.",
         "The locker room has a new problem today: @{name}. Ten straight qualifying wins. Someone better have an answer.",
         "I do not hand out attention for showing up. @{name} earned it with ten straight today. Take your bow. Then get back to work.",
@@ -333,7 +333,7 @@ interactions: {
   },
 
   ticker: [
-    'Climb the rankings for two Attribute Points. Same- or higher-level fighters below you earn one. Assign them on the Fight page.',
+    'Win above your level for two Attribute Points or at your level for one. Assign them on the Fight page.',
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
     'Energy charges one point every five seconds. Empty means no clearance; anything above zero gets you booked.',
     'Health recovers one point every minute. Commission still wants 20 before a bout.',

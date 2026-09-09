@@ -26,7 +26,7 @@ test('ten distinct CEO messages match the public migration pool',()=>{
   vm.runInNewContext(read('js/strings.js'),box);
   const pool=box.CAGE_STRINGS.social.ceo.dailyHeat;
   assert.equal(pool.length,10);assert.equal(new Set(pool).size,10);
-  const sql=read('supabase/migrations/20260906120000_daily_heat_ceo.sql');
+  const sql=read('supabase/migrations/20260908180000_level_grouped_fighter_roster.sql');
   for(const message of pool)assert.ok(sql.includes(message.replaceAll("'","''")));
   assert.match(sql,/for update/);assert.match(sql,/official_event_key=v_key/);
   assert.match(sql,/auth.uid\(\)/);assert.match(sql,/owner_id=v_user/);
