@@ -352,17 +352,22 @@
     return clamp(chance,0,fightRule('fightFinishes.maximumRockedRecoveryChance',.9));
   }
 
-  function knockoutFinishChance({targetCondition=100,rocked=false,knockdown=false,damage=0,power=0,chin=0}={}){
+  function knockoutFinishChance({targetCondition=100,rocked=false,knockdown=false,damage=0,power=0,chin=0,significant=false}={}){
     const condition=clamp(finite(targetCondition,100),0,100);
     if(condition<=0)return 1;
-    const existing=knockdown&&condition<28?.48:condition<10?.3:0;
+    // Clean significant strikes can force a TKO after accumulated damage, even without a prior rocked flag.
+    const threshold=fightRule('fightFinishes.strikeStoppageConditionThreshold',70),strikeChance=significant&&condition<threshold?clamp(
+      fightRule('fightFinishes.strikeStoppageBaseChance',.04)+(threshold-condition)*fightRule('fightFinishes.strikeStoppageConditionChancePerPoint',.002)
+      +Math.max(0,finite(damage)-6)*fightRule('fightFinishes.strikeStoppageDamageChancePerPoint',.004)
+      +(knockdown?fightRule('fightFinishes.strikeStoppageKnockdownBonus',.2):0),0,fightRule('fightFinishes.maximumStrikeStoppageChance',.35)):0;
+    const existing=Math.max(knockdown&&condition<28?.48:condition<10?.3:0,strikeChance);
     if(!rocked)return existing;
     const rockedChance=fightRule('fightFinishes.rockedFinishBaseChance',.09)+Math.max(0,finite(damage)-6)*fightRule('fightFinishes.rockedFinishDamageChancePerPoint',.012)+Math.max(0,finite(power)-finite(chin))*fightRule('fightFinishes.rockedFinishPowerVsChinPerPoint',.01)+(knockdown?fightRule('fightFinishes.rockedFinishKnockdownBonus',.22):0)+(100-condition)*.0015;
     return clamp(Math.max(existing,rockedChance),0,fightRule('fightFinishes.maximumRockedFinishChance',.58));
   }
 
   function submissionFinishChance({speed=0,opponentSpeed=0,cardio=0,opponentCardio=0,targetCondition=100,signature=false,rocked=false}={}){
-    const chance=fightRule('fightFinishes.submissionBaseChance',.07)+(finite(speed)-finite(opponentSpeed))*fightRule('fightFinishes.submissionSpeedEdgeChancePerPoint',.012)+(finite(cardio)-finite(opponentCardio))*fightRule('fightFinishes.submissionCardioEdgeChancePerPoint',.008)+(100-clamp(finite(targetCondition,100),0,100))*fightRule('fightFinishes.submissionConditionChancePerPoint',.001)+(signature?fightRule('fightFinishes.submissionSignatureBonus',.05):0)+(rocked?fightRule('fightFinishes.submissionRockedBonus',.07):0);
+    const chance=fightRule('fightFinishes.submissionBaseChance',.05)+(finite(speed)-finite(opponentSpeed))*fightRule('fightFinishes.submissionSpeedEdgeChancePerPoint',.012)+(finite(cardio)-finite(opponentCardio))*fightRule('fightFinishes.submissionCardioEdgeChancePerPoint',.008)+(100-clamp(finite(targetCondition,100),0,100))*fightRule('fightFinishes.submissionConditionChancePerPoint',.0008)+(signature?fightRule('fightFinishes.submissionSignatureBonus',.035):0)+(rocked?fightRule('fightFinishes.submissionRockedBonus',.07):0);
     return clamp(chance,fightRule('fightFinishes.minimumSubmissionChance',.05),fightRule('fightFinishes.maximumSubmissionChance',.38));
   }
 

@@ -461,8 +461,8 @@ test('rocked fighters recover from Chin and Cardio or remain vulnerable to a fol
 test('grappling finish pressure rises against a rocked opponent',()=>{
   const normal=logic.submissionFinishChance({speed:5,opponentSpeed:5,cardio:5,opponentCardio:5,targetCondition:100});
   const rocked=logic.submissionFinishChance({speed:5,opponentSpeed:5,cardio:5,opponentCardio:5,targetCondition:100,rocked:true});
-  assert.equal(normal,.07);
-  assert.equal(rocked,.14);
+  assert.equal(normal,.05);
+  assert.ok(Math.abs(rocked-normal-.07)<Number.EPSILON);
 });
 
 test('lower-level opponents award zero XP and same-level runbacks award half',()=>{

@@ -165,6 +165,11 @@ Completed careers save locally first and then sync an authenticated, private Sup
 
 `fight-rules.json` contains descriptive, validated fight and resource constants. `js/fight-rules.js` validates the file and falls back safely when a value is missing or unsafe. `js/game-logic.js` contains deterministic progression and migration helpers used by the browser and tests.
 
+Strike stoppages can follow a landed cross, hook, or kick once the defender is below 70% condition, without requiring a previous rocked event. The chance increases with accumulated damage, strike damage above six, and knockdowns, capped at 35% for this additional path. Existing rocked and critically low-condition finishes remain. Submission base chance is 5%, with a 3.5-point signature bonus and 0.08-point increase per condition point lost; skill edges and submission limits still apply. These settings live in `fightFinishes` and match the offline defaults.
+
+Run `npm run test:fight-distribution` for a reproducible 110,000-fight balance report in `output/fight-distribution/`. The script uses the actual three-round simulator and current rules, with a 40,000-fight baseline equally weighting matched fighters at 5, 12, 25, and 50 points per attribute; styles and all eight plans are sampled uniformly. It also tests individual styles, plans, an attribute gap, and reduced starting condition. For the validated tuning seed, run `node scripts/fight-outcome-distribution.cjs 10000 output/fight-distribution-tuned 20260909`: the baseline is 47.70% decisions, 32.81% KO/TKOs and 19.49% submissions. These controlled results are not live player outcome statistics.
+
+
 ## Project structure
 
 - `index.html` — application shell, screens, and dialogs

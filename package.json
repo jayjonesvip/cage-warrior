@@ -1,8 +1,9 @@
 {
   "name": "cage-grind",
-  "version": "2.7.200",
+  "version": "2.7.201",
   "private": true,
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "test:fight-distribution": "node scripts/fight-outcome-distribution.cjs"
   }
 }

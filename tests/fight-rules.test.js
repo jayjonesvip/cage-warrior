@@ -10,7 +10,7 @@ const root=path.resolve(__dirname,'..');
 
 test('fight-rules.json is valid and uses the current schema',()=>{
   const document=JSON.parse(fs.readFileSync(path.join(root,'fight-rules.json'),'utf8'));
-  assert.equal(document.schemaVersion,7);
+  assert.equal(document.schemaVersion,8);
   assert.deepEqual(document.fightStructure,{scheduledRounds:3,dailyFightLimit:12,dailyBonusQualifyingWinStreak:5,dailyBonusFights:3,minimumHealthForMedicalClearance:20});
   assert.equal(document.energyEconomy.energyRecoveryIntervalMilliseconds,5000);
   assert.equal(document.energyEconomy.healthRecoveryIntervalMilliseconds,60000);
@@ -32,7 +32,7 @@ test('fight-rules.json is valid and uses the current schema',()=>{
   assert.equal(document.auraRewards.higherLevelWinMultiplier,.25);
   assert.equal(document.fightFinishes.rockedExchanges,2);
   assert.equal(document.fightFinishes.maximumRockedChance,.16);
-  assert.equal(document.fightFinishes.submissionBaseChance,.07);
+  assert.equal(document.fightFinishes.submissionBaseChance,.05);
   assert.deepEqual(document.attributePointRewards,{victoryAgainstLowerLevelOpponent:0,victoryAgainstSameLevelOpponent:1,victoryAgainstHigherLevelOpponent:2});
 });
 
