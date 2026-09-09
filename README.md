@@ -188,3 +188,5 @@ npm test
 ```
 
 When changing cached files, update `app-version.json`, package metadata, the service-worker cache version, and `?v=` asset query strings together.
+
+Tale of the Tape shows KO/TKO and submission percentages among wins with a known recorded finish method. Shared fighters use their own career results; seeded fighters use recorded wins against players. Circuit opponents use their recorded wins against you. Missing history displays a dash, and the recorded-win sample size is shown. Estimated American odds compare squared effective attribute totals adjusted for starting condition, bounded to a 5–95% chance; they are a matchup estimate, not a calibrated simulation prediction. Apply `supabase/migrations/20260908200000_tale_of_tape_stats.sql` to enable shared finish statistics and backfill matching saved fight history.

@@ -71,5 +71,24 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  await ensure(null);assert.equal((await db.query('select count(*)::int n from cage_championship_history')).rows[0].n,1);
  for(const role of ['anon','authenticated'])for(const fn of ['cage_fighter_order(uuid[])','cage_head_to_head(uuid[])','ensure_cage_champion(uuid)','select_cage_championship_defense_challenger(uuid,date)'])assert.equal((await db.query('select has_function_privilege($1,$2,\'EXECUTE\') allowed',[role,fn])).rows[0].allowed,false);
  for(const [role,allowed] of [['anon',false],['authenticated',true]])assert.equal((await db.query("select has_function_privilege($1,'get_cage_head_to_head(uuid[])','EXECUTE') allowed",[role])).rows[0].allowed,allowed);
+ // Finish stats backfill only matching saved wins, and never count snapshot wins for human opponents.
+ await db.query('insert into cage_career_saves(owner_id,state) values($1,$2)',[id(1),{fightHistory:[{resultId:id(201),won:true,method:'TKO'}]}]);
+ await db.exec(migration('20260908200000_tale_of_tape_stats'));
+ await db.exec(migration('20260908200000_tale_of_tape_stats'));
+ const finishes=async()=> (await db.query('select get_cage_finish_stats($1) stats',[[id(1),id(5),id(9)]])).rows[0].stats;
+ assert.deepEqual((await finishes())[id(1)],{wins:1,ko:1,sub:0,dec:0,other:0});
+ assert.equal((await finishes())[id(5)],undefined);
+ await db.exec(`update cage_profiles set retired_at=null where id='${id(1)}';`);
+ const finishEvent={...event,resultId:id(501),bout:4,at:new Date(Date.now()+1000).toISOString(),won:false,finishMethod:'SUBMISSION'};
+ await db.query('select record_cage_news_result($1)',[finishEvent]);
+ assert.equal((await finishes())[id(5)],undefined,'human snapshot wins do not change career finish stats');
+ const seedFinish={...finishEvent,resultId:id(502),bout:5,opponent:'SeedNine',opponentId:null,seedId:id(9),seedRankingSnapshot:{opponent_level_at_booking:3,quality_points:35}};
+ for(let i=0;i<2;i++)await db.query('select record_cage_news_result($1)',[seedFinish]);
+ assert.deepEqual((await finishes())[id(9)],{wins:1,ko:0,sub:1,dec:0,other:0});
+ await assert.rejects(()=>db.query('select record_cage_news_result($1)',[{...seedFinish,finishMethod:'KO'}]),/Conflicting fight result ID/);
+ for(const [role,allowed] of [['anon',false],['authenticated',true]])assert.equal((await db.query("select has_function_privilege($1,'get_cage_finish_stats(uuid[])','EXECUTE') allowed",[role])).rows[0].allowed,allowed);
+ await db.exec(`update cage_profiles set created_at=now()+interval '1 minute' where id='${id(1)}';`);
+ assert.equal((await finishes())[id(1)],undefined,'previous career wins excluded');
+ console.log('Verified finish stats: backfill, unknown history, career isolation, human/seed ownership, idempotency and permissions.');
  await db.close();console.log(`Verified ${cases} attribute fixtures; SQL/JS record and H2H ordering; human/seed results, retry validation, historical backfill, title selection and permissions.`);
 })().catch(error=>{console.error(error.message);process.exit(1)});
