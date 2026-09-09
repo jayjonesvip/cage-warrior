@@ -144,7 +144,7 @@
     }
 
     async function selectCageProfiles(limit){
-      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,draws,fight_skin_aura,updated_at&retired_at=is.null&order=updated_at.desc&limit=${limit}`);
+      return authenticatedRequest(`/rest/v1/cage_profiles?select=id,handle,city,archetype,fighter_avatar,level,wins,losses,attribute_total,ranking_history,draws,fight_skin_aura,updated_at&retired_at=is.null&order=level.desc,updated_at.desc&limit=${limit}`);
     }
 
     async function selectOwnCageProfile(expectedUserId=''){

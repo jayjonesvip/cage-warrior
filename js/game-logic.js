@@ -126,6 +126,9 @@
       key:pending.key,
       cost:clamp(whole(pending.cost,maximumEnergy()),1,maximumEnergy()),
       startedAt:Math.max(0,finite(pending.startedAt,0)),
+      ...(pending.attributeRewardContext&&['tierHighestLevel','playerLevel','opponentLevel'].every(key=>Number.isFinite(pending.attributeRewardContext[key])&&pending.attributeRewardContext[key]>0)?{attributeRewardContext:{
+        tierHighestLevel:whole(pending.attributeRewardContext.tierHighestLevel,1),playerLevel:whole(pending.attributeRewardContext.playerLevel,1),opponentLevel:whole(pending.attributeRewardContext.opponentLevel,1),circuit:pending.attributeRewardContext.circuit===true
+      }}:{}),
       ...(pending.rankingSnapshot?{rankingSnapshot:normalizeRankingHistory([{...pending.rankingSnapshot,won:false}])[0]}:{})
     }:null;
     state.lastSave=Math.max(0,finite(state.lastSave,Date.now()));
@@ -219,8 +222,20 @@
   function rewardMatchup({playerLevel=1,opponentLevel=1}={}){
     return {higherRanked:false,eligible:whole(opponentLevel,1)>=whole(playerLevel,1),xpLevel:whole(opponentLevel,1)};
   }
+  const FIGHTER_TIER_NAMES=['New Blood','Prospects','Challengers','Contenders','Elite'];
+  function fighterTierBands(highestLevel=1){
+    // Integer boundaries divide the active level range evenly; the top fighter belongs to Elite.
+    const ceiling=Math.max(5,whole(highestLevel,1));
+    return FIGHTER_TIER_NAMES.map((name,index)=>({number:index+1,name,minLevel:Math.floor(index*ceiling/5)+1,maxLevel:Math.floor((index+1)*ceiling/5)}));
+  }
+  function fighterCompetitiveTier(level=1,highestLevel=1){
+    const ceiling=Math.max(5,whole(highestLevel,1));
+    return clamp(Math.ceil(Math.max(1,whole(level,1))*5/ceiling),1,5);
+  }
   function victoryAttributePointReward(playerLevel=1,opponentLevel=1,ranks={}){
-    const player=Math.max(1,whole(playerLevel,1)),opponent=Math.max(1,whole(opponentLevel,1));
+    const useTiers=!ranks.circuit&&Number.isFinite(ranks.tierHighestLevel)&&ranks.tierHighestLevel>0,
+      player=useTiers?fighterCompetitiveTier(playerLevel,ranks.tierHighestLevel):Math.max(1,whole(playerLevel,1)),
+      opponent=useTiers?fighterCompetitiveTier(opponentLevel,ranks.tierHighestLevel):Math.max(1,whole(opponentLevel,1));
     if(opponent<player)return fightRule('attributePointRewards.victoryAgainstLowerLevelOpponent',0);
     if(opponent>player)return fightRule('attributePointRewards.victoryAgainstHigherLevelOpponent',2);
     return fightRule('attributePointRewards.victoryAgainstSameLevelOpponent',1);
@@ -765,5 +780,5 @@
     };
   }
 
-return {matchupOdds,orderFighters,fighterAttributeTotal,validCombatStats,normalizeFightPlan,combatPlanRound,claimDailyHeatAura,higherRankedOpponent,rewardMatchup,careerHighlights,sparImprovement,clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,normalizeRankingHistory,appendRankingResult,rankingFightSnapshot,rankingDebug,rankingFightEntry,rankingComponents,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,applyDailyFightStreak,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,healthTierName,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraGrowthMultiplier,scaledAuraGain,lowerLevelAuraPenalty,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,loadoutCategoryLimit,fightScore,playerTrailing,auraComebackEdge,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,undiscoveredCollectibles,normalizeGearDrop};
+return {fighterTierBands,fighterCompetitiveTier,matchupOdds,orderFighters,fighterAttributeTotal,validCombatStats,normalizeFightPlan,combatPlanRound,claimDailyHeatAura,higherRankedOpponent,rewardMatchup,careerHighlights,sparImprovement,clamp,localDateKey,millisecondsUntilNextLocalDay,formatCountdown,validFighterAllocation,rollFighterAllocation,fighterArchetypeFromStats,isBlankCareer,careerLandingMode,landingChampionshipProof,normalizeRankingHistory,appendRankingResult,rankingFightSnapshot,rankingDebug,rankingFightEntry,rankingComponents,rankFighters,rankedFightTitleMode,parseStoredState,selectStoredState,shouldBackupRaw,shouldPersistCareer,clearCareerStorage,normalizeCoreState,dailyCountersFor,applyDailyFightStreak,spendEnergy,applyLevelUpResources,passiveRecovery,followersPerHour,passiveFollowerGrowth,fightFollowerReward,recoveryTimeRemaining,victoryAttributePointReward,awardVictoryAttributePoint,firstContractPending,firstContractUnlockEligible,lowerLevelFollowerPenalty,matchupAdvice,assignAttributePoint,sponsorProgress,fightWinShareText,resourceIsCritical,fightEnergyCost,bookFight,startingFightCondition,healthTierName,rockedChance,rockedRecoveryChance,knockoutFinishChance,submissionFinishChance,liveFightHealthDamage,finalFightHealthLoss,legacyXpRequirement,xpRequirement,rescaleXpProgress,opponentXpTier,auraTitle,auraGrowthMultiplier,scaledAuraGain,lowerLevelAuraPenalty,auraFightChange,nextOpponentXpStage,fightDropEligible,fightXp,loadoutCategoryLimit,fightScore,playerTrailing,auraComebackEdge,opponentState,opponentGroup,opponentAvailable,championshipCareerRank,championshipExperience,championshipSettlementPresentation,networkOpponentRatings,generatedOpponentBaseRating,capOpponentRatings,fightPlanAssessment,cardioImbalanceFatigue,socialInteractionReward,normalizeFighterIdentity,displayFighterIdentity,buildFighterIdentity,randomFighterIdentity,nextVictoryPackProgress,victoryPackReady,victoryPackWinEligible,undiscoveredCollectibles,normalizeGearDrop};
 });

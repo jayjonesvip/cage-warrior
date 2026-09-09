@@ -75,6 +75,16 @@ test('coach recognizes a better comparable spar and identifies a single plan cha
 const defaults={level:1,xp:0,fans:0,wins:0,losses:0,winStreak:0,bestStreak:0,attributePoints:0,maxEnergy:100,energy:100,maxHealth:100,health:100,aura:0,stats:{power:5,speed:5,chin:5,cardio:5},lastSave:0};
 const state=(overrides={})=>Object.assign(structuredClone(defaults),overrides);
 
+test('saved bookings retain bounded tier reward context without changing legacy bookings',()=>{
+  const attributeRewardContext={tierHighestLevel:15,playerLevel:11,opponentLevel:10,circuit:false};
+  const raw=state({pendingFight:{key:'opponent',cost:25,startedAt:100,attributeRewardContext}});
+  assert.deepEqual(logic.normalizeCoreState(structuredClone(raw),defaults,raw).pendingFight.attributeRewardContext,attributeRewardContext);
+  raw.pendingFight.attributeRewardContext={...attributeRewardContext,tierHighestLevel:Infinity};
+  assert.equal(logic.normalizeCoreState(structuredClone(raw),defaults,raw).pendingFight.attributeRewardContext,undefined);
+  delete raw.pendingFight.attributeRewardContext;
+  assert.equal(logic.normalizeCoreState(structuredClone(raw),defaults,raw).pendingFight.key,'opponent');
+});
+
 test('core migration preserves career data and adds simplified fields',()=>{
   const raw={level:4,xp:22,fans:900,wins:8,losses:2,energy:47.9,health:81,stats:{power:9.4,speed:7.6,chin:8,cardio:6},cash:999,careerEarnings:1200,trainerOn:true,trainingInjury:{id:'knee'},roster:[]};
   const migrated=logic.normalizeCoreState(structuredClone(raw),defaults,raw);

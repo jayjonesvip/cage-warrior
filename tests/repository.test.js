@@ -1297,7 +1297,7 @@ test('Fight uses one clickable ranking ladder with visible matchup rewards',()=>
   assert.match(game,/#opponentList'\)\.addEventListener\('scroll',maybeLoadMoreFightRankings,\{passive:true\}\)/);
   assert.match(game,/scroller\.scrollTop\+scroller\.clientHeight<scroller\.scrollHeight-240/);
   assert.match(styles,/\.page-scroll\{[^}]*overflow-y:auto/);
-  assert.match(html,/fight-ladder-footer[^>]*>Win at your level for 1 Attribute Point or above your level for 2/);
+  assert.match(html,/fight-ladder-footer[^>]*>Roster wins: 1 Attribute Point within your tier, 2 above, 0 below/);
   assert.match(game,/PRO \$\{opponent\.wins\}-\$\{opponent\.losses\} · LVL \$\{opponent\.tier\}[\s\S]*?\$\{attributeTotal\} ATTR/);
   assert.doesNotMatch(html,/data-opponent-filter/);
   assert.match(game,/onChampionshipChange:renderOpponents/);
@@ -1353,7 +1353,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(game,/f\.o\.network\?'ROSTER BOUT':'UNRANKED PRO BOUT'/);
   assert.match(game,/if\(win\)\{[\s\S]*?state\.wins\+\+;state\.winStreak\+\+/);
   assert.match(game,/\}else\{[\s\S]*?state\.losses\+\+;state\.winStreak=0/);
-  assert.match(html,/Win at your level for 1/);
+  assert.match(html,/Circuit rewards stay level-based/);
   assert.match(game,/CAGE CIRCUIT REMATCH/);
   assert.match(game,/circuitRematches\.length>1/);
   assert.match(game,/state\.circuitLossStreak>=2\?-1:1/);
@@ -1373,7 +1373,7 @@ test('Fight adds two on-level unranked Cage Circuit opponents above rankings',()
   assert.match(styles,/\.fighter-city-badge:has\(\.fight-country-badge\)\{[^}]*border:0/);
   for(const iso of ['us','mx','ru','br','ca','ie','gb','jp','kr','ng','th','ph','cu','pr','au','pl','ge','am','co','ar','nl','ws'])assert.ok(fs.existsSync(path.join(root,`assets/flags/${iso}.svg`)),iso);
   assert.ok(!fs.existsSync(path.join(root,'assets/flags/country-flags.svg')));
-  assert.match(html,/above your level for 2/);
+  assert.match(html,/within your tier, 2 above, 0 below/);
   assert.match(readme,/Beating either Circuit fighter removes that opponent and immediately generates a fresh on-level replacement/);
 });
 
@@ -1539,7 +1539,7 @@ test('service worker caches Open Gym navigation art but not removed activity cod
 
 test('README documents the complete simplified architecture',()=>{
   const readme=read('README.md');
-  for(const token of ['zero below the fighter\'s level, one at the same level, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gym, Gear, and Feed','state version 31','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
+  for(const token of ['zero below the fighter\'s tier, one in the same tier, and two above it','5 seconds','60 seconds','Attribute Points','Follower-based sponsors','Share Win','Home, Fight, Gym, Gear, and Feed','state version 31','balanced XP curve','1 + floor(Aura / 10)','0.75 payout multiplier','48 hours'])assert.ok(readme.includes(token),token);
   for(const threshold of ['500','2,500','10,000','30,000','80,000','200,000'])assert.ok(readme.includes(threshold),threshold);
   assert.match(readme,/five percent of current followers/);
   assert.match(readme,/drops to the highest sponsor tier their current follower total still qualifies for/);
