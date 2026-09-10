@@ -149,8 +149,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.203',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.203',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.204',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.204',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -337,7 +337,7 @@ interactions: {
     'Fast pace is an investment, kid. Bring better cardio than the other guy or pay interest late.',
     'Energy charges one point every five seconds. Empty means no clearance; anything above zero gets you booked.',
     'Health recovers one point every minute. Commission still wants 20 before a bout.',
-    'Fresh on-level contenders pay full XP. One same-day runback pays half; later wins pay none.',
+    'Every result starts a 24-hour no-rematch window against that fighter. Look for a fresh matchup.',
     'Beating a lower-level fighter costs five percent of your followers. Fans expect you to fight up, not down.',
     'Set the plan before the walkout: pace, offense, and whether you trust your style or adapt.',
     'Adapting takes focus, kid. Round one reads him, round two adjusts, round three owns the answer.',

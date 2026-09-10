@@ -47,7 +47,7 @@ test('preview and settlement retain booked tiers when the roster or player level
  assert.match(source,/fightWinRewardPreview\(f\.o,f\.attributeRewardContext\)/);
 });
 test('every matchup in the player tier receives the green highlight and YOUR TIER badge',()=>{
- const ctx={LOGIC:logic,state:{level:11},attributeRewardContext:()=>({tierHighestLevel:15}),fightWinRewardPreview:()=>({points:1,xp:0}),combatStatsPending:()=>false,silhouetteForOpponent:()=>'',escapeHtml:String,opponentCountry:()=>({name:'USA'}),opponentCountryBadge:()=>''};
+ const ctx={LOGIC:logic,state:{level:11},attributeRewardContext:()=>({tierHighestLevel:15}),fightWinRewardPreview:()=>({points:1,xp:0}),combatStatsPending:()=>false,opponentRematchRemaining:()=>0,rematchTimeLabel:()=>'24H 0M',silhouetteForOpponent:()=>'',escapeHtml:String,opponentCountry:()=>({name:'USA'}),opponentCountryBadge:()=>''};
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function renderFightLadderRow('),source.indexOf('  function renderPlayerRankingRow(')),ctx);
  for(const level of [10,11,12]){
   const html=ctx.renderFightLadderRow({network:true,tier:level,wins:1,losses:0},12,1);

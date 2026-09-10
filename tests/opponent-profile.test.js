@@ -3,10 +3,18 @@ const source=fs.readFileSync(path.join(__dirname,'../js/game.js'),'utf8');
 function harness(){
  const nodes=new Map(),stages=[],history=[],events=[];
  const $=id=>{if(!nodes.has(id)){const classes=new Set();nodes.set(id,{disabled:false,textContent:'',classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x)},setAttribute(){},focus(){}})}return nodes.get(id)};
- const ctx={$,fight:null,combatLocked:false,fightBooking:false,state:{health:100,energy:100},DAILY_FIGHT_LIMIT:10,MINIMUM_FIGHT_HEALTH:20,FIGHT_ENERGY_COST:10,MINIMUM_ACTION_ENERGY_EXCLUSIVE:0,HISTORY_KEY:'test',history:{state:null},combatStatsPending:()=>false,opponentAvailable:()=>true,sessionsLeft:()=>10,hasActionEnergy:()=>true,closeTapeStats(){},closeTapeBreakdown(){},clearFightTimers(){},createFight:o=>({o,rounds:[]}),trackEvent:name=>events.push(name),showFightStage:s=>stages.push(s),fillTape:()=>{$('#opponentProfileFight').disabled=ctx.fightBooking},writeHistory:(...args)=>history.push(args),sfx:{tap(){}},toast(){},initAudio(){},saveState(){},updateUI(){},connectSharedSocial:async()=>true,SHARED_FEED:{},fighterSessionMessage:e=>e.message,LOGIC:{bookFight(state,key,cost){state.energy-=cost;state.pendingFight={key,cost};return {ok:true,energySpent:cost}}}};
+ const ctx={$,fight:null,combatLocked:false,fightBooking:false,state:{health:100,energy:100},DAILY_FIGHT_LIMIT:10,MINIMUM_FIGHT_HEALTH:20,FIGHT_ENERGY_COST:10,MINIMUM_ACTION_ENERGY_EXCLUSIVE:0,HISTORY_KEY:'test',history:{state:null},combatStatsPending:()=>false,opponentRematchRemaining:()=>0,rematchTimeLabel:()=>'24H 0M',opponentAvailable:()=>true,sessionsLeft:()=>10,hasActionEnergy:()=>true,closeTapeStats(){},closeTapeBreakdown(){},clearFightTimers(){},createFight:o=>({o,rounds:[]}),trackEvent:name=>events.push(name),showFightStage:s=>stages.push(s),fillTape:()=>{$('#opponentProfileFight').disabled=ctx.fightBooking},writeHistory:(...args)=>history.push(args),sfx:{tap(){}},toast(){},initAudio(){},saveState(){},updateUI(){},connectSharedSocial:async()=>true,SHARED_FEED:{},fighterSessionMessage:e=>e.message,LOGIC:{bookFight(state,key,cost){state.energy-=cost;state.pendingFight={key,cost};return {ok:true,energySpent:cost}}}};
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function openTaleOfTape('),source.indexOf('  function forfeitFight(')),ctx);
  return {ctx,$,stages,history,events};
 }
+test('a rematch cooldown blocks booking before energy or title requests are spent',async()=>{
+ const h=harness();h.ctx.openTaleOfTape({key:'recent',name:'Recent Opponent',globalChampionship:true});
+ h.ctx.opponentRematchRemaining=()=>60000;
+ h.ctx.SHARED_FEED.beginChampionshipBout=async()=>{throw new Error('Must not request a title booking')};
+ await h.ctx.commitFight();
+ assert.equal(h.ctx.state.energy,100);assert.equal(h.ctx.state.pendingFight,undefined);assert.equal(h.ctx.combatLocked,false);
+ assert.equal(h.events.includes('fight_started'),false);
+});
 test('profile inspection and dismissal never book or charge a fight',()=>{
  const h=harness();h.ctx.openTaleOfTape({key:'rookie',name:'Rookie'});
  assert.equal(h.stages.at(-1),'opponentProfileModal');assert.equal(h.ctx.state.energy,100);assert.equal(h.ctx.state.pendingFight,undefined);assert.equal(h.ctx.combatLocked,false);

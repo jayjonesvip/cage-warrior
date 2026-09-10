@@ -46,6 +46,17 @@
     }
     return result;
   }
+  function rematchRemaining(entries,opponent={},now=Date.now()){
+    const id=String(opponent.sourceProfileId||opponent.key||''),key=String(opponent.key||''),name=String(opponent.networkHandle||opponent.name||'').replace(/^@/,'').toLowerCase();
+    if(!id&&!name)return 0;
+    let latest=0;
+    for(const entry of (Array.isArray(entries)?entries:[]).slice(-LIMIT)){
+      if(!entry||typeof entry.won!=='boolean'||!Number.isFinite(entry.date)||entry.date<=0||entry.date>now)continue;
+      const matches=entry.opponentId?entry.opponentId===id||entry.opponentId===key:name&&String(entry.opponent||'').replace(/^@/,'').toLowerCase()===name;
+      if(matches)latest=Math.max(latest,entry.date);
+    }
+    return latest?Math.max(0,latest+24*60*60*1000-now):0;
+  }
   function recentResults(entries){return normalize(entries).slice(-5).reverse().map(entry=>entry.won?'W':'L')}
   function charts(entries){
     const saved=normalize(entries),total=saved.length,wins=saved.filter(entry=>entry.won).length,finishes=breakdown(saved);
@@ -57,5 +68,5 @@
     }
     return donut('WIN / LOSS',total?Math.round(wins/total*100)+'%':'—','WIN RATE',[['W',wins,'#70bf99'],['L',total-wins,'#bb6878']])+donut('WIN METHODS',wins,'WINS',[['KO',finishes.ko,'#62cbea'],['SUB',finishes.sub,'#ad93d2'],['DEC',finishes.dec,'#c5a25c'],...(finishes.other?[['OTHER',finishes.other,'#a5b2bf']]:[])]);
   }
-  const api={finishCategory,finishStats,normalize,append,breakdown,recentResults,charts,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
+  const api={rematchRemaining,finishCategory,finishStats,normalize,append,breakdown,recentResults,charts,LIMIT};root.CAGE_FIGHT_HISTORY=api;if(typeof module==='object')module.exports=api;
 })(globalThis);

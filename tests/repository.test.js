@@ -1322,7 +1322,7 @@ test('CageReporter calls out lower-level wins and their follower backlash',()=>{
   pool.forEach(post=>{assert.equal(post.profile,'media');assert.match(post.text,/followers|audience|fans/i)});
   assert.match(game,/data\.win&&data\.lowerLevelWin/);
   assert.match(game,/followersLost:Math\.abs\(fans\)/);
-  assert.match(game,/lowerLevelWin:lowerLevelWin&&!calloutFight/);
+  assert.match(game,/lowerLevelWin:backlashWin&&!calloutFight/);
 });
 
 test('Fight ladder opens the current fighter profile without offering a self fight',()=>{
