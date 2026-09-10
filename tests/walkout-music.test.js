@@ -57,8 +57,8 @@ test('locker music is wired before the game and walkout ends before combat',()=>
   assert.match(html,/<details class="entrance-music">\s*<summary>/);
   assert.match(html,/ENTRANCE MUSIC<small id="entranceMusicTrackName">The Quiet Before<\/small>/);
   assert.match(game,/\$\('#entranceMusicState'\)\.textContent=/);
-  assert.match(game,/scheduleFight\(\(\)=>walkoutMusic.stop\(\),6800\)/);
-  assert.match(game,/fightPlanFeature.confirm\(\)\},7000\)/);
+  assert.match(game,/scheduleFight\(\(\)=>walkoutMusic.stop\(\),duration-200\)/);
+  assert.match(game,/fightPlanFeature.confirm\(\)\},duration\)/);
   assert.doesNotMatch(game,/setScene\(stage==='planStage'\?'locker'/);
   assert.ok(html.indexOf('id="lockerMusicToggle"')<html.indexOf('id="planStage"'));
   assert.match(html,/id="walkoutProgress" role="progressbar"/);

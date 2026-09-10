@@ -121,11 +121,11 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #resultModal .result-card{overflow-x:hidden}
 #resultScorecardClose{width:100%;margin-bottom:12px}
 #walkoutModal{z-index:105;background:#01070cdd}
-.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.204") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
+.walkout-dialog{text-align:center;border-color:#4384a4;min-height:min(440px,80dvh);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#0208100d 15%,#02081066 45%,#020810eb 85%),url("../assets/to-the-cage-walkout.png?v=2.7.205") center/cover no-repeat #09131e;text-shadow:0 2px 8px #000}
 .walkout-dialog>small{color:#8edfff;letter-spacing:1px}
 .walkout-dialog:before,.walkout-dialog:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;opacity:0;background:#eaf8ff;box-shadow:0 0 5px 2px #c7eaff99,0 0 12px 4px #9fd6ff33}
-#walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft 7s linear both}
-#walkoutModal.open .walkout-dialog:after{animation:walkoutCameraRight 7s linear both}
+#walkoutModal.open .walkout-dialog:before{animation:walkoutCameraLeft var(--walkout-duration,3s) linear both}
+#walkoutModal.open .walkout-dialog:after{animation:walkoutCameraRight var(--walkout-duration,3s) linear both}
 @keyframes walkoutCameraLeft{0%,8%{left:9%;top:27%;opacity:0}9%{opacity:.75}11%,37%{left:9%;top:27%;opacity:0}38%{left:18%;top:34%;opacity:0}39%{opacity:.65}41%,76%{left:18%;top:34%;opacity:0}77%{left:6%;top:39%;opacity:0}78%{opacity:.7}80%,100%{left:6%;top:39%;opacity:0}}
 @keyframes walkoutCameraRight{0%,23%{right:12%;top:32%;opacity:0}24%{opacity:.65}26%,58%{right:12%;top:32%;opacity:0}59%{right:7%;top:24%;opacity:0}60%{opacity:.75}62%,89%{right:7%;top:24%;opacity:0}90%{right:17%;top:38%;opacity:0}91%{opacity:.6}93%,100%{right:17%;top:38%;opacity:0}}
 @media(prefers-reduced-motion:reduce){#walkoutModal .walkout-dialog:before,#walkoutModal .walkout-dialog:after{display:none;animation:none!important}}
@@ -133,7 +133,7 @@ button:disabled { border-color:#30363d!important; background:#161b22!important; 
 #walkoutModal #walkoutMessage{font-size:13px!important;min-height:64px;display:grid;align-items:center;line-height:1.5;color:#b5c9d7;margin:10px 0 20px}
 #walkoutProgress{height:10px;overflow:hidden;border:1px solid #37566c;border-radius:999px;background:#040b11}
 #walkoutProgress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#258fd2,#8fe5ff)}
-#walkoutModal.open #walkoutProgress i{animation:walkoutFill 7s linear forwards}
+#walkoutModal.open #walkoutProgress i{animation:walkoutFill var(--walkout-duration,3s) linear forwards}
 @keyframes walkoutFill{to{width:100%}}
 @media(prefers-reduced-motion:reduce){#walkoutModal.open #walkoutProgress i{animation:none!important;width:100%}}
 .home-fight-history,.home-fight-skin .entrance-music{margin:12px;border:1px solid #365269;border-radius:10px;background:linear-gradient(145deg,#0d2232,#08121c);overflow:hidden}

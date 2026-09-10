@@ -197,3 +197,9 @@ npm test
 When changing cached files, update `app-version.json`, package metadata, the service-worker cache version, and `?v=` asset query strings together.
 
 Tale of the Tape shows KO/TKO and submission percentages among wins with a known recorded finish method. Shared fighters use their own career results; seeded fighters use recorded wins against players. Circuit opponents use their recorded wins against you. Missing history displays a dash, and the recorded-win sample size is shown. Estimated American odds compare squared effective attribute totals adjusted for starting condition, bounded to a 5–95% chance; they are a matchup estimate, not a calibrated simulation prediction. Apply `supabase/migrations/20260908200000_tale_of_tape_stats.sql` to enable shared finish statistics and backfill matching saved fight history.
+
+### First-win progression
+
+The first career win offers permanent attribute spending directly on the rewards card, with the option to save the point for later. It guarantees a short, dismissible message from Mom after the collectible pack is closed. At 1–0, the Fight screen highlights a fresh on-level Circuit opponent whose total attributes are closest to the player's base build. This recommendation survives reloads through the existing career state, respects matchup availability and the 24-hour rematch lock, and disappears after the next completed fight. The full roster remains available; the recommended bout uses the normal simulation.
+
+The opening showcase walkout lasts 1.5 seconds with one entrance beat. Later walkouts last 3 seconds. Entrance music stops before combat starts.

@@ -454,9 +454,9 @@ test('Energy uses eight discrete pips while Health remains a smooth vitality bar
   assert.match(styles,/\.health-hud \.hud-meter i[\s\S]*?#3fae5c,#5cc978/);
 });
 
-test('Attribute Point assignment has one source of truth above Fight rankings',()=>{
-  assert.equal((html.match(/data-attribute-assignment/g)||[]).length,1);
-  for(const stat of ['power','speed','chin','cardio'])assert.equal((html.match(new RegExp(`data-assign-attribute="${stat}"`,'g'))||[]).length,1,stat);
+test('Fight and first-win rewards share the permanent Attribute Point controls',()=>{
+  assert.equal((html.match(/data-attribute-assignment/g)||[]).length,2);
+  for(const stat of ['power','speed','chin','cardio'])assert.equal((html.match(new RegExp(`data-assign-attribute="${stat}"`,'g'))||[]).length,2,stat);
   assert.match(html,/data-screen="fight"[\s\S]*?fight-attribute-assignment[\s\S]*?opponent-roster fight-ladder/);
   assert.match(html,/data-attribute-effective/);
   assert.match(html,/data-attribute-breakdown/);
@@ -476,7 +476,7 @@ test('Attribute Point assignment has one source of truth above Fight rankings',(
   assert.match(game,/subtitle\.textContent=attributeAssignmentExpanded\?'Choose one permanent upgrade'/);
   assert.match(game,/effective=effectiveStat\(key\)/);
   assert.match(game,/bonus\?`\$\{base\} BASE · \+\$\{bonus\} GEAR`/);
-  assert.doesNotMatch(html,/result-attribute-assignment|ASSIGN YOUR POINT/);
+  assert.match(html,/result-attribute-assignment[^>]*data-first-win-assignment/);
   assert.doesNotMatch(game,/save it for Home/);
   assert.match(game,/assignAttributePoint/);
   assert.match(game,/awardVictoryAttributePoint/);
@@ -497,8 +497,8 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   for(const asset of ['contact-wife.jpg','contact-mom.jpg','contact-grandma.jpg','contact-brother-tommy.png','contact-agent-carl.png'])assert.match(strings,new RegExp(`assets/${asset.replace('.','\\.')}`));
   assert.match(strings,/postFightTexts:[\s\S]*chance: \.32[\s\S]*relationship:'WIFE'[\s\S]*relationship:'AGENT'/);
   assert.match(game,/const notable=titleWon\|\|titleFight\|\|\(won&&winStreak>0&&winStreak%5===0\)/);
-  assert.match(game,/pendingPostFightText=selectPostFightText\(\{won:win,forfeited:!!fight\.forfeited,lowerLevelWin,titleWon,titleFight:!!o\.globalChampionship/);
-  assert.match(game,/if\(forfeited\|\|lowerLevelWin\|\|!contacts\.length\)return null/);
+  assert.match(game,/pendingPostFightText=selectPostFightText\(\{firstCareerWin,won:win,forfeited:!!fight\.forfeited,lowerLevelWin,titleWon,titleFight:!!o\.globalChampionship/);
+  assert.match(game,/if\(forfeited\|\|\(lowerLevelWin&&!firstWin\)\|\|!contacts\.length\)return null/);
   assert.match(game,/function showPostFightFollowup\(\)\{if\(postFightPresentationBusy\(\)\)return false;if\(showPendingPostFightText\(\)\)return true/);
   assert.match(html,/id="postFightMessageInput"[^>]*placeholder="Replies unavailable"[^>]*disabled/);
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
