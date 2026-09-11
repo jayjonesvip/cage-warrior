@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="app-version" content="2.7.211" />
+<meta name="app-version" content="2.7.212" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMT6RLVT5L"></script>
 <script>
@@ -42,10 +42,10 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="assets/app-icon-180.png" />
-<link rel="stylesheet" href="css/styles.css?v=2.7.211">
-<link rel="stylesheet" href="css/shared.css?v=2.7.211">
-<link rel="stylesheet" href="css/landing.css?v=2.7.211">
-<link rel="stylesheet" href="css/github-steel.css?v=2.7.211">
+<link rel="stylesheet" href="css/styles.css?v=2.7.212">
+<link rel="stylesheet" href="css/shared.css?v=2.7.212">
+<link rel="stylesheet" href="css/landing.css?v=2.7.212">
+<link rel="stylesheet" href="css/github-steel.css?v=2.7.212">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,13 +85,13 @@
 <body class="landing-active">
 <section class="landing-page" id="landingPage" aria-labelledby="landingTitle">
   <main class="landing-card">
-    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.211" alt="" aria-hidden="true">
+    <img class="landing-watermark" src="assets/app-icon-512.png?v=2.7.212" alt="" aria-hidden="true">
     <img class="landing-logo" src="assets/cage-grind-logo.png" alt="Cage Grind">
     <p class="landing-eyebrow" id="landingEyebrow">YOUR NAME. YOUR FIGHT. YOUR LEGACY.</p>
     <div class="landing-hero"><div class="landing-hero-copy">
     <h1 id="landingTitle"><span id="landingTitleLead">BUILD. FIGHT.</span><br><span class="accent" id="landingTitleAccent">BECOME.</span></h1>
     <p class="landing-description" id="landingDescription">Create your fighter. Claim your name on the shared roster. Step into your first fight.</p>
-    </div><figure class="landing-fighter"><img src="assets/avatars/fighter-avatar-66.png?v=2.7.211" alt="A Cage Grind fighter ready to enter the cage" fetchpriority="high"><figcaption>70 LOOKS. ONE CAREER.</figcaption></figure></div>
+    </div><figure class="landing-fighter"><img src="assets/avatars/fighter-avatar-66.png?v=2.7.212" alt="A Cage Grind fighter ready to enter the cage" fetchpriority="high"><figcaption>70 LOOKS. ONE CAREER.</figcaption></figure></div>
     <button class="landing-enter" id="landingEnterBtn" type="button">START YOUR CAREER →</button>
     <div class="landing-details" id="landingDetails" aria-label="Career summary">
       <span id="landingDetailOne">FREE TO PLAY</span><i aria-hidden="true"></i>
@@ -176,20 +176,17 @@
       <div class="card build-card identity-setup fighter-build-setup" id="fighterSetup" hidden>
         <div class="card-title">Your Fighter Is Ready <small>Customize below</small></div>
         <div class="fighter-build-hometown"><label for="fighterBuildCity">FIGHTING OUT OF</label><select id="fighterBuildCity" aria-label="Fighting out of"></select><small>Hometown, look, and attributes become permanent when you use this fighter.</small></div>
-        <div class="fighter-build-card">
-          <section class="fighter-avatar-selector" aria-label="Appearance — choose your look">
-            <div class="fighter-build-section-label" id="fighterAppearanceLabel"><b>APPEARANCE</b><span>CHOOSE YOUR LOOK</span></div>
-            <div class="fighter-build-portrait"><img id="fighterBuildPortrait" src="assets/avatars/fighter-avatar-01.png" alt="Fighter 1"></div>
-            <h3 id="fighterBuildName">FIGHTER 01</h3>
-            <div class="fighter-avatar-pagination" aria-label="Choose fighter appearance"><button id="previousFighterAvatarBtn" type="button" aria-label="Previous fighter">←</button><button id="randomFighterAvatarBtn" type="button">RANDOM</button><button id="nextFighterAvatarBtn" type="button" aria-label="Next fighter">→</button></div>
-            <small class="fighter-avatar-help">ARROWS AND RANDOM CHANGE APPEARANCE ONLY</small>
+        <div class="fighter-build-card fighter-build-preview fighter-profile-visual">
+          <section class="fighter-build-appearance" aria-label="Fighter appearance">
+            <div class="fighter-profile-portrait fighter-build-preview-portrait"><img id="fighterBuildPortrait" src="assets/avatars/fighter-avatar-01.png" alt="Fighter 1"></div>
+            <button class="fighter-build-shuffle" id="randomFighterAvatarBtn" type="button">↻ SHUFFLE AVATAR</button>
           </section>
-          <section class="fighter-attribute-selector" aria-label="Attributes — 20 point build">
-            <div class="fighter-build-section-label" id="fighterAttributesLabel"><b>ATTRIBUTES</b><span>20 POINT BUILD</span></div>
-            <section class="fighter-build-archetype" aria-live="polite"><small>CALCULATED ARCHETYPE</small><strong id="fighterBuildArchetype">STRIKER</strong><p id="fighterBuildArchetypeReason">Power and speed lead this build.</p></section>
-            <div class="fighter-build-attributes" id="fighterBuildAttributes" aria-label="Fighter attributes"><div class="fighter-build-attribute"><span>POWER</span><div><i id="fighterBuildPowerMeter"></i></div><b id="fighterBuildPower">5</b></div><div class="fighter-build-attribute"><span>SPEED</span><div><i id="fighterBuildSpeedMeter"></i></div><b id="fighterBuildSpeed">5</b></div><div class="fighter-build-attribute"><span>CHIN</span><div><i id="fighterBuildChinMeter"></i></div><b id="fighterBuildChin">5</b></div><div class="fighter-build-attribute"><span>CARDIO</span><div><i id="fighterBuildCardioMeter"></i></div><b id="fighterBuildCardio">5</b></div></div>
-            <button class="fighter-build-shuffle" id="shuffleFighterAttributesBtn" type="button">↻ SHUFFLE ATTRIBUTES</button>
-          </section>
+          <div class="fighter-build-chart">
+            <div class="fighter-attribute-donut" id="fighterBuildDonut" role="img" aria-label="Your starting attribute distribution"><div class="fighter-attribute-total" aria-hidden="true"><b class="fighter-attribute-total-value" id="fighterBuildTotal">20</b><small>TOTAL</small></div></div>
+            <div class="fighter-build-preview-archetype" aria-live="polite"><small>ARCHETYPE</small><strong id="fighterBuildArchetype">STRIKER</strong><p id="fighterBuildArchetypeReason">Power and speed lead this build.</p></div>
+          </div>
+          <div class="fighter-attribute-legend" id="fighterBuildAttributes" aria-label="Starting fighter attributes"></div>
+          <button class="fighter-build-shuffle" id="shuffleFighterAttributesBtn" type="button">↻ SHUFFLE ATTRIBUTES</button>
           <button class="fighter-build-lock" id="lockFighterBuildBtn" type="button">USE THIS FIGHTER</button>
         </div>
         <div class="allocation-rule"><b>20-POINT RULE:</b> Every roll totals exactly 20. Each attribute stays between 2 and 8. Your final attributes automatically determine your permanent archetype.</div>
@@ -272,7 +269,7 @@
 
     <section class="screen" data-screen="gear">
       <section class="card daily-drop-card career-after-setup" id="gearDropOffer" hidden aria-live="polite" aria-labelledby="gearDropTitle">
-        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.211" alt="" aria-hidden="true">
+        <img class="daily-drop-pack" src="assets/cage-grind-drop-pack.png?v=2.7.212" alt="" aria-hidden="true">
         <div class="daily-drop-copy"><small id="gearDropEyebrow">ONE FREE PACK EVERY DAY</small><h2 id="gearDropTitle">DAILY DROP</h2><p id="gearDropDescription">Guaranteed collectible</p></div>
         <button class="daily" id="dailyBtn" type="button"><span id="dailyBtnLabel">CLAIM DAILY DROP</span></button>
       </section>
@@ -293,11 +290,11 @@
   </div>
 
   <nav class="bottomnav" hidden>
-    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.211" alt="" aria-hidden="true"></span>Home</button>
-    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.211" alt="" aria-hidden="true"></span>Fight</button>
-    <button class="navbtn" data-nav="gym"><span class="ni"><img src="assets/icons/nav-train.png?v=2.7.211" alt="" aria-hidden="true"></span>Gym</button>
-    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.211" alt="" aria-hidden="true"></span>Gear</button>
-    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.211" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
+    <button class="navbtn active" data-nav="home"><span class="ni"><img src="assets/icons/nav-home.png?v=2.7.212" alt="" aria-hidden="true"></span>Home</button>
+    <button class="navbtn" data-nav="fight"><span class="ni"><img src="assets/icons/nav-fight.png?v=2.7.212" alt="" aria-hidden="true"></span>Fight</button>
+    <button class="navbtn" data-nav="gym"><span class="ni"><img src="assets/icons/nav-train.png?v=2.7.212" alt="" aria-hidden="true"></span>Gym</button>
+    <button class="navbtn" data-nav="gear"><span class="ni"><img src="assets/icons/nav-gear.png?v=2.7.212" alt="" aria-hidden="true"></span>Gear</button>
+    <button class="navbtn" data-nav="feed"><span class="nav-icon-wrap"><span class="ni"><img src="assets/icons/nav-feed.png?v=2.7.212" alt="" aria-hidden="true"></span><span class="nav-badge" id="feedNavBadge" hidden>0</span></span>Feed</button>
   </nav>
 
   <div class="modal-overlay" id="retireCareerModal" aria-hidden="true">
@@ -364,7 +361,7 @@
 
   <div class="modal-overlay ceo-office-modal" id="ceoOfficeModal" aria-hidden="true">
     <div class="gig-modal ceo-office-dialog" role="dialog" aria-modal="true" aria-labelledby="ceoOfficeTitle" aria-describedby="ceoOfficeMessage">
-      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.211" alt="Cage Grind CEO seated in his office"></div>
+      <div class="ceo-office-photo"><img src="assets/cage-grind-ceo.jpg?v=2.7.212" alt="Cage Grind CEO seated in his office"></div>
       <div class="ceo-office-copy"><span>FROM THE CEO'S OFFICE · VERIFIED</span><h2 id="ceoOfficeTitle">THE CEO IS WATCHING</h2><p id="ceoOfficeMessage"></p></div>
       <div class="modal-actions single-action"><button class="modal-run" id="ceoOfficeClose" type="button">BACK TO THE GRIND</button></div>
     </div>
@@ -411,7 +408,7 @@
 
   <div id="dailyCageNews" class="modal-overlay" aria-hidden="true" hidden>
     <section class="gig-modal daily-news-dialog" role="dialog" aria-modal="true" aria-labelledby="dailyCageTitle" aria-describedby="dailyCageBody">
-      <header><img class="daily-news-ceo" src="assets/cage-grind-ceo.jpg?v=2.7.211" alt="Cage Grind CEO"><div><h2 id="dailyCageTitle">A note from the CEO</h2><small>THE DAILY CAGE</small><small data-news-date></small></div><button type="button" data-news-close aria-label="Dismiss today's CEO note">×</button></header>
+      <header><img class="daily-news-ceo" src="assets/cage-grind-ceo.jpg?v=2.7.212" alt="Cage Grind CEO"><div><h2 id="dailyCageTitle">A note from the CEO</h2><small>THE DAILY CAGE</small><small data-news-date></small></div><button type="button" data-news-close aria-label="Dismiss today's CEO note">×</button></header>
       <div class="daily-news-body"><p id="dailyCageBody" data-news-body></p><aside class="daily-news-tip"><b>PRO TIP</b><p data-news-tip></p></aside><div class="modal-actions single-action"><button type="button" class="modal-run" data-news-continue>BACK TO MY CAREER</button></div></div>
     </section>
   </div>
@@ -436,7 +433,7 @@
           <div class="opponent-profile-identity fighter-profile-visual" id="opponentProfileVisual"><div class="hero-sponsor-wallpaper" id="opponentProfileSponsorWallpaper" aria-hidden="true" hidden></div><div class="opponent-profile-portrait fighter-profile-portrait"><img id="opponentProfileAvatar" alt="Opponent portrait"></div><div class="fighter-attribute-donut" id="opponentAttributeDonut" role="img" aria-label="Attribute distribution"><div class="fighter-attribute-total" aria-hidden="true"><b class="fighter-attribute-total-value" id="opponentAttributeTotal">0</b><small>TOTAL</small></div></div></div>
           <div class="opponent-profile-stats fighter-attribute-legend" id="opponentProfileStats" aria-label="Fighter stats"></div>
           <section class="opponent-profile-skin home-fight-skin"><div class="opponent-profile-section-heading">FIGHT SKIN</div><div id="opponentProfileSkin" aria-label="Opponent Fight Skin"></div></section>
-          <div class="tape-agent-read even" id="tapeAgentRead" role="status"><img class="tape-agent-avatar" src="assets/contact-agent-carl.png?v=2.7.211" alt="Agent Carl"><small>AGENT'S READ</small><div><b id="tapeAgentHeadline">RIGHT-SIZED FIGHT</b><span id="tapeAgentMessage">A good test of your skills.</span></div></div>
+          <div class="tape-agent-read even" id="tapeAgentRead" role="status"><img class="tape-agent-avatar" src="assets/contact-agent-carl.png?v=2.7.212" alt="Agent Carl"><small>AGENT'S READ</small><div><b id="tapeAgentHeadline">RIGHT-SIZED FIGHT</b><span id="tapeAgentMessage">A good test of your skills.</span></div></div>
           <p id="opponentProfileRewards"></p><p id="opponentProfileClearance" role="status"></p>
           <div class="opponent-profile-actions"><button class="tape-action" id="opponentProfileBack" type="button">GO BACK</button><button class="tape-action fight" id="opponentProfileFight" type="button">START FIGHT</button></div>
         </section>
@@ -522,7 +519,7 @@
 
       <div class="sim-stage hidden" id="planStage">
         <div class="fight-plan-locker-room">
-          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.211" alt="Fight-night locker room prepared for the fighter">
+          <img class="fight-plan-locker-art" src="assets/focus-locker-room.jpg?v=2.7.212" alt="Fight-night locker room prepared for the fighter">
           <div class="focus-locker-label"><span>LOCKER ROOM</span><small>BUILD THE FIGHT PLAN</small></div>
           <div class="fight-plan-card">
             <span class="fight-plan-kicker">FINAL INSTRUCTIONS</span>
@@ -560,7 +557,7 @@
   <div class="modal-overlay drop-claim-modal" id="dropClaimModal" aria-hidden="true">
     <section class="drop-claim-dialog" role="dialog" aria-modal="true" aria-labelledby="dropClaimTitle" aria-describedby="dropClaimMessage">
       <header class="drop-claim-copy"><small id="dropClaimEyebrow">SEALED CAGE GRIND PACK</small><h2 id="dropClaimTitle">DROP READY</h2><p id="dropClaimMessage">Reveal your collectible.</p></header>
-      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.211" alt="Sealed Cage Grind collectible pack"></div>
+      <div class="drop-claim-stage" id="dropClaimStage"><img class="drop-claim-pack" src="assets/cage-grind-drop-pack.png?v=2.7.212" alt="Sealed Cage Grind collectible pack"></div>
       <div class="drop-claim-rewards" id="dropClaimRewards" hidden></div>
       <button class="drop-claim-action" id="dropRevealBtn" type="button">REVEAL DROP</button>
       <button class="drop-claim-action close" id="dropCloseBtn" type="button" hidden>CLOSE</button>
@@ -579,7 +576,7 @@
     <section class="result-stage result-rewards-stage" id="resultRewardsStage" aria-label="Fight rewards" hidden>
       <h3 class="result-rewards-title" id="resultRewardsTitle">REWARDS EARNED</h3>
       <div class="championship-result-status" id="championshipResultStatus" hidden role="status" aria-live="polite"></div>
-      <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.211" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
+      <div class="ceo-result-spotlight" id="ceoResultSpotlight" hidden><img src="assets/cage-grind-ceo.jpg?v=2.7.212" alt="Cage Grind CEO in his office"><div><small>FROM THE CEO'S OFFICE · VERIFIED</small><b>WELCOME TO THE SUMMIT</b><span id="ceoResultMessage"></span></div></div>
       <div class="rewards"><div class="rewardbox"><b id="rewardPrimary">+1</b><small id="rewardPrimaryLabel">Attribute Point</small></div><div class="rewardbox"><b id="rewardFans">+0</b><small id="rewardFansLabel">Followers</small></div><div class="rewardbox"><b id="rewardXp">+0</b><small id="rewardXpLabel">XP</small></div></div>
       <section class="attribute-assignment result-attribute-assignment" data-attribute-assignment data-first-win-assignment hidden aria-label="Improve your fighter" aria-live="polite">
         <header><div><small>YOUR FIRST WIN</small><h2>MAKE YOUR FIGHTER STRONGER</h2></div><b><span data-attribute-points>1</span> PT</b></header>
@@ -627,22 +624,22 @@
   </section>
 </div>
 
-<script src="js/fight-rules.js?v=2.7.211"></script>
-<script src="js/game-logic.js?v=2.7.211"></script>
-<script src="js/shared-ui.js?v=2.7.211"></script>
-<script src="js/strings.js?v=2.7.211"></script>
-<script src="js/analytics.js?v=2.7.211"></script>
-<script src="js/supabase-client.js?v=2.7.211"></script>
-<script src="js/cage-social.js?v=2.7.211"></script>
-<script src="js/landing.js?v=2.7.211"></script>
-<script src="js/fight-plan.js?v=2.7.211"></script>
-<script src="js/walkout-music.js?v=2.7.211"></script>
-<script src="js/definitions.js?v=2.7.211"></script>
-<script src="js/fight-history.js?v=2.7.211"></script>
-<script src="js/career-feedback.js?v=2.7.211"></script>
-<script src="js/pilot-sponsor.js?v=2.7.211"></script>
-<script src="js/daily-news.js?v=2.7.211"></script>
-<script src="js/game.js?v=2.7.211"></script>
-<script src="js/pwa.js?v=2.7.211"></script>
+<script src="js/fight-rules.js?v=2.7.212"></script>
+<script src="js/game-logic.js?v=2.7.212"></script>
+<script src="js/shared-ui.js?v=2.7.212"></script>
+<script src="js/strings.js?v=2.7.212"></script>
+<script src="js/analytics.js?v=2.7.212"></script>
+<script src="js/supabase-client.js?v=2.7.212"></script>
+<script src="js/cage-social.js?v=2.7.212"></script>
+<script src="js/landing.js?v=2.7.212"></script>
+<script src="js/fight-plan.js?v=2.7.212"></script>
+<script src="js/walkout-music.js?v=2.7.212"></script>
+<script src="js/definitions.js?v=2.7.212"></script>
+<script src="js/fight-history.js?v=2.7.212"></script>
+<script src="js/career-feedback.js?v=2.7.212"></script>
+<script src="js/pilot-sponsor.js?v=2.7.212"></script>
+<script src="js/daily-news.js?v=2.7.212"></script>
+<script src="js/game.js?v=2.7.212"></script>
+<script src="js/pwa.js?v=2.7.212"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@ test('unfinished builds resume once and stop landing refresh; new and completed 
 function builderHarness(state){
  const ctx={state,LOGIC,fighterCities:[{id:'phoenix',name:'PHOENIX'},{id:'boston',name:'BOSTON'}],fighterAvatars:[{id:'fighter-01'},{id:'fighter-02'}],rint:(a,b)=>b,validFighterAllocation:LOGIC.validFighterAllocation,trackEvent(){},sfx:{win(){},tap(){}},confettiBurst(){},toast(){},updateUI(){},requestAnimationFrame:fn=>fn(),$:()=>({focus(){},setAttribute(){}})};
  ctx.currentCity=()=>ctx.fighterCities.find(c=>c.id===state.fighterCity);
- vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function prepareCareerBuilder('),source.indexOf('  function stepFighterAvatar(')),ctx);
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function prepareCareerBuilder('),source.indexOf('  function randomFighterAvatar(')),ctx);
  return ctx;
 }
 test('ready-made build is editable before acceptance and preserves saved drafts',()=>{
