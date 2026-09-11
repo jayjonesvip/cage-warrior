@@ -42,10 +42,9 @@
         p_losses:profile.losses
       });
       const base=Array.isArray(data)?data[0]||null:data;
-      if(database.saveCombatStats&&profile.combatStats)try{await database.saveCombatStats(profile.combatStats)}catch{/* Retry on the next career sync. */}
-      if(database.syncCageFightSkin)try{await database.syncCageFightSkin(profile.fightSkinAura||0)}catch(error){/* Cosmetic sync must not block career updates. */}
-      const ranked=await database.syncCageRanking({p_attribute_total:profile.attributeTotal,p_ranking_history:profile.rankingHistory,p_draws:profile.draws||0});
-      return Array.isArray(ranked)?ranked[0]||base:ranked||base;
+      // Career sync publishes stats after the caller commits the reserved identity locally.
+      // Keep optional sync out of name claiming so it cannot delay or fail a successful claim.
+      return base;
     }
 
     async function retireProfile(){

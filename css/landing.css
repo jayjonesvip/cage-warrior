@@ -23,3 +23,18 @@ body.landing-active #app{visibility:hidden;pointer-events:none}
 @media (max-width:500px){.landing-page{padding:14px}.landing-watermark{width:min(94vw,460px)}.landing-card{padding:34px 22px;border-radius:18px}.landing-logo{width:min(82%,300px);margin-bottom:15px}.landing-eyebrow{margin-bottom:18px;font-size:10px}.landing-card h1,.landing-page[data-mode="building"] .landing-card h1{font-size:clamp(48px,15vw,68px)}.landing-page[data-mode="returning"] .landing-card h1{font-size:clamp(42px,13vw,58px)}.landing-description{margin:23px auto 30px;font-size:16px;line-height:1.55}.landing-enter{display:block;width:100%;padding-inline:18px}.landing-details{gap:8px;font-size:10px}.landing-details i{width:3px;height:3px}.landing-origin{margin-top:18px;font-size:10px}}
 @media (max-width:360px){.landing-card{padding:34px 18px}.landing-card h1,.landing-page[data-mode="returning"] .landing-card h1,.landing-page[data-mode="building"] .landing-card h1{font-size:clamp(42px,14vw,54px)}.landing-details{font-size:9px}}
 @media (prefers-reduced-motion:reduce){.landing-page,.landing-enter{transition:none}.landing-enter:hover{transform:none}}
+
+/* Show the fighter and shared cage without delaying career entry. */
+.landing-page{align-items:start;padding-block:24px}.landing-card{margin:auto;padding:28px;width:min(100%,720px)}
+.landing-logo{width:170px;margin-bottom:12px}.landing-eyebrow{margin-bottom:16px;font:800 10px system-ui,sans-serif;letter-spacing:.12em}
+.landing-hero{display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;gap:20px;margin-bottom:22px;text-align:left}
+.landing-card h1{font-size:clamp(40px,7vw,70px);line-height:.98;letter-spacing:-.04em}.landing-description{margin:16px 0 0;font:15px/1.5 system-ui,sans-serif}
+.landing-fighter{margin:0;min-width:0}.landing-fighter img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border:1px solid #376788;border-radius:16px;background:#07121d;box-shadow:0 8px 30px #0008}
+.landing-fighter figcaption{margin-top:8px;color:#84b8df;font:800 9px/1.4 system-ui,sans-serif;text-align:center;letter-spacing:.06em}
+.landing-enter{width:100%}.landing-details{margin-top:16px;font-size:10px;gap:10px}.landing-world{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;text-align:left}
+.landing-champion,.landing-activity{min-width:0;padding:14px;border:1px solid #294158;border-radius:12px;background:#050d17}
+.landing-champion{border-color:#766331;background:linear-gradient(135deg,#2b2415,#08111c)}.landing-world small{display:block;color:#e5c773;font:800 10px system-ui,sans-serif;letter-spacing:.08em}
+.landing-champion b{display:block;margin:8px 0;color:#fff;font:800 16px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}.landing-world span{display:block;color:#a6b7ca;font:11px/1.5 system-ui,sans-serif}
+.landing-activity small{color:#7fcaff}.landing-activity p{margin:8px 0;color:#e2eaf3;font:13px/1.45 system-ui,sans-serif;overflow-wrap:anywhere}.landing-activity span{font-size:10px}.landing-origin{margin-top:17px;font-size:9px}
+.landing-page[data-mode="returning"] .landing-hero{grid-template-columns:1fr}.landing-page[data-mode="returning"] .landing-fighter{display:none}.landing-page[data-mode="returning"] .landing-hero-copy{text-align:center}
+@media(max-width:500px){.landing-page{padding:12px}.landing-card{padding:20px 16px}.landing-logo{width:140px}.landing-hero{grid-template-columns:minmax(0,1fr) 112px;gap:12px}.landing-card h1{font-size:clamp(32px,8.7vw,43px)}.landing-description{margin-top:12px;font-size:13px}.landing-world{grid-template-columns:1fr;gap:10px;margin-top:18px}.landing-fighter figcaption{font-size:8px}.landing-links{gap:0 14px}.landing-details{font-size:9px;gap:7px}}

@@ -499,7 +499,7 @@ test('occasional post-fight texts use the established contact portraits',()=>{
   assert.match(game,/const notable=titleWon\|\|titleFight\|\|\(won&&winStreak>0&&winStreak%5===0\)/);
   assert.match(game,/pendingPostFightText=selectPostFightText\(\{firstCareerWin,won:win,forfeited:!!fight\.forfeited,lowerLevelWin,titleWon,titleFight:!!o\.globalChampionship/);
   assert.match(game,/if\(forfeited\|\|\(lowerLevelWin&&!firstWin\)\|\|!contacts\.length\)return null/);
-  assert.match(game,/function showPostFightFollowup\(\)\{if\(postFightPresentationBusy\(\)\)return false;if\(showPendingPostFightText\(\)\)return true/);
+  assert.match(game,/function showPostFightFollowup\(\)\{if\(postFightPresentationBusy\(\)\)return false;if\(showPendingSponsor\(\)\)return true/);
   assert.match(html,/id="postFightMessageInput"[^>]*placeholder="Replies unavailable"[^>]*disabled/);
   assert.doesNotMatch(html,/id="postFightMessageSend"/);
   assert.doesNotMatch(game,/sendPostFightTextReply|post_fight_text_replied/);

@@ -33,12 +33,44 @@ test('first win always selects a personal message even when the random roll woul
 });
 
 test('result upgrade spends and saves exactly one permanent point and rejects a second click',()=>{
- const nodes=new Map(),$=key=>{if(!nodes.has(key))nodes.set(key,{focus(){this.focused=true}});return nodes.get(key)};
+ const nodes=new Map(),$=key=>{if(!nodes.has(key))nodes.set(key,{getAttribute(){return null},focus(){this.focused=true}});return nodes.get(key)};
  let saves=0,updates=0;
- const ctx={$,LOGIC,state:career(),fight:{firstCareerWin:true},saveState:()=>saves++,flashAttributeStats(){},trackEvent(){},sfx:{level(){}},toast(){},updateUI:()=>updates++};
- vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function assignAttribute('),source.indexOf('  function ensureFighterDraft(')),ctx);
+ const ctx={$,LOGIC,state:career(),fight:{firstCareerWin:true,firstWinUpgradeRequired:true},saveState:()=>saves++,flashAttributeStats(){},trackEvent(){},sfx:{level(){}},toast(){},updateUI:()=>updates++};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  function firstWinUpgradePending('),source.indexOf('  async function shareContent(')),ctx);vm.runInContext(source.slice(source.indexOf('  function assignAttribute('),source.indexOf('  function ensureFighterDraft(')),ctx);
  ctx.assignAttribute('power');ctx.assignAttribute('power');
  assert.equal(ctx.state.stats.power,6);assert.equal(ctx.state.attributePoints,0);assert.equal(saves,1);assert.equal(updates,1);
- assert.equal($('#continueBtn').focused,true);assert.match($('#postFightTutorialReward').textContent,/Upgrade saved/);
+ assert.equal($('#continueBtn').focused,true);assert.match($('#postFightTutorialReward').textContent,/\+1 POWER added/);
  const restored=JSON.parse(JSON.stringify(ctx.state));assert.equal(restored.stats.power,6);assert.equal(restored.attributePoints,0);
+});
+
+function upgradeGateHarness(){
+ const nodes=new Map(),$=key=>{if(!nodes.has(key))nodes.set(key,{attrs:{},classList:{toggle(name,on){this[name]=on}},getAttribute(key){return this.attrs[key]},setAttribute(key,value){this.attrs[key]=value},focus(){this.focused=true}});return nodes.get(key)};
+ const claim=$('#continueBtn'),choice=$('[data-first-win-assignment] [data-assign-attribute]');
+ const ctx={$,LOGIC,state:career(),fight:{firstCareerWin:true,firstWinUpgradeRequired:true},$$:()=>[claim,choice],requestAnimationFrame:fn=>fn(),saveState(){},flashAttributeStats(){},trackEvent(){},sfx:{level(){}},toast(){}};
+ ctx.updateUI=()=>ctx.renderFirstWinUpgradeGate();
+ vm.createContext(ctx);
+ for(const [start,end] of [['  function firstWinUpgradePending(','  async function shareContent('],['  function setRewardClaimReady(','  function resetRewardAnimations('],['  function assignAttribute(','  function ensureFighterDraft('],['  function closeResult(','  function closeDropClaim(']])vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end)),ctx);
+ $('#resultRewardsStage').hidden=false;
+ return {ctx,$,claim,choice};
+}
+
+test('reward animation enables attribute choices but cannot unlock first-win Claim Rewards',()=>{
+ const {ctx,$,claim,choice}=upgradeGateHarness();
+ ctx.armResultAction('CLAIM REWARDS');assert.equal(claim.disabled,true);
+ ctx.setRewardClaimReady(false);assert.equal(claim.disabled,true);assert.equal(choice.disabled,true);
+ ctx.setRewardClaimReady(true);assert.equal(claim.disabled,true);assert.equal(choice.disabled,false);assert.equal(choice.focused,true);
+ assert.equal($('#firstWinUpgradeHint').textContent,'Choose an attribute to continue');assert.equal($('#resultRewardsStage').classList['first-win-upgrade-pending'],true);
+ ctx.closeResult();assert.equal(ctx.fight.firstWinUpgradeRequired,true);
+ ctx.assignAttribute('speed');assert.equal(claim.disabled,false);assert.equal(claim.focused,true);
+ assert.equal($('#firstWinUpgradeHint').textContent,'+1 SPEED added');assert.equal($('#resultRewardsStage').classList['first-win-upgrade-pending'],false);assert.equal(ctx.state.stats.speed,6);
+ ctx.setRewardClaimReady(true);assert.equal(claim.disabled,false);
+});
+
+test('one first-win upgrade is enough even with banked points; later wins and zero-point awards stay claimable',()=>{
+ const {ctx,claim}=upgradeGateHarness();
+ ctx.state.attributePoints=3;ctx.setRewardClaimReady(true);assert.equal(claim.disabled,true);
+ ctx.assignAttribute('chin');assert.equal(ctx.state.attributePoints,2);assert.equal(claim.disabled,false);
+ for(const [fight,points] of [[{firstCareerWin:false,firstWinUpgradeRequired:false},4],[{firstCareerWin:true,firstWinUpgradeRequired:false},1],[{firstCareerWin:true,firstWinUpgradeRequired:true},0],[null,2]]){
+  ctx.fight=fight;ctx.state.attributePoints=points;ctx.setRewardClaimReady(true);assert.equal(claim.disabled,false);
+ }
 });
