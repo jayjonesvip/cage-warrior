@@ -533,13 +533,13 @@
     if(fighterLevel>=requiredLevel)return {status:'eligible',headline:'TITLE SHOT AVAILABLE',action:'CHALLENGE FOR TITLE',disabled:false};
     return {status:'locked',headline:'WORLD TITLE SHOT LOCKED',action:`REACH LEVEL ${requiredLevel}`,disabled:true};
   }
-  function championshipSettlementPresentation({status='',mode='challenge',isChampion=false,defenses=0,championHandle='' }={}){
-    if(status==='stale')return {heading:'CHAMPIONSHIP CHANGED',message:'The belt changed before this result could transfer it.'};
-    if(status==='expired')return {heading:'TITLE RESULT EXPIRED',message:'The championship was not changed.'};
-    if(status==='champion_defended')return mode==='defense'?{heading:'TITLE DEFENDED',message:`${nonNegativeWhole(defenses)} SUCCESSFUL DEFENSE${nonNegativeWhole(defenses)===1?'':'S'} · NEXT CHALLENGER AVAILABLE TOMORROW`}:{heading:'TITLE FIGHT LOST',message:'The reigning champion kept the belt.'};
-    if(status==='new_champion'&&isChampion)return mode==='rematch'?{heading:'TITLE RECLAIMED',message:'You took back the World Championship.'}:{heading:'YOU ARE WORLD CHAMPION',message:'The World Championship is yours.'};
-    if(status==='new_champion')return {heading:'YOU LOST THE WORLD TITLE',message:`@${String(championHandle||'THE NEW CHAMPION')} took the belt. TITLE REMATCH AVAILABLE TOMORROW.`};
-    return {heading:'CHAMPIONSHIP RESULT SETTLED',message:'The official championship record is updated.'};
+  function championshipSettlementPresentation({status='',mode='challenge',defenses,championHandle=''}={}){
+    if(status==='stale')return {outcome:'neutral',heading:'CHAMPIONSHIP CHANGED',message:'The belt changed before this result could transfer it.'};
+    if(status==='expired')return {outcome:'neutral',heading:'TITLE RESULT EXPIRED',message:'The championship was not changed.'};
+    if(status==='champion_defended')return mode==='defense'?{outcome:'win',heading:'TITLE DEFENDED',message:`${defenses==null?'The belt stays with you.':`${nonNegativeWhole(defenses)} SUCCESSFUL DEFENSE${nonNegativeWhole(defenses)===1?'':'S'}`} · NEXT CHALLENGER AVAILABLE TOMORROW`}:{outcome:'loss',heading:'TITLE FIGHT LOST',message:'The reigning champion kept the belt.'};
+    if(status==='new_champion'&&mode!=='defense')return mode==='rematch'?{outcome:'win',heading:'TITLE RECLAIMED',message:'You took back the World Championship.'}:{outcome:'win',heading:'YOU ARE WORLD CHAMPION',message:'The World Championship is yours.'};
+    if(status==='new_champion')return {outcome:'loss',heading:'YOU LOST THE WORLD TITLE',message:`${championHandle?`@${String(championHandle).replace(/^@/,'')}`:'Your challenger'} took the belt. TITLE REMATCH AVAILABLE TOMORROW.`};
+    return {outcome:'neutral',heading:'CHAMPIONSHIP RESULT SETTLED',message:'The official championship record is updated.'};
   }
   function networkOpponentRatings(tier,avatarStats={},archetypeMods={},difficulty=0){
     const base=generatedOpponentBaseRating(tier),variance=clamp(finite(difficulty),-.7,.7),ratings={};
