@@ -104,11 +104,11 @@ test('Home progression heading is concise and content cannot widen its scroll ar
   assert.match(styles,/\.home-career-scroll \.home-profile-section-heading\{[^}]*flex-wrap:wrap;white-space:normal/);
 });
 
-test('game pages use four typography tokens without targeting landing pages or modals',()=>{
+test('game pages and shared profile headers use four typography tokens without targeting whole modals',()=>{
   const start=styles.indexOf('/* Four-size typography'),end=styles.indexOf('\n.open-gym-impact',start);
   const typography=styles.slice(start,end<0?undefined:end);
   assert.match(typography,/--type-heading:13px;--type-subheading:11px;--type-normal:10px;--type-small:9px/);
-  assert.match(typography,/#app :is\(\.screen,\.topbar,\.resource-hud,\.bottomnav\)/);
+  assert.match(typography,/#app :is\(\.screen,\.topbar,\.resource-hud,\.bottomnav,\.fighter-profile-header\)/);
   assert.match(typography,/font-size:var\(--game-text-size\)!important/);
   assert.match(typography,/--game-text-size:var\(--type-small\)/);
   assert.match(typography,/--game-text-size:var\(--type-subheading\)/);
@@ -723,7 +723,7 @@ test('Home presents Career Progression in XP, Aura, Sponsor, Victory Pack, and D
 
 test('Home uses one fixed Fighter Profile card with section headers, internal scroll, and coach footer',()=>{
   assert.match(html,/class="card build-card home-career-card page-card" id="careerGameContent"/);
-  assert.match(html,/class="card-title career-after-setup"><span class="page-title-copy"><b>Fighter Profile<\/b>/);
+  assert.match(html,/class="card-title career-after-setup fighter-profile-header"><span class="page-title-copy"><b id="homeProfileName">ROOKIE<\/b>/);
   assert.match(html,/class="home-profile-meta"><span id="cageStatus">/);
   assert.doesNotMatch(html,/<div class="rank-chip">/);
   assert.match(html,/id="careerIdentityCard">\s*<div class="page-subhead-section">\s*<div class="page-subhead home-profile-section-heading"><b>CAREER IDENTITY<\/b><span>CAREER DETAILS<\/span><\/div>/);
