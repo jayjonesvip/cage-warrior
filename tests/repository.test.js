@@ -322,7 +322,7 @@ test('fighter-name shuffle is a compact action beside the proposed name',()=>{
   assert.match(html,/class="fighter-name-draft-row"[\s\S]*class="fighter-name-preview"[\s\S]*id="fighterNameSuggestion"[\s\S]*id="newFighterNameBtn"/);
   assert.match(html,/id="newFighterNameBtn"[^>]*aria-label="Shuffle fighter name"/);
   assert.doesNotMatch(html,/>SHUFFLE NAME</);
-  assert.match(styles,/\.fighter-name-draft-row\{[^}]*grid-template-columns:minmax\(0,1fr\) 40px[^}]*align-items:stretch/);
+  assert.match(styles,/\.fighter-name-draft-row\{[^}]*grid-template-columns:minmax\(0,1fr\) 60px[^}]*align-items:stretch/);
   assert.match(styles,/\.fighter-name-shuffle\{[^}]*min-height:74px/);
 });
 

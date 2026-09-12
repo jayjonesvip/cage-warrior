@@ -27,8 +27,8 @@
     if(!championship)return championship;
     if(championship.is_champion===true||isCurrentChampion(championship,state))return Object.assign({},championship,{is_champion:true,challenge_eligible:false,rematch_blocked:false,level_eligible:true,daily_bout_used:false,eligibility_status:'champion',former_champion:false,former_champion_rematch:false});
     if(!championship.champion_id)return championship;
-    const blocked=championship.daily_bout_used===true||championship.rematch_blocked===true;
-    return Object.assign({},championship,{level_eligible:true,challenge_eligible:!blocked,eligibility_status:blocked?championship.eligibility_status:'eligible'});
+    const rematch=championship.former_champion_rematch===true,blocked=!rematch&&(championship.daily_bout_used===true||championship.rematch_blocked===true);
+    return Object.assign({},championship,{level_eligible:true,challenge_eligible:!blocked,rematch_blocked:blocked,eligibility_status:rematch?'former_champion_rematch':blocked?championship.eligibility_status:'eligible'});
   }
 
   function championshipCardModel({championship,state={},loaded=false,unavailable=false}={}){
