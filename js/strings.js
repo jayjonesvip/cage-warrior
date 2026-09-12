@@ -149,8 +149,8 @@ opponentNames: {
 
   social: {
     profiles: {
-      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.220',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
-      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.220',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
+      media: {author:'CageReporter',handle:'@CageReporter',tone:'media',avatar:'assets/cage-reporter.jpg?v=2.7.221',verified:true,bio:'Cage Grind’s official fight desk. Publishes contract signings and official fight results.'},
+      ceo: {author:'Cage Grind CEO',handle:'@CageGrindCEO',tone:'ceo',avatar:'assets/cage-grind-ceo.jpg?v=2.7.221',verified:true,bio:'Founder and CEO of Cage Grind. Builds the cards, signs the title fights, and decides which performances deserve the biggest stage.'},
       promoter: {author:'Mack Vale',handle:'@MackMakesFights',tone:'promoter'},
       gym: {author:'Iron District Gym',handle:'@IronDistrict',tone:'gym'},
       rival: {author:'Fight Night Rival',handle:'@NoEasyRounds',tone:'rival'}
@@ -183,6 +183,22 @@ opponentNames: {
     sponsorReturning:'Welcome back, @{name}. Your following is above the {brand} milestone again, and the partnership is back on.',
     sponsorDropped:'{brand} has dropped @{name} after the fighter fell below its follower requirement. Rebuild the audience and the door can reopen.',
   cycles: {
+  fightingHurt: {
+    win: [
+      {profile:'media',text:'Fighting hurt, still finding a way to win. '},
+      {profile:'media',text:'Hurt before the bell, victorious after it. '},
+      {profile:'media',text:'Not fully healed, but the hand still goes up. '},
+      {profile:'media',text:'Fighting hurt couldn’t keep this fighter down. '},
+      {profile:'media',text:'Entered hurt. Left with the win. '}
+    ],
+    loss: [
+      {profile:'media',text:'Fighting hurt, and the result went against them. '},
+      {profile:'media',text:'Already hurt before the bell; now a loss to absorb. '},
+      {profile:'media',text:'Came in hurt and couldn’t find the win. '},
+      {profile:'media',text:'Fighting hurt ended in another hard night. '},
+      {profile:'media',text:'Hurt on arrival, beaten in the cage. '}
+    ]
+  },
   fightWin: [
     {profile:'media', text:'RESULT: {name} defeats {opponent} by {finish}. Clean result, no excuses.{titleSuffix}'},
     {profile:'media', text:'{name} takes the win over {opponent} by {finish}. That was control, not luck.{titleSuffix}'},
